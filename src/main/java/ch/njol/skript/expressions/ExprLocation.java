@@ -21,6 +21,8 @@
 
 package ch.njol.skript.expressions;
 
+import java.lang.reflect.Array;
+
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;

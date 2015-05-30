@@ -108,7 +108,7 @@ public class EffPotion extends Effect {
 			final Timespan dur = duration.getSingle(e);
 			if (dur == null)
 				return;
-			d = dur.getTicks();
+			d = (int) (dur.getTicks() >= Integer.MAX_VALUE ? Integer.MAX_VALUE: dur.getTicks());
 		}
 		for (final LivingEntity en : entities.getArray(e)) {
 			for (final PotionEffectType t : ts) {

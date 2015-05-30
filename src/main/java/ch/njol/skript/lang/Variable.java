@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -376,12 +377,11 @@ public class Variable<T> implements Expression<T> {
 						i++;
 					}
 				} else {
-//					final ClassInfo<?> ci = delta == null ? null : Classes.getSuperClassInfo(delta.getClass());
-//					if (ci != null && ci.getSerializeAs() != null) {
-//						set(e, Converters.convert(delta, ci.getSerializeAs()));
-//					} else {
+					//Mirre Start, Location bug fix.
+					if(delta[0] instanceof Location)
+						set(e, ((Location)delta[0]).clone());
+					//Mirre End
 					set(e, delta[0]);
-//					}
 				}
 				break;
 			case RESET:

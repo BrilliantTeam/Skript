@@ -36,6 +36,7 @@ import ch.njol.yggdrasil.YggdrasilSerializable;
 
 /**
  * @author Peter Güttinger
+ * @edited by Mirreducki. Changed int to long.
  */
 public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { // REMIND unit
 
@@ -45,8 +46,8 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 	private final static Noun m_hour = new Noun("time.hour");
 	private final static Noun m_day = new Noun("time.day");
 	final static Noun[] names = {m_tick, m_second, m_minute, m_hour, m_day};
-	final static int[] times = {50, 1000, 1000 * 60, 1000 * 60 * 60, 1000 * 60 * 60 * 24};
-	final static HashMap<String, Integer> parseValues = new HashMap<String, Integer>();
+	final static long[] times = {50, 1000, 1000 * 60, 1000 * 60 * 60, 1000 * 60 * 60 * 24};
+	final static HashMap<String, Long> parseValues = new HashMap<String, Long>();
 	static {
 		Language.addListener(new LanguageChangeListener() {
 			@Override
@@ -68,7 +69,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 		boolean isMinecraftTimeSet = false;
 		if (s.matches("^\\d+:\\d\\d(:\\d\\d)?(\\.\\d{1,4})?$")) { // MM:SS[.ms] or HH:MM:SS[.ms]
 			final String[] ss = s.split("[:.]");
-			final int[] times = {1000 * 60 * 60, 1000 * 60, 1000, 1}; // h, m, s, ms
+			final long[] times = {1000 * 60 * 60, 1000 * 60, 1000, 1}; // h, m, s, ms
 			final int offset = ss.length == 3 && !s.contains(".") || ss.length == 4 ? 0 : 1;
 			for (int i = 0; i < ss.length; i++) {
 				t += times[offset + i] * Utils.parseInt("" + ss[i]);
@@ -111,7 +112,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 				if (sub.endsWith(","))
 					sub = sub.substring(0, sub.length() - 1);
 				
-				final Integer d = parseValues.get(sub.toLowerCase());
+				final Long d = parseValues.get(sub.toLowerCase());
 				if (d == null)
 					return null;
 				
@@ -147,7 +148,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 		return millis;
 	}
 	
-	public int getTicks() {
+	public long getTicks() {
 		return Math.round(millis / 50f);
 	}
 	
@@ -161,11 +162,11 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 	}
 	
 	@SuppressWarnings("unchecked")
-	final static NonNullPair<Noun, Integer>[] simpleValues = new NonNullPair[] {
-			new NonNullPair<Noun, Integer>(m_day, 1000 * 60 * 60 * 24),
-			new NonNullPair<Noun, Integer>(m_hour, 1000 * 60 * 60),
-			new NonNullPair<Noun, Integer>(m_minute, 1000 * 60),
-			new NonNullPair<Noun, Integer>(m_second, 1000)
+	final static NonNullPair<Noun, Long>[] simpleValues = new NonNullPair[] {
+			new NonNullPair<Noun, Long>(m_day, (long) (1000 * 60 * 60 * 24)),
+			new NonNullPair<Noun, Long>(m_hour, (long) (1000 * 60 * 60)),
+			new NonNullPair<Noun, Long>(m_minute, (long) (1000 * 60)),
+			new NonNullPair<Noun, Long>(m_second, (long) 1000)
 	};
 	
 	public static String toString(final long millis) {
@@ -187,7 +188,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 		return toString(1. * millis / simpleValues[simpleValues.length - 1].getSecond(), simpleValues[simpleValues.length - 1], flags);
 	}
 	
-	private static String toString(final double amount, final NonNullPair<Noun, Integer> p, final int flags) {
+	private static String toString(final double amount, final NonNullPair<Noun, Long> p, final int flags) {
 		return p.getFirst().withAmount(amount, flags);
 	}
 	
@@ -201,7 +202,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (millis ^ (millis >>> 32));
+		result = prime * result + (int) (millis/Integer.MAX_VALUE);
 		return result;
 	}
 	

@@ -76,7 +76,6 @@ import ch.njol.skript.classes.data.SkriptClasses;
 import ch.njol.skript.command.Commands;
 import ch.njol.skript.doc.Documentation;
 import ch.njol.skript.events.EvtSkript;
-import ch.njol.skript.hooks.Hook;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
@@ -295,41 +294,6 @@ public final class Skript extends JavaPlugin implements Listener {
 			public void run() {
 				assert Bukkit.getWorlds().get(0).getFullTime() == tick;
 				
-				// load hooks
-				try {
-					final JarFile jar = new JarFile(getFile());
-					try {
-						for (final JarEntry e : new EnumerationIterable<JarEntry>(jar.entries())) {
-							if (e.getName().startsWith("ch/njol/skript/hooks/") && e.getName().endsWith("Hook.class") && StringUtils.count("" + e.getName(), '/') <= 5) {
-								final String c = e.getName().replace('/', '.').substring(0, e.getName().length() - ".class".length());
-								try {
-									final Class<?> hook = Class.forName(c, true, getClassLoader());
-									if (hook != null && Hook.class.isAssignableFrom(hook) && !hook.isInterface() && Hook.class != hook) {
-										hook.getDeclaredConstructor().setAccessible(true);
-										hook.getDeclaredConstructor().newInstance();
-									}
-								} catch (final ClassNotFoundException ex) {
-									Skript.exception(ex, "Cannot load class " + c);
-								} catch (final ExceptionInInitializerError err) {
-									Skript.exception(err.getCause(), "Class " + c + " generated an exception while loading");
-								}
-								continue;
-//							} else if (Documentation.generate) {
-//								try {
-//									Class.forName(e.getName().replace('/', '.').substring(0, e.getName().length() - ".class".length()), true, getClassLoader());
-//								} catch (final Exception ex) {}
-							}
-						}
-					} finally {
-						try {
-							jar.close();
-						} catch (final IOException e) {}
-					}
-				} catch (final Exception e) {
-					error("Error while loading plugin hooks" + (e.getLocalizedMessage() == null ? "" : ": " + e.getLocalizedMessage()));
-					if (testing())
-						e.printStackTrace();
-				}
 				
 				Language.setUseLocal(false);
 				

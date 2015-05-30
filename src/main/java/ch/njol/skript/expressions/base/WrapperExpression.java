@@ -44,6 +44,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 public abstract class WrapperExpression<T> extends SimpleExpression<T> {
+	
 	private Expression<? extends T> expr;
 	
 	@SuppressWarnings("null")

@@ -93,12 +93,10 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 			s = "" + m.group(1);
 			i = Utils.parseInt("" + m.group(2));
 		}
-		System.out.println("I:" + i);
 		final Class<?> c = Classes.getClassFromUserInput(s);
 		int j = 1;
 		Loop loop = null;
 		for (final Loop l : ScriptLoader.currentLoops) {
-			System.out.println(s);
 			if ((c != null && c.isAssignableFrom(l.getLoopedExpression().getReturnType())) || l.getLoopedExpression().isLoopOf(s)) {
 				if (j < i) {
 					j++;
