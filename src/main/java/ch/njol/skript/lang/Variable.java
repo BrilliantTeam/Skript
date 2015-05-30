@@ -470,8 +470,10 @@ public class Variable<T> implements Expression<T> {
 								final Class<?> c = d.getClass();
 								assert c != null;
 								ci = Classes.getSuperClassInfo(c);
-								if (ci.getMath() != null)
+								//Mirre Start
+								if (ci.getMath() != null || d instanceof Number)
 									o = d;
+								//Mirre End
 								changed = true;
 								continue;
 							}
