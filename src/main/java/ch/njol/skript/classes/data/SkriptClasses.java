@@ -419,7 +419,7 @@ public class SkriptClasses {
 					@Nullable
 					public Timespan deserialize(final String s) {
 						try {
-							return new Timespan(Integer.parseInt(s));
+							return new Timespan(Long.parseLong(s));
 						} catch (final NumberFormatException e) {
 							return null;
 						}

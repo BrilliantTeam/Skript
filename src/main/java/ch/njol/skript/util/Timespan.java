@@ -36,7 +36,7 @@ import ch.njol.yggdrasil.YggdrasilSerializable;
 
 /**
  * @author Peter Güttinger
- * @edited by Mirreducki. Changed int to long.
+ * @edited by Mirreducki. Increased maximum timespan.
  */
 public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { // REMIND unit
 
@@ -46,7 +46,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 	private final static Noun m_hour = new Noun("time.hour");
 	private final static Noun m_day = new Noun("time.day");
 	final static Noun[] names = {m_tick, m_second, m_minute, m_hour, m_day};
-	final static long[] times = {50, 1000, 1000 * 60, 1000 * 60 * 60, 1000 * 60 * 60 * 24};
+	final static long[] times = {50L, 1000L, 1000L * 60L, 1000L * 60L * 60L, 1000L * 60L * 60L * 24L};
 	final static HashMap<String, Long> parseValues = new HashMap<String, Long>();
 	static {
 		Language.addListener(new LanguageChangeListener() {
@@ -69,10 +69,11 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 		boolean isMinecraftTimeSet = false;
 		if (s.matches("^\\d+:\\d\\d(:\\d\\d)?(\\.\\d{1,4})?$")) { // MM:SS[.ms] or HH:MM:SS[.ms]
 			final String[] ss = s.split("[:.]");
-			final long[] times = {1000 * 60 * 60, 1000 * 60, 1000, 1}; // h, m, s, ms
+			final long[] times = {1000L * 60L * 60L, 1000L * 60L, 1000L, 1L}; // h, m, s, ms
+			
 			final int offset = ss.length == 3 && !s.contains(".") || ss.length == 4 ? 0 : 1;
 			for (int i = 0; i < ss.length; i++) {
-				t += times[offset + i] * Utils.parseInt("" + ss[i]);
+				t += times[offset + i] * Utils.parseLong("" + ss[i]);	
 			}
 		} else {
 			final String[] subs = s.toLowerCase().split("\\s+");
@@ -85,7 +86,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 					continue;
 				}
 				
-				float amount = 1;
+				double amount = 1;
 				if (Noun.isIndefiniteArticle(sub)) {
 					if (i == subs.length - 1)
 						return null;
@@ -94,7 +95,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 				} else if (sub.matches("^\\d+(.\\d+)?$")) {
 					if (i == subs.length - 1)
 						return null;
-					amount = Float.parseFloat(sub);
+					amount = Double.parseDouble(sub);
 					sub = subs[++i];
 				}
 				
@@ -163,10 +164,10 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 	
 	@SuppressWarnings("unchecked")
 	final static NonNullPair<Noun, Long>[] simpleValues = new NonNullPair[] {
-			new NonNullPair<Noun, Long>(m_day, (long) (1000 * 60 * 60 * 24)),
-			new NonNullPair<Noun, Long>(m_hour, (long) (1000 * 60 * 60)),
-			new NonNullPair<Noun, Long>(m_minute, (long) (1000 * 60)),
-			new NonNullPair<Noun, Long>(m_second, (long) 1000)
+			new NonNullPair<Noun, Long>(m_day,  1000L * 60 * 60 * 24),
+			new NonNullPair<Noun, Long>(m_hour, 1000L * 60 * 60),
+			new NonNullPair<Noun, Long>(m_minute, 1000L * 60),
+			new NonNullPair<Noun, Long>(m_second, 1000L)
 	};
 	
 	public static String toString(final long millis) {
