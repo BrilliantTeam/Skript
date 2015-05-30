@@ -151,6 +151,9 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ PLUGIN ================
 	
+	@SuppressWarnings({"unused"})
+	private static String MIRRE = "MIRRE";
+	
 	@Nullable
 	private static Skript instance = null;
 	

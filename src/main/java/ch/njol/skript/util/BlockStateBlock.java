@@ -385,5 +385,11 @@ public class BlockStateBlock implements Block {
 		}
 		return loc;
 	}
+
+	@Override
+	public void setType(Material arg0, boolean arg1) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

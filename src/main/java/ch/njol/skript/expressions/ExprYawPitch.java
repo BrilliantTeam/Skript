@@ -22,7 +22,9 @@
 package ch.njol.skript.expressions;
 
 import org.bukkit.Location;
+import org.bukkit.event.Event;
 
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -31,6 +33,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * @author Peter Güttinger
@@ -40,6 +43,9 @@ import ch.njol.util.Kleenean;
 @Examples("log \"%player%: %location of player%, %player's yaw%, %player's pitch%\" to \"playerlocs.log\"")
 @Since("2.0")
 public class ExprYawPitch extends SimplePropertyExpression<Location, Float> {
+	
+	public static boolean randomSK = true;
+	
 	static {
 		register(ExprYawPitch.class, Float.class, "(0¦yaw|1¦pitch)", "locations");
 	}
@@ -67,5 +73,50 @@ public class ExprYawPitch extends SimplePropertyExpression<Location, Float> {
 	protected String getPropertyName() {
 		return yaw ? "yaw" : "pitch";
 	}
+	
+	@SuppressWarnings({"unchecked", "null"})
+		@Override
+		public Class<?>[] acceptChange(final ChangeMode mode) {
+			if (mode == ChangeMode.SET || mode == ChangeMode.ADD || mode == ChangeMode.REMOVE)
+				return CollectionUtils.array(Float.class);
+			return null;
+		}
+	
+		@SuppressWarnings({"incomplete-switch", "null"})
+		@Override
+		public void change(Event e, Object[] delta, ChangeMode mode) {
+			Location l = getExpr().getSingle(e);
+			Float f = (Float) delta[0];
+			switch (mode) {
+				case SET:
+					if (yaw)
+						l.setYaw(convertToPositive(f));
+					else
+						l.setPitch(f);
+						break;
+				case ADD:
+					if (yaw)
+						l.setYaw(convertToPositive(l.getYaw()) + f);
+					else
+						l.setPitch(l.getPitch() + f);
+					break;
+				case REMOVE:
+					if (yaw)
+						l.setYaw(convertToPositive(l.getYaw()) - f);
+					else
+						l.setPitch(l.getPitch() - f);
+					break;
+			default:
+				break;
+			}
+		}
+	
+	
+		//Some random method decided to use for converting to positive values.
+		public float convertToPositive(Number n) {
+			if (n.floatValue() * -1 == Math.abs(n.floatValue()))
+				return 360 + n.floatValue();
+			return n.floatValue();
+		}	
 	
 }

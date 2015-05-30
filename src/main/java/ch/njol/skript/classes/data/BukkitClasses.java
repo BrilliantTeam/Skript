@@ -626,7 +626,7 @@ public class BukkitClasses {
 					@SuppressWarnings("deprecation")
 					@Override
 					protected OfflinePlayer deserialize(final Fields fields) throws StreamCorruptedException {
-						if (fields.hasField("uuid") && uuidSupported) {
+						if (fields.contains("uuid") && uuidSupported) {
 							final UUID uuid = fields.getObject("uuid", UUID.class);
 							OfflinePlayer p;
 							if (uuid == null || (p = Bukkit.getOfflinePlayer(uuid)) == null)

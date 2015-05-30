@@ -310,6 +310,7 @@ public class FlatFileStorage extends VariablesStorage {
 		pw.println();
 	}
 	
+	@SuppressWarnings("null")
 	@Override
 	protected final void disconnect() {
 		synchronized (connectionLock) {
@@ -324,6 +325,7 @@ public class FlatFileStorage extends VariablesStorage {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	protected final boolean connect() {
 		synchronized (connectionLock) {

@@ -85,11 +85,12 @@ public class CondIsBanned extends Condition {
 				} else if (o instanceof OfflinePlayer) {
 					return ((OfflinePlayer) o).isBanned();
 				} else if (o instanceof String) {
-					return Bukkit.getIPBans().contains(o) || !ipBanned && CollectionUtils.contains(Bukkit.getBannedPlayers(), new Predicate<OfflinePlayer>() {
-						@Override
-						public boolean test(final @Nullable OfflinePlayer t) {
-							return t != null && ((String) o).equals(t.getName());
-						}
+					return Bukkit.getIPBans().contains(o) || !ipBanned && 
+						CollectionUtils.contains(Bukkit.getBannedPlayers().toArray(new OfflinePlayer[Bukkit.getBannedPlayers().size()]), new Predicate<OfflinePlayer>() {
+							@Override
+							public boolean test(final @Nullable OfflinePlayer t) {
+								return t != null && ((String) o).equals(t.getName());
+							}
 					});
 				}
 				assert false;
