@@ -356,7 +356,7 @@ public abstract class Commands {
 		final String arguments = m.group(3) == null ? "" : m.group(3);
 		final StringBuilder pattern = new StringBuilder();
 		
-		List<Argument<?>> currentArguments = new ArrayList<Argument<?>>();
+		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<Argument<?>>();
 		m = argumentPattern.matcher(arguments);
 		int lastEnd = 0;
 		int optionals = 0;
@@ -466,8 +466,7 @@ public abstract class Commands {
 			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage, aliases, permission, permissionMessage, executableBy, ScriptLoader.loadItems(trigger));
 		} finally {
 			Commands.currentArguments = null;
-		}
-		
+		}	
 		registerCommand(c);
 		
 		if (Skript.logVeryHigh() && !Skript.debug())

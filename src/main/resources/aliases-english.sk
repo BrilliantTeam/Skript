@@ -121,7 +121,7 @@ collections:
 	# all food which can be eaten by rightclicking, i.e. doesn't include cake.
 	food¦s = any apple, mushroom soup, bread, any porkchop, any fish, cookie, melon slice, any beef, any chicken, rotten flesh, any carrot, any potato, pumpkin pie
 	# the same list but without raw food & rotten flesh
-	healthy food¦s = any apple, mushroom soup, bread, cooked porkchop, cooked fish, cookie, melon slice, steak, cooked chicken, any carrot, potato, baked potato, pumpkin pie
+	healthy food¦s = any apple, mushroom soup, bread, cooked porkchop, cooked fish, cookie, melon slice, steak, cooked chicken, any carrot, potato, baked potato, pumpkin pie, cooked rabbit, rabbit stew, cooked mutton
 
 	# all vehicles, i.e. all minecarts and the boat
 	vehicle¦s = any minecart, boat
@@ -153,6 +153,7 @@ default aliases:
 		light blue = :3
 		yellow = :4
 		light green = :5
+		lime = :5
 		pink = :6
 		gray = :7
 		light gray = :8
@@ -198,6 +199,7 @@ default aliases:
 
 	# -- bedrock --
 	bedrock = 7
+	barrier = 166
 
 
 	# -- water & lava --
@@ -320,23 +322,24 @@ default aliases:
 
 
 	# -- sponge --
-	sponge¦s = 19
+	{sponge type}:
+		dry = :0
+		wet = :1
+	{sponge type} sponge¦s = 19
+	sponge¦s = 19:0
+	any sponge¦s = 19:0-1
 
 
 	# -- glass --
+	{wool} [stained] glass [pane] = 160
 	glass = 20
 	glass pane¦s = 102
 	thin glass = 102
 	window¦s = 102
 	window glass = 102
-	{wool} [stained] glass = 95
-	{wool} [stained] glass pane = 160
-	{wool} [stained] thin glass = 160
-	{wool} [stained] window¦s = 160
-	{wool} [stained] window glass = 160
 	
 	<any> glass pane = any stained glass pane, glass pane
-	<any> glass = any glass pane, stained glass, glass
+	<any> glass = any glass pane, glass
 	
 
 	# -- lapis lazuli --
@@ -350,6 +353,7 @@ default aliases:
 
 	# -- sandstone --
 	sand[ ]stone¦s = 24
+	red sand[ ]stone¦s = 179
 
 
 	# -- note block --
@@ -593,13 +597,17 @@ default aliases:
 
 	# -- single & double steps / slabs --
 	{any slab}:
-		{default} = 44, 126
-		single = 44, 126
-		double = 43, 125
+		{default} = 44, 126, 182
+		single = 44, 126, 182
+		double = 43, 125, 181
 	{stone slab}:
 		{default} = 44
 		single = 44
 		double = 43
+	{stone slab 2}:
+		{default} = 182
+		single = 182
+		double = 181
 	{wooden slab}:
 		{default} = 126
 		single = 126
@@ -630,25 +638,32 @@ default aliases:
 		{default} = :0-1, :3-5, :8-9, :11-13
 		<any> = :0-1, :3-5, :8-9, :11-13
 		stone = :0, :8
-		sandstone = :1, :9
+		sand[ ]stone = :1, :9
 		cobble[stone] = :3, :11
 		brick = :4, :12
 		stone brick[s]) = :5, :13
 	{stone slab type no default}:
 		<any> = :0-1, :3-5, :8-9, :11-13
 		stone = :0, :8
-		sandstone = :1, :9
+		sand[ ]stone = :1, :9
 		cobble[stone] = :3, :11
 		brick = :4, :12
 		stone brick[s]) = :5, :13
-	
+	{stone slab 2 type}:
+		{default} = :0, :8
+		<any> = :0, :8
+		red sand[ ]stone = :0, :8
+	{stone slab 2 type no default}:
+		<any> = :0, :8
+		red sand[ ]stone = :0, :8
 	{slab facing no default} {stone slab} {stone slab type no default} (step|slab)¦s = :
 	{slab facing} {stone slab} {stone slab type} (step|slab) (block|item)¦s = :
 	{slab facing no default} {wooden slab} {wooden slab type} [wood[en]] (step|slab)¦s = :
 	{slab facing} {wooden slab} {wooden slab type} (step|slab) (block|item)¦s = :
+	{slab facing no default} {stone slab 2} {stone slab 2 type no default} (step|slab)¦s = :
+	{slab facing} {stone slab 2} {stone slab 2 type} (step|slab) (block|item)¦s = :
 	{slab facing no default} {any slab} (step|slab)¦s = :
 	{slab facing} {any slab} (step|slab) (block|item)¦s = :
-
 
 	# -- bricks & clay --
 	[clay] brick¦s = 45, 336
@@ -661,9 +676,9 @@ default aliases:
 	clay <block> = 82
 	clay <item> = 337
 	clay ball¦s = 337
-	
-	hard[ened] clay = 172
 
+
+	hard[ened] clay = 172
 
 	# -- TNT --
 	TNT¦s = 46
@@ -714,9 +729,10 @@ default aliases:
 		stone brick[s] = 109
 		nether [brick[s]] = 114
 		sand[ ]stone = 128
-		[nether] quartz = 156
+		[nether] quar[t]z = 156
 		acacia [wood] = 163
 		dark oak [wood] = 164
+		red sand[ ]stone = 180
 	{stairs direction}:
 		{default} = :0-3
 		any = :0-7
@@ -783,28 +799,67 @@ default aliases:
 	# as any 'block is <alias>' condition will fail if you click the wrong part of the door.
 	# 'set <block> to door:1' will correctly place an open door though.
 	{doortype}:
-		{default} = 64, 71
-		wood[en] = 64
+		{default} = 64, 71, 193, 194, 195, 196, 197
+		wood[en] = 64, 193, 194, 195, 196, 197
+		(normal|regular|oak) [wood] = 64
 		iron = 71
+		(pine|redwood|fir|spruce) [wood] = 193
+		birch [wood] = 194
+		jungle [wood] = 195
+		acacia [wood] = 196
+		dark oak [wood] = 197
 	{doorhalf}:
 		top¦s = :8-9
 		bottom¦s = :0-7
 	{doortype} door [block] {doorhalf} = :
 	{doortype} door block¦s = :
-	wood[en] door item¦s = 324
-	wood[en] door¦s = 324, 64
-	iron door item¦s = 330
-	iron door¦s = 330, 71
-	door item¦s = 330, 324
-	door¦s = 330, 71, 324, 64
+	{dooritemtype}:
+		{default} = 324, 330, 427, 428, 429, 430, 431 
+		wood[en] = 324, 427, 428, 429, 430, 431
+		(normal|regular|oak) [wood] = 324
+		iron = 330
+		(pine|redwood|fir|spruce) [wood] = 427
+		birch [wood] = 428
+		jungle [wood] = 429
+		acacia [wood] = 430
+		dark oak [wood] = 431
+	{dooritemtype} door item¦s = :
+	{anydoortype}:
+		{default} = 64, 71, 193, 194, 195, 196, 197, 324, 330, 427, 428, 429, 430, 431
+		wood[en] = 64, 193, 194, 195, 196, 197, 324, 427, 428, 429, 430, 431
+		(normal|regular|oak) [wood] = 64, 324
+		iron = 71, 330
+		(pine|redwood|fir|spruce) [wood] = 193, 427
+		birch [wood] = 194, 428
+		jungle [wood] = 195, 429
+		acacia [wood] = 196, 430
+		dark oak [wood] = 197, 431
+	{anydoortype} door¦s = :
+	door¦s = 64, 71, 193, 194, 195, 196, 197, 324, 330, 427, 428, 429, 430, 431
 
-	trapdoor¦s = 96
-	open[ed] trapdoor¦s = 96:4-7
-	closed trapdoor¦s = 96:0-3
+	[wood[en]] trapdoor¦s = 96
+	open[ed] [wood[en]] trapdoor¦s = 96:4-7
+	closed [wood[en]] trapdoor¦s = 96:0-3
 
-	fence gate¦s = 107
-	open[ed] fence gate¦s = 107:4-7
-	closed fence gate¦s = 107:0-3
+	iron trapdoor = 167
+	iron open[ed] trapdoor¦s = 167:4-7
+	iron closed trapdoor¦s = 167:0-3
+
+	fence gate¦s = 107, 183, 184, 185, 186, 187
+	{fencegatetype}:
+		{default} = 107, 183, 184, 185, 186, 187
+		wooden = 107, 183, 184, 185, 186, 187
+		(normal|regular|oak) [wood] = 107
+		(pine|redwood|fir|spruce) [wood] = 183
+		birch [wood] = 184
+		jungle [wood] = 185
+		acacia [wood] = 186
+		dark oak [wood] = 187
+	{fencegatestate}:
+		opened = :4-7
+		closed = :0-3
+	{fencegatestate} {fencegatetype} fence gate¦s = :
+	{fencegatetype} fence gate¦s = :
 
 
 	# -- ladder --
@@ -920,8 +975,8 @@ default aliases:
 	any retracted piston¦s = retracted piston, retracted sticky piston
 
 	redstone lamp¦s = 123, 124
-	(inactive|unpowered|unlit) redstone lamp¦s = 123
-	redstone lamp¦ off¦s off = 123
+	(inactive|unpowered|unlit) restone lamp¦s = 123
+	restone lamp¦ off¦s off = 123
 	(active|glowing|powered|lit) redstone lamp¦s = 124
 	redstone lamp¦ on¦s on = 124
 	
@@ -932,6 +987,7 @@ default aliases:
 	(active|powered) redstone comparator¦s = 150
 	
 	daylight sensor¦s = 151
+	inverted daylight sensor¦s = 178
 	
 	redstone block¦s = 152
 	block¦¦s¦ of redstone = 152
@@ -970,7 +1026,17 @@ default aliases:
 
 
 	# -- fence --
-	fence¦s = 85
+	{fencetype}:
+		{default} = 85, 113, 188, 189, 190, 191, 192
+		nether [brick[s]] = 113
+		wooden = 85, 188, 189, 190, 191, 192
+		(normal|regular|oak) [wood] = 85
+		(pine|redwood|fir|spruce) [wood] = 188
+		birch [wood] = 189
+		jungle [wood] = 190
+		acacia [wood] = 191
+		dark oak [wood] = 192
+	{fencetype} fence¦s = :
 
 
 	# -- pumpkin & lack-o-lantern: see vegetation
@@ -992,8 +1058,8 @@ default aliases:
 	# -- redstone repeater: see redstone
 
 
-	# -- locked chest: does not exist anymore, replaced with::
-	# -- stained glass: see glass
+	# -- locked chest --
+	locked chest¦s = 95
 
 
 	# -- trapdoor: see doors
@@ -1021,8 +1087,7 @@ default aliases:
 
 
 	# -- iron bars --
-	iron bars @x = 101
-	bars @x = 101
+	[iron] bars @x = 101
 
 
 	# -- glass pane: see glass
@@ -1049,7 +1114,7 @@ default aliases:
 	nether brick¦s = 112, 405
 	nether brick block¦s = 112
 	nether brick item¦s = 405
-	nether [brick[s]] fence¦s = 113
+	# nether brick fence: see fence
 	# nether brick stairs: see stairs
 
 
@@ -1156,8 +1221,8 @@ default aliases:
 	# -- weighted pressure plates, redstone comparator, daylight sensor, redstone block: see redstone
 	
 	
-	# -- nether quartz ore, quartz block -- 
-	[nether] quartz ore = 153
+	# -- nether quar[t]z ore, quar[t]z block -- 
+	[nether] quar[t]z ore = 153
 	{quartz block}:
 		(normal|regular) = :0
 		chiseled = :1
@@ -1166,12 +1231,12 @@ default aliases:
 		horizontal pillar = :3-4
 		ns pillas = :3
 		ew pillar = :4
-	{quartz block} [nether] quartz = 155
-	{quartz block} [nether] quartz block¦s = 155
-	pillar [nether] quartz (block|item)¦s = 155:2
-	[nether] quartz = 155, 406
-	[nether] quartz item¦s = 406
-	# quartz stairs: see stairs
+	{quartz block} [nether] quar[t]z = 155
+	{quartz block} [nether] quar[t]z block¦s = 155
+	pillar [nether] quar[t]z (block|item) = 155:2
+	[nether] quar[t]z = 155, 406
+	[nether] quar[t]z item¦s = 406
+	# quarz stairs: see stairs
 	
 	
 	# -- hopper: see redstone
@@ -1208,6 +1273,25 @@ default aliases:
 	
 	# -- large flower: see vegetation
 
+	# -- slime block --
+	slime[ball¦s] = 341
+	slime block = 165
+
+	# -- prismarine block --
+	prismarine block¦s = 168:0
+	prismarine brick¦s = 168:1
+	dark prismarine block¦s = 168:2
+	any prismarine block¦s = 168:0-2
+	sea lantern¦s = 169
+	prismarine shard¦s = 409
+	prismarine crystal¦s = 410
+
+	# -- banner block --
+	{wool} banner = 176, 177, 425
+	{wool} banner item = 425 
+	{wool} banner block = 176, 177
+	{wool} standing banner [block] = 176
+	{wool} wall banner [block] = 177
 
 
 
@@ -1218,6 +1302,7 @@ default aliases:
 	# -- flint and steel --
 	flint and steel¦s = 259
 	flint'n'steel¦s = 259
+	flit & steel¦s = 259
 
 
 	# -- apples --
@@ -1451,9 +1536,7 @@ default aliases:
 	written book¦s = 387
 
 
-	# -- slimeball --
-	slime[ball¦s] = 341
-
+	# -- slime item: see slime
 
 	# minecart with chest/furnace: see minecarts
 
@@ -1737,12 +1820,12 @@ default aliases:
 	# -- pumpkin pie: see vegetation --
 
 
-	# -- Fireworks --
+	# -- fireworks --
 	firework rocket¦s = 401
 	firework star¦s = 402
 
 
-	# -- Enchanted Book --
+	# -- enchanted book --
 	enchanted book¦s @an = 403
 
 	
@@ -1752,10 +1835,33 @@ default aliases:
 	# -- nether brick item: see nether brick stuff
 	
 	
-	# -- nether quartz: see nether quartz block
+	# -- nether quarz: see nether quarz block
 	
 	
 	# -- minecart with TNT/hopper: see minecarts
+
+
+	# -- prismarine shard: see prismarine block
+
+
+	# -- prismarine crystals: see prismarine block
+
+
+	# -- rabbit --
+	[<any>] rabbit meat = 411, 412
+	raw rabbit¦s = 411
+	raw rabbit meat = 411
+	cooked rabbit¦s = 412
+	cooked rabbit meat = 412
+	rabbit stew¦s = 413
+	rabbit foot¦s = 414
+	rabbit hide¦s = 415
+	rabbit skin = 415
+	rabbit leather = 415
+
+
+	# -- armour stand --
+	armo[u]r stand = 416
 	
 	
 	# -- horse armour --
@@ -1774,6 +1880,18 @@ default aliases:
 	
 	# -- minecart with command block: see minecarts
 	
+
+	# -- sheep --
+	[<any>] mutton = 423, 424
+	[<any>] sheep meat = 423, 424
+	raw mutton = 423
+	raw sheep meat = 423
+	cooked mutton = 424
+	cooked sheep meat = 424
+	
+	
+	# -- miscellaneous wooden doors: see doors, trapdoors and fence gates
+
 
 	# -- music discs --
 	music disc¦s = 2256, 2257, 2258, 2259, 2260, 2261, 2262, 2263, 2264, 2265, 2266, 2267
