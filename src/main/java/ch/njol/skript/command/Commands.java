@@ -356,7 +356,7 @@ public abstract class Commands {
 		final String arguments = m.group(3) == null ? "" : m.group(3);
 		final StringBuilder pattern = new StringBuilder();
 		
-		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<Argument<?>>();
+		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<Argument<?>>(); //Mirre
 		m = argumentPattern.matcher(arguments);
 		int lastEnd = 0;
 		int optionals = 0;
