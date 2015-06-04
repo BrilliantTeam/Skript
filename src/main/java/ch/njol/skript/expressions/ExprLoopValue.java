@@ -97,7 +97,7 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 		int j = 1;
 		Loop loop = null;
 		for (final Loop l : ScriptLoader.currentLoops) {
-			if ((c != null && c.isAssignableFrom(l.getLoopedExpression().getReturnType())) || l.getLoopedExpression().isLoopOf(s)) {
+			if ((c != null && c.isAssignableFrom(l.getLoopedExpression().getReturnType())) || "value".equals(s) || l.getLoopedExpression().isLoopOf(s)) {
 				if (j < i) {
 					j++;
 					continue;

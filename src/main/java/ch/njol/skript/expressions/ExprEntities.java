@@ -23,6 +23,7 @@ package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -173,10 +174,9 @@ public class ExprEntities extends SimpleExpression<Entity> {
 	@Nullable
 	public Iterator<? extends Entity> iterator(final Event e) {
 		if (matchedPattern >= 2) {
-			final Entity en;
 			final Location l;
 			if (centerEntity != null) {
-				en = centerEntity.getSingle(e);
+				Entity en = centerEntity.getSingle(e);
 				if (en == null)
 					return null;
 				l = en.getLocation();
@@ -185,16 +185,13 @@ public class ExprEntities extends SimpleExpression<Entity> {
 				l = center.getSingle(e);
 				if (l == null)
 					return null;
-				en = l.getWorld().spawn(l, ExperienceOrb.class);
 			}
 			assert radius != null;
 			final Number n = radius.getSingle(e);
 			if (n == null)
 				return null;
 			final double d = n.doubleValue();
-			final List<Entity> es = en.getNearbyEntities(d, d, d);
-			if (centerEntity == null)
-				en.remove();
+			final Collection<Entity> es = l.getWorld().getNearbyEntities(l, d, d, d);
 			final double radiusSquared = d * d * Skript.EPSILON_MULT;
 			final EntityData<?>[] ts = types.getAll(e);
 			return new CheckedIterator<Entity>(es.iterator(), new NullableChecker<Entity>() {
