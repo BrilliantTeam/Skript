@@ -21,6 +21,7 @@
 
 package ch.njol.skript.expressions;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -84,6 +85,7 @@ public class ExprTargetedBlock extends PropertyExpression<Player, Block> {
 		return Classes.getDebugMessage(getAll(e));
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Nullable
 	Block getTargetedBlock(final @Nullable Player p, final Event e) {
 		if (p == null)
@@ -101,8 +103,12 @@ public class ExprTargetedBlock extends PropertyExpression<Player, Block> {
 //			return ((PlayerInteractEvent) e).getClickedBlock();
 //		}
 		try {
-			Block b = p.getTargetBlock((Set<Material>)null, SkriptConfig.maxTargetBlockDistance.value());
-			if (b.getType() == Material.AIR)
+			Block b;
+			if(Skript.methodExists(Player.class, "getTargetBlock", Set.class, int.class)){
+				b = p.getTargetBlock((Set<Material>)null, SkriptConfig.maxTargetBlockDistance.value());
+			}else{
+				b = p.getTargetBlock((HashSet<Byte>)null, SkriptConfig.maxTargetBlockDistance.value());
+			}if (b.getType() == Material.AIR)
 				b = null;
 			targetedBlocks.put(p, b);
 			return b;

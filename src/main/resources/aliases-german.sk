@@ -9,7 +9,8 @@
 # == WICHTIG: DIESE GEGENSTANDSNAMEN SIND NOCH NICHT ALLE ÜBERSETZT!
 #   bitte melde dich bei mir (njol@gmx.ch) falls du beim Übersetzen helfen möchtest :)
 #
-
+# Fix for MC 1.8 items by mrschmock (mrschmock@julcraft.de)
+ 
 item = Gegenst¦and¦ände @m
 block = Bl¦ock¦öcke @m
 
@@ -24,8 +25,9 @@ Sammlungen:
 	# Erze
 	Erz¦e = Kohlenerz, Eisenerz, Golderz, Diamanterz, Lapiserz, beliebiges Rotsteinerz
 	# Bennmaterialien für Schmelzöfen
-	Brennmaterial¦ien = Lavaeimer, Lohenstab, Kohle, Holzkohle, Planke, Baumstamm, grosser Pilz, Werkbank, Zaun, Holztreppe, Falltür, Setzling, Stock, Kiste, verschlossene Kiste, Musikbox, Notenblock
-
+	Brennmaterial¦ien = Lavaeimer, Lohenstab, Kohle, Holzkohle, Planke, Baumstamm, grosser Pilz, Werkbank, Zaun, wooden stairs, trapdoor, Setzling, Stock, Truhe, locked chest, Jukebox, Notenblock
+	#Brennmaterial¦ien = Lavaeimer, Lohenstab, Kohle, Holzkohle, Planke, Baumstamm, grosser Pilz, Werkbank, Zaun, Holztreppe, Falltür, Setzling, Stock, Kiste, verschlossene Kiste, Musikbox, Notenblock
+	
 	# Essen exkl. Kuchen
 	Essen = beliebiger Apfel, Pilzsuppe, Brot, beliebiges Schweinefleisch, beliebiger Fisch, Keks, Melonenschnitz, beliebiges Rindfleisch, beliebiges Huhn, verrottetes Fleisch
 	# die gleiche Liste ohne rohes & verrottetes Fleisch
@@ -596,7 +598,7 @@ Standardnamen:
 	# -- stairs --
 	{stairs}:
 		{default} = 53, 134, 135, 136, 67, 108, 109, 114, 128, 156
-		(oak|regular|normal) [wood] = 53
+		(eichen|regular|normal) [wood] = 53
 		(spruce|fir|redwood|pine) [wood] = 134
 		birch [wood] = 135
 		jungle [wood] = 136
@@ -1673,3 +1675,81 @@ Standardnamen:
 	ward [music] disc¦s = 2265
 	11-disc¦s = 2266
 	wait [music] disc¦s = 2267
+	
+	
+	# -- FIX for 1.8.x --
+	
+	Schleimbl¦ock¦öcke @m = 165
+	Barriere¦n @f = 166
+	Eisenfalltür¦en @f = 167
+	Prismarinbl¦ock¦öcke @m = 168
+	Seelaterne¦n @f = 169
+	
+	Standbanner @n = 176
+	Wandbanner @n = 177
+	
+	invertierter Tageslichsensor¦en @m = 178
+	# Dämmerungssensor vielleicht???
+	
+	Rotsandstein¦e @m = 179
+	Rotandsteintreppe¦n @f = 180
+	Rotsandsteindoppelstufe¦n @f = 181
+	Rotsandsteinstufe¦n @f = 182
+	
+	Fichtenholzzauntor¦e @n = 183
+	Birkenholzzauntor¦e @n = 184
+	Tropenholzzauntor¦e @n = 185
+	Schwarzeichenholzzauntor¦e @n = 186
+	Akazienholzzauntor¦e @n = 187
+	Fichtenholzz¦aun¦äune @m = 188
+	Birkenholzz¦aun¦äune @m  = 189
+	Tropenholzz¦aun¦äune @m  = 190
+	Schwarzeichenholzz¦aun¦äune @m  = 191
+	Akazienholzz¦aun¦äune @m  = 192
+	Fichtenholztür¦en @f = 193
+	Birkenholztür¦en @f = 194
+	Tropenholztür¦en @f = 195
+	Akazienholztür¦en @f = 196
+	Schwarzeichenholztür¦en @f = 197
+	
+	# -- items -- 
+	Fichtenholztür¦en @f = 427
+	Birkenholztür¦en @f = 428
+	Tropenholztür¦e @f = 429
+	Akazienholztür¦en @f = 430
+	Schwarzeichenholztür¦en @f = 431
+	
+	Prismarinscherbe¦n @f = 409
+	Prismarinkristal¦e @m = 410
+	
+	Rohes Kaninchen @n = 411:0
+	Gebratenes Kaninchen @n = 412:0
+	Kaninchenragout @n = 413:0
+	Kaninchenpfote¦n @f = 414:0
+	Kaninchenfell¦e @n = 415:0
+	Rüstungsständer @m = 416:0
+	
+	Rohes Hammelfleisch @n = 423:0
+	Gebratenes Hammelfleisch @n = 424:0
+	
+	
+	Banner @n = 425
+	<any> Banner @n = 425:0-15
+	schwarzes Banner @n = 425:0
+	rotes Banner @n = 425:1
+	grünes Banner @n = 425:2
+	braunes Banner @n = 425:3
+	blaues Banner @n = 425:4
+	violettes Banner @n = 425:5
+	türkises Banner @n = 425:6
+	hellgraues Banner @n = 425:7
+	graues Banner @f = 425:8
+	rosa Banner @n = 425:9
+	hellgrünes Banner @n = 425:10
+	gelbes Banner @n = 425:11
+	hellblaues Banner @n = 425:12
+	magenta Banner @n = 425:13
+	orangenes Banner @n = 425:14
+	weisses Banner @n = 425:15
+	
+	

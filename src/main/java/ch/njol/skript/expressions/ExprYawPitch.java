@@ -61,7 +61,7 @@ public class ExprYawPitch extends SimplePropertyExpression<Location, Float> {
 	@SuppressWarnings("null")
 	@Override
 	public Float convert(final Location l) {
-		return yaw ? l.getYaw() : l.getPitch();
+		return yaw ? convertToPositive(l.getYaw()) : l.getPitch();
 	}
 	
 	@Override
