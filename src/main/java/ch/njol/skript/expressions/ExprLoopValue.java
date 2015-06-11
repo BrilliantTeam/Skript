@@ -46,6 +46,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
+import ch.njol.skript.util.ScriptOptions;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 
@@ -96,8 +97,11 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 		final Class<?> c = Classes.getClassFromUserInput(s);
 		int j = 1;
 		Loop loop = null;
+		
+		@SuppressWarnings("null")
+		boolean b = ScriptOptions.getInstance().usesNewLoops(ScriptLoader.currentScript.getFile());
 		for (final Loop l : ScriptLoader.currentLoops) {
-			if ((c != null && c.isAssignableFrom(l.getLoopedExpression().getReturnType())) || "value".equals(s) || l.getLoopedExpression().isLoopOf(s)) {
+			if ((c != null && c.isAssignableFrom(l.getLoopedExpression().getReturnType())) || (b ? "value".equals(s) : false) || l.getLoopedExpression().isLoopOf(s)) {
 				if (j < i) {
 					j++;
 					continue;

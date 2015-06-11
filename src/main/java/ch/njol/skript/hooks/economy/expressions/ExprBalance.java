@@ -76,6 +76,7 @@ public class ExprBalance extends SimplePropertyExpression<OfflinePlayer, Money> 
 		return new Class[] {Money.class, Number.class};
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) throws UnsupportedOperationException {
 		assert mode != ChangeMode.REMOVE_ALL;
