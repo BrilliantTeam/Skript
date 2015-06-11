@@ -30,6 +30,7 @@ import ch.njol.skript.events.bukkit.ScriptEvent;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.util.ScriptOptions;
 import ch.njol.util.Kleenean;
 
@@ -48,8 +49,9 @@ public class EffScriptOptionLoops extends Effect {
 	@SuppressWarnings("null")
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if(!ScriptLoader.isCurrentEvent(ScriptEvent.class) && isDelayed != Kleenean.TRUE){
-			Skript.warning("Current event is not Script Event or you have a delay before the script option.");
+		if(!ScriptLoader.isCurrentEvent(ScriptEvent.class) || isDelayed == Kleenean.TRUE){
+			Skript.error("Current event is not Script Event or you have a delay before the script option. Defaulting to 2.2 loops.", ErrorQuality.SEMANTIC_ERROR);
+			ScriptOptions.getInstance().setUsesNewLoops(ScriptLoader.currentScript.getFile(), true);
 			return false;
 		}
 		ScriptOptions.getInstance().setUsesNewLoops(ScriptLoader.currentScript.getFile(), parseResult.mark == 2);
