@@ -79,7 +79,7 @@ public class EffIgnite extends Effect {
 			final Timespan t = duration.getSingle(e);
 			if (t == null)
 				return;
-			d = (int) (t.getTicks() >= Integer.MAX_VALUE ? Integer.MAX_VALUE : t.getTicks());
+			d = (int) (t.getTicks_i() >= Integer.MAX_VALUE ? Integer.MAX_VALUE : t.getTicks_i());
 		} else {
 			d = ignite ? DEFAULT_DURATION : 0;
 		}

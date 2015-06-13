@@ -149,8 +149,17 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 		return millis;
 	}
 	
-	public long getTicks() {
-		return Math.round(millis / 50f);
+	public long getTicks_i() {
+		return Math.round((millis / 50.0));
+	}
+	
+	/**
+	 * @deprecated Use getTicks_i() instead. Since this method limits timespan to Integer.MAX_VALUE.
+	 * @addon I only keep this to allow for older addons to still work. / Mirre
+	 */
+	@Deprecated
+	public int getTicks() {
+		return Math.round((millis >= Float.MAX_VALUE ? Float.MAX_VALUE : millis) / 50f);
 	}
 	
 	@Override

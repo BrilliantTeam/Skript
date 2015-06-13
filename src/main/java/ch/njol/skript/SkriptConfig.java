@@ -79,8 +79,8 @@ public abstract class SkriptConfig {
 				@Override
 				public void set(final Timespan t) {
 					final Task ct = Updater.checkerTask;
-					if (t.getTicks() != 0 && ct != null && !ct.isAlive())
-						ct.setNextExecution(t.getTicks());
+					if (t.getTicks_i() != 0 && ct != null && !ct.isAlive())
+						ct.setNextExecution(t.getTicks_i());
 				}
 			});
 	final static Option<Boolean> automaticallyDownloadNewVersion = new Option<Boolean>("automatically download new version", false);

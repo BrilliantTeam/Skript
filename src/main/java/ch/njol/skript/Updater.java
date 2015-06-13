@@ -145,8 +145,8 @@ public final class Updater {
 					return;
 				check(Bukkit.getConsoleSender(), SkriptConfig.automaticallyDownloadNewVersion.value(), true);
 				final Timespan t = SkriptConfig.updateCheckInterval.value();
-				if (t.getTicks() != 0)
-					setNextExecution(t.getTicks());
+				if (t.getTicks_i() != 0)
+					setNextExecution(t.getTicks_i());
 			}
 		};
 	}

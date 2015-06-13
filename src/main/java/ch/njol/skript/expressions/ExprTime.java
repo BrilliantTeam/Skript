@@ -109,7 +109,7 @@ public class ExprTime extends PropertyExpression<World, Time> {
 				assert delta != null;
 				final Timespan ts = (Timespan) delta[0];
 				for (final World w : worlds) {
-					w.setTime(w.getTime() + mod * ts.getTicks());
+					w.setTime(w.getTime() + mod * ts.getTicks_i());
 				}
 				break;
 			case DELETE:

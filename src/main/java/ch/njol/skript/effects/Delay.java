@@ -83,7 +83,7 @@ public class Delay extends Effect {
 						Skript.info(getIndentation() + "... continuing after " + (System.nanoTime() - start) / 1000000000. + "s");
 					TriggerItem.walk(next, e);
 				}
-			}, d.getTicks());
+			}, d.getTicks_i());
 		}
 		return null;
 	}
