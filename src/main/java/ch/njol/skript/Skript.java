@@ -153,7 +153,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ PLUGIN ================
 	
-	public static String MIRRE = "V6";
+	public static String MIRRE = "V7";
 	
 	@Nullable
 	private static Skript instance = null;
@@ -901,6 +901,30 @@ public final class Skript extends JavaPlugin implements Listener {
 		statements.add(info);
 	}
 	
+	/** 
+	 * @param Used for checking if any of the condition patterns are already registered.
+	 * @param If the integer returned is 0 then there's one or more condition with the exact same pattern already registered.
+	 * @param The lower the integer returned the more similar a pattern was a already registered pattern.
+	 * @param It is then adviced to change up your pattern if it returns a low integer.
+	 * @example Returns 5: That means there's a pattern which is similar except 5 characters, to the patterns you supplied.
+	 * @param It may return 666 but that just means there's no patterns similar at all.
+	 */
+	public static int conditionExists(String... patterns){
+		int highestMatching = 666;
+		for(SyntaxElementInfo<? extends Condition> info : conditions){
+			for(String s : info.patterns){
+				for(String s2 : patterns){
+					@SuppressWarnings("null")
+					int dist = StringUtils.distance(s, s2);
+					if(dist < highestMatching){
+						highestMatching = dist;
+					}
+				}
+			}
+		}
+		return highestMatching;
+	}
+	
 	/**
 	 * Registers an {@link Effect}.
 	 * 
@@ -912,6 +936,30 @@ public final class Skript extends JavaPlugin implements Listener {
 		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(patterns, effect);
 		effects.add(info);
 		statements.add(info);
+	}
+	
+	/** 
+	 * @param Used for checking if any of the effect patterns are already registered.
+	 * @param If the integer returned is 0 then there's one or more effect with the exact same pattern already registered.
+	 * @param The lower the integer returned the more similar a pattern was a already registered pattern.
+	 * @param It is then adviced to change up your pattern if it returns a low integer.
+	 * @example Returns 5: That means there's a pattern which is similar except 5 characters, to the patterns you supplied.
+	 * @param It may return 666 but that just means there's no patterns similar at all.
+	 */
+	public static int effectExists(String... patterns){
+		int highestMatching = 666;
+		for(SyntaxElementInfo<? extends Effect> info : effects){
+			for(String s : info.patterns){
+				for(String s2 : patterns){
+					@SuppressWarnings("null")
+					int dist = StringUtils.distance(s, s2);
+					if(dist < highestMatching){
+						highestMatching = dist;
+					}
+				}
+			}
+		}
+		return highestMatching;
 	}
 	
 	public static Collection<SyntaxElementInfo<? extends Statement>> getStatements() {
@@ -950,6 +998,30 @@ public final class Skript extends JavaPlugin implements Listener {
 			expressionTypesStartIndices[i]++;
 		}
 		expressions.add(expressionTypesStartIndices[type.ordinal()], info);
+	}
+	
+	/** 
+	 * @param Used for checking if any of the expressions patterns are already registered.
+	 * @param If the integer returned is 0 then there's one or more expression with the exact same pattern already registered.
+	 * @param The lower the integer returned the more similar a pattern was a already registered pattern.
+	 * @param It is then adviced to change up your pattern if it returns a low integer.
+	 * @example Returns 5: That means there's a pattern which is similar except 5 characters, to the patterns you supplied.
+	 * @param It may return 666 but that just means there's no patterns similar at all.
+	 */
+	public static int expressionExists(String... patterns){
+		int highestMatching = 666;
+		for(ExpressionInfo<?, ?> info : expressions){
+			for(String s : info.patterns){
+				for(String s2 : patterns){
+					@SuppressWarnings("null")
+					int dist = StringUtils.distance(s, s2);
+					if(dist < highestMatching){
+						highestMatching = dist;
+					}
+				}
+			}
+		}
+		return highestMatching;
 	}
 	
 	@SuppressWarnings("null")
@@ -1009,6 +1081,30 @@ public final class Skript extends JavaPlugin implements Listener {
 		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, patterns, c, events);
 		Skript.events.add(r);
 		return r;
+	}
+	
+	/** 
+	 * @param Used for checking if any of the events patterns are already registered.
+	 * @param If the integer returned is 0 then there's one or more event with the exact same pattern already registered.
+	 * @param The lower the integer returned the more similar a pattern was a already registered pattern.
+	 * @param It is then adviced to change up your pattern if it returns a low integer.
+	 * @example Returns 5: That means there's a pattern which is similar except 5 characters, to the patterns you supplied.
+	 * @param It may return 666 but that just means there's no patterns similar at all.
+	 */
+	public static int eventExists(String... patterns){
+		int highestMatching = 666;
+		for(SkriptEventInfo<?> info : events){
+			for(String s : info.patterns){
+				for(String s2 : patterns){
+					@SuppressWarnings("null")
+					int dist = StringUtils.distance(s, s2);
+					if(dist < highestMatching){
+						highestMatching = dist;
+					}
+				}
+			}
+		}
+		return highestMatching;
 	}
 	
 	public final static Collection<SkriptEventInfo<?>> getEvents() {
