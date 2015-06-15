@@ -113,9 +113,6 @@ public class CondCompare extends Condition {
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		
-		if(!parser.regexes.isEmpty())
-			System.out.println(parser.regexes.get(0));
-		System.out.println(parser.expr);
 		first = vars[0];
 		second = vars[1];
 		if (vars.length == 3)
