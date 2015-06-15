@@ -21,6 +21,7 @@
 
 package ch.njol.skript.conditions;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -31,9 +32,12 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionList;
+import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.log.RetainingLogHandler;
@@ -108,6 +112,10 @@ public class CondCompare extends Condition {
 	@SuppressWarnings("null")
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
+		
+		if(!parser.regexes.isEmpty())
+			System.out.println(parser.regexes.get(0));
+		System.out.println(parser.expr);
 		first = vars[0];
 		second = vars[1];
 		if (vars.length == 3)
@@ -123,7 +131,7 @@ public class CondCompare extends Condition {
 			if (third instanceof ExpressionList)
 				((ExpressionList<?>) third).invertAnd();
 		}
-		final boolean b = init();
+		final boolean b = init(parser.expr);
 		final Expression<?> third = this.third;
 		if (!b) {
 			if (third == null && first.getReturnType() == Object.class && second.getReturnType() == Object.class) {
@@ -157,8 +165,8 @@ public class CondCompare extends Condition {
 		return Classes.getSuperClassInfo(e.getReturnType()).getName().withIndefiniteArticle();
 	}
 	
-	@SuppressWarnings("unchecked")
-	private boolean init() {
+	@SuppressWarnings({"unchecked", "null"})
+	private boolean init(String expr) {
 		final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 		Expression<?> third = this.third;
 		try {
@@ -190,11 +198,21 @@ public class CondCompare extends Condition {
 		} finally {
 			log.stop();
 		}
-		
 		final Class<?> f = first.getReturnType(), s = third == null ? second.getReturnType() : Utils.getSuperType(second.getReturnType(), third.getReturnType());
 		if (f == Object.class || s == Object.class)
 			return true;
-		comp = Comparators.getComparator(f, s);
+		//Mirre
+		if(Entity.class.isAssignableFrom(s)){
+			String[] split = expr.split(" ");
+			if(EntityData.parseWithoutIndefiniteArticle(split[split.length - 1]) != null){
+				comp = Comparators.getComparator(f, EntityData.class);
+				second = SkriptParser.parseLiteral(split[split.length - 1], EntityData.class, ParseContext.DEFAULT);
+			}
+		}
+		//Mirre
+		
+		else
+			comp = Comparators.getComparator(f, s);
 		
 		return comp != null;
 	}

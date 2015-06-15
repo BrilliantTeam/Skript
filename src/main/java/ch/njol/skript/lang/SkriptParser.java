@@ -32,16 +32,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.command.Argument;
 import ch.njol.skript.command.Commands;
 import ch.njol.skript.command.ScriptCommand;
 import ch.njol.skript.command.ScriptCommandEvent;
+import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.ExprParse;
 import ch.njol.skript.lang.function.ExprFunctionCall;
 import ch.njol.skript.lang.function.Function;
@@ -56,6 +59,7 @@ import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
@@ -392,9 +396,24 @@ public class SkriptParser {
 		assert types.length == 1 || !CollectionUtils.contains(types, Object.class);
 		
 		final boolean isObject = types.length == 1 && types[0] == Object.class;
-		
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
+			//Mirre
+			if (isObject){
+				if ((flags & PARSE_LITERALS) != 0) {
+					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
+					final SkriptParser p = new SkriptParser(expr, PARSE_LITERALS, context);
+					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
+						final Expression<?> e = p.parseExpression(c);
+						if (e != null) {
+							log.printLog();
+							return (Expression<? extends T>) e;
+						}
+						log.clear();
+					}
+				}
+			}
+			//Mirre
 			final Expression<? extends T> r = parseSingleExpr(false, null, types);
 			if (r != null) {
 				log.printLog();

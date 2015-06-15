@@ -153,7 +153,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ PLUGIN ================
 	
-	public static String MIRRE = "V6";
+	public static String MIRRE = "V7";
 	
 	@Nullable
 	private static Skript instance = null;
