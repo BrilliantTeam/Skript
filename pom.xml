@@ -27,18 +27,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>ch.njol</groupId>
-			<artifactId>utils</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>ch.njol</groupId>
-			<artifactId>yggdrasil</artifactId>
-			<version>0.1</version>
-			<scope>compile</scope>
-		</dependency>
+
 
 		<!-- <dependency> <groupId>org.bukkit</groupId> <artifactId>minecraft-server</artifactId> <version>1.5.2</version> <scope>provided</scope> </dependency> -->
 

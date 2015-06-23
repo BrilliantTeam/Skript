@@ -40,6 +40,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -85,10 +86,10 @@ public abstract class Variables {
 				info = (ClassInfo<? extends ConfigurationSerializable>) Classes.getExactClassInfo(Object.class);
 			}
 			
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({"unchecked"})
 			@Override
 			@Nullable
-			public String getID(final Class<?> c) {
+			public String getID(final @NonNull Class<?> c) {
 				if (ConfigurationSerializable.class.isAssignableFrom(c) && Classes.getSuperClassInfo(c) == Classes.getExactClassInfo(Object.class))
 					return configurationSerializablePrefix + ConfigurationSerialization.getAlias((Class<? extends ConfigurationSerializable>) c);
 				return null;
@@ -96,7 +97,7 @@ public abstract class Variables {
 			
 			@Override
 			@Nullable
-			public Class<? extends ConfigurationSerializable> getClass(final String id) {
+			public Class<? extends ConfigurationSerializable> getClass(final @NonNull String id) {
 				if (id.startsWith(configurationSerializablePrefix))
 					return ConfigurationSerialization.getClassByAlias(id.substring(configurationSerializablePrefix.length()));
 				return null;
