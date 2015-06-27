@@ -381,10 +381,7 @@ public class DatabaseStorage extends VariablesStorage {
 				sqlException(e);
 				return false;
 			}
-			if (first)
-				return prepareQueries();
-			else
-				return true;
+			return true;
 		}
 	}
 	
