@@ -28,6 +28,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,7 +36,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Filter;
@@ -102,6 +105,8 @@ import ch.njol.skript.log.LogEntry;
 import ch.njol.skript.log.LogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.log.Verbosity;
+import ch.njol.skript.mirre.FeatureConfig;
+import ch.njol.skript.mirre.FilterPrintStream;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.registrations.Converters;
@@ -153,7 +158,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ PLUGIN ================
 	
-	public static String MIRRE = "V7";
+	public static String MIRRE = "V8";
 	
 	@Nullable
 	private static Skript instance = null;
@@ -186,7 +191,6 @@ public final class Skript extends JavaPlugin implements Listener {
 	public final static Message m_invalid_reload = new Message("skript.invalid reload"),
 			m_finished_loading = new Message("skript.finished loading");
 	
-	@SuppressWarnings("null")
 	@Override
 	public void onEnable() {
 		if (disabled) {
@@ -194,6 +198,8 @@ public final class Skript extends JavaPlugin implements Listener {
 			setEnabled(false);
 			return;
 		}
+		
+		System.setOut(new FilterPrintStream(System.out));
 		
 		Language.loadDefault(getAddonInstance());
 		
@@ -504,6 +510,36 @@ public final class Skript extends JavaPlugin implements Listener {
 			}
 		}, this);
 		
+		
+		Bukkit.getScheduler().runTaskAsynchronously(getInstance(), new Runnable(){
+
+			@Override
+			public void run() {
+				String s = getMirreVersion();
+				if(!s.equalsIgnoreCase(MIRRE)){
+					Skript.warning("A new version of Skript Fixes has been found. Skript 2.2 Fixes " + s + " has been released. It's recommended to try the latest version.");
+				}
+			}
+			
+		});
+	}
+	
+	@SuppressWarnings("null")
+	static String getMirreVersion(){
+		try {
+	      URL url = new URL("http://mirre.eu.pn/version/");
+	      Scanner scanner = new Scanner(url.openStream());
+	      String str = "";
+	      while (scanner.hasNext()) {
+	          str = str + scanner.next();
+	      }
+	      scanner.close();
+	      return str;
+	    }
+	    catch (IOException ex) {
+	    	
+	    }
+	    return null;
 	}
 	
 	private static Version minecraftVersion = new Version(666);

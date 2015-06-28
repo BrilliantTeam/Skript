@@ -74,6 +74,7 @@ import ch.njol.skript.localization.Message;
 import ch.njol.skript.log.BukkitLoggerFilter;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
+import ch.njol.skript.mirre.FilterPrintStream;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Callback;
@@ -184,14 +185,14 @@ public abstract class Commands {
 		}
 	};
 	
-	static boolean suppressUnknownCommandMessage = false;
+	public static boolean suppressUnknownCommandMessage = false;
 	static {
 		BukkitLoggerFilter.addFilter(new Filter() {
 			@Override
 			public boolean isLoggable(final @Nullable LogRecord record) {
 				if (record == null)
 					return false;
-				if (suppressUnknownCommandMessage && record.getMessage() != null && record.getMessage().toLowerCase().startsWith("unknown command")) {
+				if (suppressUnknownCommandMessage && record.getMessage() != null && record.getMessage().startsWith("Unknown command. Type")) {
 					suppressUnknownCommandMessage = false;
 					return false;
 				}
