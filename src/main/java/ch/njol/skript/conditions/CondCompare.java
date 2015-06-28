@@ -162,7 +162,7 @@ public class CondCompare extends Condition {
 		return Classes.getSuperClassInfo(e.getReturnType()).getName().withIndefiniteArticle();
 	}
 	
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings({"unchecked"})
 	private boolean init(String expr) {
 		final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 		Expression<?> third = this.third;

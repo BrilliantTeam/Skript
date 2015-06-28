@@ -70,13 +70,21 @@ public class ExprEntity extends SimpleExpression<Entity> {
 		final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 		try {
 			if (!StringUtils.startsWithIgnoreCase(parseResult.expr, "the ") && !StringUtils.startsWithIgnoreCase(parseResult.expr, "event-")) {
-				final ItemType item = Aliases.parseItemType("" + parseResult.regexes.get(0).group());
+				
+				String s = parseResult.regexes.get(0).group();
+				final ItemType item = Aliases.parseItemType("" + s);
 				log.clear();
 				if (item != null) {
 					log.printLog();
 					return false;
 				}
+				
+				//if(!StringUtils.startsWithIgnoreCase(parseResult.expr, "the event-") && !s.equalsIgnoreCase("player") && !s.equalsIgnoreCase("entity")){
+				//	return false;
+				//}
+				
 			}
+			
 			final EntityData<?> type = EntityData.parseWithoutIndefiniteArticle("" + parseResult.regexes.get(0).group());
 			log.clear();
 			log.printLog();
