@@ -19,7 +19,7 @@
  * 
  */
 
-package ch.njol.skript;
+package ch.njol.skript.mirre;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,11 +35,16 @@ import java.util.zip.ZipFile;
 
 import org.bukkit.Bukkit;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.config.Config;
+import ch.njol.skript.config.Node;
+import ch.njol.skript.config.OptionSection;
+import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.util.ExceptionUtils;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.util.Pair;
 import ch.njol.util.coll.iterator.EnumerationIterable;
+import ch.njol.util.coll.iterator.IteratorIterable;
 
 /**
  * @author Peter Güttinger
@@ -53,17 +58,19 @@ public class FeatureConfig {
 	private static List<String> disabledClassNames = new ArrayList<String>();
 	private static List<String> disabledPatterns = new ArrayList<String>();
 	
+	public final static OptionSection features = new OptionSection("features");
+	
 	public static boolean contains(String className, String... patterns){
 		if(disabledClassNames.contains(className)){
 			if(debug)
-				Bukkit.getLogger().info("Disabling feature " + className + " through the Features.sk config.");
+				Skript.info("Disabling feature " + className + " through the Features.sk config.");
 			return true;
 		}
 		
 		for(String pattern : patterns){
 			if(disabledPatterns.contains(pattern)){
 				if(debug)
-					Bukkit.getLogger().info("Disabling the feature " + className + " which had the exact pattern: " + pattern + ".");
+					Skript.info("Disabling the feature " + className + " which had the exact pattern: " + pattern + ".");
 				return true;
 			}
 		}
@@ -72,7 +79,8 @@ public class FeatureConfig {
 	
 
 	
-	static void load(File f){
+	@SuppressWarnings("null")
+	public static void load(File f){
 		if(loaded)
 			return;
 		loaded = true;
@@ -121,24 +129,30 @@ public class FeatureConfig {
 		
 		
 		if(mc != null){
-			HashMap<String, String> map = mc.toMap(",");
-			for(Entry<String, String> entry : map.entrySet()){
-				if(entry.getKey().equalsIgnoreCase("DEBUG")){
-					if(entry.getValue().equalsIgnoreCase("true"))
-						debug = true;
-				}else if(entry.getKey().startsWith("Feature") && !entry.getValue().equalsIgnoreCase("null")){
-					disabledPatterns.add(entry.getValue());
-				}else{
-					disabledClassNames.add(entry.getKey());
-					if(!entry.getValue().equalsIgnoreCase("null")){
-						disabledPatterns.add(entry.getValue());
+			mc.load(FeatureConfig.class);
+			
+			
+			if(mc.get("DEBUG").equalsIgnoreCase("true"))
+				debug = true;
+			
+			SectionNode node = (SectionNode) mc.getMainNode().get("features");
+			if(node != null && !node.isEmpty()){
+				for(Node n : new IteratorIterable<Node>(node.iterator())){		
+					if(n.getKey().startsWith("Feature")){
+						disabledPatterns.add(mc.get("features", n.getKey()));
+					}else{
+						disabledClassNames.add(n.getKey());
+						String s = mc.get("features", n.getKey());
+						if(!s.equalsIgnoreCase("null"))
+							disabledPatterns.add(s);
 					}
 				}
 			}
+			
 		}
 	}
 	
-	static void discard(){
+	public static void discard(){
 		if(loaded){
 			disabledPatterns.clear();
 			disabledClassNames.clear();
