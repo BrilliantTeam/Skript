@@ -186,6 +186,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	public final static Message m_invalid_reload = new Message("skript.invalid reload"),
 			m_finished_loading = new Message("skript.finished loading");
 	
+	@SuppressWarnings("null")
 	@Override
 	public void onEnable() {
 		if (disabled) {
@@ -235,6 +236,10 @@ public final class Skript extends JavaPlugin implements Listener {
 						final File af = new File(getDataFolder(), e.getName());
 						if (!af.exists())
 							saveTo = af;
+					} else if (e.getName().startsWith("features.sk")) {
+						final File af = new File(getDataFolder(), e.getName());
+						if (!af.exists())
+							saveTo = af;
 					}
 					if (saveTo != null) {
 						final InputStream in = f.getInputStream(e);
@@ -257,6 +262,8 @@ public final class Skript extends JavaPlugin implements Listener {
 				}
 			}
 		}
+		FeatureConfig.load(getFile());
+		
 		
 		getCommand("skript").setExecutor(new SkriptCommand());
 		
@@ -268,6 +275,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		new DefaultComparators();
 		new DefaultConverters();
 		new DefaultFunctions();
+		
 		
 		try {
 			getAddonInstance().loadClasses("ch.njol.skript", "conditions", "effects", "events", "expressions", "entity");
@@ -331,6 +339,8 @@ public final class Skript extends JavaPlugin implements Listener {
 				Language.setUseLocal(false);
 				
 				stopAcceptingRegistrations();
+				
+				FeatureConfig.discard();
 				
 				Documentation.generate(); // TODO move to test classes?
 				
@@ -894,8 +904,11 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @param condition The condition's class
 	 * @param patterns Skript patterns to match this condition
 	 */
+	@SuppressWarnings("null")
 	public static <E extends Condition> void registerCondition(final Class<E> condition, final String... patterns) throws IllegalArgumentException {
 		checkAcceptRegistrations();
+		if(FeatureConfig.contains(condition.getSimpleName(), patterns))
+			return;
 		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(patterns, condition);
 		conditions.add(info);
 		statements.add(info);
@@ -907,8 +920,11 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @param effect The effect's class
 	 * @param patterns Skript patterns to match this effect
 	 */
+	@SuppressWarnings("null")
 	public static <E extends Effect> void registerEffect(final Class<E> effect, final String... patterns) throws IllegalArgumentException {
 		checkAcceptRegistrations();
+		if(FeatureConfig.contains(effect.getSimpleName(), patterns))
+			return;
 		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(patterns, effect);
 		effects.add(info);
 		statements.add(info);
@@ -941,8 +957,11 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @param patterns Skript patterns that match this expression
 	 * @throws IllegalArgumentException if returnType is not a normal class
 	 */
+	@SuppressWarnings("null")
 	public static <E extends Expression<T>, T> void registerExpression(final Class<E> c, final Class<T> returnType, final ExpressionType type, final String... patterns) throws IllegalArgumentException {
 		checkAcceptRegistrations();
+		if(FeatureConfig.contains(c.getSimpleName(), patterns))
+			return;
 		if (returnType.isAnnotation() || returnType.isArray() || returnType.isPrimitive())
 			throw new IllegalArgumentException("returnType must be a normal type");
 		final ExpressionInfo<E, T> info = new ExpressionInfo<E, T>(patterns, returnType, c);
@@ -987,10 +1006,12 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @param patterns Skript patterns to match this event
 	 * @return A SkriptEventInfo representing the registered event. Used to generate Skript's documentation.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "null"})
 	public static <E extends SkriptEvent> SkriptEventInfo<E> registerEvent(final String name, final Class<E> c, final Class<? extends Event> event, final String... patterns) {
 		checkAcceptRegistrations();
 		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, patterns, c, CollectionUtils.array(event));
+		if(FeatureConfig.contains(c.getSimpleName(), patterns))
+			return r;
 		events.add(r);
 		return r;
 	}
@@ -1004,9 +1025,12 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @param patterns Skript patterns to match this event
 	 * @return A SkriptEventInfo representing the registered event. Used to generate Skript's documentation.
 	 */
+	@SuppressWarnings("null")
 	public static <E extends SkriptEvent> SkriptEventInfo<E> registerEvent(final String name, final Class<E> c, final Class<? extends Event>[] events, final String... patterns) {
 		checkAcceptRegistrations();
 		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, patterns, c, events);
+		if(FeatureConfig.contains(c.getSimpleName(), patterns))
+			return r;
 		Skript.events.add(r);
 		return r;
 	}
