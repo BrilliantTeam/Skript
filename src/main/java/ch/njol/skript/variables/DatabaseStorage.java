@@ -474,7 +474,7 @@ public class DatabaseStorage extends VariablesStorage {
 			if (value != null && value.length > MAX_VALUE_SIZE)
 				Skript.error("The variable {" + name + "} cannot be saved in the database as its value's size (" + value.length + ") exceeds the maximum allowed size of " + MAX_VALUE_SIZE + "! An attempt to save the variable will be made nonetheless.");
 			try {
-				if (!monitor && type == null) {
+				if (type == null) {
 					assert value == null;
 					final PreparedStatement deleteQuery = this.deleteQuery;
 					assert deleteQuery != null;
