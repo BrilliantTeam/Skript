@@ -39,7 +39,9 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.util.Slot;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -193,6 +195,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 		@Nullable
 		abstract String get(@Nullable Object o);
 		
+		@SuppressWarnings("unused")
 		String getFrom() {
 			final StringBuilder b = new StringBuilder();
 			for (int i = 0; i < types.length; i++) {
@@ -211,16 +214,33 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	}
 	
 	static {
-		for (final NameType n : NameType.values())
-			register(ExprName.class, String.class, n.pattern, n.getFrom());
+		register(ExprName.class, String.class, "(0¦)name[s]", "objects");
+		register(ExprName.class, String.class, "(1¦)(display|nick|chat)[ ]name[s]", "objects");
+		register(ExprName.class, String.class, "(2¦)(player|tab)[ ]list name[s]", "players");
+
+		/*for (final NameType n : NameType.values()){
+			System.out.println("Pattern: [the] " + n.pattern + " of " + n.getFrom());
+			register(ExprName.class, String.class, n.pattern, "objects");
+		}*/
 	}
 	
 	@SuppressWarnings("null")
 	private NameType type;
 	
-	@SuppressWarnings("null")
+	@SuppressWarnings({"null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
+		
+		//Mirre Start Quick Fix
+		Class<?> returnType = exprs[0] instanceof Variable ? null : exprs[0].getReturnType();
+		if(returnType != null && parseResult.mark <= 1){
+			if(!(Player.class.isAssignableFrom(returnType)) && !(ItemStack.class.isAssignableFrom(returnType)) && !(Slot.class.isAssignableFrom(returnType)) && !(LivingEntity.class.isAssignableFrom(returnType))){
+				return false;
+			}
+			
+		}
+		//Mirre End
+		
 		type = NameType.values()[parseResult.mark];
 		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
