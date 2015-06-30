@@ -214,12 +214,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	}
 	
 	static {
-		//register(ExprName.class, String.class, "(0¦)name[s]", "objects");
-		//register(ExprName.class, String.class, "(1¦)(display|nick|chat)[ ]name[s]", "objects");
-		//register(ExprName.class, String.class, "(2¦)(player|tab)[ ]list name[s]", "players");
-
 		for (final NameType n : NameType.values()){
-
 			register(ExprName.class, String.class, n.pattern, n.getFrom());
 		}
 	}
@@ -227,25 +222,15 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	@SuppressWarnings("null")
 	private NameType type;
 	
-	@SuppressWarnings({"null"})
+	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		
-		/*Mirre Start Quick Fix
-		Class<?> returnType = exprs[0] instanceof Variable ? null : exprs[0].getReturnType();
-		if(returnType != null && parseResult.mark <= 1){
-			if(!(Player.class.isAssignableFrom(returnType)) && !(ItemStack.class.isAssignableFrom(returnType)) && !(Slot.class.isAssignableFrom(returnType)) && !(Entity.class.isAssignableFrom(returnType))){
-				return false;
-			}
-			
-		}
-		//Mirre End */
 		type = NameType.values()[parseResult.mark];
-		//Expression<?> c = exprs[0].getConvertedExpression(Object.class);
-		//if(c == null)
-		//	return false;
-		//setExpr(c);
-		return super.init(exprs, matchedPattern, isDelayed, parseResult);
+		if(exprs[0] instanceof Variable)
+			setExpr(exprs[0].getConvertedExpression(Object.class));
+		else
+			setExpr(exprs[0]);
+		return true;
 	}
 	
 	@Override
