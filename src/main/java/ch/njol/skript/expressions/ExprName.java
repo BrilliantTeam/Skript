@@ -22,6 +22,7 @@
 package ch.njol.skript.expressions;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -195,7 +196,6 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 		@Nullable
 		abstract String get(@Nullable Object o);
 		
-		@SuppressWarnings("unused")
 		String getFrom() {
 			final StringBuilder b = new StringBuilder();
 			for (int i = 0; i < types.length; i++) {
@@ -214,14 +214,14 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	}
 	
 	static {
-		register(ExprName.class, String.class, "(0¦)name[s]", "objects");
-		register(ExprName.class, String.class, "(1¦)(display|nick|chat)[ ]name[s]", "objects");
-		register(ExprName.class, String.class, "(2¦)(player|tab)[ ]list name[s]", "players");
+		//register(ExprName.class, String.class, "(0¦)name[s]", "objects");
+		//register(ExprName.class, String.class, "(1¦)(display|nick|chat)[ ]name[s]", "objects");
+		//register(ExprName.class, String.class, "(2¦)(player|tab)[ ]list name[s]", "players");
 
-		/*for (final NameType n : NameType.values()){
-			System.out.println("Pattern: [the] " + n.pattern + " of " + n.getFrom());
-			register(ExprName.class, String.class, n.pattern, "objects");
-		}*/
+		for (final NameType n : NameType.values()){
+
+			register(ExprName.class, String.class, n.pattern, n.getFrom());
+		}
 	}
 	
 	@SuppressWarnings("null")
@@ -231,17 +231,20 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		
-		//Mirre Start Quick Fix
+		/*Mirre Start Quick Fix
 		Class<?> returnType = exprs[0] instanceof Variable ? null : exprs[0].getReturnType();
 		if(returnType != null && parseResult.mark <= 1){
-			if(!(Player.class.isAssignableFrom(returnType)) && !(ItemStack.class.isAssignableFrom(returnType)) && !(Slot.class.isAssignableFrom(returnType)) && !(LivingEntity.class.isAssignableFrom(returnType))){
+			if(!(Player.class.isAssignableFrom(returnType)) && !(ItemStack.class.isAssignableFrom(returnType)) && !(Slot.class.isAssignableFrom(returnType)) && !(Entity.class.isAssignableFrom(returnType))){
 				return false;
 			}
 			
 		}
-		//Mirre End
-		
+		//Mirre End */
 		type = NameType.values()[parseResult.mark];
+		//Expression<?> c = exprs[0].getConvertedExpression(Object.class);
+		//if(c == null)
+		//	return false;
+		//setExpr(c);
 		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 	
