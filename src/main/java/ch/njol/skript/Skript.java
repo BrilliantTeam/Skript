@@ -122,6 +122,7 @@ import ch.njol.skript.variables.Variables;
 import ch.njol.util.Closeable;
 import ch.njol.util.Kleenean;
 import ch.njol.util.NullableChecker;
+import ch.njol.util.Pair;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.CheckedIterator;
@@ -943,9 +944,11 @@ public final class Skript extends JavaPlugin implements Listener {
 	@SuppressWarnings("null")
 	public static <E extends Condition> void registerCondition(final Class<E> condition, final String... patterns) throws IllegalArgumentException {
 		checkAcceptRegistrations();
-		if(FeatureConfig.contains(condition.getSimpleName(), patterns))
+		
+		Pair<Boolean, String[]> pair = FeatureConfig.contains(condition.getSimpleName(), patterns);
+		if(pair.getFirst())
 			return;
-		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(patterns, condition);
+		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(pair.getSecond(), condition);
 		conditions.add(info);
 		statements.add(info);
 	}
@@ -959,9 +962,10 @@ public final class Skript extends JavaPlugin implements Listener {
 	@SuppressWarnings("null")
 	public static <E extends Effect> void registerEffect(final Class<E> effect, final String... patterns) throws IllegalArgumentException {
 		checkAcceptRegistrations();
-		if(FeatureConfig.contains(effect.getSimpleName(), patterns))
+		Pair<Boolean, String[]> pair = FeatureConfig.contains(effect.getSimpleName(), patterns);
+		if(pair.getFirst())
 			return;
-		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(patterns, effect);
+		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(pair.getSecond(), effect);
 		effects.add(info);
 		statements.add(info);
 	}
@@ -996,11 +1000,12 @@ public final class Skript extends JavaPlugin implements Listener {
 	@SuppressWarnings("null")
 	public static <E extends Expression<T>, T> void registerExpression(final Class<E> c, final Class<T> returnType, final ExpressionType type, final String... patterns) throws IllegalArgumentException {
 		checkAcceptRegistrations();
-		if(FeatureConfig.contains(c.getSimpleName(), patterns))
+		Pair<Boolean, String[]> pair = FeatureConfig.contains(c.getSimpleName(), patterns);
+		if(pair.getFirst())
 			return;
 		if (returnType.isAnnotation() || returnType.isArray() || returnType.isPrimitive())
 			throw new IllegalArgumentException("returnType must be a normal type");
-		final ExpressionInfo<E, T> info = new ExpressionInfo<E, T>(patterns, returnType, c);
+		final ExpressionInfo<E, T> info = new ExpressionInfo<E, T>(pair.getSecond(), returnType, c);
 		for (int i = type.ordinal() + 1; i < ExpressionType.values().length; i++) {
 			expressionTypesStartIndices[i]++;
 		}
@@ -1045,9 +1050,10 @@ public final class Skript extends JavaPlugin implements Listener {
 	@SuppressWarnings({"unchecked", "null"})
 	public static <E extends SkriptEvent> SkriptEventInfo<E> registerEvent(final String name, final Class<E> c, final Class<? extends Event> event, final String... patterns) {
 		checkAcceptRegistrations();
-		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, patterns, c, CollectionUtils.array(event));
-		if(FeatureConfig.contains(c.getSimpleName(), patterns))
-			return r;
+		Pair<Boolean, String[]> pair = FeatureConfig.contains(c.getSimpleName(), patterns);
+		if(pair.getFirst())
+			return new SkriptEventInfo<E>(name, patterns, c, CollectionUtils.array(event));
+		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, pair.getSecond(), c, CollectionUtils.array(event));
 		events.add(r);
 		return r;
 	}
@@ -1064,9 +1070,10 @@ public final class Skript extends JavaPlugin implements Listener {
 	@SuppressWarnings("null")
 	public static <E extends SkriptEvent> SkriptEventInfo<E> registerEvent(final String name, final Class<E> c, final Class<? extends Event>[] events, final String... patterns) {
 		checkAcceptRegistrations();
-		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, patterns, c, events);
-		if(FeatureConfig.contains(c.getSimpleName(), patterns))
-			return r;
+		Pair<Boolean, String[]> pair = FeatureConfig.contains(c.getSimpleName(), patterns);
+		if(pair.getFirst())
+			return new SkriptEventInfo<E>(name, patterns, c, events);
+		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, pair.getSecond(), c, events);
 		Skript.events.add(r);
 		return r;
 	}

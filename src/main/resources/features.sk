@@ -18,3 +18,19 @@ features:
 	#Feature1: [chat][( |-)]recipients
 	#Feature2: [the] (attacked|damaged|victim) [<(.+)>]
 	#ExprChatRecipients: [chat][( |-)]recipients
+
+	ExampleWhatever: null
+
+#You can also alter a pattern if put inside "alterSyntax:"
+#It should be put in the following format: <Pattern to alter>: <Altered Pattern>
+
+alterSyntax:
+	#This pattern: "inventory of %inventorytype%" conflicts with Skript's pattern "inventor(y|ies) of %inventoryholder%". 
+	#So we want to alter it instead of disabling the whole feature.
+	
+	#inventory of %inventorytype%: new inventory of %inventorytype% 
+	
+	ExampleASDSADSAD: ExampleLOL
+
+#Never alter this.
+Version: V8

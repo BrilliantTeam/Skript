@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -58,23 +59,33 @@ public class FeatureConfig {
 	private static List<String> disabledClassNames = new ArrayList<String>();
 	private static List<String> disabledPatterns = new ArrayList<String>();
 	
-	public final static OptionSection features = new OptionSection("features");
+	private static Map<String, String> alteredPatterns = new HashMap<String, String>();
 	
-	public static boolean contains(String className, String... patterns){
+	public final static OptionSection features = new OptionSection("features");
+	public final static OptionSection alterSyntax = new OptionSection("alterSyntax");
+	
+	public static Pair<Boolean, String[]> contains(String className, String... patterns){
+		
 		if(disabledClassNames.contains(className)){
 			if(debug)
 				Skript.info("Disabling feature " + className + " through the Features.sk config.");
-			return true;
+			return new Pair<Boolean, String[]>(true, patterns);
 		}
 		
-		for(String pattern : patterns){
-			if(disabledPatterns.contains(pattern)){
+		for(int i = 0 ; i < patterns.length ; i++){
+			if(alteredPatterns.containsKey(patterns[i])){
 				if(debug)
-					Skript.info("Disabling the feature " + className + " which had the exact pattern: " + pattern + ".");
-				return true;
+					Skript.info("Altering the pattern" + patterns[i] + " to " + alteredPatterns.get(patterns[i]) + ".");
+				patterns[i] = alteredPatterns.get(patterns[i]);
+				return new Pair<Boolean, String[]>(false, patterns);
+			}
+			if(disabledPatterns.contains(patterns[i])){
+				if(debug)
+					Skript.info("Disabling the feature " + className + " which had the exact pattern: " + patterns[i] + ".");
+				return new Pair<Boolean, String[]>(true, patterns);
 			}
 		}
-		return false;
+		return new Pair<Boolean, String[]>(false, patterns);
 	}
 	
 
@@ -132,6 +143,9 @@ public class FeatureConfig {
 			mc.load(FeatureConfig.class);
 			
 			
+			if(mc.get("Version").isEmpty() || !mc.get("Version").equalsIgnoreCase(Skript.MIRRE)){
+				Skript.warning("Your features.sk config file might by outdated. Delete your features.sk in the Skript folder to renew the config file.");
+			}
 			if(mc.get("DEBUG").equalsIgnoreCase("true"))
 				debug = true;
 			
@@ -148,7 +162,12 @@ public class FeatureConfig {
 					}
 				}
 			}
-			
+			SectionNode alterNode = (SectionNode) mc.getMainNode().get("alterSyntax");
+			if(alterNode != null && !alterNode.isEmpty()){
+				for(Node n : new IteratorIterable<Node>(alterNode.iterator())){	
+					alteredPatterns.put(n.getKey(), mc.get("alterSyntax", n.getKey()));
+				}
+			}
 		}
 	}
 	
