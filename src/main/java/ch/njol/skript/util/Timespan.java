@@ -141,8 +141,17 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 		this.millis = millis;
 	}
 	
+	/**
+	 * @deprecated Use fromTicks_i(long ticks) instead. Since this method limits timespan to 50 * Integer.MAX_VALUE.
+	 * @addon I only keep this to allow for older addons to still work. / Mirre
+	 */
+	@Deprecated
 	public static Timespan fromTicks(final int ticks) {
-		return new Timespan((long) ticks * 50);
+		return new Timespan(ticks * 50L);
+	}
+	
+	public static Timespan fromTicks_i(final long ticks) {
+		return new Timespan(ticks * 50L);
 	}
 	
 	public long getMilliSeconds() {

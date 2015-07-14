@@ -51,7 +51,7 @@ import ch.njol.util.coll.iterator.IteratorIterable;
  * @author Peter Güttinger
  *
  */
-public class FeatureConfig {
+public class FeatureConfigLol {
 	
 	private static boolean loaded = false;
 	private static boolean debug = false;
@@ -71,18 +71,19 @@ public class FeatureConfig {
 				Skript.info("Disabling feature " + className + " through the Features.sk config.");
 			return new Pair<Boolean, String[]>(true, patterns);
 		}
-		
-		for(int i = 0 ; i < patterns.length ; i++){
-			if(alteredPatterns.containsKey(patterns[i])){
-				if(debug)
-					Skript.info("Altering the pattern" + patterns[i] + " to " + alteredPatterns.get(patterns[i]) + ".");
-				patterns[i] = alteredPatterns.get(patterns[i]);
-				return new Pair<Boolean, String[]>(false, patterns);
-			}
-			if(disabledPatterns.contains(patterns[i])){
-				if(debug)
-					Skript.info("Disabling the feature " + className + " which had the exact pattern: " + patterns[i] + ".");
-				return new Pair<Boolean, String[]>(true, patterns);
+		if(patterns != null){
+			for(int i = 0 ; i < patterns.length ; i++){
+				if(alteredPatterns.containsKey(patterns[i])){
+					if(debug)
+						Skript.info("Altering the pattern" + patterns[i] + " to " + alteredPatterns.get(patterns[i]) + ".");
+					patterns[i] = alteredPatterns.get(patterns[i]);
+					return new Pair<Boolean, String[]>(false, patterns);
+				}
+				if(disabledPatterns.contains(patterns[i])){
+					if(debug)
+						Skript.info("Disabling the feature " + className + " which had the exact pattern: " + patterns[i] + ".");
+					return new Pair<Boolean, String[]>(true, patterns);
+				}
 			}
 		}
 		return new Pair<Boolean, String[]>(false, patterns);
@@ -140,10 +141,10 @@ public class FeatureConfig {
 		
 		
 		if(mc != null){
-			mc.load(FeatureConfig.class);
+			mc.load(FeatureConfigLol.class);
 			
 			
-			if(mc.get("Version").isEmpty() || !mc.get("Version").equalsIgnoreCase(Skript.MIRRE)){
+			if(mc.get("Version") == null || !mc.get("Version").equalsIgnoreCase(Skript.MIRRE)){
 				Skript.warning("Your features.sk config file might by outdated. Delete your features.sk in the Skript folder to renew the config file.");
 			}
 			if(mc.get("DEBUG").equalsIgnoreCase("true"))
