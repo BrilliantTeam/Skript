@@ -515,7 +515,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			public void run() {
 				String s = getMirreVersion();
 				if(!s.equalsIgnoreCase(MIRRE)){
-					Skript.warning("A new version of Skript Fixes has been found. Skript 2.2 Fixes " + s + " has been released. It's recommended to try the latest version.");
+					Bukkit.getLogger().info("[Skript] A new version of Skript Fixes has been found. Skript 2.2 Fixes " + s + " has been released. It's recommended to try the latest version.");
 				}
 			}
 			
