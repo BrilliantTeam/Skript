@@ -93,6 +93,8 @@ public abstract class SkriptConfig {
 	public final static OptionSection databases = new OptionSection("databases");
 	
 	public final static Option<Boolean> usePlayerUUIDsInVariableNames = new Option<Boolean>("use player UUIDs in variable names", false); // TODO change to true later (as well as in the default config)
+	public final static Option<Boolean> enablePlayerVariableFix = new Option<Boolean>("player variable fix", true);
+
 	
 	@SuppressWarnings("null")
 	private final static DateFormat shortDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);

@@ -42,12 +42,12 @@ import ch.njol.util.coll.CollectionUtils;
 @Description("The yaw or pitch of a location. You likely won't need this expression ever if you don't know what this means.")
 @Examples("log \"%player%: %location of player%, %player's yaw%, %player's pitch%\" to \"playerlocs.log\"")
 @Since("2.0")
-public class ExprYawPitch extends SimplePropertyExpression<Location, Float> {
+public class ExprYawPitch extends SimplePropertyExpression<Location, Number> {
 	
 	public static boolean randomSK = true;
 	
 	static {
-		register(ExprYawPitch.class, Float.class, "(0¦yaw|1¦pitch)", "locations");
+		register(ExprYawPitch.class, Number.class, "(0¦yaw|1¦pitch)", "locations");
 	}
 	
 	private boolean yaw;
@@ -60,13 +60,13 @@ public class ExprYawPitch extends SimplePropertyExpression<Location, Float> {
 	
 	@SuppressWarnings("null")
 	@Override
-	public Float convert(final Location l) {
+	public Number convert(final Location l) {
 		return yaw ? convertToPositive(l.getYaw()) : l.getPitch();
 	}
 	
 	@Override
-	public Class<? extends Float> getReturnType() {
-		return Float.class;
+	public Class<? extends Number> getReturnType() {
+		return Number.class;
 	}
 	
 	@Override
@@ -78,7 +78,7 @@ public class ExprYawPitch extends SimplePropertyExpression<Location, Float> {
 		@Override
 		public Class<?>[] acceptChange(final ChangeMode mode) {
 			if (mode == ChangeMode.SET || mode == ChangeMode.ADD || mode == ChangeMode.REMOVE)
-				return CollectionUtils.array(Float.class);
+				return CollectionUtils.array(Number.class);
 			return null;
 		}
 	
@@ -86,14 +86,16 @@ public class ExprYawPitch extends SimplePropertyExpression<Location, Float> {
 		@Override
 		public void change(Event e, Object[] delta, ChangeMode mode) {
 			Location l = getExpr().getSingle(e);
-			Float f = (Float) delta[0];
+			if(delta[0] == null || l == null)
+				return;
+			float f = ((Number) delta[0]).floatValue();
 			switch (mode) {
 				case SET:
 					if (yaw)
 						l.setYaw(convertToPositive(f));
 					else
 						l.setPitch(f);
-						break;
+					break;
 				case ADD:
 					if (yaw)
 						l.setYaw(convertToPositive(l.getYaw()) + f);
@@ -113,10 +115,10 @@ public class ExprYawPitch extends SimplePropertyExpression<Location, Float> {
 	
 	
 		//Some random method decided to use for converting to positive values.
-		public float convertToPositive(Number n) {
-			if (n.floatValue() * -1 == Math.abs(n.floatValue()))
-				return 360 + n.floatValue();
-			return n.floatValue();
+		public float convertToPositive(float f) {
+			if (f * -1 == Math.abs(f))
+				return 360 + f;
+			return f;
 		}	
 	
 }

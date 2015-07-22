@@ -32,12 +32,17 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
+import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.classes.Arithmetic;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -199,7 +204,7 @@ public class Variable<T> implements Expression<T> {
 		final String n = name.toString(e).toLowerCase(Locale.ENGLISH);
 		if (n.endsWith(Variable.SEPARATOR + "*") != list) // prevents e.g. {%expr%} where "%expr%" ends with "::*" from returning a Map
 			return null;
-		final Object val = Variables.getVariable(n, e, local);
+		final Object val = !list ? convertIfOldPlayer(n, e, Variables.getVariable(n, e, local)) : Variables.getVariable(n, e, local);
 		if (val == null)
 			return Variables.getVariable((local ? LOCAL_VARIABLE_TOKEN : "") + name.getDefaultVariableName().toLowerCase(Locale.ENGLISH), e, false);
 		return val;
@@ -214,15 +219,38 @@ public class Variable<T> implements Expression<T> {
 		if (val == null)
 			return Array.newInstance(types[0], 0);
 		final List<Object> l = new ArrayList<Object>();
+		final String name = StringUtils.substring(this.name.toString(e), 0, -1).toLowerCase(Locale.ENGLISH);
 		for (final Entry<String, ?> v : ((Map<String, ?>) val).entrySet()) {
 			if (v.getKey() != null && v.getValue() != null) {
+				Object o;
 				if (v.getValue() instanceof Map)
-					l.add(((Map<String, ?>) v.getValue()).get(null));
+					o = ((Map<String, ?>) v.getValue()).get(null);
 				else
-					l.add(v.getValue());
+					o = v.getValue();	
+				l.add(convertIfOldPlayer(name + v.getKey(), e, o));
 			}
 		}
 		return l.toArray();
+	}
+	
+	private final static boolean uuidSupported = Skript.methodExists(OfflinePlayer.class, "getUniqueId");
+	
+	/*
+	 * Workaround for player variables when a player has left and rejoined 
+	 * because the player object inside the variable will be a (kinda) dead variable
+	 * as a new player object has been created by the server.
+	 */
+	@SuppressWarnings({"deprecation"})
+	@Nullable Object convertIfOldPlayer(String key, Event event, @Nullable Object t){
+		if(SkriptConfig.enablePlayerVariableFix.value() && t != null && t instanceof Player){
+			Player p = (Player) t;
+			if(!p.isValid() && p.isOnline()){
+				Player player = uuidSupported ? Bukkit.getPlayer(p.getUniqueId()) : Bukkit.getPlayerExact(p.getName());
+				Variables.setVariable(key, player, event, local);
+				return player;
+			}
+		}
+		return t;
 	}
 	
 	public Iterator<Pair<String, Object>> variablesIterator(final Event e) {
@@ -249,7 +277,7 @@ public class Variable<T> implements Expression<T> {
 				while (keys.hasNext()) {
 					key = keys.next();
 					if (key != null) {
-						next = Variables.getVariable(name + key, e, local);
+						next = convertIfOldPlayer(name + key, e, Variables.getVariable(name + key, e, local));
 						if (next != null && !(next instanceof TreeMap))
 							return true;
 					}
@@ -292,6 +320,7 @@ public class Variable<T> implements Expression<T> {
 			@Nullable
 			private T next = null;
 			
+			@SuppressWarnings({"unchecked"})
 			@Override
 			public boolean hasNext() {
 				if (next != null)
@@ -300,6 +329,7 @@ public class Variable<T> implements Expression<T> {
 					key = keys.next();
 					if (key != null) {
 						next = Converters.convert(Variables.getVariable(name + key, e, local), types);
+						next = (T) convertIfOldPlayer(name + key, e, next);
 						if (next != null && !(next instanceof TreeMap))
 							return true;
 					}
@@ -529,7 +559,7 @@ public class Variable<T> implements Expression<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public T[] getAll(final Event e) {
-		if (list)
+		if(list)
 			return getConvertedArray(e);
 		final T o = getConverted(e);
 		if (o == null) {
