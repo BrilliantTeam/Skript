@@ -165,6 +165,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 	/**
 	 * @deprecated Use getTicks_i() instead. Since this method limits timespan to Integer.MAX_VALUE.
 	 * @addon I only keep this to allow for older addons to still work. / Mirre
+	 * @Well if need the ticks because of a method that takes a int input it doesn't really matter.
 	 */
 	@Deprecated
 	public int getTicks() {

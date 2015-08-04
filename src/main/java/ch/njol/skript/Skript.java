@@ -522,7 +522,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		});
 	}
 	
-	@SuppressWarnings("null")
 	static String getMirreVersion(){
 		try {
 	      URL url = new URL("http://mirre.eu.pn/version/");
@@ -537,7 +536,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	    catch (IOException ex) {
 	    	
 	    }
-	    return null;
+	    return "";
 	}
 	
 	private static Version minecraftVersion = new Version(666);
