@@ -33,7 +33,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -415,8 +417,21 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 			final E e = loc.getWorld().spawn(loc, getType());
 			if (e == null)
 				throw new IllegalArgumentException();
-			if (baby.isTrue() && e instanceof Ageable)
-				((Ageable) e).setBaby();
+			if (baby.isTrue()){
+				if(e instanceof Ageable)
+					((Ageable) e).setBaby();
+				else if(e instanceof Zombie)
+					((Zombie) e).setBaby(true);
+				else if(e instanceof PigZombie)
+					((PigZombie) e).setBaby(true);
+			}else if(baby.isFalse()){
+				if(e instanceof Ageable)
+					((Ageable) e).setAdult();
+				else if(e instanceof Zombie)
+					((Zombie) e).setBaby(false);
+				else if(e instanceof PigZombie)
+					((PigZombie) e).setBaby(false);
+			}
 			set(e);
 			return e;
 		} catch (final IllegalArgumentException e) {

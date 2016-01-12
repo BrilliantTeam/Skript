@@ -23,7 +23,7 @@ public class FilterPrintStream extends PrintStream {
 	}
 	
 	@Override
-	public void println(String string){
+	public synchronized void println(String string){
 		if(Commands.suppressUnknownCommandMessage && string.contains("Unknown command. Type")){
 			Commands.suppressUnknownCommandMessage = false;
 			return;

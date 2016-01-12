@@ -199,7 +199,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			return;
 		}
 		
-		System.setOut(new FilterPrintStream(System.out));
+		//System.setOut(new FilterPrintStream(System.out));
 		
 		Language.loadDefault(getAddonInstance());
 		
