@@ -21,6 +21,7 @@
 
 package ch.njol.skript.events;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -91,14 +92,12 @@ public class EvtClick extends SkriptEvent {
 	
 	@Override
 	public boolean check(final Event e) {
-		final Player player;
 		final Block block;
 		final Entity entity;
 		
 		if (e instanceof PlayerInteractEntityEvent) {
 			if (click == LEFT || types == null) // types == null  will be handled by the PlayerInteractEvent that is fired as well
 				return false;
-			player = ((PlayerInteractEntityEvent) e).getPlayer();
 			entity = ((PlayerInteractEntityEvent) e).getRightClicked();
 			block = null;
 		} else if (e instanceof PlayerInteractEvent) {
@@ -119,7 +118,6 @@ public class EvtClick extends SkriptEvent {
 			}
 			if ((this.click & click) == 0)
 				return false;
-			player = ((PlayerInteractEvent) e).getPlayer();
 			block = ((PlayerInteractEvent) e).getClickedBlock();
 			entity = null;
 		} else {
@@ -130,7 +128,7 @@ public class EvtClick extends SkriptEvent {
 		if (tools != null && !tools.check(e, new Checker<ItemType>() {
 			@Override
 			public boolean check(final ItemType t) {
-				return t.isOfType(player.getItemInHand());
+				return t.isOfType(((PlayerInteractEvent) e).getItem());
 			}
 		})) {
 			return false;
