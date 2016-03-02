@@ -117,9 +117,6 @@ public class EvtBlock extends SkriptEvent {
 		} else if (e instanceof PlayerBucketEmptyEvent) {
 			id = ((PlayerBucketEmptyEvent) e).getBucket() == Material.WATER_BUCKET ? Material.STATIONARY_WATER.getId() : Material.STATIONARY_LAVA.getId();
 			durability = 0;
-		} else if (e instanceof PaintingEvent) {
-			id = Material.PAINTING.getId();
-			durability = 0;
 		} else if (Skript.isRunningMinecraft(1, 4, 3) && e instanceof HangingEvent) {
 			final EntityData<?> d = EntityData.fromEntity(((HangingEvent) e).getEntity());
 			return types.check(e, new Checker<ItemType>() {
@@ -128,6 +125,9 @@ public class EvtBlock extends SkriptEvent {
 					return t != null && Relation.EQUAL.is(DefaultComparators.entityItemComparator.compare(d, t));
 				}
 			});
+		} else if (e instanceof PaintingEvent) {
+			id = Material.PAINTING.getId();
+			durability = 0;
 		} else {
 			assert false;
 			return false;

@@ -193,7 +193,6 @@ public class DefaultChangers {
 			return CollectionUtils.array(ItemType[].class, Inventory[].class);
 		}
 		
-		@SuppressWarnings("deprecation")
 		@Override
 		public void change(final Inventory[] invis, final @Nullable Object[] delta, final ChangeMode mode) {
 			for (final Inventory invi : invis) {
@@ -217,14 +216,20 @@ public class DefaultChangers {
 						//$FALL-THROUGH$
 					case ADD:
 						assert delta != null;
-						for (final Object d : delta) {
-							if (d instanceof Inventory) {
-								for (final ItemStack i : (Inventory) d) {
-									if (i != null)
-										invi.addItem(i);
+						if(delta instanceof ItemStack[]) {
+							ItemStack[] items = (ItemStack[]) delta;
+							if(items.length > 36) {
+								return;
+							}
+							for (final Object d : delta) {
+								if (d instanceof Inventory) {
+									for (final ItemStack i : (Inventory) d) {
+										if (i != null)
+											invi.addItem(i);
+									}
+								} else {
+									((ItemType) d).addTo(invi);
 								}
-							} else {
-								((ItemType) d).addTo(invi);
 							}
 						}
 						break;
