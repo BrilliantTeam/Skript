@@ -45,6 +45,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Giant;
+import org.bukkit.entity.Golem;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.ItemFrame;
@@ -146,6 +147,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("bottle of enchanting", ThrownExpBottle.class));
 		types.add(new SimpleEntityDataInfo("tnt", TNTPrimed.class));
 		types.add(new SimpleEntityDataInfo("zombie", Zombie.class));
+		types.add(new SimpleEntityDataInfo("shulker", Golem.class));
+		types.add(new SimpleEntityDataInfo("golem", Golem.class));
 		
 		if (Skript.classExists("org.bukkit.entity.ItemFrame")) {
 			types.add(new SimpleEntityDataInfo("item frame", ItemFrame.class));
