@@ -1751,5 +1751,42 @@ Standardnamen:
 	magenta Banner @n = 425:13
 	orangenes Banner @n = 425:14
 	weisses Banner @n = 425:15
-	
-	
+
+	# -- FIX for 1.9.x --
+
+	Endstab @m = 198
+	Choruspflanze @f = 199
+	Chorusblüte @f = 200
+	Purpurblock @m = 201
+	Purpursäule @f = 202
+	Purpurtreppe @f = 203
+	Purpurdoppelstufe  @f = 204
+	Purpurstufe @f = 205
+	Endsteinziegel @m = 206
+	Rote-Bete-Keime @f = 207
+	Trampelpfadblock @m = 208
+	Endtorblock @m = 209
+	Wiederhol-Befehlsblock @m = 210
+	Ketten-Befehlsblock @m = 211
+	Gefrorener Eisblock @m = 212
+
+	Struckturblock @m = 255
+
+	Enderkristall @m = 426
+	Chorusfrucht @f = 432
+	Geplatzte Chorusfrucht @f = 433
+	Rote Bete @f = 434
+	Rote-Bete-Samen @m = 435
+	Borschtsch @m = 436
+	Drachenatem @m = 437
+	Wurftrank @m = 438
+	Spektralpfeil  @m = 439
+	Nasserpfeil @m = 440
+	Verweilende Wasserflasche @f = 441
+	Schild @n = 442
+	Elytren = 443
+	Fichtenholzboot @n = 444
+	Birkenholzboot @n = 445
+	Tropenholzboot @n = 446
+	Akazienholzboot @n = 447
+	Schwarzeichenholzboot @n = 448
