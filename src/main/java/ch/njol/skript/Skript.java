@@ -159,6 +159,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	// ================ PLUGIN ================
 	
 	public static String MIRRE = "V9";
+	public static boolean DEV_BUILD = true; //Disables version checking
 	
 	@Nullable
 	private static Skript instance = null;
@@ -514,7 +515,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			@Override
 			public void run() {
 				String s = getMirreVersion();
-				if(!s.equalsIgnoreCase(MIRRE)){
+				if(!s.equalsIgnoreCase(MIRRE) && !DEV_BUILD){
 					Bukkit.getLogger().info("[Skript] A new version of Skript Fixes has been found. Skript 2.2 Fixes " + s + " has been released. It's recommended to try the latest version.");
 				}
 			}

@@ -24,7 +24,6 @@ package ch.njol.skript.events;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.Painting;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -104,8 +103,8 @@ public class EvtBlock extends SkriptEvent {
 		}
 		if (types == null)
 			return true;
-		final int id;
-		final short durability;
+		int id = 0;
+		short durability = 0;
 		if (e instanceof BlockEvent) {
 			id = ((BlockEvent) e).getBlock().getTypeId();
 			durability = ((BlockEvent) e).getBlock().getData();
