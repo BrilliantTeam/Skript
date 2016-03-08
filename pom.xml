@@ -40,18 +40,21 @@
 			<version>7.1</version>
 		</dependency>
 
-		<!--<dependency>
+		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>Vault</artifactId>
 			<version>1.5.4</version>
-			<scope>provided</scope>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/Vault.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.sk89q</groupId>
 			<artifactId>worldguard</artifactId>
 			<version>6.1.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>-->
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/worldguard-6.1.jar</systemPath>
+		</dependency>
+		
 		<dependency>
 			<groupId>me.ryanhamshire</groupId>
 			<artifactId>griefprevention</artifactId>
