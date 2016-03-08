@@ -155,10 +155,11 @@ import ch.njol.util.coll.iterator.EnumerationIterable;
  * @see Converters#registerConverter(Class, Class, Converter)
  */
 public final class Skript extends JavaPlugin implements Listener {
-
+	
 	// ================ PLUGIN ================
-
-
+	
+	public static String MIRRE = "V9";
+	
 	@Nullable
 	private static Skript instance = null;
 	
@@ -507,48 +508,37 @@ public final class Skript extends JavaPlugin implements Listener {
 			}
 		}, this);
 		
-
+		
 		Bukkit.getScheduler().runTaskAsynchronously(getInstance(), new Runnable(){
 
-			@SuppressWarnings("null")
 			@Override
 			public void run() {
-				String[] s = getLatestVersionInformation();
-				Double version = Double.valueOf(s[0]) != null ? Double.valueOf(s[0]) : 0.0;
-				String url = String.valueOf(s[1]) != null ? String.valueOf(s[1]) : "https://forums.skunity.com/t/4184";
-				if(version == 0.0) {
-					Skript.warning("Failed to check for a new update from http://nfell2009.uk/skript/version! Returned value: " + version);
-				} else if(version > getCurrentVersion()) {
-					Skript.info("A new version of Skript has been found. Skript " + version + " has been released. It's recommended to try the latest version.");
-					Skript.info("Download link: " + url);
-				} else {
-					Skript.warning("An unknown error occoured when attempting to get current version number");
+				String s = getMirreVersion();
+				if(!s.equalsIgnoreCase(MIRRE)){
+					Bukkit.getLogger().info("[Skript] A new version of Skript Fixes has been found. Skript 2.2 Fixes " + s + " has been released. It's recommended to try the latest version.");
 				}
 			}
-
+			
 		});
 	}
-
-	static Double getCurrentVersion() {
-		return 1.0;
-	}
-
-	static @Nullable String[] getLatestVersionInformation(){
+	
+	static String getMirreVersion(){
 		try {
-	      URL url = new URL("http://nfell2009.uk/skript/version");
+	      URL url = new URL("http://mirre.eu.pn/version/");
 	      Scanner scanner = new Scanner(url.openStream());
 	      String str = "";
 	      while (scanner.hasNext()) {
 	          str = str + scanner.next();
 	      }
 	      scanner.close();
-	      return str.split("->");
-	    } catch (IOException ex) {
-		Skript.warning("An error occoured when trying to find the latest version information!");
-		return new String[] {null, null};
+	      return str;
 	    }
+	    catch (IOException ex) {
+	    	
+	    }
+	    return "";
 	}
-
+	
 	private static Version minecraftVersion = new Version(666);
 	private static boolean runningCraftBukkit = false;
 	
