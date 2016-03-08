@@ -29,9 +29,9 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
-			<version>1.8.7-R0.1-SNAPSHOT</version>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
+			<version>1.9-R0.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -40,7 +40,7 @@
 			<version>7.1</version>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>Vault</artifactId>
 			<version>1.5.4</version>
@@ -51,7 +51,7 @@
 			<artifactId>worldguard</artifactId>
 			<version>6.1.1-SNAPSHOT</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>me.ryanhamshire</groupId>
 			<artifactId>griefprevention</artifactId>
@@ -87,7 +87,7 @@
 	<repositories>
 		<repository>
 			<id>spigot-repo</id>
-			<url>http://hub.spigotmc.org/nexus/content/groups/public/</url>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
 			<id>sqlibrary-repo</id>

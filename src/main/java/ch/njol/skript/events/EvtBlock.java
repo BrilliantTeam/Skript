@@ -22,6 +22,10 @@
 package ch.njol.skript.events;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LeashHitch;
+import org.bukkit.entity.Painting;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
@@ -32,9 +36,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
-import org.bukkit.event.painting.PaintingBreakEvent;
-import org.bukkit.event.painting.PaintingEvent;
-import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -60,7 +61,7 @@ public class EvtBlock extends SkriptEvent {
 	static {
 		// TODO 'block destroy' event for any kind of block destruction (player, water, trampling, fall (sand, toches, ...), etc) -> BlockPhysicsEvent?
 		// REMIND attacking an item frame first removes its item; include this in on block damage?
-		Skript.registerEvent("Break / Mine", EvtBlock.class, new Class[] {BlockBreakEvent.class, PlayerBucketFillEvent.class, Skript.isRunningMinecraft(1, 4, 3) ? HangingBreakEvent.class : PaintingBreakEvent.class}, "[block] (break[ing]|1¦min(e|ing)) [[of] %itemtypes%]")
+		Skript.registerEvent("Break / Mine", EvtBlock.class, new Class[] {BlockBreakEvent.class, PlayerBucketFillEvent.class, Skript.isRunningMinecraft(1, 4, 3) ? HangingBreakEvent.class : HangingBreakEvent.class}, "[block] (break[ing]|1¦min(e|ing)) [[of] %itemtypes%]")
 				.description("Called when a block is broken by a player. If you use 'on mine', only events where the broken block dropped something will call the trigger.")
 				.examples("on mine", "on break of stone", "on mine of any ore")
 				.since("1.0 (break), <i>unknown</i> (mine)");
@@ -68,7 +69,7 @@ public class EvtBlock extends SkriptEvent {
 				.description("Called when a block is destroyed by fire.")
 				.examples("on burn", "on burn of wood, fences, or chests")
 				.since("1.0");
-		Skript.registerEvent("Place", EvtBlock.class, new Class[] {BlockPlaceEvent.class, PlayerBucketEmptyEvent.class, Skript.isRunningMinecraft(1, 4, 3) ? HangingPlaceEvent.class : PaintingPlaceEvent.class}, "[block] (plac(e|ing)|build[ing]) [[of] %itemtypes%]")
+		Skript.registerEvent("Place", EvtBlock.class, new Class[] {BlockPlaceEvent.class, PlayerBucketEmptyEvent.class, Skript.isRunningMinecraft(1, 4, 3) ? HangingPlaceEvent.class : HangingPlaceEvent.class}, "[block] (plac(e|ing)|build[ing]) [[of] %itemtypes%]")
 				.description("Called when a player places a block.")
 				.examples("on place", "on place of a furnace, workbench or chest")
 				.since("1.0");
@@ -125,9 +126,15 @@ public class EvtBlock extends SkriptEvent {
 					return t != null && Relation.EQUAL.is(DefaultComparators.entityItemComparator.compare(d, t));
 				}
 			});
-		} else if (e instanceof PaintingEvent) {
-			id = Material.PAINTING.getId();
-			durability = 0;
+		} else if (e instanceof HangingEvent) {
+			Entity entity = ((HangingEvent) e).getEntity();
+			if (entity instanceof Painting) {
+				id = Material.PAINTING.getId();
+				durability = 0;
+			} else if (entity instanceof ItemFrame) {
+				id = Material.ITEM_FRAME.getId();
+				durability = 0;
+			}
 		} else {
 			assert false;
 			return false;

@@ -61,8 +61,8 @@ import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.painting.PaintingEvent;
-import org.bukkit.event.painting.PaintingPlaceEvent;
+import org.bukkit.event.hanging.HangingEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -585,25 +585,25 @@ public final class BukkitEventValues {
 				}
 			}, 0);
 		} else {
-			EventValues.registerEventValue(PaintingEvent.class, Painting.class, new Getter<Painting, PaintingEvent>() {
+			EventValues.registerEventValue(HangingEvent.class, Hanging.class, new Getter<Hanging, HangingEvent>() {
 				@Override
 				@Nullable
-				public Painting get(final PaintingEvent e) {
-					return e.getPainting();
+				public Hanging get(final HangingEvent e) {
+					return e.getEntity();
 				}
 			}, 0);
-			EventValues.registerEventValue(PaintingEvent.class, World.class, new Getter<World, PaintingEvent>() {
+			EventValues.registerEventValue(HangingEvent.class, World.class, new Getter<World, HangingEvent>() {
 				@Override
 				@Nullable
-				public World get(final PaintingEvent e) {
-					return e.getPainting().getWorld();
+				public World get(final HangingEvent e) {
+					return e.getEntity().getWorld();
 				}
 			}, 0);
 			// PaintingPlaceEvent
-			EventValues.registerEventValue(PaintingPlaceEvent.class, Player.class, new Getter<Player, PaintingPlaceEvent>() {
+			EventValues.registerEventValue(HangingPlaceEvent.class, Player.class, new Getter<Player, HangingPlaceEvent>() {
 				@Override
 				@Nullable
-				public Player get(final PaintingPlaceEvent e) {
+				public Player get(final HangingPlaceEvent e) {
 					return e.getPlayer();
 				}
 			}, 0);
