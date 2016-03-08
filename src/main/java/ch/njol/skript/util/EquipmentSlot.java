@@ -23,11 +23,13 @@ package ch.njol.skript.util;
 
 import java.util.Locale;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.PlayerUtils;
 import ch.njol.skript.registrations.Classes;
 
@@ -42,16 +44,46 @@ public class EquipmentSlot extends Slot {
 	
 	public static enum EquipSlot {
 		TOOL {
+			@SuppressWarnings("deprecation")
 			@Override
 			@Nullable
 			public ItemStack get(final EntityEquipment e) {
+				if (Skript.isRunningMinecraft(1, 9)) {
+					return e.getItemInMainHand();
+				}
 				return e.getItemInHand();
 			}
 			
+			@SuppressWarnings("deprecation")
 			@Override
 			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
-				e.setItemInHand(item);
+				if (Skript.isRunningMinecraft(1, 9)) {
+					e.setItemInMainHand(item);
+				} else {
+					e.setItemInHand(item);
+				}
 			}
+		},
+		OFFHAND { // Since Minecraft 1.9 (defaults to main hand if earlier version)
+
+			@Override
+			@Nullable
+			public ItemStack get(EntityEquipment e) {
+				if (Skript.isRunningMinecraft(1, 9)) {
+					return e.getItemInOffHand();
+				}
+				return e.getItemInHand();
+			}
+
+			@Override
+			public void set(EntityEquipment e, @Nullable ItemStack item) {
+				if (Skript.isRunningMinecraft(1, 9)) {
+					e.setItemInOffHand(item);
+				} else {
+					e.setItemInHand(item);
+				}
+			}
+			
 		},
 		HELMET {
 			@Override

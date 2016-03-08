@@ -22,6 +22,7 @@
 package ch.njol.skript.events;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -29,6 +30,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -96,12 +99,23 @@ public class EvtClick extends SkriptEvent {
 		final Entity entity;
 		
 		if (e instanceof PlayerInteractEntityEvent) {
+			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, no BOTH hands trigger the event (might be a bug?)
+				ItemStack mainHand = ((PlayerInteractEntityEvent) e).getPlayer().getInventory().getItemInMainHand();
+				if (((PlayerInteractEntityEvent) e).getHand() == EquipmentSlot.OFF_HAND && (mainHand == null || mainHand.getType() == Material.AIR)) return false;
+			}
+			
 			if (click == LEFT || types == null) // types == null  will be handled by the PlayerInteractEvent that is fired as well
 				return false;
 			entity = ((PlayerInteractEntityEvent) e).getRightClicked();
 			block = null;
 		} else if (e instanceof PlayerInteractEvent) {
-			final Action a = ((PlayerInteractEvent) e).getAction();
+			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
+			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, no BOTH hands trigger the event (might be a bug?)
+				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
+				if (clickEvent.getHand() == EquipmentSlot.OFF_HAND && (mainHand == null || mainHand.getType() == Material.AIR) ) return false;
+			}
+			
+			final Action a = clickEvent.getAction();
 			final int click;
 			switch (a) {
 				case LEFT_CLICK_AIR:
@@ -118,7 +132,7 @@ public class EvtClick extends SkriptEvent {
 			}
 			if ((this.click & click) == 0)
 				return false;
-			block = ((PlayerInteractEvent) e).getClickedBlock();
+			block = clickEvent.getClickedBlock();
 			entity = null;
 		} else {
 			assert false;

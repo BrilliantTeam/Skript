@@ -57,11 +57,13 @@ import ch.njol.util.Kleenean;
 @Description("The item a player is holding.")
 @Examples({"player is holding a pickaxe",
 		"# is the same as",
-		"player's tool is a pickaxe"})
+		"player's tool is a pickaxe",
+		"player's offhand tool is shield #Only for Minecraft 1.9"})
 @Since("1.0")
 public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 	static {
 		Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)");
+		Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] ((offhand|off) (tool|held item|weapon)|shield) [of %livingentities%]", "%livingentities%'[s] ((offhand|off) (tool|held item|weapon)|shield)");
 	}
 	
 	@SuppressWarnings({"unchecked", "null"})
@@ -133,5 +135,58 @@ public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 	@Override
 	public boolean setTime(final int time) {
 		return super.setTime(time, getExpr(), PlayerItemHeldEvent.class, PlayerBucketFillEvent.class, PlayerBucketEmptyEvent.class);
+	}
+	
+	/**
+	 * Offhand tool expression for Minecraft 1.9.
+	 * @author bensku
+	 *
+	 */
+	public class OffTool extends ExprTool {
+		@Override
+		protected Slot[] get(final Event e, final LivingEntity[] source) {
+			final boolean delayed = Delay.isDelayed(e);
+			return get(source, new Getter<Slot, LivingEntity>() {
+				@Override
+				@Nullable
+				public Slot get(final LivingEntity p) {
+					if (!delayed) {
+						if (e instanceof PlayerItemHeldEvent && ((PlayerItemHeldEvent) e).getPlayer() == p) {
+							final PlayerInventory i = ((PlayerItemHeldEvent) e).getPlayer().getInventory();
+							assert i != null;
+							return new InventorySlot(i, getTime() >= 0 ? ((PlayerItemHeldEvent) e).getNewSlot() : ((PlayerItemHeldEvent) e).getPreviousSlot());
+						} else if (e instanceof PlayerBucketEvent && ((PlayerBucketEvent) e).getPlayer() == p) {
+							final PlayerInventory i = ((PlayerBucketEvent) e).getPlayer().getInventory();
+							assert i != null;
+							return new InventorySlot(i, ((PlayerBucketEvent) e).getPlayer().getInventory().getHeldItemSlot()) {
+								@Override
+								@Nullable
+								public ItemStack getItem() {
+									return getTime() <= 0 ? super.getItem() : ((PlayerBucketEvent) e).getItemStack();
+								}
+								
+								@Override
+								public void setItem(final @Nullable ItemStack item) {
+									if (getTime() >= 0) {
+										((PlayerBucketEvent) e).setItemStack(item);
+									} else {
+										super.setItem(item);
+									}
+								}
+							};
+						}
+					}
+					final EntityEquipment e = p.getEquipment();
+					if (e == null)
+						return null;
+					return new EquipmentSlot(e, EquipmentSlot.EquipSlot.OFFHAND) {
+						@Override
+						public String toString_i() {
+							return "the " + (getTime() == 1 ? "future " : getTime() == -1 ? "former " : "") + super.toString_i();
+						}
+					};
+				}
+			});
+		}
 	}
 }

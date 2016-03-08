@@ -103,8 +103,8 @@ public class EvtBlock extends SkriptEvent {
 		}
 		if (types == null)
 			return true;
-		int id = 0;
-		short durability = 0;
+		final int id;
+		final short durability;
 		if (e instanceof BlockEvent) {
 			id = ((BlockEvent) e).getBlock().getTypeId();
 			durability = ((BlockEvent) e).getBlock().getData();
