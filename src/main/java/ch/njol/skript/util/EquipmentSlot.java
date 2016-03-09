@@ -64,7 +64,7 @@ public class EquipmentSlot extends Slot {
 				}
 			}
 		},
-		OFFHAND { // Since Minecraft 1.9 (defaults to main hand if earlier version)
+		OFF_HAND { // Since Minecraft 1.9 (defaults to main hand if earlier version)
 
 			@Override
 			@Nullable
@@ -72,7 +72,8 @@ public class EquipmentSlot extends Slot {
 				if (Skript.isRunningMinecraft(1, 9)) {
 					return e.getItemInOffHand();
 				}
-				return e.getItemInHand();
+				Skript.warning("No off hand support, but skript would need that!");
+				return new ItemStack(Material.AIR);
 			}
 
 			@Override
@@ -80,7 +81,7 @@ public class EquipmentSlot extends Slot {
 				if (Skript.isRunningMinecraft(1, 9)) {
 					e.setItemInOffHand(item);
 				} else {
-					e.setItemInHand(item);
+					Skript.warning("No off hand support, but skript would need that!");
 				}
 			}
 			
@@ -131,6 +132,23 @@ public class EquipmentSlot extends Slot {
 			@Override
 			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
 				e.setBoots(item);
+			}
+		},
+		OFF_TOOL {
+			@SuppressWarnings("deprecation")
+			@Override
+			@Nullable
+			public ItemStack get(final EntityEquipment e) {
+				return (Skript.isRunningMinecraft(1, 9) ? e.getItemInOffHand() : e.getItemInHand()); //Compatibility reasons
+			}
+
+			@SuppressWarnings("deprecation")
+			@Override
+			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
+				if (Skript.isRunningMinecraft(1, 9))
+					e.setItemInOffHand(item);
+				else
+					e.setItemInHand(item); //Compatibility reasons
 			}
 		};
 		

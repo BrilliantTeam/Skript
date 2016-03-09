@@ -62,14 +62,23 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 	static {
-		Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)");
-		Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] ((offhand|off) (tool|held item|weapon)|shield) [of %livingentities%]", "%livingentities%'[s] ((offhand|off) (tool|held item|weapon)|shield)");
+		Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)",
+				"[the] (off[-]tool|off[-][held ]item|off[-]weapon) [of %livingentities%]", "%livingentities%'[s] (off[-]tool|off[-][held ]item|off[-]weapon)");
+		if (Skript.isRunningMinecraft(1, 9)) {
+			Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)",
+					"[the] (off[(-| )]tool|off[(-| )][held ]item|off[(-| )]weapon) [of %livingentities%]", "%livingentities%'[s] (off[(-| )]tool|off[(-| )][held ]item|off[(-| )]weapon)");
+		} else {
+			Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)");
+		}
 	}
+	
+	boolean offTool; //Is this item offhand tools
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		setExpr((Expression<Player>) exprs[0]);
+		offTool = matchedPattern >= 2;
 		return true;
 	}
 	
@@ -109,7 +118,7 @@ public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 				final EntityEquipment e = p.getEquipment();
 				if (e == null)
 					return null;
-				return new EquipmentSlot(e, EquipmentSlot.EquipSlot.TOOL) {
+				return new EquipmentSlot(e, offTool ? EquipmentSlot.EquipSlot.OFF_TOOL : EquipmentSlot.EquipSlot.TOOL) {
 					@Override
 					public String toString_i() {
 						return "the " + (getTime() == 1 ? "future " : getTime() == -1 ? "former " : "") + super.toString_i();
@@ -179,7 +188,7 @@ public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 					final EntityEquipment e = p.getEquipment();
 					if (e == null)
 						return null;
-					return new EquipmentSlot(e, EquipmentSlot.EquipSlot.OFFHAND) {
+					return new EquipmentSlot(e, EquipmentSlot.EquipSlot.OFF_HAND) {
 						@Override
 						public String toString_i() {
 							return "the " + (getTime() == 1 ? "future " : getTime() == -1 ? "former " : "") + super.toString_i();

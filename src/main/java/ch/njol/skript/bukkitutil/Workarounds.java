@@ -46,7 +46,8 @@ public abstract class Workarounds {
 		Bukkit.getPluginManager().registerEvents(new Listener() {
 			@EventHandler(priority = EventPriority.HIGHEST)
 			public void onInteract(final PlayerInteractEvent e) {
-				if (e.hasItem() && (e.getPlayer().getItemInHand() == null || e.getPlayer().getItemInHand().getType() == Material.AIR || e.getPlayer().getItemInHand().getAmount() == 0))
+				//TODO Check if it's needed to do one for off hand?
+				if (e.hasItem() && (e.getPlayer().getInventory().getItemInMainHand() == null || e.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR || e.getPlayer().getInventory().getItemInMainHand().getAmount() == 0))
 					e.setUseItemInHand(Result.DENY);
 			}
 		}, Skript.getInstance());
