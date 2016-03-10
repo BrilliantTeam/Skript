@@ -21,6 +21,8 @@
 
 package ch.njol.skript.events;
 
+import java.lang.invoke.MethodHandle;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
@@ -103,8 +105,8 @@ public class EvtBlock extends SkriptEvent {
 		}
 		if (types == null)
 			return true;
-		final int id;
-		final short durability;
+		int id = 0;
+		short durability = 0;
 		if (e instanceof BlockEvent) {
 			id = ((BlockEvent) e).getBlock().getTypeId();
 			durability = ((BlockEvent) e).getBlock().getData();
@@ -138,10 +140,15 @@ public class EvtBlock extends SkriptEvent {
 			assert false;
 			return false;
 		}
+		
+		//Hacky code to fix Java 8 compilation problems... TODO maybe use lambdas instead and break Java 7?
+		final int idFinal = id;
+		final short durFinal = durability;
+		
 		return types.check(e, new Checker<ItemType>() {
 			@Override
 			public boolean check(final @Nullable ItemType t) {
-				return t != null && t.isOfType(id, durability);
+				return t != null && t.isOfType(idFinal, durFinal);
 			}
 		});
 	}

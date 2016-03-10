@@ -58,27 +58,17 @@ import ch.njol.util.Kleenean;
 @Examples({"player is holding a pickaxe",
 		"# is the same as",
 		"player's tool is a pickaxe",
-		"player's offhand tool is shield #Only for Minecraft 1.9"})
+		"player's off hand tool is shield #Only for Minecraft 1.9"})
 @Since("1.0")
 public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 	static {
-		Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)",
-				"[the] (off[-]tool|off[-][held ]item|off[-]weapon) [of %livingentities%]", "%livingentities%'[s] (off[-]tool|off[-][held ]item|off[-]weapon)");
-		if (Skript.isRunningMinecraft(1, 9)) {
-			Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)",
-					"[the] (off[(-| )]tool|off[(-| )][held ]item|off[(-| )]weapon) [of %livingentities%]", "%livingentities%'[s] (off[(-| )]tool|off[(-| )][held ]item|off[(-| )]weapon)");
-		} else {
-			Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)");
-		}
+		Skript.registerExpression(ExprTool.class, Slot.class, ExpressionType.PROPERTY, "[the] (tool|held item|weapon) [of %livingentities%]", "%livingentities%'[s] (tool|held item|weapon)");
 	}
-	
-	boolean offTool; //Is this item offhand tools
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		setExpr((Expression<Player>) exprs[0]);
-		offTool = matchedPattern >= 2;
 		return true;
 	}
 	
@@ -118,7 +108,7 @@ public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 				final EntityEquipment e = p.getEquipment();
 				if (e == null)
 					return null;
-				return new EquipmentSlot(e, offTool ? EquipmentSlot.EquipSlot.OFF_TOOL : EquipmentSlot.EquipSlot.TOOL) {
+				return new EquipmentSlot(e, EquipmentSlot.EquipSlot.TOOL) {
 					@Override
 					public String toString_i() {
 						return "the " + (getTime() == 1 ? "future " : getTime() == -1 ? "former " : "") + super.toString_i();
@@ -146,56 +136,4 @@ public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 		return super.setTime(time, getExpr(), PlayerItemHeldEvent.class, PlayerBucketFillEvent.class, PlayerBucketEmptyEvent.class);
 	}
 	
-	/**
-	 * Offhand tool expression for Minecraft 1.9.
-	 * @author bensku
-	 *
-	 */
-	public class OffTool extends ExprTool {
-		@Override
-		protected Slot[] get(final Event e, final LivingEntity[] source) {
-			final boolean delayed = Delay.isDelayed(e);
-			return get(source, new Getter<Slot, LivingEntity>() {
-				@Override
-				@Nullable
-				public Slot get(final LivingEntity p) {
-					if (!delayed) {
-						if (e instanceof PlayerItemHeldEvent && ((PlayerItemHeldEvent) e).getPlayer() == p) {
-							final PlayerInventory i = ((PlayerItemHeldEvent) e).getPlayer().getInventory();
-							assert i != null;
-							return new InventorySlot(i, getTime() >= 0 ? ((PlayerItemHeldEvent) e).getNewSlot() : ((PlayerItemHeldEvent) e).getPreviousSlot());
-						} else if (e instanceof PlayerBucketEvent && ((PlayerBucketEvent) e).getPlayer() == p) {
-							final PlayerInventory i = ((PlayerBucketEvent) e).getPlayer().getInventory();
-							assert i != null;
-							return new InventorySlot(i, ((PlayerBucketEvent) e).getPlayer().getInventory().getHeldItemSlot()) {
-								@Override
-								@Nullable
-								public ItemStack getItem() {
-									return getTime() <= 0 ? super.getItem() : ((PlayerBucketEvent) e).getItemStack();
-								}
-								
-								@Override
-								public void setItem(final @Nullable ItemStack item) {
-									if (getTime() >= 0) {
-										((PlayerBucketEvent) e).setItemStack(item);
-									} else {
-										super.setItem(item);
-									}
-								}
-							};
-						}
-					}
-					final EntityEquipment e = p.getEquipment();
-					if (e == null)
-						return null;
-					return new EquipmentSlot(e, EquipmentSlot.EquipSlot.OFF_HAND) {
-						@Override
-						public String toString_i() {
-							return "the " + (getTime() == 1 ? "future " : getTime() == -1 ? "former " : "") + super.toString_i();
-						}
-					};
-				}
-			});
-		}
-	}
 }

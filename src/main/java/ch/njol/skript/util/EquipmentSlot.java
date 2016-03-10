@@ -64,7 +64,7 @@ public class EquipmentSlot extends Slot {
 				}
 			}
 		},
-		OFF_HAND { // Since Minecraft 1.9 (defaults to main hand if earlier version)
+		OFF_HAND { // Since Minecraft 1.9 (defaults to empty if earlier version)
 
 			@Override
 			@Nullable
@@ -72,7 +72,7 @@ public class EquipmentSlot extends Slot {
 				if (Skript.isRunningMinecraft(1, 9)) {
 					return e.getItemInOffHand();
 				}
-				Skript.warning("No off hand support, but skript would need that!");
+				Skript.warning("No off hand support, but a skript would need that!");
 				return new ItemStack(Material.AIR);
 			}
 
@@ -81,7 +81,7 @@ public class EquipmentSlot extends Slot {
 				if (Skript.isRunningMinecraft(1, 9)) {
 					e.setItemInOffHand(item);
 				} else {
-					Skript.warning("No off hand support, but skript would need that!");
+					Skript.warning("No off hand support, but a skript would need that!");
 				}
 			}
 			
