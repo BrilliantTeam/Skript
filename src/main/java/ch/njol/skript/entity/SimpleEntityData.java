@@ -151,10 +151,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("bottle of enchanting", ThrownExpBottle.class));
 		types.add(new SimpleEntityDataInfo("tnt", TNTPrimed.class));
 		types.add(new SimpleEntityDataInfo("zombie", Zombie.class));
-		types.add(new SimpleEntityDataInfo("shulker", Shulker.class));
-		types.add(new SimpleEntityDataInfo("shulker bullet", ShulkerBullet.class));
 		types.add(new SimpleEntityDataInfo("golem", Golem.class));
-		types.add(new SimpleEntityDataInfo("guardian", Guardian.class));
 		
 		if (Skript.classExists("org.bukkit.entity.ItemFrame")) {
 			types.add(new SimpleEntityDataInfo("item frame", ItemFrame.class));
@@ -168,6 +165,9 @@ public class SimpleEntityData extends EntityData<Entity> {
 		if(Skript.classExists("org.bukkit.entity.ArmorStand")){
 			types.add(new SimpleEntityDataInfo("endermite", Endermite.class));
 			types.add(new SimpleEntityDataInfo("armor stand", ArmorStand.class));
+		} if (Skript.classExists("org.bukkit.entity.Shulker")) {
+			types.add(new SimpleEntityDataInfo("shulker", Shulker.class));
+			types.add(new SimpleEntityDataInfo("shulker bullet", ShulkerBullet.class));
 		}
 		// TODO !Update with every version [entities]
 		
