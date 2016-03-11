@@ -21,6 +21,8 @@
 
 package ch.njol.skript.classes.data;
 
+import java.util.Arrays;
+
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
@@ -35,6 +37,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffectType;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.bukkitutil.PlayerUtils;
 import ch.njol.skript.classes.Changer;
@@ -193,6 +196,7 @@ public class DefaultChangers {
 			return CollectionUtils.array(ItemType[].class, Inventory[].class);
 		}
 		
+		@SuppressWarnings("null")
 		@Override
 		public void change(final Inventory[] invis, final @Nullable Object[] delta, final ChangeMode mode) {
 			for (final Inventory invi : invis) {
@@ -216,7 +220,8 @@ public class DefaultChangers {
 						//$FALL-THROUGH$
 					case ADD:
 						assert delta != null;
-						if(delta instanceof ItemStack[]) {
+						
+						if(delta instanceof ItemStack[]) { // Old behavior - legacy code
 							ItemStack[] items = (ItemStack[]) delta;
 							if(items.length > 36) {
 								return;
@@ -230,6 +235,10 @@ public class DefaultChangers {
 								} else {
 									((ItemType) d).addTo(invi);
 								}
+							}
+						} else if (delta instanceof ItemType[]) {
+							for (final Object d : delta) {
+								((ItemType) d).addTo(invi);
 							}
 						}
 						break;

@@ -880,7 +880,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		}
 		
 		final boolean b = addTo(buf);
-		Skript.info("Adding items to " + Arrays.asList(buf).toString());
 		invi.setContents(buf);
 		return b;
 	}
