@@ -561,7 +561,7 @@ public final class BukkitEventValues {
 		
 		// --- HangingEvents ---
 		// 1.4.3
-		if (Skript.supports("org.bukkit.event.hanging.HangingEvent")) {
+		if (Skript.classExists("org.bukkit.event.hanging.HangingEvent")) {
 			EventValues.registerEventValue(HangingEvent.class, Hanging.class, new Getter<Hanging, HangingEvent>() {
 				@Override
 				@Nullable
@@ -584,30 +584,7 @@ public final class BukkitEventValues {
 					return e.getPlayer();
 				}
 			}, 0);
-		} else {
-			EventValues.registerEventValue(HangingEvent.class, Hanging.class, new Getter<Hanging, HangingEvent>() {
-				@Override
-				@Nullable
-				public Hanging get(final HangingEvent e) {
-					return e.getEntity();
-				}
-			}, 0);
-			EventValues.registerEventValue(HangingEvent.class, World.class, new Getter<World, HangingEvent>() {
-				@Override
-				@Nullable
-				public World get(final HangingEvent e) {
-					return e.getEntity().getWorld();
-				}
-			}, 0);
-			// PaintingPlaceEvent
-			EventValues.registerEventValue(HangingPlaceEvent.class, Player.class, new Getter<Player, HangingPlaceEvent>() {
-				@Override
-				@Nullable
-				public Player get(final HangingPlaceEvent e) {
-					return e.getPlayer();
-				}
-			}, 0);
-		}
+		} // Finally removed old painting support - Spigot 1.9 removed the events
 		
 		// --- VehicleEvents ---
 		EventValues.registerEventValue(VehicleEvent.class, Vehicle.class, new Getter<Vehicle, VehicleEvent>() {

@@ -72,6 +72,9 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	// 1.4.5
 	public final static boolean itemMetaSupported = Skript.supports("org.bukkit.inventory.meta.ItemMeta");
 	
+	// Minecraft < 1.9 (1.9 has bug fixed)
+	public final static boolean invSizeWorkaround = !Skript.isRunningMinecraft(1, 9);
+	
 	/**
 	 * Note to self: use {@link #add_(ItemData)} to add item datas, don't add them directly to this list.
 	 */
@@ -865,14 +868,19 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		ItemStack[] buf = invi.getContents();
 		if (buf == null)
 			return false;
-		if (buf.length > 36) {
-			ItemStack[] tBuf = buf.clone();
-			buf = new ItemStack[35];
-			for(int i = 0; i < 35; ++i) {
-				buf[i] = tBuf[i];
+		
+		if (invSizeWorkaround) { // MC < 1.9
+			if (buf.length > 36) {
+				ItemStack[] tBuf = buf.clone();
+				buf = new ItemStack[35];
+				for(int i = 0; i < 35; ++i) {
+					buf[i] = tBuf[i];
+				}
 			}
 		}
+		
 		final boolean b = addTo(buf);
+		Skript.info("Adding items to " + Arrays.asList(buf).toString());
 		invi.setContents(buf);
 		return b;
 	}
