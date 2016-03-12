@@ -115,7 +115,11 @@ public class EvtClick extends SkriptEvent {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
 			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, no BOTH hands trigger the event (might be a bug?)
 				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
-				if (clickEvent.getHand() == EquipmentSlot.OFF_HAND && (mainHand == null || mainHand.getType() == Material.AIR) ) return false;
+				
+				Player player = clickEvent.getPlayer();
+				boolean useOffHand = checkOffHandUse(player.getInventory().getItemInMainHand(), player.getInventory().getItemInOffHand(), click, player);
+				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND))
+					return false;
 			}
 			
 			final Action a = clickEvent.getAction();
