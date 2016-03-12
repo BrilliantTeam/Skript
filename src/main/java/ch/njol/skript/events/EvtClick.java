@@ -120,9 +120,7 @@ public class EvtClick extends SkriptEvent {
 				Player player = clickEvent.getPlayer();
 				@SuppressWarnings("null")
 				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player);
-				Skript.info("Hand is " +  clickEvent.getHand() + " result is " + useOffHand);
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
-					Skript.info("Hands don't match!");
 					return false;
 				}
 			}
@@ -183,7 +181,6 @@ public class EvtClick extends SkriptEvent {
 	private boolean checkOffHandUse(ItemStack mainHand, ItemStack offHand, int clickType, Player player) {
 		boolean mainUsable = false;
 		boolean offUsable = false;
-		Skript.info("Items are " + mainHand + " and " + offHand);
 		
 		if (clickType == RIGHT) {
 			if (offHand == null || offHand.getType() == Material.AIR) return false;
@@ -216,7 +213,6 @@ public class EvtClick extends SkriptEvent {
 			}
 			
 			if (offHand.getType().isBlock() || offHand.getType().isEdible()) {
-				Skript.info("offHand is block or food!");
 				offUsable = true;
 			}
 			
@@ -242,7 +238,6 @@ public class EvtClick extends SkriptEvent {
 				case GOLD_SPADE:
 				case DIAMOND_SPADE:
 				case ENDER_PEARL:
-					Skript.info("Set main hand usable");
 					mainUsable = true;
 					break;
 				default:
@@ -250,13 +245,10 @@ public class EvtClick extends SkriptEvent {
 			}
 			
 			if (mainHand.getType().isBlock() || mainHand.getType().isEdible()) {
-				Skript.info("mainHand is block or food!");
 				mainUsable = true;
 			}
 		}
-		
-		Skript.info("Usable: " + mainUsable + " " + offUsable);
-		
+				
 		if (mainUsable) return false;
 		else if (offUsable) return true;
 		else return false;
