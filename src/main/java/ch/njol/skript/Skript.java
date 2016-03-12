@@ -158,7 +158,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ PLUGIN ================
 	
-	public static String MIRRE = "V9";
+	public static String MIRRE = "V9b";
 	public static boolean DEV_BUILD = true; //Disables version checking
 	
 	@Nullable

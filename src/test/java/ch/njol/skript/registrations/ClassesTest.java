@@ -136,7 +136,12 @@ public class ClassesTest {
 				Color.BLACK, StructureType.RED_MUSHROOM, WeatherType.THUNDER,
 				new Date(System.currentTimeMillis()), new Timespan(1337), new Time(12000), new Timeperiod(1000, 23000),
 				new Experience(15), new Direction(0, Math.PI, 10), new Direction(new double[] {0, 1, 0}),
-				new EntityType(new SimpleEntityData(HumanEntity.class), 300), new CreeperData(), new SimpleEntityData(Snowball.class), new HorseData(Variant.SKELETON_HORSE), new WolfData(), new XpOrbData(50),
+				new EntityType(new SimpleEntityData(HumanEntity.class), 300),
+				new CreeperData(),
+				new SimpleEntityData(Snowball.class),
+				new HorseData(Variant.SKELETON_HORSE),
+				new WolfData(),
+				new XpOrbData(50),
 				
 				// Bukkit - simple classes only
 				GameMode.ADVENTURE, Biome.EXTREME_HILLS, DamageCause.FALL,
