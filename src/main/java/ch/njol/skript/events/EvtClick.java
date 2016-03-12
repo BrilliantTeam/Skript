@@ -22,6 +22,7 @@
 package ch.njol.skript.events;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -170,4 +171,47 @@ public class EvtClick extends SkriptEvent {
 		return (click == LEFT ? "left" : click == RIGHT ? "right" : "") + "click" + (types != null ? " on " + types.toString(e, debug) : "") + (tools != null ? " holding " + tools.toString(e, debug) : "");
 	}
 	
+	private boolean checkOffHandUse(ItemStack mainHand, ItemStack offHand, int clickType, Player player) {
+		boolean mainUsable = true;
+		boolean offUsable = false;
+		
+		if (clickType == RIGHT) {
+			switch (offHand.getType()) {
+				case BOW:
+				case EGG:
+				case SPLASH_POTION:
+				case SNOW_BALL:
+				case BUCKET:
+				case FISHING_ROD:
+				case FLINT_AND_STEEL:
+				case WOOD_HOE:
+				case STONE_HOE:
+				case IRON_HOE:
+				case GOLD_HOE:
+				case DIAMOND_HOE:
+				case LEASH:
+				case SHEARS:
+				case WOOD_SPADE:
+				case STONE_SPADE:
+				case IRON_SPADE:
+				case GOLD_SPADE:
+				case DIAMOND_SPADE:
+				case SHIELD:
+				case ENDER_PEARL:
+					offUsable = true;
+				default:
+					offUsable = false;
+			}
+			
+			if (offHand.getType().isBlock() || offHand.getType().isEdible()) {
+				offUsable = true;
+			}
+		}
+		
+		if (!offUsable) return false;
+		
+		if (mainHand.getType().isEdible() && player.getFoodLevel() != 20) return false;
+		
+		return true;
+	}
 }
