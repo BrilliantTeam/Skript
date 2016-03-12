@@ -115,11 +115,16 @@ public class EvtClick extends SkriptEvent {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
 			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, no BOTH hands trigger the event (might be a bug?)
 				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
+				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
 				Player player = clickEvent.getPlayer();
-				boolean useOffHand = checkOffHandUse(player.getInventory().getItemInMainHand(), player.getInventory().getItemInOffHand(), click, player);
-				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND))
+				@SuppressWarnings("null")
+				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player);
+				Skript.info("Hand is " +  clickEvent.getHand() + " result is " + useOffHand);
+				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
+					Skript.info("Hands don't match!");
 					return false;
+				}
 			}
 			
 			final Action a = clickEvent.getAction();
@@ -176,10 +181,12 @@ public class EvtClick extends SkriptEvent {
 	}
 	
 	private boolean checkOffHandUse(ItemStack mainHand, ItemStack offHand, int clickType, Player player) {
-		boolean mainUsable = true;
+		boolean mainUsable = false;
 		boolean offUsable = false;
+		Skript.info("Items are " + mainHand + " and " + offHand);
 		
 		if (clickType == RIGHT) {
+			if (offHand == null || offHand.getType() == Material.AIR) return false;
 			switch (offHand.getType()) {
 				case BOW:
 				case EGG:
@@ -203,19 +210,55 @@ public class EvtClick extends SkriptEvent {
 				case SHIELD:
 				case ENDER_PEARL:
 					offUsable = true;
+					break;
 				default:
 					offUsable = false;
 			}
 			
 			if (offHand.getType().isBlock() || offHand.getType().isEdible()) {
+				Skript.info("offHand is block or food!");
 				offUsable = true;
+			}
+			
+			if ((mainHand == null || mainHand.getType() == Material.AIR) && offUsable) return true;
+			switch (mainHand.getType()) {
+				case BOW:
+				case EGG:
+				case SPLASH_POTION:
+				case SNOW_BALL:
+				case BUCKET:
+				case FISHING_ROD:
+				case FLINT_AND_STEEL:
+				case WOOD_HOE:
+				case STONE_HOE:
+				case IRON_HOE:
+				case GOLD_HOE:
+				case DIAMOND_HOE:
+				case LEASH:
+				case SHEARS:
+				case WOOD_SPADE:
+				case STONE_SPADE:
+				case IRON_SPADE:
+				case GOLD_SPADE:
+				case DIAMOND_SPADE:
+				case ENDER_PEARL:
+					Skript.info("Set main hand usable");
+					mainUsable = true;
+					break;
+				default:
+					mainUsable = false;
+			}
+			
+			if (mainHand.getType().isBlock() || mainHand.getType().isEdible()) {
+				Skript.info("mainHand is block or food!");
+				mainUsable = true;
 			}
 		}
 		
-		if (!offUsable) return false;
+		Skript.info("Usable: " + mainUsable + " " + offUsable);
 		
-		if (mainHand.getType().isEdible() && player.getFoodLevel() != 20) return false;
-		
-		return true;
+		if (mainUsable) return false;
+		else if (offUsable) return true;
+		else return false;
 	}
 }
