@@ -61,10 +61,24 @@ public class HorseData extends EntityData<Horse> {
 	
 	@Override
 	protected boolean init(final Literal<?>[] exprs, final int matchedPattern, final ParseResult parseResult) {
-		variant = Variant.values()[matchedPattern];
-//		if (variant == Variant.HORSE) {
-//			// TODO color and style // rem: toString
-//		}
+		switch (matchedPattern) { // If Variant ordering is changed, will not break
+			case 0:
+				variant = Variant.HORSE;
+				break;
+			case 1:
+				variant = Variant.DONKEY;
+				break;
+			case 2:
+				variant = Variant.MULE;
+				break;
+			case 3:
+				variant = Variant.UNDEAD_HORSE;
+				break;
+			case 4:
+				variant = Variant.SKELETON_HORSE;
+				break;
+		}
+		
 		return true;
 	}
 	
