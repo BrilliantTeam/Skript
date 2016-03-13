@@ -21,8 +21,11 @@
 
 package ch.njol.skript.expressions;
 
+import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 import org.eclipse.jdt.annotation.Nullable;
@@ -40,30 +43,36 @@ import ch.njol.util.Kleenean;
  */
 public class ExprPotionItem extends SimpleExpression<ItemStack> {
 	
-	public static final String potionTypePattern;
-	public static final String potionModPattern;
-	
 	static {
-		potionTypePattern = "(1¦(uncraftable|empty)|2¦mundane|3¦thick|4¦awkward|5¦night vision|6¦invisibility|7¦leaping|8¦fire resistance|9¦(swiftness|speed)"
-				+ "|10¦slowness|11¦water breathing|12¦(instant health|heal[ing])|13¦(instant damage|harm[ing])|14¦poison|15¦regeneration|16¦strength|17¦weakness|18¦luck)";
-		potionModPattern = "(";
 		if (Skript.classExists("org.bukkit.potion.PotionData")) {
 			Skript.registerExpression(ExprPotionItem.class, ItemStack.class, ExpressionType.PROPERTY,
-					potionTypePattern);
+					"%potiondata%");
 		}
 	}
 	
-	private PotionType type = PotionType.WATER;
+	@Nullable
+	private Expression<PotionData> data;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		return false;
+		data = (Expression<PotionData>) exprs[0];
+		if (data == null) return false;
+		return true;
 	}
 	
+	@SuppressWarnings("null")
 	@Override
 	@Nullable
 	protected ItemStack[] get(final Event e) {
-		return null;
+		if (data == null) return new ItemStack[] {};
+		PotionData potion = data.getSingle(e);
+		ItemStack item = new ItemStack(Material.POTION);
+		PotionMeta meta = (PotionMeta) item.getItemMeta();
+		meta.setBasePotionData(potion);
+		item.setItemMeta(meta);
+		
+		return new ItemStack[] {item};
 	}
 	
 	@Override

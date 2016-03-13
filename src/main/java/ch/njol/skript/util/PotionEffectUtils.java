@@ -102,4 +102,61 @@ public abstract class PotionEffectUtils {
 		}
 		return 0;
 	}
+	
+	/**
+	 * Checks if given string represents a known potion type and returns that type.
+	 * @param name Name of potion type
+	 * @return
+	 */
+	@Nullable
+	public static PotionType checkPotionType(String name) {
+		switch (name) {
+			case "uncraftable":
+			case "empty":
+				return PotionType.UNCRAFTABLE;
+			case "mundane":
+				return PotionType.MUNDANE;
+			case "thick":
+				return PotionType.THICK;
+			case "night vision":
+			case "darkvision":
+				return PotionType.NIGHT_VISION;
+			case "invisibility":
+				return PotionType.INVISIBILITY;
+			case "leaping":
+			case "jump boost":
+				return PotionType.JUMP;
+			case "fire resistance":
+			case "fire immunity":
+				return PotionType.FIRE_RESISTANCE;
+			case "swiftness":
+			case "speed":
+				return PotionType.SPEED;
+			case "slowness":
+				return PotionType.SLOWNESS;
+			case "water breathing":
+				return PotionType.WATER_BREATHING;
+			case "instant health":
+			case "healing":
+			case "health":
+				return PotionType.INSTANT_HEAL;
+			case "instant damage":
+			case "harming":
+			case "damage":
+				return PotionType.INSTANT_DAMAGE;
+			case "poison":
+				return PotionType.POISON;
+			case "regeneration":
+			case "regen":
+				return PotionType.REGEN;
+			case "strength":
+				return PotionType.STRENGTH;
+			case "weakness":
+				return PotionType.WEAKNESS;
+			case "luck":
+				return PotionType.LUCK;
+		}
+		
+		return null;
+	}
 }
