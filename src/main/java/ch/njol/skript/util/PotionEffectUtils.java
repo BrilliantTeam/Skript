@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -105,6 +106,7 @@ public abstract class PotionEffectUtils {
 	
 	/**
 	 * Checks if given string represents a known potion type and returns that type.
+	 * Unused currently, will be used soon (TM).
 	 * @param name Name of potion type
 	 * @return
 	 */
@@ -158,5 +160,16 @@ public abstract class PotionEffectUtils {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Wrapper around deprecated API function, in case it gets removed.
+	 * Changing one method is easier that changing loads of them from different expressions.
+	 * @param effect Type.
+	 * @return Potion type.
+	 */
+	@SuppressWarnings("null")
+	public static PotionType effectToType(PotionEffectType effect) {
+		return PotionType.getByEffect(effect);
 	}
 }

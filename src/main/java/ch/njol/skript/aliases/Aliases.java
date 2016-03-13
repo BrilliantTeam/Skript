@@ -62,6 +62,8 @@ import ch.njol.util.Setter;
 @SuppressWarnings("deprecation")
 public abstract class Aliases {
 	
+	private final static boolean newPotions = Skript.isRunningMinecraft(1, 9);
+	
 	/**
 	 * Note to self: never use this, use {@link #getAlias_i(String)} instead.
 	 */
@@ -181,6 +183,11 @@ public abstract class Aliases {
 	 */
 	static LinkedHashMap<String, ItemType> getAliases(final String name, final ItemType value, final Variations variations) {
 		final LinkedHashMap<String, ItemType> r = new LinkedHashMap<String, ItemType>(); // LinkedHashMap to preserve order for item names
+		
+		if (name.contains("potion") && newPotions) { // 1.9 new potions hack
+			return r;
+		}
+		
 		for (int i = 0; i < name.length(); i++) {
 			final char c = name.charAt(i);
 			if ("[({".indexOf(c) != -1) {
