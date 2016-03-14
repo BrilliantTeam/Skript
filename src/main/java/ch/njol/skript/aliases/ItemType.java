@@ -37,6 +37,7 @@ import java.util.Random;
 import java.util.RandomAccess;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -74,6 +75,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	
 	// Minecraft < 1.9 (1.9 has bug fixed)
 	public final static boolean invSizeWorkaround = !Skript.isRunningMinecraft(1, 9);
+	public final static boolean rawNamesSupported = Skript.isRunningMinecraft(1, 8);
 	
 	/**
 	 * Note to self: use {@link #add_(ItemData)} to add item datas, don't add them directly to this list.
@@ -1127,4 +1129,21 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		fields.setFields(this);
 	}
 	
+	/**
+	 * Gets raw item names ("minecraft:some_item"). Only works for Minecraft 1.8+.
+	 * @return
+	 */
+	public List<String> getRawNames() {
+		if (!rawNamesSupported) Skript.error("Raw Minecraft names are not supported. It requires Minecraft 1.8+!");
+		
+		List<String> rawNames = new ArrayList<String>();
+		for (ItemData data : types) {
+			rawNames.add("minecraft:" + Material.getMaterial(data.typeid).toString().toLowerCase()
+					.replace("leash", "lead") // Add hacky code here :)
+					.replace("wood", "planks")
+					);
+		}
+		
+		return rawNames;
+	}
 }

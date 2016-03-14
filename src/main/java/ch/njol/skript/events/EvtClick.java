@@ -208,6 +208,7 @@ public class EvtClick extends SkriptEvent {
 				case ENDER_PEARL:
 					offUsable = true;
 					break;
+					//$CASES-OMITTED$
 				default:
 					offUsable = false;
 			}
@@ -240,6 +241,7 @@ public class EvtClick extends SkriptEvent {
 				case ENDER_PEARL:
 					mainUsable = true;
 					break;
+					//$CASES-OMITTED$
 				default:
 					mainUsable = false;
 			}
