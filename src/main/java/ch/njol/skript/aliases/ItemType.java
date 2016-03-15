@@ -1130,12 +1130,11 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	/**
-	 * Gets raw item names ("minecraft:some_item"). Only works for Minecraft 1.8+.
-	 * @return
+	 * Gets raw item names ("minecraft:some_item"). Works even if server doesn't support them,
+	 * since Bukkit API doesn't in any case.
+	 * @return names
 	 */
 	public List<String> getRawNames() {
-		if (!rawNamesSupported) Skript.error("Raw Minecraft names are not supported. It requires Minecraft 1.8+!");
-		
 		List<String> rawNames = new ArrayList<String>();
 		for (ItemData data : types) {
 			rawNames.add("minecraft:" + Material.getMaterial(data.typeid).toString().toLowerCase()

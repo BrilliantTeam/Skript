@@ -44,9 +44,7 @@ import ch.njol.util.Kleenean;
 public class ExprRawName extends SimpleExpression<String> {
 	
 	static {
-		if (Skript.isRunningMinecraft(1, 8)) {
-			Skript.registerExpression(ExprRawName.class, String.class, ExpressionType.SIMPLE, "(raw|minecraft|vanilla) name of %itemtypes%");
-		}
+		Skript.registerExpression(ExprRawName.class, String.class, ExpressionType.SIMPLE, "(raw|minecraft|vanilla) name of %itemtypes%");
 	}
 	
 	@Nullable
