@@ -25,13 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.LanguageChangeListener;
 
@@ -168,8 +171,27 @@ public abstract class PotionEffectUtils {
 	 * @param effect Type.
 	 * @return Potion type.
 	 */
-	@SuppressWarnings("null")
+	@Nullable
 	public static PotionType effectToType(PotionEffectType effect) {
 		return PotionType.getByEffect(effect);
+	}
+	
+	/**
+	 * Get potion string representation.
+	 * @param effect
+	 * @param extended
+	 * @param strong
+	 * @return
+	 */
+	public static String getPotionName(@Nullable PotionEffectType effect, boolean extended, boolean strong) {
+		if (effect == null) return "bottle of water"; 
+		
+		String s = "";
+		if (extended) s += "extended";
+		else if (strong) s += "strong";
+		s += " potion of ";
+		s += toString(effect);
+		
+		return s;
 	}
 }

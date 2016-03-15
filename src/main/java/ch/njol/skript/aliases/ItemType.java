@@ -419,6 +419,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 				r.add_(d1.intersection(d2));
 			}
 		}
+		r.meta = this.meta; // A bit hacky...
 		if (r.types.isEmpty())
 			return null;
 		return r;

@@ -44,21 +44,22 @@ import ch.njol.util.Kleenean;
  */
 public class ExprPotionItem extends SimpleExpression<ItemType> {
 	
-	public static final String POTION_MODS = "[(0¦(regular|normal)|1¦(strong|upgraded|level 2)|2¦(extended|long)) ]";
+	public static final String POTION_MODS = "[(0¦(regular|normal)|1¦(strong|upgraded|level 2)|2¦(extended|long)) ][(20¦(splash|exploding)|40¦lingering) ]";
 	
 	static {
 		if (Skript.classExists("org.bukkit.potion.PotionData")) {
 			Skript.registerExpression(ExprPotionItem.class, ItemType.class, ExpressionType.SIMPLE,
-					POTION_MODS + "potion of %potioneffecttype%", POTION_MODS + "%potioneffecttype% potion", "potion");
+					POTION_MODS + "potion of %potioneffecttype%", POTION_MODS + "%potioneffecttype% potion", "(potion|water bottle|bottle of water)");
 		}
 	}
 	
-	@Nullable
+	@SuppressWarnings("null")
 	private Expression<PotionEffectType> type;
 	private int mod = 0; // 1=upgraded, 2=extended
+	private int usage = 0; // 0=normal, 1=splash, 2=exploding
 	private boolean water = false;
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		if (matchedPattern == 2) {
@@ -68,6 +69,14 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 		
 		type = (Expression<PotionEffectType>) exprs[0];
 		mod = parseResult.mark;
+		if (parseResult.mark >= 20) {
+			usage = 1;
+			mod = parseResult.mark - 20;
+		}
+		if (parseResult.mark >= 40) {
+			usage = 2;
+			mod = parseResult.mark - 40;
+		}
 		if (exprs.length == 0) return false;
 		return true;
 	}
@@ -76,7 +85,11 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 	@Override
 	@Nullable
 	protected ItemType[] get(final Event e) {
-		ItemStack item = new ItemStack(Material.POTION);
+		Material mat = Material.POTION;
+		if (usage == 1) mat = Material.SPLASH_POTION;
+		if (usage == 2) mat = Material.LINGERING_POTION;
+		
+		ItemStack item = new ItemStack(mat);
 		if (water) return new ItemType[] {new ItemType(item)};
 		PotionData potion = new PotionData(PotionEffectUtils.effectToType(type.getSingle(e)), mod == 2, mod == 1);
 		PotionMeta meta = (PotionMeta) item.getItemMeta();
@@ -98,6 +111,7 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "";
+		if (e == null) return "bottle of water";
+		return PotionEffectUtils.getPotionName(type.getSingle(e), mod == 2, mod == 1);
 	}
 }

@@ -19,7 +19,7 @@
  * 
  */
 
-package ch.njol.skript.events;
+package ch.njol.skript.expressions;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
@@ -32,7 +32,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.effects.Delay;
-import ch.njol.skript.expressions.ExprTool;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.util.EquipmentSlot;
 import ch.njol.skript.util.Getter;

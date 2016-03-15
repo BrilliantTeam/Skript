@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
@@ -50,6 +51,7 @@ import ch.njol.skript.localization.RegexMessage;
 import ch.njol.skript.log.BlockingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.util.EnchantmentType;
+import ch.njol.skript.util.PotionEffectUtils;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.Setter;
@@ -184,7 +186,7 @@ public abstract class Aliases {
 	static LinkedHashMap<String, ItemType> getAliases(final String name, final ItemType value, final Variations variations) {
 		final LinkedHashMap<String, ItemType> r = new LinkedHashMap<String, ItemType>(); // LinkedHashMap to preserve order for item names
 		
-		if (name.contains("potion") && newPotions) { // 1.9 new potions hack
+		if (value.isOfType(new ItemStack(Material.POTION)) && newPotions) { // 1.9 new potions hack
 			return r;
 		}
 		
