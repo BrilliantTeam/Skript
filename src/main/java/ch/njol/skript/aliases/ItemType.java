@@ -107,6 +107,11 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	@Nullable
 	private ItemType item = null, block = null;
 	
+	/**
+	 * If equals checks should ignore item meta.
+	 */
+	private boolean ignoreMeta = false;
+	
 	void setItem(final @Nullable ItemType item) {
 		if (equals(item)) { // can happen if someone defines a 'x' and 'x item/block' alias that have the same value, e.g. 'dirt' and 'dirt block'
 			this.item = null;
@@ -273,11 +278,14 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			}
 		}
 		final Object meta = this.meta;
-		if (meta != null) {
+		if (meta != null && !ignoreMeta) {
 			if (item == null)
 				return false;
 			final ItemMeta m = item.getItemMeta();
 			unsetItemMetaEnchs(m);
+			
+			
+			
 			if (!meta.equals(m))
 				return false;
 		}
@@ -1145,5 +1153,13 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		}
 		
 		return rawNames;
+	}
+	
+	public void setIgnoreMeta(boolean ignore) {
+		ignoreMeta = ignore;
+	}
+	
+	public boolean doesIgnoreMeta() {
+		return ignoreMeta;
 	}
 }

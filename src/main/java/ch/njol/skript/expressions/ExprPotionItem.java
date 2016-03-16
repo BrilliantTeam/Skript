@@ -49,7 +49,7 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 	static {
 		if (Skript.classExists("org.bukkit.potion.PotionData")) {
 			Skript.registerExpression(ExprPotionItem.class, ItemType.class, ExpressionType.SIMPLE,
-					POTION_MODS + "potion of %potioneffecttype%", POTION_MODS + "%potioneffecttype% potion", "(potion|water bottle|bottle of water)");
+					POTION_MODS + "potion of %potioneffecttype%", POTION_MODS + "%potioneffecttype% potion", "(water bottle|bottle of water)", "potion");
 		}
 	}
 	
@@ -58,12 +58,17 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 	private int mod = 0; // 1=upgraded, 2=extended
 	private int usage = 0; // 0=normal, 1=splash, 2=exploding
 	private boolean water = false;
+	private boolean matchAll = false;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		if (matchedPattern == 2) {
 			water = true;
+			return true;
+		} else if (matchedPattern == 3) {
+			water = true;
+			matchAll = true;
 			return true;
 		}
 		
@@ -91,15 +96,17 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 		
 		ItemStack item = new ItemStack(mat);
 		PotionData potion;
-		if (!water) 
-			potion = new PotionData(PotionEffectUtils.effectToType(type.getSingle(e)), mod == 2, mod == 1);
-		else
+		if (water)
 			potion = new PotionData(PotionType.WATER);
+		else
+			potion = new PotionData(PotionEffectUtils.effectToType(type.getSingle(e)), mod == 2, mod == 1);
 		PotionMeta meta = (PotionMeta) item.getItemMeta();
 		meta.setBasePotionData(potion);
 		item.setItemMeta(meta);
 		
-		return new ItemType[] {new ItemType(item)};
+		ItemType it = new ItemType(item);
+		if (matchAll) it.setIgnoreMeta(true);
+		return new ItemType[] {it};
 	}
 	
 	@Override
