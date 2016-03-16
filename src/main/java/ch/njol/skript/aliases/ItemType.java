@@ -74,7 +74,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public final static boolean itemMetaSupported = Skript.supports("org.bukkit.inventory.meta.ItemMeta");
 	
 	// Minecraft < 1.9 (1.9 has bug fixed)
-	public final static boolean invSizeWorkaround = !Skript.isRunningMinecraft(1, 9);
+	public final static boolean oldInvSize = !Skript.isRunningMinecraft(1, 9);
 	public final static boolean rawNamesSupported = Skript.isRunningMinecraft(1, 8);
 	
 	/**
@@ -879,11 +879,11 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		ItemStack[] buf = invi.getContents();
 		if (buf == null)
 			return false;
-		Skript.info("buf is " + Arrays.toString(buf));
+		//Skript.info("buf is " + Arrays.toString(buf));
 		
-		if (invSizeWorkaround) { // MC < 1.9
+		ItemStack[] tBuf = buf.clone();
+		if (oldInvSize) { // MC < 1.9
 			if (buf.length > 36) {
-				ItemStack[] tBuf = buf.clone();
 				buf = new ItemStack[35];
 				for(int i = 0; i < 35; ++i) {
 					buf[i] = tBuf[i];
@@ -891,7 +891,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			}
 		} else {
 			if (invi instanceof PlayerInventory) {
-				ItemStack[] tBuf = buf.clone();
 				buf = new ItemStack[36];
 				for(int i = 0; i < 36; ++i) {
 					buf[i] = tBuf[i];
@@ -900,6 +899,16 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		}
 		
 		final boolean b = addTo(buf);
+		
+		if (!oldInvSize) {
+			if (invi instanceof PlayerInventory) {
+				buf = Arrays.copyOf(buf, tBuf.length);
+				for (int i = tBuf.length - 5; i < tBuf.length; ++i) {
+					buf[i] = tBuf[i];
+				}
+			}
+		}
+		
 		invi.setContents(buf);
 		return b;
 	}

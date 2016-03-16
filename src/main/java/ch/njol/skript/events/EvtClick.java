@@ -102,9 +102,17 @@ public class EvtClick extends SkriptEvent {
 		final Entity entity;
 		
 		if (e instanceof PlayerInteractEntityEvent) {
-			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, no BOTH hands trigger the event (might be a bug?)
-				ItemStack mainHand = ((PlayerInteractEntityEvent) e).getPlayer().getInventory().getItemInMainHand();
-				if (((PlayerInteractEntityEvent) e).getHand() == EquipmentSlot.OFF_HAND && (mainHand == null || mainHand.getType() == Material.AIR)) return false;
+			PlayerInteractEntityEvent clickEvent = ((PlayerInteractEntityEvent) e);
+			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, BOTH hands trigger the event (might be a bug?)
+				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
+				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
+				
+				Player player = clickEvent.getPlayer();
+				@SuppressWarnings("null")
+				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player);
+				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
+					return false;
+				}
 			}
 			
 			if (click == LEFT || types == null) // types == null  will be handled by the PlayerInteractEvent that is fired as well
@@ -113,7 +121,7 @@ public class EvtClick extends SkriptEvent {
 			block = null;
 		} else if (e instanceof PlayerInteractEvent) {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
-			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, no BOTH hands trigger the event (might be a bug?)
+			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, BOTH hands trigger the event (might be a bug?)
 				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
 				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
@@ -217,7 +225,7 @@ public class EvtClick extends SkriptEvent {
 				offUsable = true;
 			}
 			
-			if ((mainHand == null || mainHand.getType() == Material.AIR) && offUsable) return true;
+			if (mainHand == null || mainHand.getType() == Material.AIR) return true;
 			switch (mainHand.getType()) {
 				case BOW:
 				case EGG:
