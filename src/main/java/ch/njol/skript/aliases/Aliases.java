@@ -186,7 +186,7 @@ public abstract class Aliases {
 	static LinkedHashMap<String, ItemType> getAliases(final String name, final ItemType value, final Variations variations) {
 		final LinkedHashMap<String, ItemType> r = new LinkedHashMap<String, ItemType>(); // LinkedHashMap to preserve order for item names
 		
-		if (value.isOfType(new ItemStack(Material.POTION)) && newPotions) { // 1.9 new potions hack
+		if ((name.contains("potion") || name.contains("water bottle") || name.contains("bottle of water")) && newPotions) { // 1.9 new potions hack
 			return r;
 		}
 		

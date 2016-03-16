@@ -90,8 +90,11 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 		if (usage == 2) mat = Material.LINGERING_POTION;
 		
 		ItemStack item = new ItemStack(mat);
-		if (water) return new ItemType[] {new ItemType(item)};
-		PotionData potion = new PotionData(PotionEffectUtils.effectToType(type.getSingle(e)), mod == 2, mod == 1);
+		PotionData potion;
+		if (!water) 
+			potion = new PotionData(PotionEffectUtils.effectToType(type.getSingle(e)), mod == 2, mod == 1);
+		else
+			potion = new PotionData(PotionType.WATER);
 		PotionMeta meta = (PotionMeta) item.getItemMeta();
 		meta.setBasePotionData(potion);
 		item.setItemMeta(meta);
