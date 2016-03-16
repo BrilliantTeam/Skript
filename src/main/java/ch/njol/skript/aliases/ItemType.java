@@ -879,12 +879,21 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		ItemStack[] buf = invi.getContents();
 		if (buf == null)
 			return false;
+		Skript.info("buf is " + Arrays.toString(buf));
 		
 		if (invSizeWorkaround) { // MC < 1.9
 			if (buf.length > 36) {
 				ItemStack[] tBuf = buf.clone();
 				buf = new ItemStack[35];
 				for(int i = 0; i < 35; ++i) {
+					buf[i] = tBuf[i];
+				}
+			}
+		} else {
+			if (invi instanceof PlayerInventory) {
+				ItemStack[] tBuf = buf.clone();
+				buf = new ItemStack[36];
+				for(int i = 0; i < 36; ++i) {
 					buf[i] = tBuf[i];
 				}
 			}
