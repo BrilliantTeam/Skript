@@ -108,8 +108,8 @@ public class EvtClick extends SkriptEvent {
 				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
 				Player player = clickEvent.getPlayer();
-				@SuppressWarnings("null")
-				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player);
+				assert player != null;
+				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player, null);
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
 					return false;
 				}
@@ -126,8 +126,8 @@ public class EvtClick extends SkriptEvent {
 				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
 				Player player = clickEvent.getPlayer();
-				@SuppressWarnings("null")
-				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player);
+				assert player != null;
+				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player, clickEvent.getClickedBlock());
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
 					return false;
 				}
@@ -186,9 +186,11 @@ public class EvtClick extends SkriptEvent {
 		return (click == LEFT ? "left" : click == RIGHT ? "right" : "") + "click" + (types != null ? " on " + types.toString(e, debug) : "") + (tools != null ? " holding " + tools.toString(e, debug) : "");
 	}
 	
-	private boolean checkOffHandUse(ItemStack mainHand, ItemStack offHand, int clickType, Player player) {
+	private boolean checkOffHandUse(@Nullable ItemStack mainHand, @Nullable ItemStack offHand, int clickType, Player player, @Nullable Block target) {
 		boolean mainUsable = false;
 		boolean offUsable = false;
+		
+		if (mainHand == null) mainHand = new ItemStack(Material.AIR);
 		
 		if (clickType == RIGHT) {
 			if (offHand == null || offHand.getType() == Material.AIR) return false;
@@ -225,7 +227,6 @@ public class EvtClick extends SkriptEvent {
 				offUsable = true;
 			}
 			
-			if (mainHand == null || mainHand.getType() == Material.AIR) return true;
 			switch (mainHand.getType()) {
 				case BOW:
 				case EGG:
@@ -256,6 +257,44 @@ public class EvtClick extends SkriptEvent {
 			
 			if (mainHand.getType().isBlock() || mainHand.getType().isEdible()) {
 				mainUsable = true;
+			} else if (target != null) {
+				switch (target.getType()) {
+					case ANVIL:
+					case BEACON:
+					case BED:
+					case BREWING_STAND:
+					case CAKE:
+					case CAULDRON:
+					case CHEST:
+					case TRAPPED_CHEST:
+					case ENDER_CHEST:
+					case WORKBENCH:
+					case ENCHANTMENT_TABLE:
+					case FURNACE:
+					case WOOD_DOOR:
+					case ACACIA_DOOR:
+					case JUNGLE_DOOR:
+					case DARK_OAK_DOOR:
+					case SPRUCE_DOOR:
+					case BIRCH_DOOR:
+					case IRON_DOOR:
+					case TRAP_DOOR:
+					case IRON_TRAPDOOR:
+					case FENCE_GATE:
+					case ACACIA_FENCE_GATE:
+					case JUNGLE_FENCE_GATE:
+					case DARK_OAK_FENCE_GATE:
+					case SPRUCE_FENCE_GATE:
+					case BIRCH_FENCE_GATE:
+					case HOPPER:
+					case DISPENSER:
+					case DROPPER:
+					case LEVER:
+					case WOOD_BUTTON:
+					case STONE_BUTTON:
+					case COMMAND:
+						if (!player.isSneaking()) mainUsable = true;
+				}
 			}
 		}
 				
