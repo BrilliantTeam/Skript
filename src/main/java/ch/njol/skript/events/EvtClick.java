@@ -193,7 +193,7 @@ public class EvtClick extends SkriptEvent {
 		if (mainHand == null) mainHand = new ItemStack(Material.AIR);
 		
 		if (clickType == RIGHT) {
-			if (offHand == null || offHand.getType() == Material.AIR) return false;
+			if (offHand == null) return false;
 			switch (offHand.getType()) {
 				case BOW:
 				case EGG:
@@ -257,7 +257,9 @@ public class EvtClick extends SkriptEvent {
 			
 			if (mainHand.getType().isBlock() || mainHand.getType().isEdible()) {
 				mainUsable = true;
-			} else if (target != null) {
+			}
+			
+			if (target != null) {
 				switch (target.getType()) {
 					case ANVIL:
 					case BEACON:
@@ -293,11 +295,15 @@ public class EvtClick extends SkriptEvent {
 					case WOOD_BUTTON:
 					case STONE_BUTTON:
 					case COMMAND:
-						if (!player.isSneaking()) mainUsable = true;
+						if (player.isSneaking()) {
+							if (offHand.getType() == Material.AIR && mainHand.getType() != Material.AIR) return true;
+						} else {
+							mainUsable = true;
+						}
 				}
 			}
 		}
-				
+		
 		if (mainUsable) return false;
 		else if (offUsable) return true;
 		else return false;
