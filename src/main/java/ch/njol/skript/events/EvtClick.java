@@ -109,7 +109,7 @@ public class EvtClick extends SkriptEvent {
 				
 				Player player = clickEvent.getPlayer();
 				assert player != null;
-				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player, null);
+				boolean useOffHand = checkUseOffHand(player, click, null);
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
 					return false;
 				}
@@ -127,7 +127,9 @@ public class EvtClick extends SkriptEvent {
 				
 				Player player = clickEvent.getPlayer();
 				assert player != null;
-				boolean useOffHand = checkOffHandUse(mainHand, offHand, click, player, clickEvent.getClickedBlock());
+				boolean useOffHand = checkUseOffHand(player, click, clickEvent.getClickedBlock());
+				//Skript.info("useOffHand: " + useOffHand);
+				//Skript.info("Event hand: " + clickEvent.getHand());
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
 					return false;
 				}
@@ -186,7 +188,157 @@ public class EvtClick extends SkriptEvent {
 		return (click == LEFT ? "left" : click == RIGHT ? "right" : "") + "click" + (types != null ? " on " + types.toString(e, debug) : "") + (tools != null ? " holding " + tools.toString(e, debug) : "");
 	}
 	
-	private boolean checkOffHandUse(@Nullable ItemStack mainHand, @Nullable ItemStack offHand, int clickType, Player player, @Nullable Block target) {
+	public static boolean checkUseOffHand(Player player, int clickType, @Nullable Block block) {
+		if (clickType != RIGHT) return false; // Attacking with off hand is not possible
+		
+		boolean mainUsable = false; // Usable item
+		boolean offUsable = false;
+		ItemStack mainHand = player.getInventory().getItemInMainHand();
+		ItemStack offHand = player.getInventory().getItemInOffHand();
+		
+		switch (offHand.getType()) {
+			case BOW:
+			case EGG:
+			case SPLASH_POTION:
+			case SNOW_BALL:
+			case BUCKET:
+			case FISHING_ROD:
+			case FLINT_AND_STEEL:
+			case WOOD_HOE:
+			case STONE_HOE:
+			case IRON_HOE:
+			case GOLD_HOE:
+			case DIAMOND_HOE:
+			case LEASH:
+			case SHEARS:
+			case WOOD_SPADE:
+			case STONE_SPADE:
+			case IRON_SPADE:
+			case GOLD_SPADE:
+			case DIAMOND_SPADE:
+			case SHIELD:
+			case ENDER_PEARL:
+				offUsable = true;
+				break;
+				//$CASES-OMITTED$
+			default:
+				offUsable = false;
+		}
+		
+		// Seriously? Empty hand -> block in hand, since id of AIR < 256 :O
+		if ((offHand.getType().isBlock() && offHand.getType() != Material.AIR) || offHand.getType().isEdible()) {
+			offUsable = true;
+		}
+		
+		switch (mainHand.getType()) {
+			case BOW:
+			case EGG:
+			case SPLASH_POTION:
+			case SNOW_BALL:
+			case BUCKET:
+			case FISHING_ROD:
+			case FLINT_AND_STEEL:
+			case WOOD_HOE:
+			case STONE_HOE:
+			case IRON_HOE:
+			case GOLD_HOE:
+			case DIAMOND_HOE:
+			case LEASH:
+			case SHEARS:
+			case WOOD_SPADE:
+			case STONE_SPADE:
+			case IRON_SPADE:
+			case GOLD_SPADE:
+			case DIAMOND_SPADE:
+			case ENDER_PEARL:
+				mainUsable = true;
+				break;
+				//$CASES-OMITTED$
+			default:
+				mainUsable = false;
+		}
+		
+		// Seriously? Empty hand -> block in hand, since id of AIR < 256 :O
+		if ((mainHand.getType().isBlock() && mainHand.getType() != Material.AIR) || mainHand.getType().isEdible()) {
+			mainUsable = true;
+		}
+		
+		boolean blockUsable = false;
+		if (block != null) {
+			switch (block.getType()) {
+				case ANVIL:
+				case BEACON:
+				case BED:
+				case BREWING_STAND:
+				case CAKE:
+				case CAULDRON:
+				case CHEST:
+				case TRAPPED_CHEST:
+				case ENDER_CHEST:
+				case WORKBENCH:
+				case ENCHANTMENT_TABLE:
+				case FURNACE:
+				case WOODEN_DOOR:
+				case ACACIA_DOOR:
+				case JUNGLE_DOOR:
+				case DARK_OAK_DOOR:
+				case SPRUCE_DOOR:
+				case BIRCH_DOOR:
+				case IRON_DOOR:
+				case TRAP_DOOR:
+				case IRON_TRAPDOOR:
+				case FENCE_GATE:
+				case ACACIA_FENCE_GATE:
+				case JUNGLE_FENCE_GATE:
+				case DARK_OAK_FENCE_GATE:
+				case SPRUCE_FENCE_GATE:
+				case BIRCH_FENCE_GATE:
+				case HOPPER:
+				case DISPENSER:
+				case DROPPER:
+				case LEVER:
+				case WOOD_BUTTON:
+				case STONE_BUTTON:
+				case COMMAND:
+				case ITEM_FRAME:
+					blockUsable = true;
+					break;
+					//$CASES-OMITTED$
+				default:
+					blockUsable = false;
+			}
+		}
+		
+		boolean isSneaking = player.isSneaking();
+		boolean blockInMain = mainHand.getType().isBlock() && mainHand.getType() != Material.AIR;
+		boolean blockInOff = offHand.getType().isBlock() && offHand.getType() != Material.AIR;
+		
+		if (blockUsable) { // Special behavior
+			if (isSneaking) {
+				//Skript.info("Is sneaking on usable block!");
+				if (offHand.getType() != Material.AIR) return false;
+				if (mainHand.getType() != Material.AIR) return true;
+				//Skript.info("Sneak checks didn't pass.");
+			} else { // When not sneaking, main hand is ALWAYS used
+				return false;
+			}
+		}
+		
+		//Skript.info("Check for usable items...");
+		if (mainUsable) return false;
+		if (offUsable) return true;
+		//Skript.info("No hand has usable item");
+		
+		// Still not returned?
+		if (mainHand.getType() != Material.AIR) return false;
+		//Skript.info("Main hand is an item.");
+		if (offHand.getType() != Material.AIR) return true;
+		
+		//Skript.info("Final return!");
+		return false; // Both hands are AIR material!
+	}
+	
+	private boolean checkOffHandUse2(@Nullable ItemStack mainHand, @Nullable ItemStack offHand, int clickType, Player player, @Nullable Block target) {
 		boolean mainUsable = false;
 		boolean offUsable = false;
 		
