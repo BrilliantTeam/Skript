@@ -33,6 +33,7 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingEvent;
@@ -50,6 +51,7 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.util.Checker;
 
@@ -82,6 +84,10 @@ public class EvtBlock extends SkriptEvent {
 				.description("Called when a block is created, but not by a player, e.g. snow forms due to snowfall, water freezes in cold biomes, or a block spreads (see <a href='#spread'>spread event</a>).")
 				.examples("on form of snow", "on form of a mushroom")
 				.since("1.0");
+		Skript.registerEvent("Block Growth", EvtBlock.class, BlockGrowEvent.class, "(plant|crop|block) grow[(th|ing)] [[of] %itemtypes%]")
+				.description("Called when a crop grows.")
+				.examples("on crop growth")
+				.since("2.2-Fixes-V10");
 	}
 	
 	@Nullable

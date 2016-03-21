@@ -44,6 +44,7 @@ import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
@@ -309,6 +310,15 @@ public final class BukkitEventValues {
 			public Player get(final SignChangeEvent e) {
 				return e.getPlayer();
 			}
+		}, 0);
+		// BlockGrowEvent
+		EventValues.registerEventValue(BlockGrowEvent.class, Block.class, new Getter<Block, BlockGrowEvent>() {
+			@Override
+			@Nullable
+			public Block get(BlockGrowEvent e) {
+				return new BlockStateBlock(e.getBlock().getState(), true);
+			}
+			
 		}, 0);
 		
 		// === EntityEvents ===
