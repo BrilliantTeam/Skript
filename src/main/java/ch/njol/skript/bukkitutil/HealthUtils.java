@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import ch.njol.skript.Skript;
 import ch.njol.util.Math2;
@@ -216,6 +217,12 @@ public abstract class HealthUtils {
 		} catch (final InvocationTargetException ex) {
 			Skript.exception(ex);
 		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	public final static void setDamageCause(final LivingEntity e, final DamageCause cause) {
+		e.setLastDamageCause(new EntityDamageEvent(e, cause, 0)); // Use deprecated way too keep it compatible and create cleaner code
+		// Non-deprecated way is really, really bad
 	}
 	
 }

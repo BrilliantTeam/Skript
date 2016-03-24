@@ -64,6 +64,7 @@ import ch.njol.skript.classes.EnumSerializer;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.expressions.ExprDamageCause;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.util.SimpleLiteral;
@@ -926,6 +927,7 @@ public class BukkitClasses {
 				.usage(DamageCauseUtils.getAllNames())
 				.examples("")
 				.since("2.0")
+				.defaultExpression(new ExprDamageCause())
 				.after("itemtype", "itemstack", "entitydata", "entitytype")
 				.parser(new Parser<DamageCause>() {
 					@Override

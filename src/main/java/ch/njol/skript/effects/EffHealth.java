@@ -23,6 +23,7 @@ package ch.njol.skript.effects;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -53,7 +54,7 @@ public class EffHealth extends Effect {
 	
 	static {
 		Skript.registerEffect(EffHealth.class,
-				"damage %slots/livingentities/itemstack% by %number% [heart[s]]",
+				"damage %slots/livingentities/itemstack% by %number% [heart[s]][ with fake cause %-damagecause%]",
 				"heal %livingentities% [by %-number% [heart[s]]]",
 				"repair %slots/itemstack% [by %-number%]");
 	}
@@ -63,6 +64,8 @@ public class EffHealth extends Effect {
 	@Nullable
 	private Expression<Number> damage;
 	private boolean heal = false;
+	@Nullable
+	private Expression<DamageCause> dmgCause;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
@@ -76,6 +79,8 @@ public class EffHealth extends Effect {
 		}
 		damage = (Expression<Number>) vars[1];
 		heal = (matchedPattern >= 1);
+		
+		if (vars.length >= 2) dmgCause = (Expression<DamageCause>) vars[2];
 		return true;
 	}
 	
@@ -120,6 +125,11 @@ public class EffHealth extends Effect {
 					HealthUtils.setHealth((LivingEntity) damageable, HealthUtils.getMaxHealth((LivingEntity) damageable));
 				} else {
 					HealthUtils.heal((LivingEntity) damageable, (heal ? 1 : -1) * damage);
+					
+					DamageCause cause = DamageCause.CUSTOM;
+					if (dmgCause != null) cause = dmgCause.getSingle(e);
+					assert cause != null;
+					HealthUtils.setDamageCause((LivingEntity) damageable, cause);
 				}
 			}
 		}
