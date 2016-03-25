@@ -126,10 +126,12 @@ public class EffHealth extends Effect {
 				} else {
 					HealthUtils.heal((LivingEntity) damageable, (heal ? 1 : -1) * damage);
 					
-					DamageCause cause = DamageCause.CUSTOM;
-					if (dmgCause != null) cause = dmgCause.getSingle(e);
-					assert cause != null;
-					HealthUtils.setDamageCause((LivingEntity) damageable, cause);
+					if (!heal) {
+						DamageCause cause = DamageCause.CUSTOM;
+						if (dmgCause != null) cause = dmgCause.getSingle(e);
+						assert cause != null;
+						HealthUtils.setDamageCause((LivingEntity) damageable, cause);
+					}
 				}
 			}
 		}
