@@ -657,7 +657,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			if (getItem().types.size() != 1 || getItem().types.get(0).hasDataRange() || getItem().types.get(0).typeid == -1)
 				return false;
 		}
-		return addTo(getCopiedContents(invi));
+		return addTo(getStorageContents(invi));
 	}
 	
 	public final static ItemStack[] getCopiedContents(final Inventory invi) {
@@ -666,6 +666,23 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			if (buf[i] != null)
 				buf[i] = buf[i].clone();
 		return buf;
+	}
+	
+	/**
+	 * Gets copy of storage contents, i.e. ignores armor and off hand. This is due to Spigot 1.9
+	 * added armor slots, and off hand to default inventory index.
+	 * @param invi Inventory
+	 * @return Copied storage contents
+	 */
+	public final static ItemStack[] getStorageContents(final Inventory invi) {
+		if (invi instanceof PlayerInventory) {
+			final ItemStack[] buf = invi.getContents();
+			final ItemStack[] tBuf = new ItemStack[36];
+			for (int i = 0; i < 36; i++)
+				if (buf[i] != null)
+					tBuf[i] = buf[i].clone();
+			return tBuf;
+		} else return getCopiedContents(invi);
 	}
 	
 	/**

@@ -91,7 +91,7 @@ public class CondCanHold extends Condition {
 						}
 					}, isNegated());
 				}
-				final ItemStack[] buf = ItemType.getCopiedContents(invi);
+				final ItemStack[] buf = ItemType.getStorageContents(invi);
 				return items.check(e, new Checker<ItemType>() {
 					@Override
 					public boolean check(final ItemType t) {
