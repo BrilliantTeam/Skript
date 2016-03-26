@@ -80,7 +80,7 @@ public class EffHealth extends Effect {
 		damage = (Expression<Number>) vars[1];
 		heal = (matchedPattern >= 1);
 		
-		if (vars.length >= 2) dmgCause = (Expression<DamageCause>) vars[2];
+		if (vars.length >= 3) dmgCause = (Expression<DamageCause>) vars[2];
 		return true;
 	}
 	
