@@ -21,6 +21,7 @@
 
 package ch.njol.skript.util;
 
+import ch.njol.skript.bukkitutil.BiomeMappings;
 import org.bukkit.block.Biome;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -30,19 +31,17 @@ import org.eclipse.jdt.annotation.Nullable;
 public abstract class BiomeUtils {
 	private BiomeUtils() {}
 	
-	private final static EnumUtils<Biome> util = new EnumUtils<Biome>(Biome.class, "biomes");
-	
 	@Nullable
 	public final static Biome parse(final String s) {
-		return util.parse(s);
+		return BiomeMappings.parse(s);
 	}
 	
 	public static String toString(final Biome b, final int flags) {
-		return util.toString(b, flags);
+		return BiomeMappings.toString(b, flags);
 	}
 	
 	public final static String getAllNames() {
-		return util.getAllNames();
+		return BiomeMappings.getAllNames();
 	}
 	
 }
