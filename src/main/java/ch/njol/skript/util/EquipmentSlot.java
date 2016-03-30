@@ -133,23 +133,6 @@ public class EquipmentSlot extends Slot {
 			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
 				e.setBoots(item);
 			}
-		},
-		OFF_TOOL {
-			@SuppressWarnings("deprecation")
-			@Override
-			@Nullable
-			public ItemStack get(final EntityEquipment e) {
-				return (Skript.isRunningMinecraft(1, 9) ? e.getItemInOffHand() : e.getItemInHand()); //Compatibility reasons
-			}
-
-			@SuppressWarnings("deprecation")
-			@Override
-			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
-				if (Skript.isRunningMinecraft(1, 9))
-					e.setItemInOffHand(item);
-				else
-					e.setItemInHand(item); //Compatibility reasons
-			}
 		};
 		
 		@Nullable

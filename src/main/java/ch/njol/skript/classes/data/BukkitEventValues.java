@@ -84,6 +84,7 @@ import org.bukkit.event.weather.WeatherEvent;
 import org.bukkit.event.world.ChunkEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -103,6 +104,8 @@ import ch.njol.skript.util.Getter;
 public final class BukkitEventValues {
 	
 	public BukkitEventValues() {}
+	
+	protected static final boolean offHandSupport = Skript.isRunningMinecraft(1, 9);
 	
 	static {
 		
@@ -544,12 +547,40 @@ public final class BukkitEventValues {
 				return e.getRightClicked();
 			}
 		}, 0);
+		EventValues.registerEventValue(PlayerInteractEntityEvent.class, ItemStack.class, new Getter<ItemStack, PlayerInteractEntityEvent>() {
+			@Override
+			@Nullable
+			public ItemStack get(final PlayerInteractEntityEvent e) {
+				if (offHandSupport) {
+					EquipmentSlot hand = e.getHand();
+					if (hand == EquipmentSlot.HAND) return e.getPlayer().getInventory().getItemInMainHand();
+					else if (hand == EquipmentSlot.OFF_HAND) return e.getPlayer().getInventory().getItemInOffHand();
+					else return null;
+				} else {
+					return e.getPlayer().getItemInHand();
+				}
+			}
+		}, 0);
 		// PlayerInteractEvent
 		EventValues.registerEventValue(PlayerInteractEvent.class, Block.class, new Getter<Block, PlayerInteractEvent>() {
 			@Override
 			@Nullable
 			public Block get(final PlayerInteractEvent e) {
 				return e.getClickedBlock();
+			}
+		}, 0);
+		EventValues.registerEventValue(PlayerInteractEvent.class, ItemStack.class, new Getter<ItemStack, PlayerInteractEvent>() {
+			@Override
+			@Nullable
+			public ItemStack get(final PlayerInteractEvent e) {
+				if (offHandSupport) {
+					EquipmentSlot hand = e.getHand();
+					if (hand == EquipmentSlot.HAND) return e.getPlayer().getInventory().getItemInMainHand();
+					else if (hand == EquipmentSlot.OFF_HAND) return e.getPlayer().getInventory().getItemInOffHand();
+					else return null;
+				} else {
+					return e.getPlayer().getItemInHand();
+				}
 			}
 		}, 0);
 		// PlayerShearEntityEvent
