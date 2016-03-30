@@ -573,14 +573,7 @@ public final class BukkitEventValues {
 			@Override
 			@Nullable
 			public ItemStack get(final PlayerInteractEvent e) {
-				if (offHandSupport) {
-					EquipmentSlot hand = e.getHand();
-					if (hand == EquipmentSlot.HAND) return e.getPlayer().getInventory().getItemInMainHand();
-					else if (hand == EquipmentSlot.OFF_HAND) return e.getPlayer().getInventory().getItemInOffHand();
-					else return null;
-				} else {
-					return e.getPlayer().getItemInHand();
-				}
+				return e.getItem();
 			}
 		}, 0);
 		// PlayerShearEntityEvent
