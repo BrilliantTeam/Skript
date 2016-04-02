@@ -109,7 +109,9 @@ public class EvtClick extends SkriptEvent {
 				
 				Player player = clickEvent.getPlayer();
 				assert player != null;
-				boolean useOffHand = checkUseOffHand(player, click, null);
+				boolean useOffHand = checkUseOffHand(player, click, null, clickEvent.getRightClicked());
+				Skript.info("useOffHand: " + useOffHand);
+				Skript.info("Event hand: " + clickEvent.getHand());
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
 					return false;
 				}
@@ -127,9 +129,9 @@ public class EvtClick extends SkriptEvent {
 				
 				Player player = clickEvent.getPlayer();
 				assert player != null;
-				boolean useOffHand = checkUseOffHand(player, click, clickEvent.getClickedBlock());
-				//Skript.info("useOffHand: " + useOffHand);
-				//Skript.info("Event hand: " + clickEvent.getHand());
+				boolean useOffHand = checkUseOffHand(player, click, clickEvent.getClickedBlock(), null);
+				Skript.info("useOffHand: " + useOffHand);
+				Skript.info("Event hand: " + clickEvent.getHand());
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
 					return false;
 				}
@@ -188,13 +190,16 @@ public class EvtClick extends SkriptEvent {
 		return (click == LEFT ? "left" : click == RIGHT ? "right" : "") + "click" + (types != null ? " on " + types.toString(e, debug) : "") + (tools != null ? " holding " + tools.toString(e, debug) : "");
 	}
 	
-	public static boolean checkUseOffHand(Player player, int clickType, @Nullable Block block) {
+	public static boolean checkUseOffHand(Player player, int clickType, @Nullable Block block, @Nullable Entity entity) {
 		if (clickType != RIGHT) return false; // Attacking with off hand is not possible
 		
 		boolean mainUsable = false; // Usable item
 		boolean offUsable = false;
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
+		
+		Skript.info("block is " + block);
+		Skript.info("entity is " + entity);
 		
 		switch (offHand.getType()) {
 			case BOW:
@@ -264,13 +269,13 @@ public class EvtClick extends SkriptEvent {
 		}
 		
 		boolean blockUsable = false;
+		boolean mainOnly = false;
 		if (block != null) {
 			switch (block.getType()) {
 				case ANVIL:
 				case BEACON:
 				case BED:
 				case BREWING_STAND:
-				case CAKE:
 				case CAULDRON:
 				case CHEST:
 				case TRAPPED_CHEST:
@@ -303,9 +308,21 @@ public class EvtClick extends SkriptEvent {
 				case ITEM_FRAME:
 					blockUsable = true;
 					break;
+				case CAKE_BLOCK:
+					mainOnly = true;
+					break;
 					//$CASES-OMITTED$
 				default:
 					blockUsable = false;
+			}
+		} else if (entity != null) {
+			switch (entity.getType()) {
+				case ITEM_FRAME:
+					mainOnly = true;
+					break;
+					//$CASES-OMITTED$
+				default:
+					mainOnly = false;
 			}
 		}
 		
@@ -322,19 +339,21 @@ public class EvtClick extends SkriptEvent {
 			} else { // When not sneaking, main hand is ALWAYS used
 				return false;
 			}
+		} else if (mainOnly) {
+			return false;
 		}
 		
-		//Skript.info("Check for usable items...");
+		Skript.info("Check for usable items...");
 		if (mainUsable) return false;
 		if (offUsable) return true;
-		//Skript.info("No hand has usable item");
+		Skript.info("No hand has usable item");
 		
 		// Still not returned?
 		if (mainHand.getType() != Material.AIR) return false;
-		//Skript.info("Main hand is an item.");
+		Skript.info("Main hand is an item.");
 		if (offHand.getType() != Material.AIR) return true;
 		
-		//Skript.info("Final return!");
+		Skript.info("Final return!");
 		return false; // Both hands are AIR material!
 	}
 	
