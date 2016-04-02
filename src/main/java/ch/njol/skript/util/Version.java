@@ -135,7 +135,7 @@ public class Version implements Serializable, Comparable<Version> {
 		return version[1];
 	}
 	
-	public int getRevisin() {
+	public int getRevision() {
 		return version.length == 2 ? 0 : version[2];
 	}
 	
