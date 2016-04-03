@@ -110,8 +110,8 @@ public class EvtClick extends SkriptEvent {
 				Player player = clickEvent.getPlayer();
 				assert player != null;
 				boolean useOffHand = checkUseOffHand(player, click, null, clickEvent.getRightClicked());
-				Skript.info("useOffHand: " + useOffHand);
-				Skript.info("Event hand: " + clickEvent.getHand());
+				//Skript.info("useOffHand: " + useOffHand);
+				//Skript.info("Event hand: " + clickEvent.getHand());
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
 					return false;
 				}
@@ -130,8 +130,8 @@ public class EvtClick extends SkriptEvent {
 				Player player = clickEvent.getPlayer();
 				assert player != null;
 				boolean useOffHand = checkUseOffHand(player, click, clickEvent.getClickedBlock(), null);
-				Skript.info("useOffHand: " + useOffHand);
-				Skript.info("Event hand: " + clickEvent.getHand());
+				//Skript.info("useOffHand: " + useOffHand);
+				//Skript.info("Event hand: " + clickEvent.getHand());
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
 					return false;
 				}
@@ -198,8 +198,8 @@ public class EvtClick extends SkriptEvent {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 		
-		Skript.info("block is " + block);
-		Skript.info("entity is " + entity);
+		//Skript.info("block is " + block);
+		//Skript.info("entity is " + entity);
 		
 		switch (offHand.getType()) {
 			case BOW:
@@ -343,17 +343,17 @@ public class EvtClick extends SkriptEvent {
 			return false;
 		}
 		
-		Skript.info("Check for usable items...");
+		//Skript.info("Check for usable items...");
 		if (mainUsable) return false;
 		if (offUsable) return true;
-		Skript.info("No hand has usable item");
+		//Skript.info("No hand has usable item");
 		
 		// Still not returned?
 		if (mainHand.getType() != Material.AIR) return false;
-		Skript.info("Main hand is an item.");
+		//Skript.info("Main hand is an item.");
 		if (offHand.getType() != Material.AIR) return true;
 		
-		Skript.info("Final return!");
+		//Skript.info("Final return!");
 		return false; // Both hands are AIR material!
 	}
 	
