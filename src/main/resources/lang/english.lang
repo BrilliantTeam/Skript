@@ -327,7 +327,7 @@ biomes:
 	extreme_hills_mountains: extreme hills mountains
 	extreme_hills_plus_mountains: extreme hills plus mountains
 	mega_spruce_taiga_hills: mega spruce taiga hills
-	void: void #1.9
+	void: void biome #There is also damage cause...
 
 # -- Tree Types --
 tree types:
