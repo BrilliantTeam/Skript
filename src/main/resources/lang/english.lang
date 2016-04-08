@@ -906,7 +906,7 @@ visual effects:
 	explosion:
 		name: explosion @an
 		pattern: explosion
-	void_void:
+	void_fog:
 		name: void fog @-
 		pattern: void fog
 	small_smoke:
@@ -924,7 +924,7 @@ visual effects:
 	water_drip:
 		name: water drip @a
 		pattern: water drip
-	lava drip:
+	lava_drip:
 		name: lava drip @a
 		pattern: lava drip
 	snow_shovel:
@@ -942,6 +942,9 @@ visual effects:
 	happy_villager:
 		name: happy villager @-
 		pattern: happy villager|green sparks
+	large_smoke:
+		name: large smoke @-
+		pattern: large smoke
 	item_break:
 		name: item break @-
 		pattern: %itemtype% item break[ing]

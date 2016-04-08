@@ -32,6 +32,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.eclipse.jdt.annotation.Nullable;
@@ -131,14 +132,15 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			}
 		},
 		TILE_BREAK(Effect.TILE_BREAK) {
+			@SuppressWarnings("null")
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
 				if (raw == null)
 					return Material.STONE;
 				else if (raw instanceof ItemType) {
 					ItemStack rand = ((ItemType) raw).getRandom();
-					if (rand == null) return Material.STONE;
-					Material type = rand.getType();
+					if (rand == null) return Material.STONE.getData();
+					MaterialData type = rand.getData();
 					assert type != null;
 					return type;
 				} else {
@@ -147,14 +149,15 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			}
 		},
 		TILE_DUST(Effect.TILE_DUST) {
+			@SuppressWarnings("null")
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
 				if (raw == null)
 					return Material.STONE;
 				else if (raw instanceof ItemType) {
 					ItemStack rand = ((ItemType) raw).getRandom();
-					if (rand == null) return Material.STONE;
-					Material type = rand.getType();
+					if (rand == null) return Material.STONE.getData();
+					MaterialData type = rand.getData();
 					assert type != null;
 					return type;
 				} else {
