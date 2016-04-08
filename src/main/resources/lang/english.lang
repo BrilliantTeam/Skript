@@ -849,6 +849,108 @@ visual effects:
 	wolf_smoke:
 		name: wolf smoke @-
 		pattern: wolf smok(e|ing)
+	fireworks_spark:
+		name: firework's spark @-
+		pattern: firework['s] spark
+	crit:
+		name: critical hit @a
+		pattern: (critical hit|crit)[ sparks]
+	magic_crit:
+		name: magical critical hit @a
+		pattern: (magic[al]|blue) (critical hit|crit) [sparks]
+	potion_swirl:
+		name: potion swirl @a
+		pattern: potion swirl
+	potion_swirl_transparent:
+		name: transparent potion swirl @a
+		pattern: transparent potion swirl
+	spell:
+		name: spell @a
+		pattern: spell|thrown potion|lingering potion
+	instant_spell:
+		name: spell @a
+		pattern: instant (spell|thrown potion)
+	witch_magic:
+		name: witch magic @-
+		pattern: witch magic|purple sparks
+	note:
+		name: note @a
+		pattern: note
+	portal:
+		name: portal @a
+		pattern: [nether] portal
+	flying_glyph:
+		name: flying glyph @a
+		pattern: flying (glyph|letter)|enchantment table
+	flame:
+		name: flame @-
+		pattern: flame|fire
+	lava_pop:
+		name: lava pop @a
+		pattern: lava [pop]
+	footstep:
+		name: footstep @a
+		pattern: footstep
+	splash:
+		name: water splash @a
+		pattern: [water] splash
+	particle_smoke:
+		name: smoke particle @a
+		pattern: smoke particle
+	explosion_huge:
+		name: huge explosion @a
+		pattern: huge explosion
+	explosion_large:
+		name: large explosion @a
+		pattern: large explosion
+	explosion:
+		name: explosion @an
+		pattern: explosion
+	void_void:
+		name: void fog @-
+		pattern: void fog
+	small_smoke:
+		name: small smoke @-
+		pattern: small smoke|town aura
+	cloud:
+		name: cloud @a
+		pattern: cloud
+	coloured_dust:
+		name: coloured dust @-
+		pattern: colo[u]red dust
+	snowball_break:
+		name: snowball break @a
+		pattern: snowball break
+	water_drip:
+		name: water drip @a
+		pattern: water drip
+	lava drip:
+		name: lava drip @a
+		pattern: lava drip
+	snow_shovel:
+		name: snow shovel @-
+		pattern: snow shovel|snow(man| golem) spawn
+	slime:
+		name: slime @-
+		pattern: slime
+	heart:
+		name: heart @a
+		pattern: heart
+	angry_villager:
+		name: angry villager @a
+		pattern: angry villager|villager thundercloud
+	happy_villager:
+		name: happy villager @-
+		pattern: happy villager|green sparks
+	item_break:
+		name: item break @-
+		pattern: %itemtype% item break[ing]
+	tile_break:
+		name: tile break @-
+		pattern: %itemtype% break[ing]
+	tile_dust:
+		name: tile dust @-
+		pattern: [sprinting] dust of [%itemtype%]
 
 # -- Boolean --
 boolean:

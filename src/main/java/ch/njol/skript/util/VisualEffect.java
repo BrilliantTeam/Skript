@@ -27,14 +27,17 @@ import java.util.List;
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -76,7 +79,89 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		SHEEP_EAT(EntityEffect.SHEEP_EAT),
 		WOLF_HEARTS(EntityEffect.WOLF_HEARTS),
 		WOLF_SHAKE(EntityEffect.WOLF_SHAKE),
-		WOLF_SMOKE(EntityEffect.WOLF_SMOKE);
+		WOLF_SMOKE(EntityEffect.WOLF_SMOKE),
+		
+		// Particles
+		FIREWORKS_SPARK(Effect.FIREWORKS_SPARK),
+		CRIT(Effect.CRIT),
+		MAGIC_CRIT(Effect.MAGIC_CRIT),
+		POTION_SWIRL(Effect.POTION_SWIRL),
+		POTION_SWIRL_TRANSPARENT(Effect.POTION_SWIRL_TRANSPARENT),
+		SPELL(Effect.SPELL),
+		INSTANT_SPELL(Effect.INSTANT_SPELL),
+		WITCH_MAGIC(Effect.WITCH_MAGIC),
+		NOTE(Effect.NOTE),
+		PORTAL(Effect.PORTAL),
+		FLYING_GLYPH(Effect.FLYING_GLYPH),
+		FLAME(Effect.FLAME),
+		LAVA_POP(Effect.LAVA_POP),
+		FOOTSTEP(Effect.FOOTSTEP),
+		SPLASH(Effect.SPLASH),
+		PARTICLE_SMOKE(Effect.PARTICLE_SMOKE), // Why separate particle... ?
+		EXPLOSION_HUGE(Effect.EXPLOSION_HUGE),
+		EXPLOSION_LARGE(Effect.EXPLOSION_LARGE),
+		EXPLOSION(Effect.EXPLOSION),
+		VOID_FOG(Effect.VOID_FOG),
+		SMALL_SMOKE(Effect.SMALL_SMOKE),
+		CLOUD(Effect.CLOUD),
+		COLOURED_DUST(Effect.COLOURED_DUST),
+		SNOWBALL_BREAK(Effect.SNOWBALL_BREAK),
+		WATER_DRIP(Effect.WATERDRIP),
+		LAVA_DRIP(Effect.LAVADRIP),
+		SNOW_SHOVEL(Effect.SNOW_SHOVEL),
+		SLIME(Effect.SLIME),
+		HEART(Effect.HEART),
+		ANGRY_VILLAGER(Effect.VILLAGER_THUNDERCLOUD),
+		HAPPY_VILLAGER(Effect.HAPPY_VILLAGER),
+		LARGE_SMOKE(Effect.LARGE_SMOKE),
+		ITEM_BREAK(Effect.ITEM_BREAK) {
+			@Override
+			public Object getData(final @Nullable Object raw, final Location l) {
+				if (raw == null)
+					return Material.IRON_SWORD;
+				else if (raw instanceof ItemType) {
+					ItemStack rand = ((ItemType) raw).getRandom();
+					if (rand == null) return Material.IRON_SWORD;
+					Material type = rand.getType();
+					assert type != null;
+					return type;
+				} else {
+					return raw;
+				}
+			}
+		},
+		TILE_BREAK(Effect.TILE_BREAK) {
+			@Override
+			public Object getData(final @Nullable Object raw, final Location l) {
+				if (raw == null)
+					return Material.STONE;
+				else if (raw instanceof ItemType) {
+					ItemStack rand = ((ItemType) raw).getRandom();
+					if (rand == null) return Material.STONE;
+					Material type = rand.getType();
+					assert type != null;
+					return type;
+				} else {
+					return raw;
+				}
+			}
+		},
+		TILE_DUST(Effect.TILE_DUST) {
+			@Override
+			public Object getData(final @Nullable Object raw, final Location l) {
+				if (raw == null)
+					return Material.STONE;
+				else if (raw instanceof ItemType) {
+					ItemStack rand = ((ItemType) raw).getRandom();
+					if (rand == null) return Material.STONE;
+					Material type = rand.getType();
+					assert type != null;
+					return type;
+				} else {
+					return raw;
+				}
+			}
+		};
 		
 		final Object effect;
 		
