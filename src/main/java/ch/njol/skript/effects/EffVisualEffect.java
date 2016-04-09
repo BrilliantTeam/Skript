@@ -51,7 +51,7 @@ import ch.njol.util.Kleenean;
 @Since("2.1")
 public class EffVisualEffect extends Effect {
 	static {
-		Skript.registerEffect(EffVisualEffect.class, "(play|show) %visualeffects% (on|%directions%) %entities/locations% [to %-players%]");
+		Skript.registerEffect(EffVisualEffect.class, "(play|show) %visualeffects% (on|%directions%) %entities/locations% [(to %-players%|in (radius|range) of %number%)]");
 	}
 	
 	@SuppressWarnings("null")
@@ -62,6 +62,8 @@ public class EffVisualEffect extends Effect {
 	private Expression<?> where;
 	@Nullable
 	private Expression<Player> players;
+	@Nullable
+	private Expression<Number> radius;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
@@ -69,7 +71,12 @@ public class EffVisualEffect extends Effect {
 		effects = (Expression<VisualEffect>) exprs[0];
 		direction = (Expression<Direction>) exprs[1];
 		where = exprs[2];
-		players = (Expression<Player>) exprs[3];
+		if (exprs[3] != null) {
+			if (exprs[3].getReturnType() == Player.class)
+				players = (Expression<Player>) exprs[3];
+			else
+				radius = (Expression<Number>) exprs[3];
+		}
 		if (effects instanceof Literal) {
 			final VisualEffect[] effs = effects.getAll(null);
 			boolean hasLocationEffect = false, hasEntityEffect = false;

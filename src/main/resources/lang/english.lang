@@ -860,10 +860,10 @@ visual effects:
 		pattern: (magic[al]|blue) (critical hit|crit) [sparks]
 	potion_swirl:
 		name: potion swirl @a
-		pattern: potion swirl
+		pattern: [%color%] potion swirl
 	potion_swirl_transparent:
 		name: transparent potion swirl @a
-		pattern: transparent potion swirl
+		pattern: [%color%] transparent potion swirl
 	spell:
 		name: spell @a
 		pattern: spell|thrown potion|lingering potion
@@ -917,7 +917,7 @@ visual effects:
 		pattern: cloud
 	coloured_dust:
 		name: coloured dust @-
-		pattern: colo[u]red dust
+		pattern: (%color%|colo[u]red) dust
 	snowball_break:
 		name: snowball break @a
 		pattern: snowball break
@@ -954,6 +954,7 @@ visual effects:
 	tile_dust:
 		name: tile dust @-
 		pattern: [sprinting] dust of [%itemtype%]
+	area_expression: [with] [area of %number%, %number%(,| and) %number%][[ and] speed of %number%]
 
 # -- Boolean --
 boolean:

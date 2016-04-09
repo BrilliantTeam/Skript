@@ -23,6 +23,7 @@ package ch.njol.skript.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
@@ -86,8 +87,18 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		FIREWORKS_SPARK(Effect.FIREWORKS_SPARK),
 		CRIT(Effect.CRIT),
 		MAGIC_CRIT(Effect.MAGIC_CRIT),
-		POTION_SWIRL(Effect.POTION_SWIRL),
-		POTION_SWIRL_TRANSPARENT(Effect.POTION_SWIRL_TRANSPARENT),
+		POTION_SWIRL(Effect.POTION_SWIRL) {
+			@Override
+			public boolean supportsColors() {
+				return true;
+			}
+		},
+		POTION_SWIRL_TRANSPARENT(Effect.POTION_SWIRL_TRANSPARENT) {
+			@Override
+			public boolean supportsColors() {
+				return true;
+			}
+		},
 		SPELL(Effect.SPELL),
 		INSTANT_SPELL(Effect.INSTANT_SPELL),
 		WITCH_MAGIC(Effect.WITCH_MAGIC),
@@ -105,7 +116,12 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		VOID_FOG(Effect.VOID_FOG),
 		SMALL_SMOKE(Effect.SMALL_SMOKE),
 		CLOUD(Effect.CLOUD),
-		COLOURED_DUST(Effect.COLOURED_DUST),
+		COLOURED_DUST(Effect.COLOURED_DUST) {
+			@Override
+			public boolean supportsColors() {
+				return true;
+			}
+		},
 		SNOWBALL_BREAK(Effect.SNOWBALL_BREAK),
 		WATER_DRIP(Effect.WATERDRIP),
 		LAVA_DRIP(Effect.LAVADRIP),
@@ -184,6 +200,13 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			assert raw == null;
 			return null;
 		}
+		
+		/**
+		 * Checks if this effect has color support.
+		 */
+		public boolean supportsColors() {
+			return false;
+		}
 	}
 	
 	private final static String TYPE_ID = "VisualEffect.Type";
@@ -212,7 +235,13 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 							Skript.warning("Missing pattern at '" + (node + ".pattern") + "' in the " + Language.getName() + " language file");
 					} else {
 						types.add(ts[i]);
-						patterns.add(pattern);
+						if (ts[i].supportsColors())
+							patterns.add(pattern);
+						else {
+							String dVarExpr = Language.get_(LANGUAGE_NODE + ".area_expression");
+							if (dVarExpr == null) dVarExpr = "";
+							patterns.add(pattern + " " + dVarExpr);
+						}
 					}
 					if (names[i] == null)
 						names[i] = new Noun(node + ".name");
@@ -227,6 +256,10 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	private Type type;
 	@Nullable
 	private Object data;
+	private double speed = 1;
+	private double dX, dY, dZ = 0;
+	@Nullable
+	private Color color;
 	
 	/**
 	 * For parsing & deserialisation
@@ -238,8 +271,41 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		type = types.get(matchedPattern);
-		assert exprs.length <= 1;
-		data = exprs.length == 0 || exprs[0] == null ? null : exprs[0].getSingle(null);
+		
+		if (type.supportsColors()) {
+			for (Expression<?> expr : exprs) {
+				if (expr.getReturnType() == Color.class)
+					color = (Color) expr.getSingle(null);
+				else
+					data = expr.getSingle(null);
+			}
+		} else {
+			int numberParams = 0;
+			for (Expression<?> expr : exprs) {
+				if (expr.getReturnType() == Number.class)
+					numberParams++;
+			}
+			
+			int dPos = 0; // Data index
+			if (exprs[0].getReturnType() != Number.class) {
+				dPos = 1;
+				data = exprs[0].getSingle(null);
+			}
+			
+			if (numberParams == 1) // Only speed
+				speed = ((Number) exprs[dPos].getSingle(null)).doubleValue();
+			else if (numberParams == 3) { // Only dX, dY, dZ
+				dX = ((Number) exprs[dPos].getSingle(null)).doubleValue();
+				dY = ((Number) exprs[dPos + 1].getSingle(null)).doubleValue();
+				dZ = ((Number) exprs[dPos + 2].getSingle(null)).doubleValue();
+			} else { // Both present
+				dX = ((Number) exprs[dPos].getSingle(null)).doubleValue();
+				dY = ((Number) exprs[dPos + 1].getSingle(null)).doubleValue();
+				dZ = ((Number) exprs[dPos + 2].getSingle(null)).doubleValue();
+				speed = ((Number) exprs[dPos + 3].getSingle(null)).doubleValue();
+			}
+		}
+		
 		return true;
 	}
 	
@@ -256,13 +322,20 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	}
 	
 	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e) {
+		play(ps, l, e, 0);
+	}
+	
+	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e, final int radius) {
 		assert e == null || l.equals(e.getLocation());
 		if (isEntityEffect()) {
 			if (e != null)
 				e.playEffect((EntityEffect) type.effect);
 		} else {
 			if (ps == null) {
-				l.getWorld().playEffect(l, (Effect) type.effect, type.getData(data, l));
+				if (radius == 0)
+					l.getWorld().playEffect(l, (Effect) type.effect, type.getData(data, l));
+				else
+					l.getWorld().playEffect(l, (Effect) type.effect, type.getData(data, l), radius);
 			} else {
 				for (final Player p : ps)
 					p.playEffect(l, (Effect) type.effect, type.getData(data, l));
