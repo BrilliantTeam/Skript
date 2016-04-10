@@ -24,9 +24,12 @@ package ch.njol.skript.effects;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -52,7 +55,8 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class EffDrop extends Effect {
 	static {
-		Skript.registerEffect(EffDrop.class, "drop %itemtypes/experience% [%directions% %locations%]");
+		Skript.registerEffect(EffDrop.class, "drop %itemtypes/experience% [%directions% %locations%]",
+				"drop %itemtypes/experience% [%directions% %locations%] without velocity");
 	}
 	
 	@SuppressWarnings("null")
@@ -60,11 +64,14 @@ public class EffDrop extends Effect {
 	@SuppressWarnings("null")
 	private Expression<Location> locations;
 	
+	private boolean useVelocity = true;
+	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		drops = exprs[0];
 		locations = Direction.combine((Expression<? extends Direction>) exprs[1], (Expression<? extends Location>) exprs[2]);
+		if (matchedPattern == 1) useVelocity = false;
 		return true;
 	}
 	
@@ -90,8 +97,15 @@ public class EffDrop extends Effect {
 					orb.setExperience(((Experience) o).getXP());
 				} else {
 					for (final ItemStack is : ((ItemType) o).getItem().getAll()) {
-						if (is.getType() != Material.AIR)
-							l.getWorld().dropItemNaturally(itemDropLoc, is);
+						if (is.getType() != Material.AIR) {
+							if (useVelocity) {
+								l.getWorld().dropItemNaturally(itemDropLoc, is);
+							} else {
+								final Item item = l.getWorld().dropItem(l, is);
+								item.teleport(l);
+								item.setVelocity(new Vector(0, 0, 0));
+							}
+						}
 					}
 				}
 			}
