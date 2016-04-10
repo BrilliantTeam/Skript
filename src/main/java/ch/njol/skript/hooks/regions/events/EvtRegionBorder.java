@@ -156,8 +156,8 @@ public class EvtRegionBorder extends SelfRegisteringSkriptEvent {
 			final Location to = e.getTo(), from = e.getFrom();
 			if (to.equals(from))
 				return;
-			if (to.getWorld().equals(from.getWorld()) && to.distanceSquared(from) < 2)
-				return;
+			//if (to.getWorld().equals(from.getWorld()) && to.distanceSquared(from) < 2)
+			//	return;
 			final Set<? extends Region> oldRs = RegionsPlugin.getRegionsAt(from), newRs = RegionsPlugin.getRegionsAt(to);
 			for (final Region r : oldRs) {
 				if (!newRs.contains(r))
