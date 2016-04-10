@@ -22,6 +22,7 @@
 package ch.njol.skript.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -257,10 +258,8 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	private Type type;
 	@Nullable
 	private Object data;
-	private double speed = 1;
-	private double dX, dY, dZ = 0;
-	@Nullable
-	private Color color;
+	private float speed = 1;
+	private float dX, dY, dZ = 0;
 	
 	/**
 	 * For parsing & deserialisation
@@ -275,17 +274,27 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		
 		if (type.isColorable()) {
 			for (Expression<?> expr : exprs) {
-				if (expr.getReturnType() == Color.class)
-					color = (Color) expr.getSingle(null);
-				else
+				if (expr == null) continue;
+				else if (expr.getReturnType() == Color.class) {
+					org.bukkit.Color color = ((Color) expr.getSingle(null)).getBukkitColor();
+					dX = color.getRed() / 255;
+					dY = color.getBlue() / 255;
+					dZ = color.getGreen() / 255;
+					
+					if (type == Type.COLOURED_DUST)
+						dX = dX - 1F;
+				} else {
 					data = expr.getSingle(null);
+				}
 			}
 		} else {
 			int numberParams = 0;
 			for (Expression<?> expr : exprs) {
-				if (expr.getReturnType() == Number.class)
+				if (expr.getReturnType() == Long.class || expr.getReturnType() == Integer.class || expr.getReturnType() == Number.class)
 					numberParams++;
 			}
+			Skript.info("numberParams " + numberParams);
+			Skript.info(Arrays.toString(exprs));
 			
 			int dPos = 0; // Data index
 			if (exprs[0].getReturnType() != Number.class) {
@@ -294,16 +303,16 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			}
 			
 			if (numberParams == 1) // Only speed
-				speed = ((Number) exprs[dPos].getSingle(null)).doubleValue();
+				speed = ((Number) exprs[dPos].getSingle(null)).floatValue();
 			else if (numberParams == 3) { // Only dX, dY, dZ
-				dX = ((Number) exprs[dPos].getSingle(null)).doubleValue();
-				dY = ((Number) exprs[dPos + 1].getSingle(null)).doubleValue();
-				dZ = ((Number) exprs[dPos + 2].getSingle(null)).doubleValue();
-			} else { // Both present
-				dX = ((Number) exprs[dPos].getSingle(null)).doubleValue();
-				dY = ((Number) exprs[dPos + 1].getSingle(null)).doubleValue();
-				dZ = ((Number) exprs[dPos + 2].getSingle(null)).doubleValue();
-				speed = ((Number) exprs[dPos + 3].getSingle(null)).doubleValue();
+				dX = ((Number) exprs[dPos].getSingle(null)).floatValue();
+				dY = ((Number) exprs[dPos + 1].getSingle(null)).floatValue();
+				dZ = ((Number) exprs[dPos + 2].getSingle(null)).floatValue();
+			} else if (numberParams == 4){ // Both present
+				dX = ((Number) exprs[dPos].getSingle(null)).floatValue();
+				dY = ((Number) exprs[dPos + 1].getSingle(null)).floatValue();
+				dZ = ((Number) exprs[dPos + 2].getSingle(null)).floatValue();
+				speed = ((Number) exprs[dPos + 3].getSingle(null)).floatValue();
 			}
 		}
 		
@@ -323,10 +332,10 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	}
 	
 	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e) {
-		play(ps, l, e, 0, 0);
+		play(ps, l, e, 0, 32);
 	}
 	
-	@SuppressWarnings({"deprecation", "null"})
+	@SuppressWarnings({"deprecation"})
 	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e, final int count, final int radius) {
 		assert e == null || l.equals(e.getLocation());
 		if (isEntityEffect()) {
@@ -335,19 +344,18 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		} else {
 			if (ps == null) {
 				int id = 0;
-				int dt = 0;
+				int dataId = 0;
+				Object pData = type.getData(data, l);
 				
-				if (data instanceof Material) {
-					id = ((Material) data).getId();
-				} else if (data instanceof MaterialData) {
-					id = ((MaterialData) data).getItemTypeId();
-					dt = ((MaterialData) data).getData();
+				if (pData instanceof Material) {
+					id = ((Material) pData).getId();
+				} else if (pData instanceof MaterialData) {
+					id = ((MaterialData) pData).getItemTypeId();
+					dataId = ((MaterialData) pData).getData();
 				}
+				Skript.info("dX: " + dX + " dY: " + dY + " dZ: " + dZ);
 				
-				if (radius == 0) {
-					l.getWorld().playEffect(l, (Effect) type.effect, type.getData(data, l));
-				} else
-					l.getWorld().playEffect(l, (Effect) type.effect, type.getData(data, l), radius);
+				l.getWorld().spigot().playEffect(l, (Effect) type.effect, id, dataId, dX, dY, dZ, speed, count, radius);
 			} else {
 				for (final Player p : ps)
 					p.playEffect(l, (Effect) type.effect, type.getData(data, l));

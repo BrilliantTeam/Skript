@@ -51,7 +51,8 @@ import ch.njol.util.Kleenean;
 @Since("2.1")
 public class EffVisualEffect extends Effect {
 	static {
-		Skript.registerEffect(EffVisualEffect.class, "(play|show) %visualeffects% (on|%directions%) %entities/locations% [(to %-players%|in (radius|range) of %number%)]");
+		Skript.registerEffect(EffVisualEffect.class, "(play|show) %visualeffects% (on|%directions%) %entities/locations% [(to %-players%|in (radius|range) of %number%)]",
+				"(play|show) %number% %visualeffects% (on|%directions%) %entities/locations% [(to %-players%|in (radius|range) of %number%)]");
 	}
 	
 	@SuppressWarnings("null")
@@ -64,18 +65,26 @@ public class EffVisualEffect extends Effect {
 	private Expression<Player> players;
 	@Nullable
 	private Expression<Number> radius;
+	@Nullable
+	private Expression<Number> count;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		effects = (Expression<VisualEffect>) exprs[0];
-		direction = (Expression<Direction>) exprs[1];
-		where = exprs[2];
-		if (exprs[3] != null) {
+		int base = 0;
+		if (matchedPattern == 1) {
+			count = (Expression<Number>) exprs[0];
+			base = 1;
+		}
+		
+		effects = (Expression<VisualEffect>) exprs[base];
+		direction = (Expression<Direction>) exprs[base + 1];
+		where = exprs[base + 2];
+		if (exprs[base + 3] != null) {
 			if (exprs[3].getReturnType() == Player.class)
-				players = (Expression<Player>) exprs[3];
+				players = (Expression<Player>) exprs[base + 3];
 			else
-				radius = (Expression<Number>) exprs[3];
+				radius = (Expression<Number>) exprs[base + 3];
 		}
 		if (effects instanceof Literal) {
 			final VisualEffect[] effs = effects.getAll(null);
@@ -102,17 +111,21 @@ public class EffVisualEffect extends Effect {
 		final Direction[] dirs = direction.getArray(e);
 		final Object[] os = where.getArray(e);
 		final Player[] ps = players != null ? players.getArray(e) : null;
+		final Number rad = radius != null ? radius.getSingle(e) : 32; // 32=default particle radius
+		final Number cnt = count != null ? count.getSingle(e) : 0;
+		assert rad != null;
+		assert cnt != null;
 		for (final Direction d : dirs) {
 			for (final Object o : os) {
 				if (o instanceof Entity) {
 					for (final VisualEffect eff : effs) {
-						eff.play(ps, d.getRelative((Entity) o), (Entity) o);
+						eff.play(ps, d.getRelative((Entity) o), (Entity) o, cnt.intValue(), rad.intValue());
 					}
 				} else if (o instanceof Location) {
 					for (final VisualEffect eff : effs) {
 						if (eff.isEntityEffect())
 							continue;
-						eff.play(ps, d.getRelative((Location) o), null);
+						eff.play(ps, d.getRelative((Location) o), null, cnt.intValue(), rad.intValue());
 					}
 				} else {
 					assert false;
