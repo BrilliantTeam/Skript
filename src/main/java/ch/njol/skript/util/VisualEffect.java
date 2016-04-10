@@ -258,7 +258,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	private Type type;
 	@Nullable
 	private Object data;
-	private float speed = 1;
+	private float speed = 0;
 	private float dX, dY, dZ = 0;
 	
 	/**
@@ -293,8 +293,6 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				if (expr.getReturnType() == Long.class || expr.getReturnType() == Integer.class || expr.getReturnType() == Number.class)
 					numberParams++;
 			}
-			Skript.info("numberParams " + numberParams);
-			Skript.info(Arrays.toString(exprs));
 			
 			int dPos = 0; // Data index
 			if (exprs[0].getReturnType() != Number.class) {
@@ -353,7 +351,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 					id = ((MaterialData) pData).getItemTypeId();
 					dataId = ((MaterialData) pData).getData();
 				}
-				Skript.info("dX: " + dX + " dY: " + dY + " dZ: " + dZ);
+				//Skript.info("dX: " + dX + " dY: " + dY + " dZ: " + dZ);
 				
 				l.getWorld().spigot().playEffect(l, (Effect) type.effect, id, dataId, dX, dY, dZ, speed, count, radius);
 			} else {

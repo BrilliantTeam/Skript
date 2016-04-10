@@ -954,7 +954,7 @@ visual effects:
 	block_dust:
 		name: block dust @-
 		pattern: [sprinting] dust of [%itemtype%]
-	area_expression: [with [offset of %number%, %number%(,| and) %number%][[ and] speed of %number%]]
+	area_expression: [with [offset of %number%, %number%(,| and) %number%][[and ]speed %number%]]
 
 # -- Boolean --
 boolean:
