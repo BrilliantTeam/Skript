@@ -870,9 +870,9 @@ visual effects:
 	instant_spell:
 		name: spell @a
 		pattern: instant (spell|thrown potion)
-	witch_magic:
-		name: witch magic @-
-		pattern: witch magic|purple sparks
+	witch_spell:
+		name: witch spell @-
+		pattern: witch (magic|spell)|purple sparks
 	note:
 		name: note @a
 		pattern: note
@@ -889,8 +889,8 @@ visual effects:
 		name: lava pop @a
 		pattern: lava [pop]
 	footstep:
-		name: footstep @a
-		pattern: footstep
+		name: footstep @x
+		pattern: footsteps
 	splash:
 		name: water splash @a
 		pattern: [water] splash
@@ -945,14 +945,14 @@ visual effects:
 	large_smoke:
 		name: large smoke @-
 		pattern: large smoke
-	item_break:
-		name: item break @-
-		pattern: %itemtype% item break[ing]
-	tile_break:
-		name: tile break @-
+	item_crack:
+		name: item crack @-
+		pattern: %itemtype% item (break|crack)[ing]
+	block_break:
+		name: block break @-
 		pattern: %itemtype% break[ing]
-	tile_dust:
-		name: tile dust @-
+	block_dust:
+		name: block dust @-
 		pattern: [sprinting] dust of [%itemtype%]
 	area_expression: [with] [area of %number%, %number%(,| and) %number%][[ and] speed of %number%]
 

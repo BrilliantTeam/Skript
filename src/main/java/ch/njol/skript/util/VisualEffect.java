@@ -29,6 +29,7 @@ import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -89,19 +90,19 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		MAGIC_CRIT(Effect.MAGIC_CRIT),
 		POTION_SWIRL(Effect.POTION_SWIRL) {
 			@Override
-			public boolean supportsColors() {
+			public boolean isColorable() {
 				return true;
 			}
 		},
 		POTION_SWIRL_TRANSPARENT(Effect.POTION_SWIRL_TRANSPARENT) {
 			@Override
-			public boolean supportsColors() {
+			public boolean isColorable() {
 				return true;
 			}
 		},
 		SPELL(Effect.SPELL),
 		INSTANT_SPELL(Effect.INSTANT_SPELL),
-		WITCH_MAGIC(Effect.WITCH_MAGIC),
+		WITCH_SPELL(Effect.WITCH_MAGIC),
 		NOTE(Effect.NOTE),
 		PORTAL(Effect.PORTAL),
 		FLYING_GLYPH(Effect.FLYING_GLYPH),
@@ -118,7 +119,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		CLOUD(Effect.CLOUD),
 		COLOURED_DUST(Effect.COLOURED_DUST) {
 			@Override
-			public boolean supportsColors() {
+			public boolean isColorable() {
 				return true;
 			}
 		},
@@ -131,7 +132,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		ANGRY_VILLAGER(Effect.VILLAGER_THUNDERCLOUD),
 		HAPPY_VILLAGER(Effect.HAPPY_VILLAGER),
 		LARGE_SMOKE(Effect.LARGE_SMOKE),
-		ITEM_BREAK(Effect.ITEM_BREAK) {
+		ITEM_CRACK(Effect.ITEM_BREAK) {
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
 				if (raw == null)
@@ -147,7 +148,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				}
 			}
 		},
-		TILE_BREAK(Effect.TILE_BREAK) {
+		BLOCK_BREAK(Effect.TILE_BREAK) {
 			@SuppressWarnings("null")
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
@@ -164,7 +165,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				}
 			}
 		},
-		TILE_DUST(Effect.TILE_DUST) {
+		BLOCK_DUST(Effect.TILE_DUST) {
 			@SuppressWarnings("null")
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
@@ -204,7 +205,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		/**
 		 * Checks if this effect has color support.
 		 */
-		public boolean supportsColors() {
+		public boolean isColorable() {
 			return false;
 		}
 	}
@@ -235,7 +236,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 							Skript.warning("Missing pattern at '" + (node + ".pattern") + "' in the " + Language.getName() + " language file");
 					} else {
 						types.add(ts[i]);
-						if (ts[i].supportsColors())
+						if (ts[i].isColorable())
 							patterns.add(pattern);
 						else {
 							String dVarExpr = Language.get_(LANGUAGE_NODE + ".area_expression");
@@ -272,7 +273,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		type = types.get(matchedPattern);
 		
-		if (type.supportsColors()) {
+		if (type.isColorable()) {
 			for (Expression<?> expr : exprs) {
 				if (expr.getReturnType() == Color.class)
 					color = (Color) expr.getSingle(null);
@@ -322,19 +323,30 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	}
 	
 	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e) {
-		play(ps, l, e, 0);
+		play(ps, l, e, 0, 0);
 	}
 	
-	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e, final int radius) {
+	@SuppressWarnings({"deprecation", "null"})
+	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e, final int count, final int radius) {
 		assert e == null || l.equals(e.getLocation());
 		if (isEntityEffect()) {
 			if (e != null)
 				e.playEffect((EntityEffect) type.effect);
 		} else {
 			if (ps == null) {
-				if (radius == 0)
+				int id = 0;
+				int dt = 0;
+				
+				if (data instanceof Material) {
+					id = ((Material) data).getId();
+				} else if (data instanceof MaterialData) {
+					id = ((MaterialData) data).getItemTypeId();
+					dt = ((MaterialData) data).getData();
+				}
+				
+				if (radius == 0) {
 					l.getWorld().playEffect(l, (Effect) type.effect, type.getData(data, l));
-				else
+				} else
 					l.getWorld().playEffect(l, (Effect) type.effect, type.getData(data, l), radius);
 			} else {
 				for (final Player p : ps)
