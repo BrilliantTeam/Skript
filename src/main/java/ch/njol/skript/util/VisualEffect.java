@@ -295,7 +295,8 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			}
 			
 			int dPos = 0; // Data index
-			if (exprs[0].getReturnType() != Number.class) {
+			Expression<?> expr = exprs[0];
+			if (expr.getReturnType() != Long.class && expr.getReturnType() != Integer.class && expr.getReturnType() != Number.class) {
 				dPos = 1;
 				data = exprs[0].getSingle(null);
 			}
