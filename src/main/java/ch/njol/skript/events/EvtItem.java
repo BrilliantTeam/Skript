@@ -25,6 +25,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -43,6 +45,8 @@ import ch.njol.util.Checker;
  */
 public class EvtItem extends SkriptEvent {
 	private final static boolean hasConsumeEvent = Skript.classExists("org.bukkit.event.player.PlayerItemConsumeEvent");
+	private final static boolean hasPrepareCraftEvent = Skript.classExists("org.bukkit.event.inventory.PrepareItemCraftEvent");
+	
 	static {
 		Skript.registerEvent("Dispense", EvtItem.class, BlockDispenseEvent.class, "dispens(e|ing) [[of] %itemtypes%]")
 				.description("Called when a dispenser dispenses an item.")
@@ -61,8 +65,14 @@ public class EvtItem extends SkriptEvent {
 				.description("Called when a player crafts an item.")
 				.examples("")
 				.since("");
+		if (hasPrepareCraftEvent) {
+			Skript.registerEvent("Prepare Craft", EvtItem.class, PrepareItemCraftEvent.class, "[player] (preparing|beginning) craft[ing] [[of] %itemtypes%]")
+					.description("Called just before displaying crafting result to player. You can set the result, but not cancel the event")
+					.examples("")
+					.since("2.2-Fixes-V10");
+		}
 		Skript.registerEvent("Pick Up", EvtItem.class, PlayerPickupItemEvent.class, "[player] (pick[ ]up|picking up) [[of] %itemtypes%]")
-				.description("Called when a player picks up an item. Please note that the item is still on the ground when this event is called.")
+				.description("Called when a player picks up an item. Note that setting the result item might or might not work due to Bukkit bugs.")
 				.examples("")
 				.since("");
 		// TODO brew event
@@ -76,6 +86,11 @@ public class EvtItem extends SkriptEvent {
 					.examples("")
 					.since("2.0");
 		}
+		
+		Skript.registerEvent("Inventory Click", EvtItem.class, InventoryClickEvent.class, "[player] inventory(-| )click[ing] [[at] %itemtypes%]")
+				.description("Called when clicking on inventory slot.")
+				.examples("")
+				.since("2.2-Fixes-V10");
 	}
 	
 	@Nullable
@@ -102,6 +117,8 @@ public class EvtItem extends SkriptEvent {
 			is = ((PlayerDropItemEvent) e).getItemDrop().getItemStack();
 		} else if (e instanceof CraftItemEvent) {
 			is = ((CraftItemEvent) e).getRecipe().getResult();
+		} else if (hasPrepareCraftEvent && e instanceof PrepareItemCraftEvent) {
+			is = ((PrepareItemCraftEvent) e).getRecipe().getResult();
 		} else if (e instanceof PlayerPickupItemEvent) {
 			is = ((PlayerPickupItemEvent) e).getItem().getItemStack();
 		} else if (hasConsumeEvent && e instanceof PlayerItemConsumeEvent) {

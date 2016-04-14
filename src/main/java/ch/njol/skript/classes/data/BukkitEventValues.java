@@ -62,6 +62,7 @@ import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -96,6 +97,8 @@ import ch.njol.skript.util.BlockStateBlock;
 import ch.njol.skript.util.BlockUtils;
 import ch.njol.skript.util.DelayedChangeBlock;
 import ch.njol.skript.util.Getter;
+import ch.njol.skript.util.InventorySlot;
+import ch.njol.skript.util.Slot;
 
 /**
  * @author Peter Güttinger
@@ -674,6 +677,7 @@ public final class BukkitEventValues {
 		}, 0);
 		
 		// === InventoryEvents ===
+		// InventoryClickEvent
 		EventValues.registerEventValue(InventoryClickEvent.class, Player.class, new Getter<Player, InventoryClickEvent>() {
 			@Override
 			@Nullable
@@ -688,6 +692,15 @@ public final class BukkitEventValues {
 				return e.getWhoClicked().getWorld();
 			}
 		}, 0);
+		EventValues.registerEventValue(InventoryClickEvent.class, Slot.class, new Getter<Slot, InventoryClickEvent>() {
+			@SuppressWarnings("null")
+			@Override
+			@Nullable
+			public Slot get(final InventoryClickEvent e) {
+				return new InventorySlot(e.getInventory(), e.getSlot());
+			}
+		}, 0);
+		// CraftItemEvent
 		EventValues.registerEventValue(CraftItemEvent.class, ItemStack.class, new Getter<ItemStack, CraftItemEvent>() {
 			@Override
 			@Nullable
@@ -695,7 +708,14 @@ public final class BukkitEventValues {
 				return e.getRecipe().getResult();
 			}
 		}, 0);
-		
+		// PrepareItemCraftEvent
+		EventValues.registerEventValue(PrepareItemCraftEvent.class, Slot.class, new Getter<Slot, PrepareItemCraftEvent>() {
+			@Override
+			@Nullable
+			public Slot get(final PrepareItemCraftEvent e) {
+				return new InventorySlot(e.getInventory(), 9);
+			}
+		}, 0);
 	}
 	
 }
