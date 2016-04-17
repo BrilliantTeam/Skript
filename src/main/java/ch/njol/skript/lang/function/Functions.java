@@ -40,6 +40,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Utils;
@@ -66,6 +67,8 @@ public abstract class Functions {
 	
 	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<String, JavaFunction<?>>();
 	final static Map<String, FunctionData> functions = new HashMap<String, FunctionData>();
+	
+	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<FunctionReference<?>>();
 	
 	/**
 	 * @param function
@@ -231,6 +234,21 @@ public abstract class Functions {
 	@SuppressWarnings("null")
 	public static Iterable<JavaFunction<?>> getJavaFunctions() {
 		return javaFunctions.values();
+	}
+	
+	public final static void addPostCheck(FunctionReference<?> ref) {
+		postCheckNeeded.add(ref);
+	}
+	
+	public final static void postCheck() {
+		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
+		for (FunctionReference<?> ref : postCheckNeeded) {
+			Function<?> func = getFunction(ref.functionName);
+			if (func == null) {
+				Skript.error("The function '" + ref.functionName + "' does not exist");
+				log.printError();
+			}
+		}
 	}
 	
 }

@@ -145,6 +145,9 @@ case sensitive: false
 # This e.g. applies to the effect 'replace' and the conditions 'contains' and 'is/is not'.
 # Variable names are case-insensitive irrespective of this setting.
 
+allow function calls before definations: true
+# Whether scripts should be allowed to call functions that are not yet defined.
+# If enabled, functions' existence are checked after loading ALL scripts.
 
 disable variable conflict warnings: false
 # Disables warnings of potential variable name conflicts if set to true.
