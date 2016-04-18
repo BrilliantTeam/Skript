@@ -728,14 +728,10 @@ public class SkriptParser {
 			}
 			
 			final Function<?> function = Functions.getFunction(functionName);
-			if (function == null) {
-				if (SkriptConfig.allowFunctionsBeforeDefs.value()) {
-					Functions.addPostCheck(new FunctionReference<T>(functionName, SkriptLogger.getNode(), ScriptLoader.currentScript != null ? ScriptLoader.currentScript.getFile() : null, types, params));
-				} else {
-					Skript.error("The function '" + functionName + "' does not exist");
-					log.printError();
-					return null;
-				}
+			if (function == null && !SkriptConfig.allowFunctionsBeforeDefs.value()) {
+				Skript.error("The function '" + functionName + "' does not exist");
+				log.printError();
+				return null;
 			}
 			
 //			final List<Expression<?>> params = new ArrayList<Expression<?>>();
@@ -756,7 +752,7 @@ public class SkriptParser {
 //			}
 //			@SuppressWarnings("null")
 			final FunctionReference<T> e = new FunctionReference<T>(functionName, SkriptLogger.getNode(), ScriptLoader.currentScript != null ? ScriptLoader.currentScript.getFile() : null, types, params);//.toArray(new Expression[params.size()]));
-			if (!e.validateFunction(true)) {
+			if (!SkriptConfig.allowFunctionsBeforeDefs.value() && !e.validateFunction(true)) {
 				log.printError();
 				return null;
 			}

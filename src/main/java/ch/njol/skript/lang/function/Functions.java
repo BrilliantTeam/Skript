@@ -241,13 +241,18 @@ public abstract class Functions {
 	}
 	
 	public final static void postCheck() {
-		for (FunctionReference<?> ref : postCheckNeeded) {
+		if (postCheckNeeded.isEmpty()) return;
+		
+		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
+		for (final FunctionReference<?> ref : postCheckNeeded) {
 			if (!ref.validateFunction(true)) {
-				// TODO Do something
+				log.printError();
 			}
 		}
+		log.printLog();
 		
 		postCheckNeeded.clear();
+		log.stop();
 	}
 	
 }
