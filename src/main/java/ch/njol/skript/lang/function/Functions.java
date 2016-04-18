@@ -241,14 +241,13 @@ public abstract class Functions {
 	}
 	
 	public final static void postCheck() {
-		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		for (FunctionReference<?> ref : postCheckNeeded) {
-			Function<?> func = getFunction(ref.functionName);
-			if (func == null) {
-				Skript.error("The function '" + ref.functionName + "' does not exist");
-				log.printError();
+			if (!ref.validateFunction(true)) {
+				// TODO Do something
 			}
 		}
+		
+		postCheckNeeded.clear();
 	}
 	
 }

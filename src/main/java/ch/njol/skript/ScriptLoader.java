@@ -249,6 +249,9 @@ final public class ScriptLoader {
 			if (wasLocal)
 				Language.setUseLocal(true);
 		}
+		
+		Functions.postCheck(); // Check that all functions which are called exist.
+		
 		return i;
 	}
 	
@@ -277,6 +280,8 @@ final public class ScriptLoader {
 		}
 		
 		SkriptEventHandler.registerBukkitEvents();
+		
+		Functions.postCheck(); // Check that all functions which are called exist.
 		
 		return i;
 	}
