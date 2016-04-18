@@ -212,6 +212,7 @@ final public class ScriptLoader {
 			Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
 		
 		SkriptEventHandler.registerBukkitEvents();
+		Functions.postCheck(); // Check that all functions which are called exist.
 		
 		return i;
 	}

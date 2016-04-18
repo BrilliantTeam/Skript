@@ -67,12 +67,12 @@ public class EvtItem extends SkriptEvent {
 				.since("");
 		if (hasPrepareCraftEvent) {
 			Skript.registerEvent("Prepare Craft", EvtItem.class, PrepareItemCraftEvent.class, "[player] (preparing|beginning) craft[ing] [[of] %itemtypes%]")
-					.description("Called just before displaying crafting result to player. You can set the result, but not cancel the event")
+					.description("Called just before displaying crafting result to player. Note that setting the result item might or might not work due to Bukkit bugs.")
 					.examples("")
 					.since("2.2-Fixes-V10");
 		}
 		Skript.registerEvent("Pick Up", EvtItem.class, PlayerPickupItemEvent.class, "[player] (pick[ ]up|picking up) [[of] %itemtypes%]")
-				.description("Called when a player picks up an item. Note that setting the result item might or might not work due to Bukkit bugs.")
+				.description("Called when a player picks up an item. Please note that the item is still on the ground when this event is called.")
 				.examples("")
 				.since("");
 		// TODO brew event

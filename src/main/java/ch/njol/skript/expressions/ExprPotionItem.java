@@ -53,14 +53,14 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 		}
 	}
 	
-	@SuppressWarnings("null")
+	@Nullable
 	private Expression<PotionEffectType> type;
 	private int mod = 0; // 1=upgraded, 2=extended
 	private int usage = 0; // 0=normal, 1=splash, 2=exploding
 	private boolean water = false;
 	private boolean matchAll = false;
 	
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings({"unchecked"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		if (matchedPattern == 2) {
@@ -121,7 +121,8 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		if (e == null) return "bottle of water";
+		if (e == null || type == null) return "bottle of water";
+		assert type != null;
 		return PotionEffectUtils.getPotionName(type.getSingle(e), mod == 2, mod == 1);
 	}
 }
