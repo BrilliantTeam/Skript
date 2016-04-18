@@ -154,7 +154,7 @@ public class EvtRegionBorder extends SelfRegisteringSkriptEvent {
 			last = event;
 			final PlayerMoveEvent e = (PlayerMoveEvent) event;
 			final Location to = e.getTo(), from = e.getFrom();
-			if (to.equals(from))
+			if (to != null && to.equals(from))
 				return;
 			//if (to.getWorld().equals(from.getWorld()) && to.distanceSquared(from) < 2)
 			//	return;
