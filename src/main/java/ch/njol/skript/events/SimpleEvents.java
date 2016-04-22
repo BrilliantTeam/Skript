@@ -80,6 +80,8 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.spigotmc.event.entity.EntityDismountEvent;
+import org.spigotmc.event.entity.EntityMountEvent;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.util.SimpleEvent;
@@ -332,10 +334,16 @@ public class SimpleEvents {
 				.description("Called when an <a href='../classes/#entity'>entity</a> enters a vehicle, either deliberately (players) or by falling into them (mobs).")
 				.examples("")
 				.since("1.0");
-		Skript.registerEvent("Vehicle Exit", SimpleEvent.class, VehicleExitEvent.class, "vehicle exit", "exit[ing] [a] vehicle")
-				.description("Called when an entity exits a vehicle.")
-				.examples("")
-				.since("1.0");
+		if (Skript.classExists("org.spigotmc.event.entity.EntityMountEvent")) {
+			Skript.registerEvent("Entity Mount", SimpleEvent.class, EntityMountEvent.class, "mount[ing]")
+					.description("Called when entity starts riding another.")
+					.examples("")
+					.since("2.2-dev13b");
+			Skript.registerEvent("Entity Dismount", SimpleEvent.class, EntityDismountEvent.class, "dismount[ing]")
+					.description("Called when an entity dismounts.")
+					.examples("")
+					.since("2.2-dev13b");
+		}
 		Skript.registerEvent("World Init", SimpleEvent.class, WorldInitEvent.class, "world init")
 				.description("Called when a world is initialised. As all default worlds are initialised before any scripts are loaded, this event is only called for newly created worlds.",
 						"World management plugins might change the behaviour of this event though.")
