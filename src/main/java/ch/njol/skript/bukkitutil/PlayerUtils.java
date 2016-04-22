@@ -33,6 +33,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.common.collect.ImmutableList;
+
 import ch.njol.skript.Skript;
 import ch.njol.skript.util.Task;
 
@@ -74,7 +76,7 @@ public abstract class PlayerUtils {
 	@SuppressWarnings({"null", "unchecked"})
 	public final static Collection<? extends Player> getOnlinePlayers() {
 		if (hasCollecionGetOnlinePlayers) {
-			return Bukkit.getOnlinePlayers();
+			return ImmutableList.copyOf(Bukkit.getOnlinePlayers());
 		} else {
 			if (getOnlinePlayers == null) {
 				try {
@@ -88,9 +90,9 @@ public abstract class PlayerUtils {
 			try {
 				final Object o = getOnlinePlayers.invoke(null);
 				if (o instanceof Collection<?>)
-					return (Collection<? extends Player>) o;
+					return ImmutableList.copyOf((Collection<? extends Player>) o);
 				else
-					return Arrays.asList((Player[]) o);
+					return Arrays.asList(((Player[]) o).clone());
 			} catch (final IllegalAccessException e) {
 				Skript.outdatedError(e);
 			} catch (final IllegalArgumentException e) {
