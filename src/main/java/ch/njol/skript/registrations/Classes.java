@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -44,6 +45,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
+import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.classes.Converter.ConverterInfo;
@@ -125,6 +127,9 @@ public abstract class Classes {
 	@SuppressFBWarnings("LI_LAZY_INIT_STATIC")
 	private final static void sortClassInfos() {
 		assert classInfos == null;
+		
+		if (!Skript.testing() && SkriptConfig.addonSafetyChecks.value())
+			removeNullElements();
 		
 		// merge before, after & sub/supertypes in after
 		for (final ClassInfo<?> ci : tempClassInfos) {
@@ -213,6 +218,16 @@ public abstract class Classes {
 			Skript.info("All registered classes in order: " + b.toString());
 		}
 		
+	}
+	
+	@SuppressWarnings({"null", "unused"})
+	private final static void removeNullElements() {
+		Iterator<ClassInfo<?>> it = tempClassInfos.iterator();
+		while (it.hasNext()) {
+			ClassInfo<?> ci = it.next();
+			if (ci.getC() == null)
+				it.remove();
+		}
 	}
 	
 	private final static void checkAllowClassInfoInteraction() {
