@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -104,4 +106,28 @@ public abstract class PlayerUtils {
 		}
 	}
 	
+	
+	public final static boolean canEat(Player p, Material food) {
+		GameMode gm = p.getGameMode();
+		if (gm == GameMode.CREATIVE || gm == GameMode.SPECTATOR)
+			return false; // Can't eat anything in those gamemodes
+		
+		boolean edible = food.isEdible();
+		if (!edible)
+			return false;
+		boolean special;
+		switch (food) {
+			case GOLDEN_APPLE:
+			case CHORUS_FRUIT:
+				special = true;
+				break;
+				//$CASES-OMITTED$
+			default:
+				special = false;
+		}
+		if (p.getFoodLevel() < 20 || special)
+			return true;
+		
+		return false;
+	}
 }

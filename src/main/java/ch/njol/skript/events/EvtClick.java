@@ -37,6 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.PlayerUtils;
 import ch.njol.skript.classes.Comparator.Relation;
 import ch.njol.skript.classes.data.DefaultComparators;
 import ch.njol.skript.entity.EntityData;
@@ -103,7 +104,7 @@ public class EvtClick extends SkriptEvent {
 		
 		if (e instanceof PlayerInteractEntityEvent) {
 			PlayerInteractEntityEvent clickEvent = ((PlayerInteractEntityEvent) e);
-			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, BOTH hands trigger the event (might be a bug?)
+			if (Skript.isRunningMinecraft(1, 9)) {
 				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
 				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
@@ -123,7 +124,7 @@ public class EvtClick extends SkriptEvent {
 			block = null;
 		} else if (e instanceof PlayerInteractEvent) {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
-			if (Skript.isRunningMinecraft(1, 9)) { // If player has empty hand, BOTH hands trigger the event (might be a bug?)
+			if (Skript.isRunningMinecraft(1, 9)) {
 				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
 				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
@@ -198,6 +199,11 @@ public class EvtClick extends SkriptEvent {
 		ItemStack mainHand = player.getInventory().getItemInMainHand();
 		ItemStack offHand = player.getInventory().getItemInOffHand();
 		
+		Material mainMat = mainHand.getType();
+		Material offMat = offHand.getType();
+		assert mainMat != null;
+		assert offMat != null;
+		
 		//Skript.info("block is " + block);
 		//Skript.info("entity is " + entity);
 		
@@ -231,7 +237,7 @@ public class EvtClick extends SkriptEvent {
 		}
 		
 		// Seriously? Empty hand -> block in hand, since id of AIR < 256 :O
-		if ((offHand.getType().isBlock() && offHand.getType() != Material.AIR) || offHand.getType().isEdible()) {
+		if ((offMat.isBlock() && offMat != Material.AIR) || PlayerUtils.canEat(player, offMat)) {
 			offUsable = true;
 		}
 		
@@ -264,7 +270,7 @@ public class EvtClick extends SkriptEvent {
 		}
 		
 		// Seriously? Empty hand -> block in hand, since id of AIR < 256 :O
-		if ((mainHand.getType().isBlock() && mainHand.getType() != Material.AIR) || mainHand.getType().isEdible()) {
+		if ((mainMat.isBlock() && mainMat != Material.AIR) || PlayerUtils.canEat(player, mainMat)) {
 			mainUsable = true;
 		}
 		
