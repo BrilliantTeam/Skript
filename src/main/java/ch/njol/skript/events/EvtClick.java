@@ -262,6 +262,7 @@ public class EvtClick extends SkriptEvent {
 			case GOLD_SPADE:
 			case DIAMOND_SPADE:
 			case ENDER_PEARL:
+			case EYE_OF_ENDER:
 				mainUsable = true;
 				break;
 				//$CASES-OMITTED$
