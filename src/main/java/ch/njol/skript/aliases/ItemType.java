@@ -794,7 +794,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * @return Whether everything could be removed from the inventory
 	 */
 	public boolean removeFrom(final Inventory invi) {
-		final ItemStack[] buf = invi.getContents();
+		final ItemStack[] buf = getStorageContents(invi);
 		final ItemStack[] armour = invi instanceof PlayerInventory ? ((PlayerInventory) invi).getArmorContents() : null;
 		
 		@SuppressWarnings("unchecked")
