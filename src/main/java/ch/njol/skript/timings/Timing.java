@@ -21,9 +21,40 @@
 
 package ch.njol.skript.timings;
 
-/**
- *
- */
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 public class Timing {
 	
+	public class Capture {
+		
+		Timing parent;
+		
+		protected Capture(Timing parent) {
+			this.parent = parent;
+		}
+		
+		public void start() {
+			
+		}
+	}
+	
+	private List<Capture> captures = new ArrayList<Capture>();
+	
+	/**
+	 * Creates a new timing. Only used for {@link Timings}
+	 */
+	protected Timing() {
+		captures = new ArrayList<Capture>();
+	}
+	
+	/**
+	 * Creates a capture for timing.
+	 * @return
+	 */
+	public Capture capture() {
+		return new Capture(this);
+	}
 }

@@ -31,29 +31,20 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Timings {
 	
-	static class TimingObject extends HashMap<String,Timing> {}
+	private static Map<String,Timing> timings = new HashMap<String,Timing>();
 	
-	private static Map<Object,TimingObject> timings = new HashMap<Object,TimingObject>();
-	
-	public static Timing of(Object obj, String name) {
-		TimingObject map;
+	public static Timing of(String name) {
+		Timing timing;
 		synchronized (timings) {
-			if (timings.containsKey(obj)) {
-				map = timings.get(obj);
+			if (timings.containsKey(name)) {
+				timing = timings.get(name);
 			} else {
-				map = new TimingObject();
-				timings.put(obj, map);
+				timing = new Timing();
+				timings.put(name, timing);
 			}
 		}
 		
-		synchronized (map) {
-			if (map.containsKey(name)) {
-				return map.get(name);
-			} else {
-				Timing timing = new Timing();
-				map.put(name, timing);
-				return timing;
-			}
-		}
+		assert timing != null;
+		return timing;
 	}
 }
