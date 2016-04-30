@@ -31,20 +31,60 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Timings {
 	
-	private static Map<String,Timing> timings = new HashMap<String,Timing>();
+	protected static Map<Object,Timing> timings = new HashMap<Object,Timing>();
+	private static volatile boolean enabled;
+	protected static volatile long enableTime;
+	protected static volatile long disableTime;
 	
-	public static Timing of(String name) {
+	public static Timing of(Object ref) {
 		Timing timing;
 		synchronized (timings) {
-			if (timings.containsKey(name)) {
-				timing = timings.get(name);
+			if (timings.containsKey(ref)) {
+				timing = timings.get(ref);
 			} else {
 				timing = new Timing();
-				timings.put(name, timing);
+				timings.put(ref, timing);
 			}
 		}
 		
 		assert timing != null;
+		return timing;
+	}
+	
+	public static boolean enabled() {
+		return enabled;
+	}
+	
+	public static void enable() {
+		enabled = true;
+		enableTime = System.nanoTime();
+	}
+	
+	public static void disable() {
+		enabled = false;
+		disableTime = System.nanoTime();
+	}
+	
+	public static Timing start(Object ref) {
+		Timing timing = of(ref);
+		timing.start();
+		return timing;
+	}
+	
+	public static void stop(Object ref) {
+		Timing timing = of(ref);
+		timing.stop();
+	}
+	
+	public static Timing pause(Object ref) {
+		Timing timing = of(ref);
+		timing.pause();
+		return timing;
+	}
+	
+	public static Timing unpause(Object ref) {
+		Timing timing = of(ref);
+		timing.unpause();
 		return timing;
 	}
 }

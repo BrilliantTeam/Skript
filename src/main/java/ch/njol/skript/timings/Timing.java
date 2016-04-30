@@ -31,6 +31,9 @@ import ch.njol.skript.Skript;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Timing for certain action.
+ */
 public class Timing {
 	
 	public class Capture {
@@ -89,8 +92,13 @@ public class Timing {
 		inProgress = new HashMap<Thread,Capture>();
 	}
 	
+	/**
+	 * Starts timing measurement for caller thread.
+	 * @return Timing for chaining
+	 */
 	public Timing start() {
 		Thread current = Thread.currentThread();
+		assert current != null;
 		if (inProgress.containsKey(current)) {
 			inProgress.get(current).stop();
 			inProgress.remove(current);
@@ -102,5 +110,59 @@ public class Timing {
 		inProgress.put(current, c);
 		
 		return this;
+	}
+	
+	/**
+	 * Stops timing measurements for caller thread if it was in progress.
+	 */
+	public void stop() {
+		Thread current = Thread.currentThread();
+		assert current != null;
+		if (inProgress.containsKey(current)) {
+			inProgress.get(current).stop();
+			inProgress.remove(current);
+		}
+	}
+	
+	/**
+	 * Pauses timing measurement for caller thread until {@link #unpause()} is called.
+	 * @return Timing for chaining.
+	 */
+	public Timing pause() {
+		Thread current = Thread.currentThread();
+		assert current != null;
+		if (inProgress.containsKey(current)) {
+			inProgress.get(current).pause();
+		}
+		
+		return this;
+	}
+	
+	/**
+	 * Unpauses timing measurement for caller thread if it was paused.
+	 * @return Timing for chaining.
+	 */
+	public Timing unpause() {
+		Thread current = Thread.currentThread();
+		assert current != null;
+		if (inProgress.containsKey(current)) {
+			inProgress.get(current).unpause();
+		}
+		
+		return this;
+	}
+	
+	/**
+	 * Gets list of captures for given thread. Very expensive to call.
+	 * @param thread
+	 * @return Captures for given thread
+	 */
+	public List<Capture> getCaptures(Thread thread) {
+		List<Capture> ret = new ArrayList<Capture>();
+		for (Capture c : captures)
+			if (c.isOf(thread))
+				ret.add(c);
+		
+		return ret;
 	}
 }

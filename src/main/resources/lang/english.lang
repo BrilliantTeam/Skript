@@ -1027,4 +1027,8 @@ types:
 io exceptions:
 	unknownhostexception: Cannot connect to %s
 	accessdeniedexception: Access denied for %s
+# -- Timings Reports --
+timings:
+	start: "Skript timings for %s seconds:"
+
 

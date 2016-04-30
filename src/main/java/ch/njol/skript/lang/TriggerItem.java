@@ -27,6 +27,8 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.timings.Timing;
+import ch.njol.skript.timings.Timings;
 import ch.njol.util.StringUtils;
 
 /**
@@ -86,9 +88,14 @@ public abstract class TriggerItem implements Debuggable {
 	public final static boolean walk(final TriggerItem start, final Event e) {
 		assert start != null && e != null;
 		TriggerItem i = start;
+		Timing timing = null;
 		try {
+			if (Timings.enabled())
+				timing = Timings.start(e);
+			
 			while (i != null)
 				i = i.walk(e);
+			
 			return true;
 		} catch (final StackOverflowError err) {
 			final Trigger t = start.getTrigger();
@@ -99,6 +106,9 @@ public abstract class TriggerItem implements Debuggable {
 		} catch (final Exception ex) {
 			if (ex.getStackTrace().length != 0) // empty exceptions have already been printed
 				Skript.exception(ex, i);
+		} finally {
+			assert timing != null;
+			timing.stop(); // Whatever happened, end the timing
 		}
 		return false;
 	}
