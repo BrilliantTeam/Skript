@@ -74,7 +74,7 @@ public enum WeatherType {
 	
 	public static WeatherType fromWorld(final World world) {
 		assert world != null;
-		if (world.isThundering())
+		if (world.isThundering() && world.hasStorm()) // Sometimes thundering but no storm
 			return THUNDER;
 		if (world.hasStorm())
 			return RAIN;

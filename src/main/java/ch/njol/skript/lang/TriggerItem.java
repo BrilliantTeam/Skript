@@ -107,8 +107,10 @@ public abstract class TriggerItem implements Debuggable {
 			if (ex.getStackTrace().length != 0) // empty exceptions have already been printed
 				Skript.exception(ex, i);
 		} finally {
-			assert timing != null;
-			timing.stop(); // Whatever happened, end the timing
+			if (Timings.enabled()) {
+				assert timing != null;
+				timing.stop(); // Whatever happened, end the timing
+			}
 		}
 		return false;
 	}

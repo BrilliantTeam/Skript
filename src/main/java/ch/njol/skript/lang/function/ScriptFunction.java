@@ -24,6 +24,7 @@ package ch.njol.skript.lang.function;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.effects.EffReturn;
@@ -66,6 +67,7 @@ public class ScriptFunction<T> extends Function<T> {
 	 * @param value
 	 */
 	public final void setReturnValue(final FunctionEvent e, final @Nullable T[] value) {
+		Skript.info("Trigger is " + trigger.toString());
 		assert !returnValueSet;
 		returnValueSet = true;
 		returnValue = value;

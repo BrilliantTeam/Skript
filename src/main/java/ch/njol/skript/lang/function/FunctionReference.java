@@ -78,6 +78,16 @@ public class FunctionReference<T> {
 			else
 				Skript.error("The function '" + functionName + "' was deleted or renamed, but is still used in other script(s)."
 						+ " These will continue to use the old version of the function until Skript restarts.");
+			
+			function = (Function<? extends T>) new Function<Object>("empty_placeholder", new Parameter<?>[0], null, true) {
+
+				@Override
+				@Nullable
+				public Object[] execute(FunctionEvent e, Object[][] params) {
+					return null;
+				}
+				
+			};
 			return false;
 		}
 		if (newFunc == function)
