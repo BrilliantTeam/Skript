@@ -21,8 +21,13 @@
 
 package ch.njol.skript.timings;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import ch.njol.skript.Skript;
 
 import com.google.common.collect.Lists;
 
@@ -30,31 +35,72 @@ public class Timing {
 	
 	public class Capture {
 		
-		Timing parent;
+		final String thread;
 		
-		protected Capture(Timing parent) {
-			this.parent = parent;
+		long start;
+		long end;
+		
+		long paused; // Time while paused
+		long pauseBegin;
+		
+		protected Capture(final Thread thread) {
+			String name = thread.getName();
+			assert name != null;
+			this.thread = name;
 		}
 		
 		public void start() {
+			start = System.nanoTime();
+		}
+		
+		public void stop() {
+			end = System.nanoTime();
+		}
+		
+		public void pause() {
+			pauseBegin = System.nanoTime();
+		}
+		
+		public void unpause() {
+			long pauseTime = System.nanoTime() - pauseBegin;
+			paused += pauseTime;
+		}
+		
+		public long result() {
+			if (end == 0L)
+				end = System.nanoTime();
 			
+			return end - start - paused;
+		}
+		
+		public boolean isOf(Thread t) {
+			return (thread.equals(t.getName()));
 		}
 	}
 	
 	private List<Capture> captures = new ArrayList<Capture>();
+	private Map<Thread,Capture> inProgress;
 	
 	/**
-	 * Creates a new timing. Only used for {@link Timings}
+	 * Creates a new timing. Only used by {@link Timings}
 	 */
 	protected Timing() {
 		captures = new ArrayList<Capture>();
+		inProgress = new HashMap<Thread,Capture>();
 	}
 	
-	/**
-	 * Creates a capture for timing.
-	 * @return
-	 */
-	public Capture capture() {
-		return new Capture(this);
+	public Timing start() {
+		Thread current = Thread.currentThread();
+		if (inProgress.containsKey(current)) {
+			inProgress.get(current).stop();
+			inProgress.remove(current);
+		}
+		
+		Capture c = new Capture(current);
+		c.start();
+		captures.add(c);
+		inProgress.put(current, c);
+		
+		return this;
 	}
 }
