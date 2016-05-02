@@ -24,145 +24,47 @@ package ch.njol.skript.timings;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import ch.njol.skript.Skript;
+import org.bukkit.event.Event;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
+
+import ch.njol.skript.Skript;
+import ch.njol.skript.lang.Trigger;
 
 /**
  * Timing for certain action.
  */
 public class Timing {
 	
-	public class Capture {
-		
-		final String thread;
-		
-		long start;
-		long end;
-		
-		long paused; // Time while paused
-		long pauseBegin;
-		
-		protected Capture(final Thread thread) {
-			String name = thread.getName();
-			assert name != null;
-			this.thread = name;
-		}
-		
-		public void start() {
-			start = System.nanoTime();
-		}
-		
-		public void stop() {
-			end = System.nanoTime();
-		}
-		
-		public void pause() {
-			pauseBegin = System.nanoTime();
-		}
-		
-		public void unpause() {
-			long pauseTime = System.nanoTime() - pauseBegin;
-			paused += pauseTime;
-		}
-		
-		public long result() {
-			if (end == 0L)
-				end = System.nanoTime();
-			
-			return end - start - paused;
-		}
-		
-		public boolean isOf(Thread t) {
-			return (thread.equals(t.getName()));
-		}
-	}
-	
-	private List<Capture> captures = new ArrayList<Capture>();
-	private Map<Thread,Capture> inProgress;
+	private Map<Trigger,Long> triggerTimes;
+	private long eventTime;
 	
 	/**
 	 * Creates a new timing. Only used by {@link Timings}
 	 */
 	protected Timing() {
-		captures = new ArrayList<Capture>();
-		inProgress = new HashMap<Thread,Capture>();
+		triggerTimes = new LinkedHashMap<Trigger,Long>();
+		eventTime = 0L;
 	}
 	
-	/**
-	 * Starts timing measurement for caller thread.
-	 * @return Timing for chaining
-	 */
-	public Timing start() {
-		Thread current = Thread.currentThread();
-		assert current != null;
-		if (inProgress.containsKey(current)) {
-			inProgress.get(current).stop();
-			inProgress.remove(current);
-		}
-		
-		Capture c = new Capture(current);
-		c.start();
-		captures.add(c);
-		inProgress.put(current, c);
-		
-		return this;
+	public void addTrigger(Trigger t, long time) {
+		triggerTimes.put(t, time);
 	}
 	
-	/**
-	 * Stops timing measurements for caller thread if it was in progress.
-	 */
-	public void stop() {
-		Thread current = Thread.currentThread();
-		assert current != null;
-		if (inProgress.containsKey(current)) {
-			inProgress.get(current).stop();
-			inProgress.remove(current);
-		}
+	public void setEventTime(long time) {
+		eventTime = time;
 	}
 	
-	/**
-	 * Pauses timing measurement for caller thread until {@link #unpause()} is called.
-	 * @return Timing for chaining.
-	 */
-	public Timing pause() {
-		Thread current = Thread.currentThread();
-		assert current != null;
-		if (inProgress.containsKey(current)) {
-			inProgress.get(current).pause();
-		}
-		
-		return this;
+	@SuppressWarnings("null")
+	public Map<Trigger,Long> getTriggerTimes() {
+		return ImmutableMap.copyOf(triggerTimes);
 	}
 	
-	/**
-	 * Unpauses timing measurement for caller thread if it was paused.
-	 * @return Timing for chaining.
-	 */
-	public Timing unpause() {
-		Thread current = Thread.currentThread();
-		assert current != null;
-		if (inProgress.containsKey(current)) {
-			inProgress.get(current).unpause();
-		}
-		
-		return this;
-	}
-	
-	/**
-	 * Gets list of captures for given thread. Very expensive to call.
-	 * @param thread
-	 * @return Captures for given thread
-	 */
-	public List<Capture> getCaptures(Thread thread) {
-		List<Capture> ret = new ArrayList<Capture>();
-		for (Capture c : captures)
-			if (c.isOf(thread))
-				ret.add(c);
-		
-		return ret;
+	public long getEventTime() {
+		return eventTime;
 	}
 }

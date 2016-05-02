@@ -27,44 +27,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.localization.Language;
-import ch.njol.skript.timings.Timing.Capture;
 
 /**
  * Creates timing reports.
  */
 public class TimingReporter {
 	
-	public static String generateReport() {
+	public static String getReport() {
 		Map<Object,Timing> timings = Timings.timings;
-		StringBuilder sb = new StringBuilder();
+		Map<String,Long> triggers = new HashMap<String,Long>();
+		Map<Object,Long> events = new HashMap<Object,Long>();
 		
-		sb.append(String.format(Language.get("timings.start"), ((Timings.disableTime - Timings.enableTime)) / 1000000000));
-		Map<String,Long> results = parseTimings();
-		Iterator<Entry<String, Long>> it = results.entrySet().iterator();
-		while (it.hasNext()) {
-			Entry<String, Long> entry = it.next();
-			long time = entry.getValue();
-			sb.append(entry.getKey() + ": " + time + " (" + (time / 1000000000) + "ms)");
+		for (Entry<Object,Timing> entry : timings.entrySet()) {
+			Object key = entry.getKey();
+			Timing val = entry.getValue();
+			
+			for (Entry<Trigger,Long> trigger : val.getTriggerTimes().entrySet()) {
+				String name = trigger.getKey().getName();
+				long tt = 0L;
+				if (triggers.containsKey(name))
+					tt = triggers.get(name);
+				tt += trigger.getValue();
+				triggers.put(name, tt);
+			}
+			
+			long evtTime = 0L;
+			if (events.containsKey(key))
+				evtTime = events.get(key);
+			evtTime += val.getEventTime();
+		}
+		
+		long length = Timings.disableTime - Timings.enableTime;
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.format(Language.get("timings.start"), length / 1000000000));
+		
+		sb.append(Language.get("timings.triggers"));
+		for (Entry<String,Long> trigger : triggers.entrySet()) {
+			float percent = trigger.getValue() / length * 100;
+			sb.append(trigger.getKey() + ": " + (trigger.getValue() / 1000000) + "ms (" + percent + "%)");
+		}
+		
+		sb.append(Language.get("timings.events"));
+		for (Entry<Object,Long> event : events.entrySet()) {
+			float percent = event.getValue() / length * 100;
+			sb.append(event.getKey() + ": " + (event.getValue() / 1000000) + "ms (" + percent + "%)");
 		}
 		
 		return sb.toString();
-	}
-	
-	@SuppressWarnings("null")
-	public static Map<String,Long> parseTimings() {
-		Map<String,Long> ret = new HashMap<String,Long>();
-		
-		Iterator<Entry<Object, Timing>> it = Timings.timings.entrySet().iterator();
-		while (it.hasNext()) {
-			Entry<Object, Timing> entry = it.next();
-			List<Capture> captures = entry.getValue().getCaptures(Thread.currentThread());
-			long time = 0;
-			for (Capture c : captures)
-				time += c.result();
-			ret.put(entry.toString(), time);
-		}
-		
-		return ret;
 	}
 }

@@ -65,26 +65,8 @@ public class Timings {
 		disableTime = System.nanoTime();
 	}
 	
-	public static Timing start(Object ref) {
-		Timing timing = of(ref);
-		timing.start();
-		return timing;
+	public static void clear() {
+		timings.clear();
 	}
 	
-	public static void stop(Object ref) {
-		Timing timing = of(ref);
-		timing.stop();
-	}
-	
-	public static Timing pause(Object ref) {
-		Timing timing = of(ref);
-		timing.pause();
-		return timing;
-	}
-	
-	public static Timing unpause(Object ref) {
-		Timing timing = of(ref);
-		timing.unpause();
-		return timing;
-	}
 }

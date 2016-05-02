@@ -88,11 +88,7 @@ public abstract class TriggerItem implements Debuggable {
 	public final static boolean walk(final TriggerItem start, final Event e) {
 		assert start != null && e != null;
 		TriggerItem i = start;
-		Timing timing = null;
 		try {
-			if (Timings.enabled())
-				timing = Timings.start(e);
-			
 			while (i != null)
 				i = i.walk(e);
 			
@@ -106,11 +102,6 @@ public abstract class TriggerItem implements Debuggable {
 		} catch (final Exception ex) {
 			if (ex.getStackTrace().length != 0) // empty exceptions have already been printed
 				Skript.exception(ex, i);
-		} finally {
-			if (Timings.enabled()) {
-				assert timing != null;
-				timing.stop(); // Whatever happened, end the timing
-			}
 		}
 		return false;
 	}

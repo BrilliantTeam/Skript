@@ -47,6 +47,8 @@ import ch.njol.skript.command.Commands;
 import ch.njol.skript.lang.SelfRegisteringSkriptEvent;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.function.Functions;
+import ch.njol.skript.timings.Timing;
+import ch.njol.skript.timings.Timings;
 
 /**
  * @author Peter Güttinger
@@ -155,16 +157,24 @@ public abstract class SkriptEventHandler {
 	}
 	
 	private static long startEvent;
+	@Nullable
+	private static Timing timing;
 	
 	public static void logEventStart(final Event e) {
+		if (Timings.enabled())
+			timing = Timings.of(e.getEventName());
+		
+		startEvent = System.nanoTime();
 		if (!Skript.logVeryHigh())
 			return;
-		startEvent = System.nanoTime();
 		Skript.info("");
 		Skript.info("== " + e.getClass().getName() + " ==");
 	}
 	
 	public static void logEventEnd() {
+		if (timing != null)
+			timing.setEventTime(System.nanoTime() - startEvent);
+		
 		if (!Skript.logVeryHigh())
 			return;
 		Skript.info("== took " + 1. * (System.nanoTime() - startEvent) / 1000000. + " milliseconds ==");
@@ -173,13 +183,16 @@ public abstract class SkriptEventHandler {
 	static long startTrigger;
 	
 	public static void logTriggerStart(final Trigger t) {
+		startTrigger = System.nanoTime();
 		if (!Skript.logVeryHigh())
 			return;
 		Skript.info("# " + t.getName());
-		startTrigger = System.nanoTime();
 	}
 	
 	public static void logTriggerEnd(final Trigger t) {
+		if (timing != null)
+			timing.addTrigger(t, System.nanoTime() - startTrigger);
+		
 		if (!Skript.logVeryHigh())
 			return;
 		Skript.info("# " + t.getName() + " took " + 1. * (System.nanoTime() - startTrigger) / 1000000. + " milliseconds");
