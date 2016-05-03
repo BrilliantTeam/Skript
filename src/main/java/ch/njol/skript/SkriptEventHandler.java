@@ -160,6 +160,7 @@ public abstract class SkriptEventHandler {
 	@Nullable
 	private static Timing timing;
 	
+	@SuppressWarnings("null")
 	public static void logEventStart(final Event e) {
 		if (Timings.enabled())
 			timing = Timings.of(e.getEventName());

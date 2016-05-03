@@ -45,6 +45,7 @@ public class FunctionReference<T> {
 	
 	final String functionName;
 	
+	@Nullable
 	private Function<? extends T> function;
 	
 	private boolean singleUberParam;
@@ -59,7 +60,6 @@ public class FunctionReference<T> {
 	@Nullable
 	public final File script;
 	
-	@SuppressWarnings("null")
 	public FunctionReference(final String functionName, final @Nullable Node node, @Nullable final File script, @Nullable final Class<? extends T>[] returnTypes, final Expression<?>[] params) {
 		this.functionName = functionName;
 		this.node = node;
@@ -78,16 +78,6 @@ public class FunctionReference<T> {
 			else
 				Skript.error("The function '" + functionName + "' was deleted or renamed, but is still used in other script(s)."
 						+ " These will continue to use the old version of the function until Skript restarts.");
-			
-			function = (Function<? extends T>) new Function<Object>("empty_placeholder", new Parameter<?>[0], null, true) {
-
-				@Override
-				@Nullable
-				public Object[] execute(FunctionEvent e, Object[][] params) {
-					return null;
-				}
-				
-			};
 			return false;
 		}
 		if (newFunc == function)
@@ -176,8 +166,12 @@ public class FunctionReference<T> {
 		return true;
 	}
 	
+	@SuppressWarnings("null")
 	@Nullable
 	protected T[] execute(final Event e) {
+		if (function == null)
+			return null;
+		
 		final Object[][] params = new Object[singleUberParam ? 1 : parameters.length][];
 		if (singleUberParam && parameters.length > 1) {
 			final ArrayList<Object> l = new ArrayList<Object>();

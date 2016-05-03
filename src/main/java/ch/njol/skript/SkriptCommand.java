@@ -78,6 +78,9 @@ public class SkriptCommand implements CommandExecutor {
 //					.add("set", "Creates a new variable or changes an existing one")
 //					.add("delete", "Deletes a variable")
 //					.add("find", "Find variables")
+			).add(new CommandHelp("timings", Color.DARK_RED)
+					.add("start")
+					.add("stop")
 			).add("help");
 	
 	private final static ArgsMessage m_reloading = new ArgsMessage(NODE + ".reload.reloading");

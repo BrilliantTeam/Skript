@@ -1030,5 +1030,7 @@ io exceptions:
 # -- Timings Reports --
 timings:
 	start: "Skript timings for %s seconds:"
+	events: "Event times: used time (percent of timing length)
+	triggers: "Trigger times: used time (percent of timing length)
 
 

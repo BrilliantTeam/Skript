@@ -21,12 +21,19 @@
 
 package ch.njol.skript.timings;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.localization.Language;
 
@@ -35,6 +42,7 @@ import ch.njol.skript.localization.Language;
  */
 public class TimingReporter {
 	
+	@SuppressWarnings("null")
 	public static String getReport() {
 		Map<Object,Timing> timings = Timings.timings;
 		Map<String,Long> triggers = new HashMap<String,Long>();
@@ -76,5 +84,24 @@ public class TimingReporter {
 		}
 		
 		return sb.toString();
+	}
+	
+	public static void saveToFile(String str) {
+		File folder = Skript.getInstance().getDataFolder();
+		File file = new File(folder + "/timings-" + DateFormat.getTimeInstance().format(System.currentTimeMillis()) + ".log");
+		if (!file.exists())
+			try {
+				file.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				return;
+			}
+		try {
+			PrintWriter out = new PrintWriter(file);
+			out.write(str);
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace(); // Can't happen...
+		}
 	}
 }
