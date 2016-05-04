@@ -133,15 +133,6 @@ public class EvtBlock extends SkriptEvent {
 					return t != null && Relation.EQUAL.is(DefaultComparators.entityItemComparator.compare(d, t));
 				}
 			});
-		} else if (e instanceof HangingEvent) {
-			Entity entity = ((HangingEvent) e).getEntity();
-			if (entity instanceof Painting) {
-				id = Material.PAINTING.getId();
-				durability = 0;
-			} else if (entity instanceof ItemFrame) {
-				id = Material.ITEM_FRAME.getId();
-				durability = 0;
-			}
 		} else {
 			assert false;
 			return false;

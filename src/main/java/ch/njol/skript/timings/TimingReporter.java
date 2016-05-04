@@ -65,22 +65,23 @@ public class TimingReporter {
 			if (events.containsKey(key))
 				evtTime = events.get(key);
 			evtTime += val.getEventTime();
+			events.put(key, evtTime);
 		}
 		
 		long length = Timings.disableTime - Timings.enableTime;
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format(Language.get("timings.start"), length / 1000000000));
+		sb.append(String.format(Language.get("timings.start"), length / (float) 1000000000) + "\n");
 		
-		sb.append(Language.get("timings.triggers"));
+		sb.append(Language.get("timings.triggers") + "\n");
 		for (Entry<String,Long> trigger : triggers.entrySet()) {
-			float percent = trigger.getValue() / length * 100;
-			sb.append(trigger.getKey() + ": " + (trigger.getValue() / 1000000) + "ms (" + percent + "%)");
+			float percent = trigger.getValue() / (float) length * 100;
+			sb.append(trigger.getKey() + ": " + (trigger.getValue() / (float) 1000000) + "ms (" + percent + "%)\n");
 		}
 		
-		sb.append(Language.get("timings.events"));
+		sb.append(Language.get("timings.events") + "\n");
 		for (Entry<Object,Long> event : events.entrySet()) {
-			float percent = event.getValue() / length * 100;
-			sb.append(event.getKey() + ": " + (event.getValue() / 1000000) + "ms (" + percent + "%)");
+			float percent = event.getValue() / (float) length * 100;
+			sb.append(event.getKey() + ": " + (event.getValue() / (float) 1000000) + "ms (" + percent + "%)\n");
 		}
 		
 		return sb.toString();

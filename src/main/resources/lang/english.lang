@@ -1029,8 +1029,9 @@ io exceptions:
 	accessdeniedexception: Access denied for %s
 # -- Timings Reports --
 timings:
-	start: "Skript timings for %s seconds:"
-	events: "Event times: used time (percent of timing length)
-	triggers: "Trigger times: used time (percent of timing length)
-
+	start: Skript timings for %s seconds:
+	events: Event times: used time (percents)
+	triggers: Trigger times: used time (percents)
+	start message: Skript timings started
+	stop message: Skript timings stopped and results parsed
 
