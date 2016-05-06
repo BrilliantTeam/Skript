@@ -822,6 +822,7 @@ public class BukkitClasses {
 				.usage(BiomeUtils.getAllNames())
 				.examples("biome at the player is desert")
 				.since("1.4.4")
+				.after("damagecause")
 				.parser(new Parser<Biome>() {
 					@Override
 					@Nullable

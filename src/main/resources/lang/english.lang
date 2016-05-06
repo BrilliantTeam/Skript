@@ -321,7 +321,7 @@ biomes:
 	cold_taiga_mountains: cold taiga mountains
 	savanna_mountains: savanna mountains
 	savanna_plateau_mountains: savanna plateau mountains
-	mesa_bryce: Hoodoos, Bryce, mesa bryce, mesa (bryce)
+	mesa_bryce: bryce, mesa bryce, mesa (bryce), hoodoos
 	mesa_plateau_forest_mountains: mesa plateau forest mountains
 	mesa_plateau_mountains: mesa plateau mountains
 	birch_forest_mountains: birch forest mountains
@@ -331,7 +331,7 @@ biomes:
 	extreme_hills_mountains: extreme hills mountains
 	extreme_hills_plus_mountains: extreme hills plus mountains
 	mega_spruce_taiga_hills: mega spruce taiga hills
-	void: void biome #There is also damage cause...
+	void: void
 
 # -- Tree Types --
 tree types:

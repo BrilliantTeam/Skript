@@ -199,6 +199,10 @@ public abstract class SkriptEventHandler {
 		Skript.info("# " + t.getName() + " took " + 1. * (System.nanoTime() - startTrigger) / 1000000. + " milliseconds");
 	}
 	
+	public static void removeTiming() {
+		timing = null;
+	}
+	
 	static void addTrigger(final Class<? extends Event>[] events, final Trigger trigger) {
 		for (final Class<? extends Event> e : events) {
 			List<Trigger> ts = triggers.get(e);

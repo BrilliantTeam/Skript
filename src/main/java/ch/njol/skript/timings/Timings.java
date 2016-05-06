@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import ch.njol.skript.SkriptEventHandler;
+
 /**
  * Static utils for Skript timings.
  */
@@ -63,6 +65,7 @@ public class Timings {
 	public static void disable() {
 		enabled = false;
 		disableTime = System.nanoTime();
+		SkriptEventHandler.removeTiming();
 	}
 	
 	public static void clear() {
