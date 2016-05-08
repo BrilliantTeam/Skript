@@ -48,6 +48,8 @@ import ch.njol.yggdrasil.YggdrasilID;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
@@ -240,8 +242,15 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	@SuppressWarnings("null")
 	@Override
 	public Collection<? extends Region> getRegionsAt_i(final Location l) {
-		final Iterator<ProtectedRegion> i = plugin.getRegionManager(l.getWorld()).getApplicableRegions(l).iterator();
 		final ArrayList<Region> r = new ArrayList<Region>();
+		
+		RegionManager manager = plugin.getRegionManager(l.getWorld());
+		if (manager == null)
+			return r;
+		ApplicableRegionSet applicable = manager.getApplicableRegions(l);
+		if (applicable == null)
+			return r;
+		final Iterator<ProtectedRegion> i = applicable.iterator();
 		while (i.hasNext())
 			r.add(new WorldGuardRegion(l.getWorld(), i.next()));
 		return r;

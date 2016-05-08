@@ -166,7 +166,6 @@ public class FunctionReference<T> {
 		return true;
 	}
 	
-	@SuppressWarnings("null")
 	@Nullable
 	protected T[] execute(final Event e) {
 		if (function == null)
@@ -182,6 +181,7 @@ public class FunctionReference<T> {
 			for (int i = 0; i < params.length; i++)
 				params[i] = parameters[i].getArray(e); // TODO what if an argument is not available? pass null or abort?
 		}
+		assert function != null;
 		return function.execute(params);
 	}
 	
@@ -189,9 +189,13 @@ public class FunctionReference<T> {
 		return single;
 	}
 	
-	@SuppressWarnings("null")
+	@SuppressWarnings("unchecked")
 	public Class<? extends T> getReturnType() {
-		return function.returnType.getC();
+		if (function == null)
+			return (Class<? extends T>) Void.class; // No function = no return
+		assert function != null;
+		ClassInfo<? extends T> ret = function.getReturnType();
+		return (Class<? extends T>) (ret == null ? Void.class : ret);
 	}
 	
 	public String toString(@Nullable final Event e, final boolean debug) {
