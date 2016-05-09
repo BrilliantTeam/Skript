@@ -268,17 +268,20 @@ public class ScriptCommand implements CommandExecutor {
 					aliases.add(lowerAlias);
 			}
 			bukkitCommand.setAliases(activeAliases);
-			bukkitCommand.register(commandMap);
+			commandMap.register("skript", bukkitCommand);
 		}
 	}
 	
 	public void unregister(final SimpleCommandMap commandMap, final Map<String, Command> knownCommands, final @Nullable Set<String> aliases) {
 		synchronized (commandMap) {
 			knownCommands.remove(label);
+			knownCommands.remove("skript:" + label);
 			if (aliases != null)
 				aliases.removeAll(activeAliases);
-			for (final String alias : activeAliases)
+			for (final String alias : activeAliases) {
 				knownCommands.remove(alias);
+				knownCommands.remove("skript:" + alias);
+			}
 			activeAliases = new ArrayList<String>(this.aliases);
 			bukkitCommand.unregister(commandMap);
 			bukkitCommand.setAliases(this.aliases);
