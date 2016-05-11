@@ -64,6 +64,7 @@ import ch.njol.skript.lang.While;
 import ch.njol.skript.lang.function.Function;
 import ch.njol.skript.lang.function.FunctionEvent;
 import ch.njol.skript.lang.function.Functions;
+import ch.njol.skript.lang.function.Signature;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.PluralizingArgsMessage;
@@ -572,6 +573,71 @@ final public class ScriptLoader {
 			SkriptLogger.setNode(null);
 		}
 		return new ScriptInfo();
+	}
+	
+	/**
+	 * Parses elements of a script.
+	 */
+	@SuppressWarnings("unchecked")
+	private final static void loadElements(final File f) {
+		try {
+			final Config config = new Config(f, true, false, ":");
+			if (SkriptConfig.keepConfigsLoaded.value())
+				SkriptConfig.configs.add(config);
+			int numTriggers = 0;
+			int numCommands = 0;
+			int numFunctions = 0;
+			
+			currentAliases.clear();
+			currentOptions.clear();
+			currentScript = config;
+			
+//			final SerializedScript script = new SerializedScript();
+			
+			final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
+			
+			try {
+				for (final Node cnode : config.getMainNode()) {
+					if (!(cnode instanceof SectionNode)) {
+						Skript.error("invalid line - all code has to be put into triggers");
+						continue;
+					}
+					
+					final SectionNode node = ((SectionNode) cnode);
+					String event = node.getKey();
+					if (event == null)
+						continue;
+					
+					
+					if (!SkriptParser.validateLine(event))
+						continue;
+					
+					if (event.toLowerCase().startsWith("function ")) {
+						
+						setCurrentEvent("function", FunctionEvent.class);
+						
+						final Signature<?> func = Functions.loadSignature(node);
+						if (func != null) {
+							numFunctions++;
+						}
+						
+						deleteCurrentEvent();
+						
+						continue;
+					}
+				}
+				
+				currentScript = null;
+			} finally {
+				numErrors.stop();
+			}
+		} catch (final IOException e) {
+			Skript.error("Could not load " + f.getName() + ": " + ExceptionUtils.toString(e));
+		} catch (final Exception e) {
+			Skript.exception(e, "Could not load " + f.getName());
+		} finally {
+			SkriptLogger.setNode(null);
+		}
 	}
 	
 	/**

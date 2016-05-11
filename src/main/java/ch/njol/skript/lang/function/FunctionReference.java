@@ -195,7 +195,7 @@ public class FunctionReference<T> {
 			return (Class<? extends T>) Void.class; // No function = no return
 		assert function != null;
 		ClassInfo<? extends T> ret = function.getReturnType();
-		return (Class<? extends T>) (ret == null ? Void.class : ret);
+		return (Class<? extends T>) (ret == null ? Unknown.class : ret.getC());
 	}
 	
 	public String toString(@Nullable final Event e, final boolean debug) {

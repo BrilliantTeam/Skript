@@ -67,6 +67,7 @@ public abstract class Functions {
 	
 	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<String, JavaFunction<?>>();
 	final static Map<String, FunctionData> functions = new HashMap<String, FunctionData>();
+	final static Map<String, Signature<?>> signatures = new HashMap<String, Signature<?>>();
 	
 	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<FunctionReference<?>>();
 	
@@ -104,8 +105,31 @@ public abstract class Functions {
 		final String definition = node.getKey();
 		assert definition != null;
 		final Matcher m = functionPattern.matcher(definition);
+		//if (!m.matches()) // We have checks when loading the signature
+		//	return error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
+		final String name = "" + m.group(1);
+		Signature<?> sign = signatures.get(name);
+		final List<Parameter<?>> params = sign.getParameters();
+		final ClassInfo<?> c = sign.getReturnType();
+		final NonNullPair<String, Boolean> p = sign.getDbgInfo();
+		
+		if (Skript.debug() || node.debug())
+			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")" + (c != null && p != null ? " :: " + Utils.toEnglishPlural(c.getCodeName(), p.getSecond()) : "") + ":");
+		
+		@SuppressWarnings("null")
+		final Function<?> f = new ScriptFunction<Object>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
+//		functions.put(name, new FunctionData(f)); // in constructor
+		return f;
+	}
+	
+	@Nullable
+	public static Signature<?> loadSignature(final SectionNode node) {
+		SkriptLogger.setNode(node);
+		final String definition = node.getKey();
+		assert definition != null;
+		final Matcher m = functionPattern.matcher(definition);
 		if (!m.matches())
-			return error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
+			error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
 		final String name = "" + m.group(1);
 		final String args = m.group(2);
 		final String returnType = m.group(3);
@@ -113,16 +137,16 @@ public abstract class Functions {
 		int j = 0;
 		for (int i = 0; i <= args.length(); i = SkriptParser.next(args, i, ParseContext.DEFAULT)) {
 			if (i == -1)
-				return error("Invalid text/variables/parentheses in the arguments of this function");
+				return signError("Invalid text/variables/parentheses in the arguments of this function");
 			if (i == args.length() || args.charAt(i) == ',') {
 				final String arg = args.substring(j, i);
 				final Matcher n = paramPattern.matcher(arg);
 				if (!n.matches())
-					return error("The " + StringUtils.fancyOrderNumber(params.size() + 1) + " argument's definition is invalid. It should look like 'name: type' or 'name: type = default value'.");
+					return signError("The " + StringUtils.fancyOrderNumber(params.size() + 1) + " argument's definition is invalid. It should look like 'name: type' or 'name: type = default value'.");
 				final String paramName = "" + n.group(1);
 				for (final Parameter<?> p : params) {
 					if (p.name.toLowerCase(Locale.ENGLISH).equals(paramName.toLowerCase(Locale.ENGLISH)))
-						return error("Each argument's name must be unique, but the name '" + paramName + "' occurs at least twice.");
+						return signError("Each argument's name must be unique, but the name '" + paramName + "' occurs at least twice.");
 				}
 				ClassInfo<?> c;
 				c = Classes.getClassInfoFromUserInput("" + n.group(2));
@@ -130,7 +154,7 @@ public abstract class Functions {
 				if (c == null)
 					c = Classes.getClassInfoFromUserInput(pl.getFirst());
 				if (c == null)
-					return error("Cannot recognise the type '" + n.group(2) + "'");
+					return signError("Cannot recognise the type '" + n.group(2) + "'");
 				final Parameter<?> p = Parameter.newInstance(paramName, c, !pl.getSecond(), n.group(3));
 				if (p == null)
 					return null;
@@ -152,22 +176,23 @@ public abstract class Functions {
 			if (c == null)
 				c = Classes.getClassInfoFromUserInput(p.getFirst());
 			if (c == null) {
-				Skript.error("Cannot recognise the type '" + returnType + "'");
-				return null;
+				return signError("Cannot recognise the type '" + returnType + "'");
 			}
 		}
 		
-		if (Skript.debug() || node.debug())
-			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")" + (c != null && p != null ? " :: " + Utils.toEnglishPlural(c.getCodeName(), p.getSecond()) : "") + ":");
-		
-		@SuppressWarnings("null")
-		final Function<?> f = new ScriptFunction<Object>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
-//		functions.put(name, new FunctionData(f)); // in constructor
-		return f;
+		@SuppressWarnings("unchecked")
+		Signature<?> sign = new Signature<Object>(name, params, (ClassInfo<Object>) c, p);
+		return sign;
 	}
 	
 	@Nullable
 	private final static Function<?> error(final String error) {
+		Skript.error(error);
+		return null;
+	}
+	
+	@Nullable
+	private final static Signature<?> signError(final String error) {
 		Skript.error(error);
 		return null;
 	}
@@ -178,6 +203,11 @@ public abstract class Functions {
 		if (d == null)
 			return null;
 		return d.function;
+	}
+	
+	@Nullable
+	public final static Signature<?> getSignature(final String name) {
+		return signatures.get(name);
 	}
 	
 	private final static Collection<FunctionReference<?>> toValidate = new ArrayList<FunctionReference<?>>();
