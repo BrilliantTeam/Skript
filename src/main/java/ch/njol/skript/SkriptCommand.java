@@ -157,11 +157,13 @@ public class SkriptCommand implements CommandExecutor {
 						}
 						reloading(sender, "script", f.getName());
 						ScriptLoader.unloadScript(f);
+						ScriptLoader.loadStructures(new File[] {f});
 						ScriptLoader.loadScripts(new File[] {f});
 						reloaded(sender, r, "script", f.getName());
 					} else {
 						reloading(sender, "scripts in folder", f.getName());
 						final int disabled = ScriptLoader.unloadScripts(f).files;
+						ScriptLoader.loadStructures(f);
 						final int enabled = ScriptLoader.loadScripts(f).files;
 						if (Math.max(disabled, enabled) == 0)
 							info(sender, "reload.empty folder", f.getName());
@@ -175,6 +177,7 @@ public class SkriptCommand implements CommandExecutor {
 						info(sender, "enable.all.enabling");
 						final File[] files = toggleScripts(new File(Skript.getInstance().getDataFolder(), Skript.SCRIPTSFOLDER), true).toArray(new File[0]);
 						assert files != null;
+						ScriptLoader.loadStructures(files);
 						ScriptLoader.loadScripts(files);
 						if (r.numErrors() == 0) {
 							info(sender, "enable.all.enabled");
@@ -202,6 +205,7 @@ public class SkriptCommand implements CommandExecutor {
 						}
 						
 						info(sender, "enable.single.enabling", f.getName());
+						ScriptLoader.loadStructures(new File[] {f});
 						ScriptLoader.loadScripts(new File[] {f});
 						if (r.numErrors() == 0) {
 							info(sender, "enable.single.enabled", f.getName());
@@ -224,6 +228,8 @@ public class SkriptCommand implements CommandExecutor {
 						info(sender, "enable.folder.enabling", f.getName(), scripts.size());
 						final File[] ss = scripts.toArray(new File[scripts.size()]);
 						assert ss != null;
+						
+						ScriptLoader.loadStructures(ss);
 						final ScriptInfo i = ScriptLoader.loadScripts(ss);
 						assert i.files == scripts.size();
 						if (r.numErrors() == 0) {

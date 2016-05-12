@@ -197,6 +197,7 @@ final public class ScriptLoader {
 		try {
 			Language.setUseLocal(false);
 			
+			loadStructures(scriptsFolder);
 			i = loadScripts(scriptsFolder);
 			
 			synchronized (loadedScripts) {
@@ -213,7 +214,6 @@ final public class ScriptLoader {
 			Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
 		
 		SkriptEventHandler.registerBukkitEvents();
-		Functions.postCheck(); // Check that all functions which are called exist.
 		
 		return i;
 	}
@@ -252,8 +252,6 @@ final public class ScriptLoader {
 				Language.setUseLocal(true);
 		}
 		
-		Functions.postCheck(); // Check that all functions which are called exist.
-		
 		return i;
 	}
 	
@@ -282,8 +280,6 @@ final public class ScriptLoader {
 		}
 		
 		SkriptEventHandler.registerBukkitEvents();
-		
-		Functions.postCheck(); // Check that all functions which are called exist.
 		
 		return i;
 	}
@@ -576,10 +572,45 @@ final public class ScriptLoader {
 	}
 	
 	/**
-	 * Parses elements of a script.
+	 * Loads the specified scripts.
+	 * 
+	 * @param files
+	 */
+	public final static void loadStructures(final File[] files) {
+		Arrays.sort(files);
+		for (final File f : files) {
+			assert f != null : Arrays.toString(files);
+			loadStructure(f);
+		}
+	
+		
+		SkriptEventHandler.registerBukkitEvents();
+	}
+	
+	/**
+	 * Loads structures of all scripts in given directory.
+	 * 
+	 * @param directory
+	 */
+	public final static void loadStructures(final File directory) {
+		final File[] files = directory.listFiles(scriptFilter);
+		Arrays.sort(files);
+		for (final File f : files) {
+			if (f.isDirectory()) {
+				loadStructures(f);
+			} else {
+				loadStructure(f);
+			}
+		}
+	}
+	
+	/**
+	 * Loads structure of given script, currently only for functions. Must be called before
+	 * actually loading that script.
+	 * @param f Script
 	 */
 	@SuppressWarnings("unchecked")
-	private final static void loadElements(final File f) {
+	private final static void loadStructure(final File f) {
 		try {
 			final Config config = new Config(f, true, false, ":");
 			if (SkriptConfig.keepConfigsLoaded.value())
@@ -616,7 +647,7 @@ final public class ScriptLoader {
 						
 						setCurrentEvent("function", FunctionEvent.class);
 						
-						final Signature<?> func = Functions.loadSignature(node);
+						final Signature<?> func = Functions.loadSignature(config.getFileName(), node);
 						if (func != null) {
 							numFunctions++;
 						}
@@ -673,7 +704,8 @@ final public class ScriptLoader {
 	 */
 	final static ScriptInfo unloadScript(final File script) {
 		final ScriptInfo r = unloadScript_(script);
-		Functions.validateFunctions();
+		Functions.clearFunctions(script);
+		//Functions.validateFunctions();
 		return r;
 	}
 	

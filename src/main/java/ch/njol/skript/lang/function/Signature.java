@@ -21,6 +21,8 @@
 
 package ch.njol.skript.lang.function;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -33,34 +35,37 @@ import ch.njol.util.NonNullPair;
  */
 public class Signature<T> {
 	
-	final String name; // Stored for hashCode
-	final List<Parameter<?>> parameters;
+	public final String script;
+	public final String name; // Stored for hashCode
+	public final List<Parameter<?>> parameters;
 	@Nullable
 	final ClassInfo<T> returnType;
 	@Nullable
-	final NonNullPair<String, Boolean> dbgInfo;
+	final NonNullPair<String, Boolean> info;
+	public final boolean single;
 	
-	public Signature(String name, List<Parameter<?>> parameters, @Nullable final ClassInfo<T> returnType, @Nullable final NonNullPair<String, Boolean> dbgInfo) {
+	@SuppressWarnings("null")
+	public Signature(String script, String name, List<Parameter<?>> parameters, @Nullable final ClassInfo<T> returnType, @Nullable final NonNullPair<String, Boolean> info, boolean single) {
+		this.script = script;
 		this.name = name;
-		this.parameters = parameters;
+		this.parameters = Collections.unmodifiableList(parameters);
 		this.returnType = returnType;
-		this.dbgInfo = dbgInfo;
+		this.info = info;
+		this.single = single;
 		
 		Functions.signatures.put(name, this);
 	}
 	
-	public List<Parameter<?>> getParameters() {
-		return parameters;
+	public int getMaxParameters() {
+		return parameters.size();
 	}
 	
-	@Nullable
-	public ClassInfo<T> getReturnType() {
-		return returnType;
-	}
-	
-	@Nullable
-	public NonNullPair<String, Boolean> getDbgInfo() {
-		return dbgInfo;
+	public int getMinParameters() {
+		for (int i = parameters.size() - 1; i >= 0; i--) {
+			if (parameters.get(i).def == null)
+				return i + 1;
+		}
+		return 0;
 	}
 	
 	@Override

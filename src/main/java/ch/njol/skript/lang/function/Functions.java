@@ -109,9 +109,9 @@ public abstract class Functions {
 		//	return error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
 		final String name = "" + m.group(1);
 		Signature<?> sign = signatures.get(name);
-		final List<Parameter<?>> params = sign.getParameters();
-		final ClassInfo<?> c = sign.getReturnType();
-		final NonNullPair<String, Boolean> p = sign.getDbgInfo();
+		final List<Parameter<?>> params = sign.parameters;
+		final ClassInfo<?> c = sign.returnType;
+		final NonNullPair<String, Boolean> p = sign.info;
 		
 		if (Skript.debug() || node.debug())
 			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")" + (c != null && p != null ? " :: " + Utils.toEnglishPlural(c.getCodeName(), p.getSecond()) : "") + ":");
@@ -123,14 +123,14 @@ public abstract class Functions {
 	}
 	
 	@Nullable
-	public static Signature<?> loadSignature(final SectionNode node) {
+	public static Signature<?> loadSignature(String script, final SectionNode node) {
 		SkriptLogger.setNode(node);
 		final String definition = node.getKey();
 		assert definition != null;
 		final Matcher m = functionPattern.matcher(definition);
 		if (!m.matches())
-			error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
-		final String name = "" + m.group(1);
+			return signError("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
+		final String name = "" + m.group(1); // TODO check for name uniqueness (currently functions with same name silently override each other)
 		final String args = m.group(2);
 		final String returnType = m.group(3);
 		final List<Parameter<?>> params = new ArrayList<Parameter<?>>();
@@ -181,7 +181,7 @@ public abstract class Functions {
 		}
 		
 		@SuppressWarnings("unchecked")
-		Signature<?> sign = new Signature<Object>(name, params, (ClassInfo<Object>) c, p);
+		Signature<?> sign = new Signature<Object>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
 		return sign;
 	}
 	
@@ -225,6 +225,7 @@ public abstract class Functions {
 			final FunctionData d = iter.next();
 			if (d.function instanceof ScriptFunction && script.equals(((ScriptFunction<?>) d.function).trigger.getScript())) {
 				iter.remove();
+				signatures.remove(d.function.name);
 				r++;
 				final Iterator<FunctionReference<?>> it = d.calls.iterator();
 				while (it.hasNext()) {
@@ -257,6 +258,7 @@ public abstract class Functions {
 			else
 				d.calls.clear();
 		}
+		signatures.clear();
 		assert toValidate.isEmpty() : toValidate;
 		toValidate.clear();
 	}
@@ -264,25 +266,6 @@ public abstract class Functions {
 	@SuppressWarnings("null")
 	public static Iterable<JavaFunction<?>> getJavaFunctions() {
 		return javaFunctions.values();
-	}
-	
-	public final static void addPostCheck(FunctionReference<?> ref) {
-		postCheckNeeded.add(ref);
-	}
-	
-	public final static void postCheck() {
-		if (postCheckNeeded.isEmpty()) return;
-		
-		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
-		for (final FunctionReference<?> ref : postCheckNeeded) {
-			if (!ref.validateFunction(true)) {
-				log.printError();
-			}
-		}
-		log.printLog();
-		
-		postCheckNeeded.clear();
-		log.stop();
 	}
 	
 }

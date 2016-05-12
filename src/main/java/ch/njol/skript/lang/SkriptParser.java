@@ -752,13 +752,9 @@ public class SkriptParser {
 //			}
 //			@SuppressWarnings("null")
 			final FunctionReference<T> e = new FunctionReference<T>(functionName, SkriptLogger.getNode(), ScriptLoader.currentScript != null ? ScriptLoader.currentScript.getFile() : null, types, params);//.toArray(new Expression[params.size()]));
-			if (SkriptConfig.allowFunctionsBeforeDefs.value()) {
-				Functions.addPostCheck(e); // Query function for post-checking
-			} else {
-				if (!e.validateFunction(true)) {
-					log.printError();
-					return null;
-				}
+			if (!e.validateFunction(true)) {
+				log.printError();
+				return null;
 			}
 			log.printLog();
 			return e;

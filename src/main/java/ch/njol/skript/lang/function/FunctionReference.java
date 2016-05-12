@@ -29,6 +29,7 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.lang.Expression;
@@ -47,6 +48,8 @@ public class FunctionReference<T> {
 	
 	@Nullable
 	private Function<? extends T> function;
+	@Nullable
+	private Signature<? extends T> signature;
 	
 	private boolean singleUberParam;
 	private final Expression<?>[] parameters;
@@ -70,9 +73,10 @@ public class FunctionReference<T> {
 	
 	@SuppressWarnings("unchecked")
 	public boolean validateFunction(final boolean first) {
+		final Signature<?> sign = Functions.getSignature(functionName);
 		final Function<?> newFunc = Functions.getFunction(functionName);
 		SkriptLogger.setNode(node);
-		if (newFunc == null) {
+		if (sign == null) {
 			if (first)
 				Skript.error("The function '" + functionName + "' does not exist.");
 			else
@@ -85,7 +89,7 @@ public class FunctionReference<T> {
 		
 		final Class<? extends T>[] returnTypes = this.returnTypes;
 		if (returnTypes != null) {
-			final ClassInfo<?> rt = newFunc.returnType;
+			final ClassInfo<?> rt = sign.returnType;
 			if (rt == null) {
 				if (first)
 					Skript.error("The function '" + functionName + "' doesn't return any value.");
@@ -96,15 +100,15 @@ public class FunctionReference<T> {
 			}
 			if (!CollectionUtils.containsAnySuperclass(returnTypes, rt.getC())) {
 				if (first)
-					Skript.error("The returned value of the function '" + functionName + "', " + newFunc.returnType + ", is " + SkriptParser.notOfType(returnTypes) + ".");
+					Skript.error("The returned value of the function '" + functionName + "', " + sign.returnType + ", is " + SkriptParser.notOfType(returnTypes) + ".");
 				else
 					Skript.error("The function '" + functionName + "' was redefined with a different, incompatible return type, but is still used in other script(s)."
 							+ " These will continue to use the old version of the function until Skript restarts.");
 				return false;
 			}
 			if (first) {
-				single = newFunc.single;
-			} else if (single && !newFunc.single) {
+				single = sign.single;
+			} else if (single && !sign.single) {
 				Skript.error("The function '" + functionName + "' was redefined with a different, incompatible return type, but is still used in other script(s)."
 						+ " These will continue to use the old version of the function until Skript restarts.");
 				return false;
@@ -112,15 +116,15 @@ public class FunctionReference<T> {
 		}
 		
 		// check number of parameters only if the function does not have a single parameter that accepts multiple values
-		singleUberParam = newFunc.getMaxParameters() == 1 && !newFunc.parameters[0].single;
+		singleUberParam = sign.getMaxParameters() == 1 && !sign.parameters.get(0).single;
 		if (!singleUberParam) {
-			if (parameters.length > newFunc.getMaxParameters()) {
+			if (parameters.length > sign.getMaxParameters()) {
 				if (first) {
-					if (newFunc.getMaxParameters() == 0)
+					if (sign.getMaxParameters() == 0)
 						Skript.error("The function '" + functionName + "' has no arguments, but " + parameters.length + " are given."
 								+ " To call a function without parameters, just write the function name followed by '()', e.g. 'func()'.");
 					else
-						Skript.error("The function '" + functionName + "' has only " + newFunc.getMaxParameters() + " argument" + (newFunc.getMaxParameters() == 1 ? "" : "s") + ","
+						Skript.error("The function '" + functionName + "' has only " + sign.getMaxParameters() + " argument" + (sign.getMaxParameters() == 1 ? "" : "s") + ","
 								+ " but " + parameters.length + " are given."
 								+ " If you want to use lists in function calls, you have to use additional parentheses, e.g. 'give(player, (iron ore and gold ore))'");
 				} else {
@@ -130,9 +134,9 @@ public class FunctionReference<T> {
 				return false;
 			}
 		}
-		if (parameters.length < newFunc.getMinParameters()) {
+		if (parameters.length < sign.getMinParameters()) {
 			if (first)
-				Skript.error("The function '" + functionName + "' requires at least " + newFunc.getMinParameters() + " argument" + (newFunc.getMinParameters() == 1 ? "" : "s") + ","
+				Skript.error("The function '" + functionName + "' requires at least " + sign.getMinParameters() + " argument" + (sign.getMinParameters() == 1 ? "" : "s") + ","
 						+ " but only " + parameters.length + " " + (parameters.length == 1 ? "is" : "are") + " given.");
 			else
 				Skript.error("The function '" + functionName + "' was redefined with a different, incompatible amount of arguments, but is still used in other script(s)."
@@ -140,7 +144,7 @@ public class FunctionReference<T> {
 			return false;
 		}
 		for (int i = 0; i < parameters.length; i++) {
-			final Parameter<?> p = newFunc.parameters[singleUberParam ? 0 : i];
+			final Parameter<?> p = sign.parameters.get(singleUberParam ? 0 : i);
 			final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 			try {
 				final Expression<?> e = parameters[i].getConvertedExpression(p.type.getC());
@@ -160,16 +164,18 @@ public class FunctionReference<T> {
 			}
 		}
 		
-		function = (Function<? extends T>) newFunc;
+		signature = (Signature<? extends T>) sign;
+		function = (Function<? extends T>) newFunc; // Try this, in case it exists
 		Functions.registerCaller(this);
 		
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Nullable
 	protected T[] execute(final Event e) {
 		if (function == null)
-			return null;
+			function = (Function<? extends T>) Functions.getFunction(functionName);
 		
 		final Object[][] params = new Object[singleUberParam ? 1 : parameters.length][];
 		if (singleUberParam && parameters.length > 1) {
@@ -191,10 +197,12 @@ public class FunctionReference<T> {
 	
 	@SuppressWarnings("unchecked")
 	public Class<? extends T> getReturnType() {
-		if (function == null)
-			return (Class<? extends T>) Void.class; // No function = no return
-		assert function != null;
-		ClassInfo<? extends T> ret = function.getReturnType();
+		if (signature == null) {
+			throw new SkriptAPIException("Signature of function is null when return type is asked!");
+		}
+		assert signature != null;
+		@SuppressWarnings("null") // Wait what, Eclipse? Already asserted this...
+		ClassInfo<? extends T> ret = signature.returnType;
 		return (Class<? extends T>) (ret == null ? Unknown.class : ret.getC());
 	}
 	
