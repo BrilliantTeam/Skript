@@ -727,13 +727,6 @@ public class SkriptParser {
 				params = new Expression[0];
 			}
 			
-			final Function<?> function = Functions.getFunction(functionName);
-			if (function == null && !SkriptConfig.allowFunctionsBeforeDefs.value()) {
-				Skript.error("The function '" + functionName + "' does not exist");
-				log.printError();
-				return null;
-			}
-			
 //			final List<Expression<?>> params = new ArrayList<Expression<?>>();
 //			if (args.length() != 0) {
 //				final int p = 0;

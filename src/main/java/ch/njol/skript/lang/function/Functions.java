@@ -105,8 +105,8 @@ public abstract class Functions {
 		final String definition = node.getKey();
 		assert definition != null;
 		final Matcher m = functionPattern.matcher(definition);
-		//if (!m.matches()) // We have checks when loading the signature
-		//	return error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
+		if (!m.matches()) // We have checks when loading the signature
+			return error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
 		final String name = "" + m.group(1);
 		Signature<?> sign = signatures.get(name);
 		final List<Parameter<?>> params = sign.parameters;
