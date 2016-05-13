@@ -313,6 +313,8 @@ public class EvtClick extends SkriptEvent {
 				case STONE_BUTTON:
 				case COMMAND:
 				case ITEM_FRAME:
+				case SIGN_POST:
+				case WALL_SIGN: // 2 signs...
 					blockUsable = true;
 					break;
 				case CAKE_BLOCK:
@@ -357,7 +359,7 @@ public class EvtClick extends SkriptEvent {
 		
 		// Still not returned?
 		if (mainHand.getType() != Material.AIR) return false;
-		//Skript.info("Main hand is an item.");
+		//Skript.info("Main hand is not item.");
 		if (offHand.getType() != Material.AIR) return true;
 		
 		//Skript.info("Final return!");

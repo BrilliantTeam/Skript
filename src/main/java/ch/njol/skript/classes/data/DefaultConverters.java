@@ -21,6 +21,8 @@
 
 package ch.njol.skript.classes.data;
 
+import java.util.Collection;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -38,6 +40,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.PlayerUtils;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.entity.EntityType;
@@ -289,5 +292,21 @@ public class DefaultConverters {
 			}
 		});
 		
+//		// Entity - String (UUID) // Very slow, thus disabled for now
+//		Converters.registerConverter(String.class, Entity.class, new Converter<String, Entity>() {
+//
+//			@Override
+//			@Nullable
+//			public Entity convert(String f) {
+//				Collection<? extends Player> players = PlayerUtils.getOnlinePlayers();
+//				for (Player p : players) {
+//					if (p.getName().equals(f) || p.getUniqueId().toString().equals(f))
+//						return p;
+//				}
+//				
+//				return null;
+//			}
+//			
+//		});
 	}
 }

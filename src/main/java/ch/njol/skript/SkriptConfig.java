@@ -151,7 +151,8 @@ public abstract class SkriptConfig {
 	public final static Option<Integer> maxTargetBlockDistance = new Option<Integer>("maximum target block distance", 100);
 	
 	public final static Option<Boolean> caseSensitive = new Option<Boolean>("case sensitive", false);
-	public final static Option<Boolean> allowFunctionsBeforeDefs = new Option<Boolean>("allow function calls before definations", false);
+	public final static Option<Boolean> allowFunctionsBeforeDefs = new Option<Boolean>("allow function calls before definations", false)
+			.optional(true);
 	
 	public final static Option<Boolean> disableVariableConflictWarnings = new Option<Boolean>("disable variable conflict warnings", false);
 	public final static Option<Boolean> disableObjectCannotBeSavedWarnings = new Option<Boolean>("disable variable will not be saved warnings", false);

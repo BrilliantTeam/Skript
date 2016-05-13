@@ -98,6 +98,11 @@ public abstract class Functions {
 	private final static Pattern functionPattern = Pattern.compile("function (" + functionNamePattern + ")\\((.*)\\)(?: :: (.+))?", Pattern.CASE_INSENSITIVE),
 			paramPattern = Pattern.compile("\\s*(.+?)\\s*:\\s*(.+?)(?:\\s*=\\s*(.+))?\\s*");
 	
+	/**
+	 * Loads a function from given node.
+	 * @param node Section node.
+	 * @return Script function, or null if something went wrong.
+	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final static Function<?> loadFunction(final SectionNode node) {
@@ -105,7 +110,7 @@ public abstract class Functions {
 		final String definition = node.getKey();
 		assert definition != null;
 		final Matcher m = functionPattern.matcher(definition);
-		if (!m.matches()) // We have checks when loading the signature
+		if (!m.matches()) // We have checks when loading the signature, but matches() must be called anyway
 			return error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
 		final String name = "" + m.group(1);
 		Signature<?> sign = signatures.get(name);
@@ -122,6 +127,12 @@ public abstract class Functions {
 		return f;
 	}
 	
+	/**
+	 * Loads the signature of function from given node.
+	 * @param script Script file name (<b>might</b> be used for some checks).
+	 * @param node Section node.
+	 * @return Signature of function, or null if something went wrong.
+	 */
 	@Nullable
 	public static Signature<?> loadSignature(String script, final SectionNode node) {
 		SkriptLogger.setNode(node);
@@ -185,18 +196,35 @@ public abstract class Functions {
 		return sign;
 	}
 	
+	/**
+	 * Creates an error and returns Function null.
+	 * @param error Error message.
+	 * @return Null.
+	 */
 	@Nullable
 	private final static Function<?> error(final String error) {
 		Skript.error(error);
 		return null;
 	}
 	
+	/**
+	 * Creates an error and returns Signature null.
+	 * @param error Error message.
+	 * @return Null.
+	 */
 	@Nullable
 	private final static Signature<?> signError(final String error) {
 		Skript.error(error);
 		return null;
 	}
 	
+	/**
+	 * Gets a function, if it exists. Note that even if function exists in scripts,
+	 * it might not have been parsed yet. If you want to check for existance,
+	 * then use {@link #getSignature(String)}.
+	 * @param name Name of function.
+	 * @return Function, or null if it does not exist.
+	 */
 	@Nullable
 	public final static Function<?> getFunction(final String name) {
 		final FunctionData d = functions.get(name);
@@ -205,6 +233,11 @@ public abstract class Functions {
 		return d.function;
 	}
 	
+	/**
+	 * Gets a signature of function with given name
+	 * @param name Name of function.
+	 * @return Signature, or null if function does not exist.
+	 */
 	@Nullable
 	public final static Signature<?> getSignature(final String name) {
 		return signatures.get(name);
