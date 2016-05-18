@@ -116,7 +116,7 @@ public class FunctionReference<T> {
 		}
 		
 		// check number of parameters only if the function does not have a single parameter that accepts multiple values
-		singleUberParam = sign.getMaxParameters() == 1 && !sign.parameters.get(0).single;
+		singleUberParam = sign.getMaxParameters() == 1 && !sign.getParameter(0).single;
 		if (!singleUberParam) {
 			if (parameters.length > sign.getMaxParameters()) {
 				if (first) {

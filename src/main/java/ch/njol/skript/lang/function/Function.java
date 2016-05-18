@@ -125,4 +125,14 @@ public abstract class Function<T> {
 		return "function " + name;
 	}
 	
+	/**
+	 * Generates a signature for this function. Should only be used to validate
+	 * (Java) function references.
+	 * @return Signature.
+	 */
+	@SuppressWarnings("null")
+	public Signature<T> getSignature() {
+		return new Signature<T>("unknown", name, Arrays.asList(parameters), returnType, null, single);
+	}
+	
 }

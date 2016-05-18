@@ -35,14 +35,14 @@ import ch.njol.util.NonNullPair;
  */
 public class Signature<T> {
 	
-	public final String script;
-	public final String name; // Stored for hashCode
-	public final List<Parameter<?>> parameters;
+	final String script;
+	final String name; // Stored for hashCode
+	final List<Parameter<?>> parameters;
 	@Nullable
 	final ClassInfo<T> returnType;
 	@Nullable
 	final NonNullPair<String, Boolean> info;
-	public final boolean single;
+	final boolean single;
 	
 	@SuppressWarnings("null")
 	public Signature(String script, String name, List<Parameter<?>> parameters, @Nullable final ClassInfo<T> returnType, @Nullable final NonNullPair<String, Boolean> info, boolean single) {
@@ -52,8 +52,28 @@ public class Signature<T> {
 		this.returnType = returnType;
 		this.info = info;
 		this.single = single;
-		
-		Functions.signatures.put(name, this);
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	@SuppressWarnings("null")
+	public Parameter<?> getParameter(final int index) {
+		return parameters.get(index);
+	}
+	
+	public List<Parameter<?>> getParameters() {
+		return parameters;
+	}
+	
+	@Nullable
+	public ClassInfo<T> getReturnType() {
+		return returnType;
+	}
+	
+	public boolean isSingle() {
+		return single;
 	}
 	
 	public int getMaxParameters() {

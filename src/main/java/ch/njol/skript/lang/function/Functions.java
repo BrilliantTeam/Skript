@@ -67,6 +67,7 @@ public abstract class Functions {
 	
 	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<String, JavaFunction<?>>();
 	final static Map<String, FunctionData> functions = new HashMap<String, FunctionData>();
+	final static Map<String, Signature<?>> javaSignatures = new HashMap<String, Signature<?>>();
 	final static Map<String, Signature<?>> signatures = new HashMap<String, Signature<?>>();
 	
 	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<FunctionReference<?>>();
@@ -83,6 +84,9 @@ public abstract class Functions {
 			throw new SkriptAPIException("Duplicate function " + function.name);
 		functions.put(function.name, new FunctionData(function));
 		javaFunctions.put(function.name, function);
+		Signature<?> sign = function.getSignature();
+		javaSignatures.put(function.name, sign); // This is backup for full reloads (reload all/scripts)
+		signatures.put(function.name, sign);
 		return function;
 	}
 	
@@ -193,6 +197,7 @@ public abstract class Functions {
 		
 		@SuppressWarnings("unchecked")
 		Signature<?> sign = new Signature<Object>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
+		Functions.signatures.put(name, sign);
 		return sign;
 	}
 	
@@ -292,6 +297,7 @@ public abstract class Functions {
 				d.calls.clear();
 		}
 		signatures.clear();
+		signatures.putAll(javaSignatures);
 		assert toValidate.isEmpty() : toValidate;
 		toValidate.clear();
 	}
