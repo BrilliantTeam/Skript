@@ -87,6 +87,12 @@
 			<version>3.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>de.slikey</groupId>
+			<artifactId>EffectLib</artifactId>
+			<version>4.2</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
@@ -108,6 +114,10 @@
 		<repository>
 			<id>njol-repo</id>
 			<url>http://maven.njol.ch/repo/</url>
+		</repository>
+		<repository>
+    		<id>elmakers-repo</id>
+    		<url>http://maven.elmakers.com/repository/</url>
 		</repository>
 	</repositories>
 	<build>

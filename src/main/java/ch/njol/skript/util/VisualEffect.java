@@ -42,6 +42,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.hooks.EffectLibHook;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -55,11 +56,14 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.iterator.SingleItemIterator;
 import ch.njol.yggdrasil.YggdrasilSerializable;
+import de.slikey.effectlib.util.ParticleEffect;
+import de.slikey.effectlib.util.ParticleEffect.ParticleData;
 
 /**
  * @author Peter Güttinger
  */
 public final class VisualEffect implements SyntaxElement, YggdrasilSerializable {
+	public static boolean EFFECT_LIB = false;
 	private final static String LANGUAGE_NODE = "visual effects";
 	
 	public static enum Type implements YggdrasilSerializable {
@@ -185,13 +189,17 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		};
 		
 		final Object effect;
+		final int id;
 		
+		@SuppressWarnings("deprecation")
 		private Type(final Effect effect) {
 			this.effect = effect;
+			this.id = effect.getId();
 		}
 		
 		private Type(final EntityEffect effect) {
 			this.effect = effect;
+			this.id = -1;
 		}
 		
 		/**
@@ -260,6 +268,8 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	private Object data;
 	private float speed = 0;
 	private float dX, dY, dZ = 0;
+	@Nullable
+	private org.bukkit.Color color;
 	
 	/**
 	 * For parsing & deserialisation
@@ -276,13 +286,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			for (Expression<?> expr : exprs) {
 				if (expr == null) continue;
 				else if (expr.getReturnType() == Color.class) {
-					org.bukkit.Color color = ((Color) expr.getSingle(null)).getBukkitColor();
-					dX = color.getRed() / 255;
-					dY = color.getBlue() / 255;
-					dZ = color.getGreen() / 255;
-					
-					if (type == Type.COLOURED_DUST)
-						dX = dX - 1F;
+					color = ((Color) expr.getSingle(null)).getBukkitColor();
 				} else {
 					data = expr.getSingle(null);
 				}
@@ -341,23 +345,37 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			if (e != null)
 				e.playEffect((EntityEffect) type.effect);
 		} else {
-			if (ps == null) {
-				int id = 0;
-				int dataId = 0;
+			if (EFFECT_LIB && ((Effect) type.effect).getType() == Effect.Type.PARTICLE) { // Only particles for now
+				ParticleEffect eff = EffectLibHook.ID_MAP.get(type.id);
 				Object pData = type.getData(data, l);
 				
+				ParticleData data = null;
 				if (pData instanceof Material) {
-					id = ((Material) pData).getId();
+					data = new ParticleData((Material) pData, (byte) 0) {};
 				} else if (pData instanceof MaterialData) {
-					id = ((MaterialData) pData).getItemTypeId();
-					dataId = ((MaterialData) pData).getData();
+					data = new ParticleData(((MaterialData) pData).getItemType(), ((MaterialData) pData).getData()) {};
 				}
-				//Skript.info("dX: " + dX + " dY: " + dY + " dZ: " + dZ);
 				
-				l.getWorld().spigot().playEffect(l, (Effect) type.effect, id, dataId, dX, dY, dZ, speed, count, radius);
+				eff.display(data, l, color, radius, dX, dY, dZ, speed, count);
 			} else {
-				for (final Player p : ps)
-					p.playEffect(l, (Effect) type.effect, type.getData(data, l));
+				if (ps == null) {
+					int id = 0;
+					int dataId = 0;
+					Object pData = type.getData(data, l);
+					
+					if (pData instanceof Material) {
+						id = ((Material) pData).getId();
+					} else if (pData instanceof MaterialData) {
+						id = ((MaterialData) pData).getItemTypeId();
+						dataId = ((MaterialData) pData).getData();
+					}
+					//Skript.info("dX: " + dX + " dY: " + dY + " dZ: " + dZ);
+					
+					l.getWorld().spigot().playEffect(l, (Effect) type.effect, id, dataId, dX, dY, dZ, speed, count, radius);
+				} else {
+					for (final Player p : ps)
+						p.playEffect(l, (Effect) type.effect, type.getData(data, l));
+				}
 			}
 		}
 	}
