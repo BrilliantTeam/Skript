@@ -19,50 +19,59 @@
  * 
  */
 
-package ch.njol.skript.hooks;
+package ch.njol.skript.hooks.particles;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.hooks.ParticlesPlugin;
 import ch.njol.skript.util.VisualEffect;
+import ch.njol.skript.util.VisualEffect.Type;
 import de.slikey.effectlib.EffectLib;
 import de.slikey.effectlib.util.ParticleEffect;
-import net.milkbowl.vault.chat.Chat;
-import net.milkbowl.vault.economy.Economy;
 
-import ch.njol.skript.util.VisualEffect.Type;
-
-/**
- *	Hook for better particle effects.
- */
-public class EffectLibHook extends Hook<EffectLib> {
+public class EffectLibHook extends ParticlesPlugin<EffectLib> {
+	
+	public static final Map<String,Object> ID_MAP = new HashMap<String,Object>(); // Map of effect name identifiers
 	
 	public EffectLibHook() throws IOException {}
-	
-	public static final Map<Integer,ParticleEffect> ID_MAP = new HashMap<Integer,ParticleEffect>();
 	
 	@Override
 	protected boolean init() {
 		VisualEffect.EFFECT_LIB = true;
 		
 		for (ParticleEffect eff : ParticleEffect.values()) {
-			ID_MAP.put(eff.getId(), eff);
+			ID_MAP.put(eff.getName(), eff);
 		}
+		
+		ParticlesPlugin.plugin = this;
 		
 		return true; // We don't really initialize anything... for now
 	}
 	
+	@SuppressWarnings("null")
 	@Override
 	protected void loadClasses() throws IOException {
-		
+		Skript.getAddonInstance().loadClasses(getClass().getPackage().getName());
 	}
 	
 	@Override
 	public String getName() {
 		return "EffectLib";
+	}
+	
+	@Override
+	public void playEffect(final @Nullable Player[] ps, final Location l, final int count, final int radius, final VisualEffect.Type type,
+			final @Nullable Object data, float speed, float dX, float dY, float dZ, final @Nullable Color color) {
+		EffectLibUtil.playEffect(ps, l, count, radius, type, data, speed, dX, dY, dZ, color);
 	}
 }

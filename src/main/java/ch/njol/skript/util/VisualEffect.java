@@ -42,7 +42,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.hooks.EffectLibHook;
+import ch.njol.skript.hooks.ParticlesPlugin;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -58,6 +58,8 @@ import ch.njol.util.coll.iterator.SingleItemIterator;
 import ch.njol.yggdrasil.YggdrasilSerializable;
 import de.slikey.effectlib.util.ParticleEffect;
 import de.slikey.effectlib.util.ParticleEffect.ParticleData;
+import de.slikey.effectlib.util.ParticleEffect.BlockData;
+import de.slikey.effectlib.util.ParticleEffect.ItemData;
 
 /**
  * @author Peter Güttinger
@@ -158,7 +160,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
 				if (raw == null)
-					return Material.STONE;
+					return Material.STONE.getData();
 				else if (raw instanceof ItemType) {
 					ItemStack rand = ((ItemType) raw).getRandom();
 					if (rand == null) return Material.STONE.getData();
@@ -175,7 +177,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
 				if (raw == null)
-					return Material.STONE;
+					return Material.STONE.getData();
 				else if (raw instanceof ItemType) {
 					ItemStack rand = ((ItemType) raw).getRandom();
 					if (rand == null) return Material.STONE.getData();
@@ -189,17 +191,17 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		};
 		
 		final Object effect;
-		final int id;
+		@Nullable
+		final String name;
 		
-		@SuppressWarnings("deprecation")
 		private Type(final Effect effect) {
 			this.effect = effect;
-			this.id = effect.getId();
+			this.name = effect.getName();
 		}
 		
 		private Type(final EntityEffect effect) {
 			this.effect = effect;
-			this.id = -1;
+			this.name = null;
 		}
 		
 		/**
@@ -216,6 +218,15 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		 */
 		public boolean isColorable() {
 			return false;
+		}
+		
+		/**
+		 * Gets Minecraft name of the effect, if it exists.
+		 * @return Name or null if effect uses numeric id instead.
+		 */
+		@Nullable
+		public String getMinecraftName() {
+			return this.name;
 		}
 	}
 	
@@ -346,17 +357,9 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				e.playEffect((EntityEffect) type.effect);
 		} else {
 			if (EFFECT_LIB && ((Effect) type.effect).getType() == Effect.Type.PARTICLE) { // Only particles for now
-				ParticleEffect eff = EffectLibHook.ID_MAP.get(type.id);
-				Object pData = type.getData(data, l);
-				
-				ParticleData data = null;
-				if (pData instanceof Material) {
-					data = new ParticleData((Material) pData, (byte) 0) {};
-				} else if (pData instanceof MaterialData) {
-					data = new ParticleData(((MaterialData) pData).getItemType(), ((MaterialData) pData).getData()) {};
-				}
-				
-				eff.display(data, l, color, radius, dX, dY, dZ, speed, count);
+				ParticlesPlugin<?> plugin = ParticlesPlugin.plugin;
+				assert plugin != null;
+				plugin.playEffect(ps, l, count, radius, type, data, speed, dX, dY, dZ, color);
 			} else {
 				if (ps == null) {
 					int id = 0;
