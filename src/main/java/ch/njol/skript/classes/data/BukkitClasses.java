@@ -23,6 +23,7 @@ package ch.njol.skript.classes.data;
 
 import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -46,6 +47,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -68,6 +70,7 @@ import ch.njol.skript.expressions.ExprDamageCause;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.util.SimpleLiteral;
+import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.BiomeUtils;
@@ -474,6 +477,39 @@ public class BukkitClasses {
 						return "inventory of .+";
 					}
 				}).changer(DefaultChangers.inventoryChanger));
+		
+		Classes.registerClass(new ClassInfo<InventoryAction>(InventoryAction.class, "inventory action")
+				.user("inventory actions?")
+				.name("Inventory Action")
+				.description("There are multiple ways to perform clicks in inventories. Inventory actions represent them.")
+				.user(Language.getList("inventory actions"))
+				.examples("")
+				.since("2.2-dev16")
+				.defaultExpression(new EventValueExpression<InventoryAction>(InventoryAction.class))
+				.parser(new Parser<InventoryAction>() {
+
+					@Override
+					@Nullable
+					public InventoryAction parse(String s, ParseContext context) {
+						return null; // TODO Do this, while supporting language changes... How?
+					}
+
+					@Override
+					public String toString(InventoryAction o, int flags) {
+						return Language.get("inventory actions." + o.toString().toLowerCase());
+					}
+
+					@Override
+					public String toVariableNameString(InventoryAction o) {
+						return Language.get("inventory actions." + o.toString().toLowerCase());
+					}
+
+					@Override
+					public String getVariableNamePattern() {
+						return "[a-z]+";
+					}
+					
+				}));
 		
 		Classes.registerClass(new ClassInfo<Player>(Player.class, "player")
 				.user("players?")

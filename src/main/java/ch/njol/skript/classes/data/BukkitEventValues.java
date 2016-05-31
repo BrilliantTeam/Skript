@@ -90,6 +90,7 @@ import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.command.CommandEvent;
 import ch.njol.skript.events.EvtMoveOn;
 import ch.njol.skript.registrations.EventValues;
@@ -698,6 +699,14 @@ public final class BukkitEventValues {
 			@Nullable
 			public Slot get(final InventoryClickEvent e) {
 				return new InventorySlot(e.getInventory(), e.getSlot());
+			}
+		}, 0);
+		EventValues.registerEventValue(InventoryClickEvent.class, ItemType.class, new Getter<ItemType, InventoryClickEvent>() {
+			@SuppressWarnings("null")
+			@Override
+			@Nullable
+			public ItemType get(final InventoryClickEvent e) {
+				return new ItemType(e.getCurrentItem());
 			}
 		}, 0);
 		// CraftItemEvent
