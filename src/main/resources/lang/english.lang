@@ -960,6 +960,28 @@ visual effects:
 		pattern: [sprinting] dust of [%itemtype%]
 	area_expression: [with [offset of %number%, %number%(,| and) %number%][[and ]speed %number%]]
 
+# -- Inventory Actions --
+inventory actions:
+	nothing: nothing, do nothing
+	pickup_all: pickup all, pickup all items
+	pickup_some: pickup some, pickup some items
+	pickup_half: pickup half, pickup half stack
+	pickup_one: pickup one item, pickup single item, pickup single
+	place_all: place all, place all items
+	place_some: place some, place some items
+	place_one: place one, place one item
+	swap_with_cursor: swap with cursor, swap stack with cursor, swap cursor, swap cursor stack
+	drop_all_cursor: drop all from cursor, drop stack from cursor, drop items from cursor, drop stack from cursor, drop cursor, drop cursor stack
+	drop_one_cursor: drop one from cursor, drop one item from cursor, drop single item from cursor, drop cursor item
+	drop_all_slot: drop all from slot, drop stack from slot, drop items from slot, drop stack from slot, drop slot, drop slot stack
+	drop_one_slot: drop one from slot, drop one item from slot, drop single item from slot, drop slot item
+	move_to_other_inventory: instant move, move to other inventory, shift move
+	hotbar_move_and_readd: hotbar move and readd
+	hotbar_swap: swap with hotbar, swap items with hotbar, hotbar swap, hotbar swap items
+	clone_stack: clone stack
+	collect_to_cursor: collect to cursor, collect items to cursor
+	unknown: unknown, unsupported, custom
+
 # -- Boolean --
 boolean:
 	true:

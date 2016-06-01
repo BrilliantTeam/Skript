@@ -479,11 +479,11 @@ public class BukkitClasses {
 					}
 				}).changer(DefaultChangers.inventoryChanger));
 		
-		Classes.registerClass(new ClassInfo<InventoryAction>(InventoryAction.class, "inventory action")
+		Classes.registerClass(new ClassInfo<InventoryAction>(InventoryAction.class, "inventoryaction")
 				.user("inventory actions?")
 				.name("Inventory Action")
 				.description("There are multiple ways to perform clicks in inventories. Inventory actions represent them.")
-				.user(InventoryActions.getAllNames())
+				.usage(InventoryActions.getAllNames())
 				.examples("")
 				.since("2.2-dev16")
 				.defaultExpression(new EventValueExpression<InventoryAction>(InventoryAction.class))
