@@ -76,6 +76,7 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.BiomeUtils;
 import ch.njol.skript.util.DamageCauseUtils;
 import ch.njol.skript.util.EnchantmentType;
+import ch.njol.skript.util.InventoryActions;
 import ch.njol.skript.util.PotionEffectUtils;
 import ch.njol.skript.util.StringMode;
 import ch.njol.util.StringUtils;
@@ -482,7 +483,7 @@ public class BukkitClasses {
 				.user("inventory actions?")
 				.name("Inventory Action")
 				.description("There are multiple ways to perform clicks in inventories. Inventory actions represent them.")
-				.user(Language.getList("inventory actions"))
+				.user(InventoryActions.getAllNames())
 				.examples("")
 				.since("2.2-dev16")
 				.defaultExpression(new EventValueExpression<InventoryAction>(InventoryAction.class))
@@ -491,22 +492,23 @@ public class BukkitClasses {
 					@Override
 					@Nullable
 					public InventoryAction parse(String s, ParseContext context) {
-						return null; // TODO Do this, while supporting language changes... How?
+						return InventoryActions.parse(s);
 					}
 
 					@Override
 					public String toString(InventoryAction o, int flags) {
-						return Language.get("inventory actions." + o.toString().toLowerCase());
+						return InventoryActions.toString(o, flags);
 					}
 
+					@SuppressWarnings("null")
 					@Override
 					public String toVariableNameString(InventoryAction o) {
-						return Language.get("inventory actions." + o.toString().toLowerCase());
+						return o.name();
 					}
 
 					@Override
 					public String getVariableNamePattern() {
-						return "[a-z]+";
+						return "\\S+";
 					}
 					
 				}));
