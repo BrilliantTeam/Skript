@@ -72,5 +72,12 @@ public class InventorySlot extends Slot {
 			return "slot " + index + " of inventory of " + Classes.toString(invi.getHolder());
 		return "slot " + index + " of " + Classes.toString(invi);
 	}
+
+	@Override
+	public boolean isSameSlot(Slot o) {
+		if (!(o instanceof InventorySlot))
+			return false;
+		return this.index == ((InventorySlot) o).getIndex();
+	}
 	
 }

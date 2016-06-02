@@ -55,4 +55,12 @@ public abstract class Slot implements Debuggable {
 	}
 	
 	protected abstract String toString_i();
+	
+	/**
+	 * Checks if given slot is in same position with this.
+	 * Ignores slot contents.
+	 * @param o Another slot
+	 * @return True if positions equal, false otherwise.
+	 */
+	public abstract boolean isSameSlot(Slot o);
 }

@@ -109,7 +109,9 @@ public class EvtItem extends SkriptEvent {
 		if (types == null)
 			return true;
 		final ItemStack is;
-		if (e instanceof BlockDispenseEvent) {
+		if (e instanceof InventoryClickEvent) {
+			is = ((InventoryClickEvent) e).getCurrentItem();
+		} else if (e instanceof BlockDispenseEvent) {
 			is = ((BlockDispenseEvent) e).getItem();
 		} else if (e instanceof ItemSpawnEvent) {
 			is = ((ItemSpawnEvent) e).getEntity().getItemStack();

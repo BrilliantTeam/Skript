@@ -694,20 +694,21 @@ public final class BukkitEventValues {
 				return e.getWhoClicked().getWorld();
 			}
 		}, 0);
+		EventValues.registerEventValue(InventoryClickEvent.class, ItemStack.class, new Getter<ItemStack, InventoryClickEvent>() {
+			@Override
+			@Nullable
+			public ItemStack get(final InventoryClickEvent e) {
+				if (e instanceof CraftItemEvent)
+					return ((CraftItemEvent) e).getRecipe().getResult();
+				return e.getCurrentItem();
+			}
+		}, 0);
 		EventValues.registerEventValue(InventoryClickEvent.class, Slot.class, new Getter<Slot, InventoryClickEvent>() {
 			@SuppressWarnings("null")
 			@Override
 			@Nullable
 			public Slot get(final InventoryClickEvent e) {
 				return new InventorySlot(e.getInventory(), e.getSlot());
-			}
-		}, 0);
-		EventValues.registerEventValue(InventoryClickEvent.class, ItemType.class, new Getter<ItemType, InventoryClickEvent>() {
-			@SuppressWarnings("null")
-			@Override
-			@Nullable
-			public ItemType get(final InventoryClickEvent e) {
-				return new ItemType(e.getCurrentItem());
 			}
 		}, 0);
 		EventValues.registerEventValue(InventoryClickEvent.class, InventoryAction.class, new Getter<InventoryAction, InventoryClickEvent>() {
@@ -717,14 +718,14 @@ public final class BukkitEventValues {
 				return e.getAction();
 			}
 		}, 0);
-		// CraftItemEvent
-		EventValues.registerEventValue(CraftItemEvent.class, ItemStack.class, new Getter<ItemStack, CraftItemEvent>() {
-			@Override
-			@Nullable
-			public ItemStack get(final CraftItemEvent e) {
-				return e.getRecipe().getResult();
-			}
-		}, 0);
+		// CraftItemEvent REMIND maybe re-add this when Skript parser is reworked?
+//		EventValues.registerEventValue(CraftItemEvent.class, ItemStack.class, new Getter<ItemStack, CraftItemEvent>() {
+//			@Override
+//			@Nullable
+//			public ItemStack get(final CraftItemEvent e) {
+//				return e.getRecipe().getResult();
+//			}
+//		}, 0);
 		// PrepareItemCraftEvent
 		EventValues.registerEventValue(PrepareItemCraftEvent.class, Slot.class, new Getter<Slot, PrepareItemCraftEvent>() {
 			@SuppressWarnings("null")

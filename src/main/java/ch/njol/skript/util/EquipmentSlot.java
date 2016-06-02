@@ -26,6 +26,7 @@ import java.util.Locale;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -86,7 +87,7 @@ public class EquipmentSlot extends Slot {
 			}
 			
 		},
-		HELMET {
+		HELMET(39) {
 			@Override
 			@Nullable
 			public ItemStack get(final EntityEquipment e) {
@@ -98,7 +99,7 @@ public class EquipmentSlot extends Slot {
 				e.setHelmet(item);
 			}
 		},
-		CHESTPLATE {
+		CHESTPLATE(38) {
 			@Override
 			@Nullable
 			public ItemStack get(final EntityEquipment e) {
@@ -110,7 +111,7 @@ public class EquipmentSlot extends Slot {
 				e.setChestplate(item);
 			}
 		},
-		LEGGINGS {
+		LEGGINGS(37) {
 			@Override
 			@Nullable
 			public ItemStack get(final EntityEquipment e) {
@@ -122,7 +123,7 @@ public class EquipmentSlot extends Slot {
 				e.setLeggings(item);
 			}
 		},
-		BOOTS {
+		BOOTS(36) {
 			@Override
 			@Nullable
 			public ItemStack get(final EntityEquipment e) {
@@ -134,6 +135,16 @@ public class EquipmentSlot extends Slot {
 				e.setBoots(item);
 			}
 		};
+		
+		public final int slotNumber;
+		
+		EquipSlot() {
+			slotNumber = -1;
+		}
+		
+		EquipSlot(int number) {
+			slotNumber = number;
+		}
 		
 		@Nullable
 		public abstract ItemStack get(EntityEquipment e);
@@ -166,6 +177,25 @@ public class EquipmentSlot extends Slot {
 	@Override
 	public String toString_i() {
 		return "the " + slot.name().toLowerCase(Locale.ENGLISH) + " of " + Classes.toString(e.getHolder()); // TODO localise?
+	}
+	
+	/**
+	 * Gets underlying armor slot enum.
+	 * @return Armor slot.
+	 */
+	public EquipSlot getEquipSlot() {
+		return slot;
+	}
+	
+	@Override
+	public boolean isSameSlot(Slot o) {
+		if (o instanceof InventorySlot) {
+			if (slot == EquipSlot.TOOL)
+				return false; // TODO maybe fix this
+			return this.slot.slotNumber == ((InventorySlot) o).getIndex();
+		}
+		
+		return this.slot == ((EquipmentSlot) o).getEquipSlot();
 	}
 	
 }

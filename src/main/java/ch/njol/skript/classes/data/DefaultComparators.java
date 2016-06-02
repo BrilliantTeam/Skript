@@ -66,6 +66,7 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.PotionEffectUtils;
+import ch.njol.skript.util.Slot;
 import ch.njol.skript.util.StructureType;
 import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Timeperiod;
@@ -429,7 +430,23 @@ public class DefaultComparators {
 				return false;
 			}
 		});
-		
+		// Slot - Slot
+		Comparators.registerComparator(Slot.class, Slot.class, new Comparator<Slot, Slot>() {
+
+			@Override
+			public Relation compare(Slot o1, Slot o2) {
+				Skript.info("Comparing " + o1.getClass() + " and " + o2.getClass());
+				if (o1.isSameSlot(o2))
+					return Relation.EQUAL;
+				return Relation.NOT_EQUAL;
+			}
+
+			@Override
+			public boolean supportsOrdering() {
+				return false;
+			}
+			
+		});
 	}
 	
 }

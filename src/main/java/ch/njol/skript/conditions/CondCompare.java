@@ -153,6 +153,7 @@ public class CondCompare extends Condition {
 				}
 			}
 		}
+		
 		return true;
 	}
 	
