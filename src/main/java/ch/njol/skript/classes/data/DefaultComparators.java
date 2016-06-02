@@ -435,7 +435,6 @@ public class DefaultComparators {
 
 			@Override
 			public Relation compare(Slot o1, Slot o2) {
-				Skript.info("Comparing " + o1.getClass() + " and " + o2.getClass());
 				if (o1.isSameSlot(o2))
 					return Relation.EQUAL;
 				return Relation.NOT_EQUAL;
