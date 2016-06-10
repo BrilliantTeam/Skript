@@ -47,6 +47,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -76,6 +77,7 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.BiomeUtils;
 import ch.njol.skript.util.DamageCauseUtils;
 import ch.njol.skript.util.EnchantmentType;
+import ch.njol.skript.util.EnumUtils;
 import ch.njol.skript.util.InventoryActions;
 import ch.njol.skript.util.PotionEffectUtils;
 import ch.njol.skript.util.StringMode;
@@ -482,7 +484,7 @@ public class BukkitClasses {
 		Classes.registerClass(new ClassInfo<InventoryAction>(InventoryAction.class, "inventoryaction")
 				.user("inventory actions?")
 				.name("Inventory Action")
-				.description("There are multiple ways to perform clicks in inventories. Inventory actions represent them.")
+				.description("What player just did in inventory event. Note that when in creative game mode, most actions do not work correctly.")
 				.usage(InventoryActions.getAllNames())
 				.examples("")
 				.since("2.2-dev16")
@@ -503,6 +505,40 @@ public class BukkitClasses {
 					@SuppressWarnings("null")
 					@Override
 					public String toVariableNameString(InventoryAction o) {
+						return o.name();
+					}
+
+					@Override
+					public String getVariableNamePattern() {
+						return "\\S+";
+					}
+					
+				}));
+		
+		final EnumUtils<ClickType> invClicks = new EnumUtils<ClickType>(ClickType.class, "click actions"); // Less boilerplate code!
+		Classes.registerClass(new ClassInfo<ClickType>(ClickType.class, "clickactions")
+				.user("click action?")
+				.name("Click Action")
+				.description("Click action, mostly for inventory events. Tells exactly which keys/buttons player pressed, assuming that default keybindings are used in client side.")
+				.usage(invClicks.getAllNames())
+				.examples("")
+				.since("2.2-dev16b")
+				.defaultExpression(new EventValueExpression<ClickType>(ClickType.class))
+				.parser(new Parser<ClickType>() {
+					@Override
+					@Nullable
+					public ClickType parse(String s, ParseContext context) {
+						return invClicks.parse(s);
+					}
+
+					@Override
+					public String toString(ClickType o, int flags) {
+						return invClicks.toString(o, flags);
+					}
+
+					@SuppressWarnings("null")
+					@Override
+					public String toVariableNameString(ClickType o) {
 						return o.name();
 					}
 

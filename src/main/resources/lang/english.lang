@@ -981,6 +981,22 @@ inventory actions:
 	clone_stack: clone stack
 	collect_to_cursor: collect to cursor, collect items to cursor
 	unknown: unknown, unsupported, custom
+	
+# -- Inventory Click Types --
+click actions:
+	left: left mouse button, left mouse, LMB
+	shift_left: left mouse button with shift, left mouse with shift, Shift+RMB
+	right: right mouse button, right mouse, RMB
+	shift_right: right mouse button with shift, right mouse with shift, Shift+RMB
+	window_border_left: window border using right mouse button, window border using right mouse, border using LMB
+	window_border_right: window border using left mouse button, window border using right mouse, border using RMB
+	middle: middle mouse button, middle mouse, MMB
+	number_key: number key, 0-9
+	double_click: double click using mouse, double click
+	drop: drop key, drop item, Q
+	control_drop: drop key with control, drop stack, Ctrl+Q
+	creative: creative action, creative
+	unknown: unknown, unsupported, custom
 
 # -- Boolean --
 boolean:

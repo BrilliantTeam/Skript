@@ -109,9 +109,7 @@ public class EvtItem extends SkriptEvent {
 		if (types == null)
 			return true;
 		final ItemStack is;
-		if (e instanceof InventoryClickEvent) {
-			is = ((InventoryClickEvent) e).getCurrentItem();
-		} else if (e instanceof BlockDispenseEvent) {
+		if (e instanceof BlockDispenseEvent) {
 			is = ((BlockDispenseEvent) e).getItem();
 		} else if (e instanceof ItemSpawnEvent) {
 			is = ((ItemSpawnEvent) e).getEntity().getItemStack();
@@ -127,6 +125,8 @@ public class EvtItem extends SkriptEvent {
 			is = ((PlayerItemConsumeEvent) e).getItem();
 //		} else if (e instanceof BrewEvent)
 //			is = ((BrewEvent) e).getContents().getContents()
+		} else if (e instanceof InventoryClickEvent) {
+			is = ((InventoryClickEvent) e).getCurrentItem();
 		} else {
 			assert false;
 			return false;
