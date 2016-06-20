@@ -93,6 +93,13 @@
 			<version>4.2</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>bekvon.bukkit</groupId>
+			<artifactId>residence</artifactId>
+			<systemPath>${project.basedir}/lib/Residence4.3.0.0.jar</systemPath>
+			<scope>system</scope>
+			<version>4.3.0.0</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
