@@ -793,6 +793,12 @@ entities:
 	endermite:
 		name: endermite¦s
 		pattern: endermite(|1¦s)
+	stray:
+		name: stray¦s
+		pattern: stray(|1¦s)
+	polar bear:
+		name: polar bear¦s
+		pattern: polar bears(|1¦s)
 
 # -- Damage Causes --
 damage causes:
