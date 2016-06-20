@@ -158,6 +158,8 @@ commands:
 	invalid argument: Invalid argument <gray>'%s<gray>'<reset>. Allowed are:
 	too many arguments: This command can only accept a single %2$s.
 	internal error: An internal error occurred while attempting to perform this command.
+	no player starts with: There is no player online whose name starts with '%s'
+	multiple players start with: There are several players online whose names start with '%s'
 
 # -- Hooks --
 hooks:
