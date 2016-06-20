@@ -1043,6 +1043,8 @@ types:
 	potioneffecttype: potion¦s @a
 	enchantment: enchantment¦s @an
 	damagecause: damage cause¦s @a
+	inventoryaction: inventory action¦s @a
+	clickaction: click actions¦s @a
 	
 	# Skript
 	weathertype: weather type¦s @a
