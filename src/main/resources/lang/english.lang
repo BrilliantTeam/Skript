@@ -1003,7 +1003,7 @@ click actions:
 	double_click: double click using mouse, double click
 	drop: drop key, drop item, Q
 	control_drop: drop key with control, drop stack, Ctrl+Q
-	creative: creative action, creative
+	creative: creative action
 	unknown: unknown, unsupported, custom
 
 # -- Boolean --
