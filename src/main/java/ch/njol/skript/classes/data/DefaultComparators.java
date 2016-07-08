@@ -102,6 +102,24 @@ public class DefaultComparators {
 			}
 		});
 		
+		// Slot - Slot
+		Comparators.registerComparator(Slot.class, Slot.class, new Comparator<Slot, Slot>() {
+
+			@Override
+			public Relation compare(Slot o1, Slot o2) {
+				//Skript.info("Comparing " + o1.getClass() + " and " + o2.getClass());
+				if (o1.isSameSlot(o2))
+					return Relation.EQUAL;
+				return Relation.NOT_EQUAL;
+			}
+
+			@Override
+			public boolean supportsOrdering() {
+				return false;
+			}
+			
+		});
+		
 		// ItemStack - ItemType
 		Comparators.registerComparator(ItemStack.class, ItemType.class, new Comparator<ItemStack, ItemType>() {
 			@Override
@@ -429,22 +447,6 @@ public class DefaultComparators {
 			public boolean supportsOrdering() {
 				return false;
 			}
-		});
-		// Slot - Slot
-		Comparators.registerComparator(Slot.class, Slot.class, new Comparator<Slot, Slot>() {
-
-			@Override
-			public Relation compare(Slot o1, Slot o2) {
-				if (o1.isSameSlot(o2))
-					return Relation.EQUAL;
-				return Relation.NOT_EQUAL;
-			}
-
-			@Override
-			public boolean supportsOrdering() {
-				return false;
-			}
-			
 		});
 	}
 	

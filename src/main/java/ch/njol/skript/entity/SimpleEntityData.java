@@ -56,6 +56,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.ShulkerBullet;
@@ -150,7 +151,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("squid", Squid.class));
 		types.add(new SimpleEntityDataInfo("bottle of enchanting", ThrownExpBottle.class));
 		types.add(new SimpleEntityDataInfo("tnt", TNTPrimed.class));
-		types.add(new SimpleEntityDataInfo("zombie", Zombie.class));
+		types.add(new SimpleEntityDataInfo("zombie", Zombie.class)); // TODO husks and zombie villagers (and test that)
 		types.add(new SimpleEntityDataInfo("golem", Golem.class));
 		
 		if (Skript.classExists("org.bukkit.entity.ItemFrame")) {
@@ -165,10 +166,13 @@ public class SimpleEntityData extends EntityData<Entity> {
 		if(Skript.classExists("org.bukkit.entity.ArmorStand")){
 			types.add(new SimpleEntityDataInfo("endermite", Endermite.class));
 			types.add(new SimpleEntityDataInfo("armor stand", ArmorStand.class));
-		} if (Skript.classExists("org.bukkit.entity.Shulker")) {
+		}
+		if (Skript.classExists("org.bukkit.entity.Shulker")) {
 			types.add(new SimpleEntityDataInfo("shulker", Shulker.class));
 			types.add(new SimpleEntityDataInfo("shulker bullet", ShulkerBullet.class));
 		}
+		if (Skript.classExists("org.bukkit.entity.PolarBear"))
+			types.add(new SimpleEntityDataInfo("polar bear", PolarBear.class));
 		// TODO !Update with every version [entities]
 		
 		// supertypes

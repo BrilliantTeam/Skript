@@ -67,7 +67,6 @@ public class ScriptFunction<T> extends Function<T> {
 	 * @param value
 	 */
 	public final void setReturnValue(final FunctionEvent e, final @Nullable T[] value) {
-		Skript.info("Trigger is " + trigger.toString());
 		assert !returnValueSet;
 		returnValueSet = true;
 		returnValue = value;

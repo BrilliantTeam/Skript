@@ -26,6 +26,7 @@ import org.bukkit.entity.Skeleton.SkeletonType;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 
@@ -33,60 +34,95 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
  * @author Peter Güttinger
  */
 public class SkeletonData extends EntityData<Skeleton> {
+	
 	private final static boolean hasWither = Skript.methodExists(Skeleton.class, "getSkeletonType");
+	private final static boolean hasStray = Skript.isRunningMinecraft(1, 10);
+	
 	static {
-		if (hasWither)
+		if (hasStray)
+			register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton", "stray");
+		else if (hasWither)
 			register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton");
 		else
 			register(SkeletonData.class, "skeleton", Skeleton.class, "skeleton");
 		
 	}
 	
-	private boolean wither;
+	private int type;
+	public static final int NORMAL = 0, WITHER = 1, STRAY = 2, LAST_INDEX = STRAY;
 	
 	public SkeletonData() {}
 	
-	public SkeletonData(final boolean wither) {
-		this.wither = wither;
+	public SkeletonData(final int type) {
+		if (type > LAST_INDEX)
+			throw new SkriptAPIException("Unsupported skeleton type " + type);
+		this.type = type;
 	}
 	
 	public boolean isWither() {
-		return wither;
+		return type == WITHER;
+	}
+	
+	public boolean isStray() {
+		return type == STRAY;
 	}
 	
 	@Override
 	protected boolean init(final Literal<?>[] exprs, final int matchedPattern, final ParseResult parseResult) {
-		wither = matchedPattern == 1;
+		type = matchedPattern;
 		return true;
 	}
 	
 	@Override
 	protected boolean init(final @Nullable Class<? extends Skeleton> c, final @Nullable Skeleton e) {
-		wither = (e == null || !hasWither) ? false : e.getSkeletonType() == SkeletonType.WITHER;
+		if (e == null)
+			return true;
+		
+		if (hasWither && e.getSkeletonType() == SkeletonType.WITHER)
+			type = WITHER;
+		if (hasStray && e.getSkeletonType() == SkeletonType.STRAY)
+			type = STRAY;
 		return true;
 	}
 	
 //		return wither ? "1" : "0";
 	@Override
 	protected boolean deserialize(final String s) {
-		if (s.equals("1"))
-			wither = true;
-		else if (s.equals("0"))
-			wither = false;
-		else
-			return false;
+		try {
+			int typeOffer = Integer.parseInt(s);
+			if (typeOffer > LAST_INDEX)
+				throw new SkriptAPIException("Unsupported skeleton type " + s);
+		} catch (NumberFormatException e) {
+			throw new SkriptAPIException("Cannot parse skeleton type " + s);
+		}
+		
 		return true;
 	}
 	
 	@Override
-	public void set(final Skeleton entity) {
-		if (hasWither)
-			entity.setSkeletonType(wither ? SkeletonType.WITHER : SkeletonType.NORMAL);
+	public void set(final Skeleton e) {
+		switch (type) {
+			case WITHER:
+				e.setSkeletonType(SkeletonType.WITHER);
+				break;
+			case STRAY:
+				e.setSkeletonType(SkeletonType.STRAY);
+				break;
+			default:
+				e.setSkeletonType(SkeletonType.NORMAL);
+		}
 	}
 	
 	@Override
-	protected boolean match(final Skeleton entity) {
-		return hasWither ? (entity.getSkeletonType() == SkeletonType.WITHER) == wither : true;
+	protected boolean match(final Skeleton e) {
+		switch (type) {
+			case WITHER:
+				return e.getSkeletonType() == SkeletonType.WITHER;
+			case STRAY:
+				return e.getSkeletonType() == SkeletonType.STRAY;
+			default:
+				return e.getSkeletonType() == SkeletonType.NORMAL;
+		}
 	}
 	
 	@Override
@@ -99,24 +135,24 @@ public class SkeletonData extends EntityData<Skeleton> {
 		if (!(obj instanceof SkeletonData))
 			return false;
 		final SkeletonData other = (SkeletonData) obj;
-		return other.wither == wither;
+		return other.type == type;
 	}
 	
 	@Override
 	protected int hashCode_i() {
-		return wither ? 1 : 0;
+		return type;
 	}
 	
 	@Override
 	public boolean isSupertypeOf(final EntityData<?> e) {
 		if (e instanceof SkeletonData)
-			return ((SkeletonData) e).wither == wither;
+			return ((SkeletonData) e).type == type;
 		return false;
 	}
 	
 	@Override
 	public EntityData getSuperType() {
-		return new SkeletonData(wither);
+		return new SkeletonData(type);
 	}
 	
 }

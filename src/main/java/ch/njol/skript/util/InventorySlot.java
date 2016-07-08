@@ -76,7 +76,7 @@ public class InventorySlot extends Slot {
 	@Override
 	public boolean isSameSlot(Slot o) {
 		if (o instanceof EquipmentSlot)
-			return o.isSameSlot(this);
+			return o.isSameSlot(this); // Reverse call to avoid code copy-paste
 		return this.index == ((InventorySlot) o).getIndex();
 	}
 	
