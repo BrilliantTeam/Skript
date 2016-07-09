@@ -171,8 +171,9 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("shulker", Shulker.class));
 			types.add(new SimpleEntityDataInfo("shulker bullet", ShulkerBullet.class));
 		}
-		if (Skript.classExists("org.bukkit.entity.PolarBear"))
+		if (Skript.classExists("org.bukkit.entity.PolarBear")) {
 			types.add(new SimpleEntityDataInfo("polar bear", PolarBear.class));
+		}
 		// TODO !Update with every version [entities]
 		
 		// supertypes
