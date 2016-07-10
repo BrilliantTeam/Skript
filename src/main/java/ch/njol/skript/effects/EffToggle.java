@@ -67,7 +67,7 @@ public class EffToggle extends Effect {
 	
 	// TODO !Update with every version [blocks]
 	private final static byte[] bitFlags = new byte[Skript.MAXBLOCKID + 1];
-	private final static boolean[] doors = new boolean[Skript.MAXBLOCKID + 1]; // Update also array length
+	private final static boolean[] doors = new boolean[Skript.MAXBLOCKID + 1];
 	static {
 		bitFlags[Material.DETECTOR_RAIL.getId()] = 0x8;
 		// Doors
@@ -107,6 +107,16 @@ public class EffToggle extends Effect {
 	protected void execute(final Event e) {
 		for (Block b : blocks.getArray(e)) {
 			int type = b.getTypeId();
+			
+			// Redstone lamps have separate block ids for off/on.
+			if (type == Material.REDSTONE_LAMP_OFF.getId()) {
+				b.setType(Material.REDSTONE_LAMP_ON);
+				continue;
+			} else if (type == Material.REDSTONE_LAMP_ON.getId()) {
+				b.setType(Material.REDSTONE_LAMP_OFF);
+				continue;
+			}
+			
 			byte data = b.getData();
 			if (doors[type] == true && (data & 0x8) == 0x8) {
 				b = b.getRelative(BlockFace.DOWN);
