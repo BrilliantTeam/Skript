@@ -108,15 +108,6 @@ public class EffToggle extends Effect {
 		for (Block b : blocks.getArray(e)) {
 			int type = b.getTypeId();
 			
-			// Redstone lamps have separate block ids for off/on.
-			if (type == Material.REDSTONE_LAMP_OFF.getId()) {
-				b.setType(Material.REDSTONE_LAMP_ON);
-				continue;
-			} else if (type == Material.REDSTONE_LAMP_ON.getId()) {
-				b.setType(Material.REDSTONE_LAMP_OFF);
-				continue;
-			}
-			
 			byte data = b.getData();
 			if (doors[type] == true && (data & 0x8) == 0x8) {
 				b = b.getRelative(BlockFace.DOWN);
