@@ -167,6 +167,8 @@ public abstract class SkriptConfig {
 	public final static Option<Boolean> addonSafetyChecks = new Option<Boolean>("addon safety checks", false)
 			.optional(true);
 	
+	public final static Option<Boolean> apiSoftExceptions = new Option<Boolean>("soft api exceptions", false);
+	
 	/**
 	 * This should only be used in special cases
 	 */
