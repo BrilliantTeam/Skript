@@ -41,53 +41,47 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 
-/**
- * Sorts a list of texts/stirngs alphabetically
- * @author xXAndrew28Xx
- */
 @Name("Alphabetical Sort")
-@Description("Sort a list alphabetically")
+@Description("Sorts given strings in alphabetical order.")
 @Examples({"set {_list::*} to alphabetically sorted {_list::*"})
-@Since("dev-18")
+@Since("2.2-dev18b")
 public class ExprAlphabetList extends SimpleExpression<String>{
+	
 	static{
 		Skript.registerExpression(ExprAlphabetList.class, String.class, ExpressionType.COMBINED, "alphabetically sorted %strings%");
 	}
-	private Expression<String> exprTexts;
+	
+	@SuppressWarnings("null")
+	private Expression<String> texts;
+	
+	@SuppressWarnings({"null", "unchecked"})
+	@Override
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		texts = (Expression<String>) exprs[0];
+		return true;
+	}
+	
+	@Override
+	@Nullable
+	protected String[] get(Event e) {
+		String[] sorted = texts.getAll(e).clone(); // Not yet sorted
+		Arrays.sort(sorted); // Now sorted
+		return sorted;
+	}
+	
+	@Override
+	public Class<? extends String> getReturnType() {
+		return String.class;
+	}
+	
 	@Override
 	public boolean isSingle() {
 		return false;
 	}
 
 	@Override
-	public Class<? extends String> getReturnType() {
-		return String.class;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		exprTexts = (Expression<String>) exprs[0];
-		return true;
-	}
-
-	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "alphabetically sorted %strings%";
-	}
-
-	@Override
-	@Nullable
-	protected String[] get(Event e) {
-		String[] texts = exprTexts.getArray(e);
-		ArrayList<String> alTexts = new ArrayList<String>(Arrays.asList(texts));
-		Collections.sort(alTexts, new Comparator<String>(){
-
-			@Override
-			public int compare(String o1, String o2) {
-				return o1.compareTo(o2);
-			}});
-		return alTexts.toArray(new String[alTexts.size()]);
+		return "alphabetically sorted strings";
 	}
 	
 }
