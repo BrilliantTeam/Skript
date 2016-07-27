@@ -151,8 +151,14 @@ disable variable conflict warnings: false
 # whenever you create new scripts with new variables.
 
 disable variable will not be saved warnings: false
-#Disables the "... i.e contents cannot be saved ..." warning when reloading and something in your scripts sets a variable(non local) to a value that is not serializable.
-#By Mirre.
+# Disables the "... i.e contents cannot be saved ..." warning when reloading and something in your scripts sets a variable(non local) to a value that is not serializable.
+# By Mirre.
+
+soft api exceptions: false
+# Allows Skript to ignore certain actions which would normally result in thrown exceptions.
+# If everything works correctly, you should keep this option disabled. It might cause problems in some cases.
+# However, if Skript or addons of it are not working correctly, this might help.
+# You may also get told to enable this by Skript or addon developers - then do so.
 
 # ==== Variables ====
 

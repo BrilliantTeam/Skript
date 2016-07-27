@@ -172,7 +172,7 @@ public class DefaultConverters {
 			public EntityData convert(final Entity e) {
 				return EntityData.fromEntity(e);
 			}
-		}, Converter.NO_COMMAND_ARGUMENTS);
+		}, Converter.NO_COMMAND_ARGUMENTS | Converter.NO_RIGHT_CHAINING);
 		// EntityData - EntityType
 		Converters.registerConverter(EntityData.class, EntityType.class, new Converter<EntityData, EntityType>() {
 			@Override

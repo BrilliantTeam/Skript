@@ -114,7 +114,6 @@ public class EffChange extends Effect {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		
 		mode = patterns.getInfo(matchedPattern);
 		
 		switch (mode) {

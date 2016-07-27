@@ -67,27 +67,52 @@ public class EffToggle extends Effect {
 	
 	// TODO !Update with every version [blocks]
 	private final static byte[] bitFlags = new byte[Skript.MAXBLOCKID + 1];
+	private final static boolean[] doors = new boolean[Skript.MAXBLOCKID + 1];
 	static {
 		bitFlags[Material.DETECTOR_RAIL.getId()] = 0x8;
+		// Doors
 		bitFlags[Material.WOODEN_DOOR.getId()] = 0x4;
+		bitFlags[Material.SPRUCE_DOOR.getId()] = 0x4;
+		bitFlags[Material.BIRCH_DOOR.getId()] = 0x4;
+		bitFlags[Material.JUNGLE_DOOR.getId()] = 0x4;
+		bitFlags[Material.ACACIA_DOOR.getId()] = 0x4;
+		bitFlags[Material.DARK_OAK_DOOR.getId()] = 0x4;
 		bitFlags[Material.IRON_DOOR_BLOCK.getId()] = 0x4;
+		// Redstone stuff
 		bitFlags[Material.LEVER.getId()] = 0x8;
 		bitFlags[Material.STONE_PLATE.getId()] = 0x1;
 		bitFlags[Material.WOOD_PLATE.getId()] = 0x1;
 		bitFlags[Material.STONE_BUTTON.getId()] = 0x8;
+		// Trapdoors
 		bitFlags[Material.TRAP_DOOR.getId()] = 0x4;
+		bitFlags[Material.IRON_TRAPDOOR.getId()] = 0x4;
+		// Fence gates
 		bitFlags[Material.FENCE_GATE.getId()] = 0x4;
+		bitFlags[Material.SPRUCE_FENCE_GATE.getId()] = 0x4;
+		bitFlags[Material.BIRCH_FENCE_GATE.getId()] = 0x4;
+		bitFlags[Material.JUNGLE_FENCE_GATE.getId()] = 0x4;
+		bitFlags[Material.DARK_OAK_FENCE_GATE.getId()] = 0x4;
+		bitFlags[Material.ACACIA_FENCE_GATE.getId()] = 0x4;
+		
+		doors[Material.WOODEN_DOOR.getId()] = true;
+		doors[Material.SPRUCE_DOOR.getId()] = true;
+		doors[Material.BIRCH_DOOR.getId()] = true;
+		doors[Material.JUNGLE_DOOR.getId()] = true;
+		doors[Material.ACACIA_DOOR.getId()] = true;
+		doors[Material.DARK_OAK_DOOR.getId()] = true;
+		doors[Material.IRON_DOOR_BLOCK.getId()] = true;
 	}
 	
 	@Override
 	protected void execute(final Event e) {
 		for (Block b : blocks.getArray(e)) {
 			int type = b.getTypeId();
+			
 			byte data = b.getData();
-			if ((type == Material.WOODEN_DOOR.getId() || type == Material.IRON_DOOR_BLOCK.getId()) && (data & 0x8) == 0x8) {
+			if (doors[type] == true && (data & 0x8) == 0x8) {
 				b = b.getRelative(BlockFace.DOWN);
 				type = b.getTypeId();
-				if (type != Material.WOODEN_DOOR.getId() && type != Material.IRON_DOOR_BLOCK.getId())
+				if (doors[type] != true)
 					continue;
 				data = b.getData();
 			}

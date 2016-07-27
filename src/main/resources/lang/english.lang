@@ -793,12 +793,18 @@ entities:
 	endermite:
 		name: endermite¦s
 		pattern: endermite(|1¦s)
-	stray:
-		name: stray¦s
-		pattern: stray(|1¦s)
+	shulker:
+		name: shulker¦s
+		pattern: shulker(|1¦s)
+	shulker bullet:
+		name: shulker bullet¦s
+		pattern: shulker bullet(|1¦s)
 	polar bear:
 		name: polar bear¦s
 		pattern: polar bears(|1¦s)
+	stray:
+		name: stray¦s
+		pattern: stray(|1¦s)
 
 # -- Damage Causes --
 damage causes:
@@ -1003,7 +1009,7 @@ click actions:
 	double_click: double click using mouse, double click
 	drop: drop key, drop item, Q
 	control_drop: drop key with control, drop stack, Ctrl+Q
-	creative: creative action, creative
+	creative: creative action
 	unknown: unknown, unsupported, custom
 
 # -- Boolean --
