@@ -22,6 +22,7 @@
 package ch.njol.skript.effects;
 
 import org.bukkit.GameMode;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,7 +68,7 @@ public class EffKill extends Effect {
 	@Override
 	protected void execute(final Event e) {
 		for (final Entity entity : entities.getArray(e)) {
-			if (entity instanceof LivingEntity) {
+			if (entity instanceof Damageable) {
 				final boolean creative = entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE;
 				if (creative)
 					((Player) entity).setGameMode(GameMode.SURVIVAL);
