@@ -72,7 +72,7 @@ public class EffKill extends Effect {
 				final boolean creative = entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE;
 				if (creative)
 					((Player) entity).setGameMode(GameMode.SURVIVAL);
-				HealthUtils.damage((LivingEntity) entity, HealthUtils.getMaxHealth((LivingEntity) entity) * 100); // just to make sure that it really dies >:)
+				HealthUtils.damage((Damageable) entity, HealthUtils.getMaxHealth((LivingEntity) entity) * 100); // just to make sure that it really dies >:)
 				if (creative)
 					((Player) entity).setGameMode(GameMode.CREATIVE);
 			}
