@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
 	compile 'org.spigotmc:spigot-api:1.10.2-R0.1-SNAPSHOT'
-	compile 'org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0'
+	compile 'org.eclipse.jdt:org.eclipse.jdt.annotation:1.1.0'
 	compile 'com.google.code.findbugs:findbugs:2.0.3'
 
 	testCompile 'junit:junit:4.12'
@@ -35,8 +35,6 @@ compileJava {
 	options.forkOptions.with {
 		executable = 'java'
 		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main',
-				'-err:asserIdentifier,emptyStatement,enumIdentifier,forbiddenReference,\
-				nonnullParameterAnnotationDropped,nullAnnotationInferenceConflict,nullReference,\
-				nullSpecViolation,potentialNullReference,']
+				'-properties', '.settings/org.eclipse.jdt.core.prefs']
 	}
 }
