@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 repositories {
 	jcenter()
@@ -10,15 +11,32 @@ repositories {
 	maven {
 		url 'https://oss.sonatype.org/content/groups/public/'
 	}
+
+	maven {
+		url 'http://maven.elmakers.com/repository/'
+	}
+
+	maven {
+		url 'http://maven.sk89q.com/repo'
+	}
+
+	maven {
+		url 'http://nexus.theyeticave.net/content/repositories/pub_releases'
+	}
 }
 
 dependencies {
 	compile 'org.spigotmc:spigot-api:1.10.2-R0.1-SNAPSHOT'
 	compile 'org.eclipse.jdt:org.eclipse.jdt.annotation:1.1.0'
 	compile 'com.google.code.findbugs:findbugs:2.0.3'
+	compile 'de.slikey:EffectLib:5.0'
+	compile 'com.sk89q:worldguard:6.1.2'
+	compile 'net.milkbowl.vault:Vault:1.6.6'
 
 	testCompile 'junit:junit:4.12'
 	testCompile 'org.easymock:easymock:3.4'
+
+	compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 configurations {
@@ -37,4 +55,12 @@ compileJava {
 		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main',
 				'-properties', '.settings/org.eclipse.jdt.core.prefs']
 	}
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
