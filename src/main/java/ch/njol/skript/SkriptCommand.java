@@ -12,8 +12,8 @@ import org.bukkit.util.ChatPaginator.ChatPage;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader.ScriptInfo;
-import ch.njol.skript.Updater.UpdateState;
-import ch.njol.skript.Updater.VersionInfo;
+import ch.njol.skript.LegacyUpdater.UpdateState;
+import ch.njol.skript.LegacyUpdater.VersionInfo;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.command.CommandHelp;
 import ch.njol.skript.localization.ArgsMessage;
@@ -290,45 +290,45 @@ public class SkriptCommand implements CommandExecutor {
 					}
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
-				Updater.stateLock.writeLock().lock();
+				LegacyUpdater.stateLock.writeLock().lock();
 				try {
-					final UpdateState state = Updater.state;
+					final UpdateState state = LegacyUpdater.state;
 					if (args[1].equals("check")) {
 						switch (state) {
 							case NOT_STARTED:
-								Updater.check(sender, false, false);
+								LegacyUpdater.check(sender, false, false);
 								break;
 							case CHECK_IN_PROGRESS:
-								Skript.info(sender, "" + Updater.m_check_in_progress);
+								Skript.info(sender, "" + LegacyUpdater.m_check_in_progress);
 								break;
 							case CHECK_ERROR:
-								Updater.check(sender, false, false);
+								LegacyUpdater.check(sender, false, false);
 								break;
 							case CHECKED_FOR_UPDATE:
-								if (Updater.latest.get() == null)
-									Skript.info(sender, Skript.getVersion().isStable() ? "" + Updater.m_running_latest_version : "" + Updater.m_running_latest_version_beta);
+								if (LegacyUpdater.latest.get() == null)
+									Skript.info(sender, Skript.getVersion().isStable() ? "" + LegacyUpdater.m_running_latest_version : "" + LegacyUpdater.m_running_latest_version_beta);
 								else
-									Skript.info(sender, "" + Updater.m_update_available);
+									Skript.info(sender, "" + LegacyUpdater.m_update_available);
 								break;
 							case DOWNLOAD_IN_PROGRESS:
-								Skript.info(sender, "" + Updater.m_download_in_progress);
+								Skript.info(sender, "" + LegacyUpdater.m_download_in_progress);
 								break;
 							case DOWNLOAD_ERROR:
-								Skript.info(sender, "" + Updater.m_download_error);
+								Skript.info(sender, "" + LegacyUpdater.m_download_error);
 								break;
 							case DOWNLOADED:
-								Skript.info(sender, "" + Updater.m_downloaded);
+								Skript.info(sender, "" + LegacyUpdater.m_downloaded);
 								break;
 						}
 					} else if (args[1].equalsIgnoreCase("changes")) {
 						if (state == UpdateState.NOT_STARTED) {
-							Skript.info(sender, "" + Updater.m_not_started);
+							Skript.info(sender, "" + LegacyUpdater.m_not_started);
 						} else if (state == UpdateState.CHECK_IN_PROGRESS) {
-							Skript.info(sender, "" + Updater.m_check_in_progress);
+							Skript.info(sender, "" + LegacyUpdater.m_check_in_progress);
 						} else if (state == UpdateState.CHECK_ERROR) {
-							Skript.info(sender, "" + Updater.m_check_error);
-						} else if (Updater.latest.get() == null) {
-							Skript.info(sender, Skript.getVersion().isStable() ? "" + Updater.m_running_latest_version : "" + Updater.m_running_latest_version_beta);
+							Skript.info(sender, "" + LegacyUpdater.m_check_error);
+						} else if (LegacyUpdater.latest.get() == null) {
+							Skript.info(sender, Skript.getVersion().isStable() ? "" + LegacyUpdater.m_running_latest_version : "" + LegacyUpdater.m_running_latest_version_beta);
 //						} else if (args.length == 2 && Updater.infos.size() != 1) {
 //							info(sender, "update.changes.multiple versions.title", Updater.infos.size(), Skript.getVersion());
 //							String versions = Updater.infos.get(0).version.toString();
@@ -362,7 +362,7 @@ public class SkriptCommand implements CommandExecutor {
 //									pageNum = Utils.parseInt(args[3]);
 //							}
 							final StringBuilder changes = new StringBuilder();
-							for (final VersionInfo i : Updater.infos) {
+							for (final VersionInfo i : LegacyUpdater.infos) {
 								if (changes.length() != 0)
 									changes.append("\n");
 								changes.append(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(m_changes_title.toString(i.version, i.date)));
@@ -377,36 +377,36 @@ public class SkriptCommand implements CommandExecutor {
 					} else if (args[1].equalsIgnoreCase("download")) {
 						switch (state) {
 							case NOT_STARTED:
-								Updater.check(sender, true, false);
+								LegacyUpdater.check(sender, true, false);
 								break;
 							case CHECK_IN_PROGRESS:
-								Skript.info(sender, "" + Updater.m_check_in_progress);
+								Skript.info(sender, "" + LegacyUpdater.m_check_in_progress);
 								break;
 							case CHECK_ERROR:
-								Updater.check(sender, true, false);
+								LegacyUpdater.check(sender, true, false);
 //								info(sender, Language.format("updater.check_error", updater.error));
 								break;
 							case CHECKED_FOR_UPDATE:
-								if (Updater.latest.get() == null) {
-									Skript.info(sender, Skript.getVersion().isStable() ? "" + Updater.m_running_latest_version : "" + Updater.m_running_latest_version_beta);
+								if (LegacyUpdater.latest.get() == null) {
+									Skript.info(sender, Skript.getVersion().isStable() ? "" + LegacyUpdater.m_running_latest_version : "" + LegacyUpdater.m_running_latest_version_beta);
 								} else {
-									Updater.download(sender, false);
+									LegacyUpdater.download(sender, false);
 								}
 								break;
 							case DOWNLOAD_IN_PROGRESS:
-								Skript.info(sender, "" + Updater.m_download_in_progress);
+								Skript.info(sender, "" + LegacyUpdater.m_download_in_progress);
 								break;
 							case DOWNLOADED:
-								Skript.info(sender, "" + Updater.m_downloaded);
+								Skript.info(sender, "" + LegacyUpdater.m_downloaded);
 								break;
 							case DOWNLOAD_ERROR:
 //								Skript.info(sender, "" + Updater.m_download_error);
-								Updater.download(sender, false);
+								LegacyUpdater.download(sender, false);
 								break;
 						}
 					}
 				} finally {
-					Updater.stateLock.writeLock().unlock();
+					LegacyUpdater.stateLock.writeLock().unlock();
 				}
 			} else if (args[0].equalsIgnoreCase("help")) {
 				skriptCommandHelp.showHelp(sender);

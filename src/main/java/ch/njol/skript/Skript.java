@@ -65,7 +65,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Metrics.Graph;
 import ch.njol.skript.Metrics.Plotter;
-import ch.njol.skript.Updater.UpdateState;
+import ch.njol.skript.LegacyUpdater.UpdateState;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.bukkitutil.Workarounds;
 import ch.njol.skript.classes.ClassInfo;
@@ -294,7 +294,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		SkriptConfig.load();
 		Language.setUseLocal(true);
 		
-		Updater.start();
+		LegacyUpdater.start();
 		
 		Aliases.load();
 		
@@ -494,14 +494,14 @@ public final class Skript extends JavaPlugin implements Listener {
 					new Task(Skript.this, 0) {
 						@Override
 						public void run() {
-							Updater.stateLock.readLock().lock();
+							LegacyUpdater.stateLock.readLock().lock();
 							try {
 								final Player p = e.getPlayer();
 								assert p != null;
-								if ((Updater.state == UpdateState.CHECKED_FOR_UPDATE || Updater.state == UpdateState.DOWNLOAD_ERROR) && Updater.latest.get() != null)
-									info(p, "" + Updater.m_update_available);
+								if ((LegacyUpdater.state == UpdateState.CHECKED_FOR_UPDATE || LegacyUpdater.state == UpdateState.DOWNLOAD_ERROR) && LegacyUpdater.latest.get() != null)
+									info(p, "" + LegacyUpdater.m_update_available);
 							} finally {
-								Updater.stateLock.readLock().unlock();
+								LegacyUpdater.stateLock.readLock().unlock();
 							}
 						}
 					};

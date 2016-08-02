@@ -8,7 +8,7 @@ website: http://njol.ch/projects/skript
 
 main: ch.njol.skript.Skript
 
-version: ${project.version}
+version: @version@
 
 commands:
     skript:

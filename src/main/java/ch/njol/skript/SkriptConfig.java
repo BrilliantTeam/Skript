@@ -78,7 +78,7 @@ public abstract class SkriptConfig {
 			.setter(new Setter<Timespan>() {
 				@Override
 				public void set(final Timespan t) {
-					final Task ct = Updater.checkerTask;
+					final Task ct = LegacyUpdater.checkerTask;
 					if (t.getTicks_i() != 0 && ct != null && !ct.isAlive())
 						ct.setNextExecution(t.getTicks_i());
 				}
