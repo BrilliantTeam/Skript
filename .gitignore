@@ -1,2 +1,4 @@
 /target
 /dep
+/build/
+/.gradle/
