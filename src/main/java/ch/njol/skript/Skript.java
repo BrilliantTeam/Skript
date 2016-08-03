@@ -1291,4 +1291,12 @@ public final class Skript extends JavaPlugin implements Listener {
 		sender.sendMessage(SKRIPT_PREFIX + ChatColor.DARK_RED + Utils.replaceEnglishChatStyles(error));
 	}
 	
+	/**
+	 * Indicates if Skript is running prerelease build.
+	 * @return Boolean.
+	 */
+	public static boolean isPrerelease() {
+		return true;
+	}
+	
 }

@@ -57,7 +57,6 @@ automatically download new version: false
 # If you disable this you can still use '/skript update download' to make Skript download the newest version.
 # If you're concerned about changes use '/skript update changes' for a full list of changes since your current version.
 
-
 enable effect commands: false
 effect command token: !
 # If 'enable effect commands' is set to true, chat messages starting with the 'effect command token' will be interpreted as effects and executed.

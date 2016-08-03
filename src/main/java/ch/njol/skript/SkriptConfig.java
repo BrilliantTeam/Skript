@@ -83,6 +83,10 @@ public abstract class SkriptConfig {
 						ct.setNextExecution(t.getTicks_i());
 				}
 			});
+	final static Option<Integer> updaterDownloadTries = new Option<Integer>("updater download tries", 7)
+			.optional(true);
+	final static Option<Boolean> updateToPrereleases = new Option<Boolean>("update to pre-releases", Skript.isPrerelease())
+			.optional(true);
 	final static Option<Boolean> automaticallyDownloadNewVersion = new Option<Boolean>("automatically download new version", false);
 	
 	public final static Option<Boolean> enableEffectCommands = new Option<Boolean>("enable effect commands", false);

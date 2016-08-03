@@ -147,6 +147,7 @@ updater:
 	download error: <red>There was an error downloading the latest version of Skript:<light red> %s
 	downloaded: The latest version of Skript has been downloaded! Restart the server or use /reload to apply the changes.
 	internal error: An internal error occurred while checking for the latest version of Skript. Please refer to the server log for details.
+	custom version: You're currently running custom Skript version. No updates will be automatically installed.
 
 # -- Commands --
 commands:
