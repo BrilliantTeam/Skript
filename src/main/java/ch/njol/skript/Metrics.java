@@ -75,7 +75,7 @@ public class Metrics {
 	private final static String BASE_URL = "http://report.mcstats.org";
 	
 	/**
-	 * The url used to report a server's status
+	 * The url used to report a server's state
 	 */
 	private final static String REPORT_URL = "/plugin/%s";
 	
@@ -319,7 +319,7 @@ public class Metrics {
 	}
 	
 	/**
-	 * Gets the File object of the config file that should be used to store data such as the GUID and opt-out status
+	 * Gets the File object of the config file that should be used to store data such as the GUID and opt-out state
 	 * 
 	 * @return the File object for the config file
 	 */

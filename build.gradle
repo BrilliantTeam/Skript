@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
@@ -43,6 +45,16 @@ configurations.all {
 	resolutionStrategy.dependencySubstitution {
 		substitute module('org.bukkit:bukkit') with module('org.spigotmc:spigot-api:1.10.2-R0.1-SNAPSHOT')
 	}
+}
+
+processResources {
+	filter ReplaceTokens, tokens: [
+		"version" : project.property("version")
+	]
+}
+
+jar {
+	archiveName 'Skript.jar'
 }
 
 configurations {

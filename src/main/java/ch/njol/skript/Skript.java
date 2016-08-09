@@ -65,7 +65,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Metrics.Graph;
 import ch.njol.skript.Metrics.Plotter;
-import ch.njol.skript.LegacyUpdater.UpdateState;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.bukkitutil.Workarounds;
 import ch.njol.skript.classes.ClassInfo;
@@ -294,7 +293,8 @@ public final class Skript extends JavaPlugin implements Listener {
 		SkriptConfig.load();
 		Language.setUseLocal(true);
 		
-		LegacyUpdater.start();
+		if (SkriptConfig.checkForNewVersion.value()) // We only start updater automatically if it was asked
+			Updater.start();
 		
 		Aliases.load();
 		
@@ -492,16 +492,19 @@ public final class Skript extends JavaPlugin implements Listener {
 			public void onJoin(final PlayerJoinEvent e) {
 				if (e.getPlayer().hasPermission("skript.admin")) {
 					new Task(Skript.this, 0) {
+						@SuppressWarnings("incomplete-switch")
 						@Override
 						public void run() {
-							LegacyUpdater.stateLock.readLock().lock();
-							try {
-								final Player p = e.getPlayer();
-								assert p != null;
-								if ((LegacyUpdater.state == UpdateState.CHECKED_FOR_UPDATE || LegacyUpdater.state == UpdateState.DOWNLOAD_ERROR) && LegacyUpdater.latest.get() != null)
-									info(p, "" + LegacyUpdater.m_update_available);
-							} finally {
-								LegacyUpdater.stateLock.readLock().unlock();
+							Player p = e.getPlayer();
+							if (p == null)
+								return;
+							
+							switch (Updater.state) {
+								case UPDATE_AVAILABLE:
+									Skript.info(p, "" + Updater.m_update_available);
+									break;
+								case DOWNLOADED:
+									Skript.info(p, "" + Updater.m_downloaded);
 							}
 						}
 					};

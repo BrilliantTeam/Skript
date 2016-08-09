@@ -39,7 +39,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("PvP")
-@Description("Set the PvP status for a given world.")
+@Description("Set the PvP state for a given world.")
 @Examples({"enable PvP #(current world only)",
 		"disable PvP in all worlds"})
 @Since("1.3.4")

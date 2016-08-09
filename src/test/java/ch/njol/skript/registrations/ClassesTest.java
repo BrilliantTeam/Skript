@@ -78,8 +78,8 @@ public class ClassesTest {
 	@Before
 	public void before() throws Exception {
 		
-		final File dataDir = new File("target/classes/");
-		final File jar = new File("target/", "skript.jar");
+		final File dataDir = new File("build/resources/");
+		final File jar = new File("build/", "skript.jar");
 		assumeTrue(jar.exists());
 		
 		final Logger l = Logger.getLogger(getClass().getCanonicalName());

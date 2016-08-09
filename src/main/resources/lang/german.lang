@@ -1,5 +1,5 @@
 # Default German language file by Peter Güttinger (Njol)
-version: ${project.version}
+version: @version@
 
 # -- General --
 and: und

@@ -39,7 +39,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("op/deop")
-@Description("Grant/revoke a user operator status.")
+@Description("Grant/revoke a user operator state.")
 @Examples({"op the player",
 		"deop all players"})
 @Since("1.0")

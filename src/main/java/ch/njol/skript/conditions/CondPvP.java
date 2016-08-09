@@ -40,7 +40,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("PvP")
-@Description("Checks the PvP status of a world.")
+@Description("Checks the PvP state of a world.")
 @Examples({"PvP is enabled",
 		"PvP is disabled in \"world\""})
 @Since("1.3.4")

@@ -12,8 +12,7 @@ import org.bukkit.util.ChatPaginator.ChatPage;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader.ScriptInfo;
-import ch.njol.skript.LegacyUpdater.UpdateState;
-import ch.njol.skript.LegacyUpdater.VersionInfo;
+import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.command.CommandHelp;
 import ch.njol.skript.localization.ArgsMessage;
@@ -290,123 +289,42 @@ public class SkriptCommand implements CommandExecutor {
 					}
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
-				LegacyUpdater.stateLock.writeLock().lock();
 				try {
-					final UpdateState state = LegacyUpdater.state;
+					final UpdateState state = Updater.state;
 					if (args[1].equals("check")) {
+						Updater.executor.set(sender); // We called it!
 						switch (state) {
 							case NOT_STARTED:
-								LegacyUpdater.check(sender, false, false);
+								Updater.start();
 								break;
-							case CHECK_IN_PROGRESS:
-								Skript.info(sender, "" + LegacyUpdater.m_check_in_progress);
+							case CHECKING:
+								Skript.info(sender, "" + Updater.m_check_in_progress);
 								break;
-							case CHECK_ERROR:
-								LegacyUpdater.check(sender, false, false);
+							case RUNNING_LATEST:
+								Skript.info(sender, "" + Updater.m_running_latest_version);
 								break;
-							case CHECKED_FOR_UPDATE:
-								if (LegacyUpdater.latest.get() == null)
-									Skript.info(sender, Skript.getVersion().isStable() ? "" + LegacyUpdater.m_running_latest_version : "" + LegacyUpdater.m_running_latest_version_beta);
-								else
-									Skript.info(sender, "" + LegacyUpdater.m_update_available);
+							case RUNNING_CUSTOM:
+								Skript.info(sender, "" + Updater.m_custom_version);
 								break;
-							case DOWNLOAD_IN_PROGRESS:
-								Skript.info(sender, "" + LegacyUpdater.m_download_in_progress);
+							case UPDATE_AVAILABLE:
+								Skript.info(sender, "" + Updater.m_update_available);
 								break;
-							case DOWNLOAD_ERROR:
-								Skript.info(sender, "" + LegacyUpdater.m_download_error);
+							case DOWNLOADING:
+								Skript.info(sender, "" + Updater.m_download_in_progress);
 								break;
 							case DOWNLOADED:
-								Skript.info(sender, "" + LegacyUpdater.m_downloaded);
+								Skript.info(sender, "" + Updater.m_downloaded);
 								break;
+							case ERROR:
+								Updater.start(); // Errors messages were sent already, just try again...
 						}
 					} else if (args[1].equalsIgnoreCase("changes")) {
-						if (state == UpdateState.NOT_STARTED) {
-							Skript.info(sender, "" + LegacyUpdater.m_not_started);
-						} else if (state == UpdateState.CHECK_IN_PROGRESS) {
-							Skript.info(sender, "" + LegacyUpdater.m_check_in_progress);
-						} else if (state == UpdateState.CHECK_ERROR) {
-							Skript.info(sender, "" + LegacyUpdater.m_check_error);
-						} else if (LegacyUpdater.latest.get() == null) {
-							Skript.info(sender, Skript.getVersion().isStable() ? "" + LegacyUpdater.m_running_latest_version : "" + LegacyUpdater.m_running_latest_version_beta);
-//						} else if (args.length == 2 && Updater.infos.size() != 1) {
-//							info(sender, "update.changes.multiple versions.title", Updater.infos.size(), Skript.getVersion());
-//							String versions = Updater.infos.get(0).version.toString();
-//							for (int i = Updater.infos.size() - 1; i >= 0; i--)
-//								versions += ", " + Updater.infos.get(i).version.toString();
-//							Skript.message(sender, "  " + versions);
-//							message(sender, "update.changes.multiple versions.footer");
-						} else {
-//							VersionInfo info = null;
-							int pageNum = 1;
-//							if (Updater.infos.size() == 1) {
-//								info = Updater.latest.get();
-							if (args.length >= 3 && args[2].matches("\\d+")) {
-								final String a2 = args[2];
-								assert a2 != null;
-								pageNum = Utils.parseInt(a2); // Eclipse complains about null here, not where args[2] is dereferenced above...
-							}
-//							} else {
-//								final String version = args[2];
-//								for (final VersionInfo i : Updater.infos) {
-//									if (i.version.toString().equals(version)) {
-//										info = i;
-//										break;
-//									}
-//								}
-//								if (info == null) {
-//									error(sender, "update.changes.invalid version", version);
-//									return true;
-//								}
-//								if (args.length >= 4 && args[3].matches("\\d+"))
-//									pageNum = Utils.parseInt(args[3]);
-//							}
-							final StringBuilder changes = new StringBuilder();
-							for (final VersionInfo i : LegacyUpdater.infos) {
-								if (changes.length() != 0)
-									changes.append("\n");
-								changes.append(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(m_changes_title.toString(i.version, i.date)));
-								changes.append("\n");
-								changes.append(i.changelog);
-							}
-							final ChatPage page = ChatPaginator.paginate(changes.toString(), pageNum, ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH, ChatPaginator.OPEN_CHAT_PAGE_HEIGHT - 2);
-							sender.sendMessage(page.getLines());
-							if (pageNum < page.getTotalPages())
-								message(sender, "update.changes.next page", pageNum, page.getTotalPages(), pageNum + 1);
-						}
+						// TODO not supported yet
 					} else if (args[1].equalsIgnoreCase("download")) {
-						switch (state) {
-							case NOT_STARTED:
-								LegacyUpdater.check(sender, true, false);
-								break;
-							case CHECK_IN_PROGRESS:
-								Skript.info(sender, "" + LegacyUpdater.m_check_in_progress);
-								break;
-							case CHECK_ERROR:
-								LegacyUpdater.check(sender, true, false);
-//								info(sender, Language.format("updater.check_error", updater.error));
-								break;
-							case CHECKED_FOR_UPDATE:
-								if (LegacyUpdater.latest.get() == null) {
-									Skript.info(sender, Skript.getVersion().isStable() ? "" + LegacyUpdater.m_running_latest_version : "" + LegacyUpdater.m_running_latest_version_beta);
-								} else {
-									LegacyUpdater.download(sender, false);
-								}
-								break;
-							case DOWNLOAD_IN_PROGRESS:
-								Skript.info(sender, "" + LegacyUpdater.m_download_in_progress);
-								break;
-							case DOWNLOADED:
-								Skript.info(sender, "" + LegacyUpdater.m_downloaded);
-								break;
-							case DOWNLOAD_ERROR:
-//								Skript.info(sender, "" + Updater.m_download_error);
-								LegacyUpdater.download(sender, false);
-								break;
-						}
+						// TODO not supported yet
 					}
 				} finally {
-					LegacyUpdater.stateLock.writeLock().unlock();
+					
 				}
 			} else if (args[0].equalsIgnoreCase("help")) {
 				skriptCommandHelp.showHelp(sender);
