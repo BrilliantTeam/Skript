@@ -56,8 +56,9 @@ import ch.njol.util.coll.CollectionUtils;
 public class EvtClick extends SkriptEvent {
 	
 	// Important: a click on an entity fires both an PlayerInteractEntityEvent and a PlayerInteractEvent
-
 	// TheBukor: It only fires a PlayerInteractEntityEvent in 1.9, I guess.
+	
+	private final static boolean twoHanded = Skript.isRunningMinecraft(1, 9);
 	
 	private final static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
 	
@@ -105,9 +106,9 @@ public class EvtClick extends SkriptEvent {
 		
 		if (e instanceof PlayerInteractEntityEvent) {
 			PlayerInteractEntityEvent clickEvent = ((PlayerInteractEntityEvent) e);
-			if (Skript.isRunningMinecraft(1, 9)) {
-				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
-				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
+			if (twoHanded) {
+				//ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
+				//ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
 				Player player = clickEvent.getPlayer();
 				assert player != null;
@@ -125,9 +126,9 @@ public class EvtClick extends SkriptEvent {
 			block = null;
 		} else if (e instanceof PlayerInteractEvent) {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
-			if (Skript.isRunningMinecraft(1, 9)) {
-				ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
-				ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
+			if (twoHanded) {
+				//ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
+				//ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
 				Player player = clickEvent.getPlayer();
 				assert player != null;
@@ -230,6 +231,7 @@ public class EvtClick extends SkriptEvent {
 			case DIAMOND_SPADE:
 			case SHIELD:
 			case ENDER_PEARL:
+			case MONSTER_EGG:
 				offUsable = true;
 				break;
 				//$CASES-OMITTED$
@@ -264,6 +266,7 @@ public class EvtClick extends SkriptEvent {
 			case DIAMOND_SPADE:
 			case ENDER_PEARL:
 			case EYE_OF_ENDER:
+			case MONSTER_EGG:
 				mainUsable = true;
 				break;
 				//$CASES-OMITTED$
