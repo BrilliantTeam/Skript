@@ -22,6 +22,8 @@
 package ch.njol.skript.util;
 
 import ch.njol.skript.bukkitutil.BiomeMappings;
+import ch.njol.skript.localization.Language;
+
 import org.bukkit.block.Biome;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -41,7 +43,7 @@ public abstract class BiomeUtils {
 	}
 	
 	public final static String getAllNames() {
-		return BiomeMappings.getAllNames();
+		return Language.getSpaced("biomes");
 	}
 	
 }
