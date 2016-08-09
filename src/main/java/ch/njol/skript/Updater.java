@@ -216,9 +216,10 @@ public class Updater {
 				state = UpdateState.RUNNING_CUSTOM;
 				return false;
 			}
-			if (update == null)
+			if (update == null) {
+				state = UpdateState.ERROR;
 				return false;
-			if (update != current) {
+			} if (update != current) {
 				latest.set(update);
 				infos.clear();
 				infos.addAll(releases);
@@ -270,12 +271,11 @@ public class Updater {
 			List<ResponseEntry> entries = deserialize(response);
 			
 			if (performUpdate(entries)) { // Check if we're running latest release...
+				state = UpdateState.UPDATE_AVAILABLE;
+				infos.addAll(entries);
+				latest.set(entries.get(0));
 				if (SkriptConfig.automaticallyDownloadNewVersion.value()) {
 					// TODO automatic downloading
-				} else {
-					state = UpdateState.UPDATE_AVAILABLE;
-					infos.addAll(entries);
-					latest.set(entries.get(0));
 				}
 			} else {
 				switch (state) {
@@ -287,7 +287,8 @@ public class Updater {
 						break;
 						//$CASES-OMITTED$
 					default:
-						Skript.info(sender, "" + m_internal_error); // This should never happen...
+						Skript.error(sender, "" + m_internal_error);
+						Thread.dumpStack();
 				}
 			}
 		}
