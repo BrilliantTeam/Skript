@@ -135,6 +135,11 @@ public class Updater {
 	    
 	    public List<AssetsEntry> assets;
 	    public String body; // Description of release
+	    
+	    @Override
+	    public String toString() {
+	    	return tag_name;
+	    }
 	}
 	
 	@SuppressWarnings("null")
@@ -186,6 +191,7 @@ public class Updater {
 		private CommandSender sender;
 		
 		public String tryLoadReleases(URL url) throws IOException, SocketTimeoutException {
+			Skript.debug("Trying to load releases from " + url + "...");
 			Scanner scan = null;
 			try {
 				scan = new Scanner(url.openStream(), "UTF-8");
@@ -194,6 +200,7 @@ public class Updater {
 					throw new IOException("Null output from scanner!");
 				return out;
 			} finally {
+				Skript.debug("Closing scanner NOW!");
 				if (scan != null)
 					scan.close();
 			}
@@ -205,29 +212,26 @@ public class Updater {
 			boolean allowPrereleases = SkriptConfig.updateToPrereleases.value();
 			ResponseEntry update = null;
 			for (ResponseEntry release : releases) {
-				if (current != null) {
-					if (allowPrereleases || !release.prerelease)
-						update = release;
-				} else if (ver.endsWith(release.tag_name)) {
+				if (ver.endsWith(release.tag_name)) {
 					current = release;
+					break;
 				}
+				if (update == null && (allowPrereleases || !release.prerelease))
+					update = release; // If update is not found and pre-release rules are matched: set update
 			}
 			if (current == null) { // Non-baseline version. Fail gracefully!
 				state = UpdateState.RUNNING_CUSTOM;
 				return false;
 			}
-			if (update == null) {
-				state = UpdateState.ERROR;
+			if (update == null) { // No update available
+				state = UpdateState.RUNNING_LATEST;
 				return false;
-			} if (update != current) {
-				latest.set(update);
-				infos.clear();
-				infos.addAll(releases);
-				return true;
 			}
 			
-			state = UpdateState.RUNNING_LATEST;
-			return false;
+			latest.set(update);
+			infos.clear();
+			infos.addAll(releases);
+			return true;
 		}
 		
 		@Override
@@ -252,6 +256,7 @@ public class Updater {
 				try {
 					response = tryLoadReleases(url);
 				} catch (SocketTimeoutException e) {
+					Skript.debug("Socket timeout in updater, but we can probably try again!");
 					// Do nothing here, we'll just try again...
 				} catch (IOException e) {
 					error.set(ExceptionUtils.toString(e));
@@ -274,6 +279,8 @@ public class Updater {
 				state = UpdateState.UPDATE_AVAILABLE;
 				infos.addAll(entries);
 				latest.set(entries.get(0));
+				
+				Skript.info(sender, "" + m_update_available);
 				if (SkriptConfig.automaticallyDownloadNewVersion.value()) {
 					// TODO automatic downloading
 				}
