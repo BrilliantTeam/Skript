@@ -615,6 +615,13 @@ public final class BukkitEventValues {
 					return e.getEntity().getWorld();
 				}
 			}, 0);
+			EventValues.registerEventValue(HangingEvent.class, Location.class, new Getter<Location, HangingEvent>() {
+				@Override
+				@Nullable
+				public Location get(final HangingEvent e) {
+					return e.getEntity().getLocation();
+				}
+			}, 0);
 			// HangingPlaceEvent
 			EventValues.registerEventValue(HangingPlaceEvent.class, Player.class, new Getter<Player, HangingPlaceEvent>() {
 				@Override
