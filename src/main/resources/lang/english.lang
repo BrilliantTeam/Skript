@@ -259,7 +259,9 @@ potions:
 	absorption: absorption
 	saturation: saturation
 	luck: luck
+	unluck: bad luck, unluck
 	levitation: levitation, floating
+	glowing: glowing
 
 # -- Weather --
 weather:
