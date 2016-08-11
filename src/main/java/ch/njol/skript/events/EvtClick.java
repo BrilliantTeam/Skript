@@ -30,6 +30,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -63,7 +65,10 @@ public class EvtClick extends SkriptEvent {
 	private final static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
 	
 	static {
-		Skript.registerEvent("Click", EvtClick.class, CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class),
+		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class);
+		if (Skript.classExists("org.bukkit.event.player.PlayerInteractAtEvent"))
+			eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class, PlayerArmorStandManipulateEvent.class);
+		Skript.registerEvent("Click", EvtClick.class, eventTypes,
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] [on %-entitydata/itemtype%] [(with|using|holding) %itemtype%]",
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] (with|using|holding) %itemtype% on %entitydata/itemtype%")
 				.description("Called when a user clicks on a block, an entity or air with or without an item in their hand.",
@@ -122,7 +127,7 @@ public class EvtClick extends SkriptEvent {
 			
 			if (click == LEFT || types == null) // types == null  will be handled by the PlayerInteractEvent that is fired as well
 				return false;
-			entity = ((PlayerInteractEntityEvent) e).getRightClicked();
+			entity = clickEvent.getRightClicked();
 			block = null;
 		} else if (e instanceof PlayerInteractEvent) {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
@@ -343,8 +348,8 @@ public class EvtClick extends SkriptEvent {
 		}
 		
 		boolean isSneaking = player.isSneaking();
-		boolean blockInMain = mainHand.getType().isBlock() && mainHand.getType() != Material.AIR;
-		boolean blockInOff = offHand.getType().isBlock() && offHand.getType() != Material.AIR;
+		//boolean blockInMain = mainHand.getType().isBlock() && mainHand.getType() != Material.AIR;
+		//boolean blockInOff = offHand.getType().isBlock() && offHand.getType() != Material.AIR;
 		
 		if (blockUsable) { // Special behavior
 			if (isSneaking) {
