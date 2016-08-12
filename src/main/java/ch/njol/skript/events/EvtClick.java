@@ -30,7 +30,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -66,8 +65,6 @@ public class EvtClick extends SkriptEvent {
 	
 	static {
 		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class);
-		if (Skript.classExists("org.bukkit.event.player.PlayerInteractAtEvent"))
-			eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class, PlayerArmorStandManipulateEvent.class);
 		Skript.registerEvent("Click", EvtClick.class, eventTypes,
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] [on %-entitydata/itemtype%] [(with|using|holding) %itemtype%]",
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] (with|using|holding) %itemtype% on %entitydata/itemtype%")

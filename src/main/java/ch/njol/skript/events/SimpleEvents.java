@@ -47,6 +47,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -85,6 +86,7 @@ import org.spigotmc.event.entity.EntityMountEvent;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.util.SimpleEvent;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * @author Peter Güttinger
@@ -365,6 +367,9 @@ public class SimpleEvents {
 				.description("Called when a world is unloaded. This event might never be called if you don't have a world management plugin.")
 				.examples("")
 				.since("1.0");
-		
+		Skript.registerEvent("Armor Stand Manipulation", SimpleEvent.class, PlayerArmorStandManipulateEvent.class, "armor stand manipulat(e|ion)")
+				.description("Called when player tries to edit contents of the armor stand. Usually this happens by clicking it.")
+				.examples("on armor stand manipulation")
+				.since("2.2-dev19");
 	}
 }
