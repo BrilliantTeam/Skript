@@ -482,6 +482,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		enchs.put(e, level);
 	}
 	
+	@SuppressWarnings("null") // New Eclipse didn't like this, even if it IS very safe
 	public void addEnchantments(final Map<Enchantment, Integer> enchantments) {
 		if (this.enchantments == null)
 			this.enchantments = new HashMap<Enchantment, Integer>(enchantments);

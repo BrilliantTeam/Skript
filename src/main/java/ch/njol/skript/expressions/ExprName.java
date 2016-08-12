@@ -158,7 +158,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 					return;
 				if (o instanceof Player) {
 					try {
-						((Player) o).setPlayerListName(s == null ? "" : s.length() > 16 ? s.substring(0, 16) : s);
+						((Player) o).setPlayerListName(s == null ? "" : s);
 					} catch (final IllegalArgumentException e) {}
 				} else {
 					assert false;

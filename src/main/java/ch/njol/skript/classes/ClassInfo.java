@@ -118,6 +118,7 @@ public class ClassInfo<T> implements Debuggable {
 		assert this.userInputPatterns == null;
 		this.userInputPatterns = new Pattern[userInputPatterns.length];
 		for (int i = 0; i < userInputPatterns.length; i++) {
+			assert this.userInputPatterns != null;
 			this.userInputPatterns[i] = Pattern.compile(userInputPatterns[i]);
 		}
 		return this;
