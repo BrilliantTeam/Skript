@@ -213,6 +213,7 @@ public class Updater {
 			ResponseEntry update = null;
 			for (ResponseEntry release : releases) {
 				if (ver.endsWith(release.tag_name)) {
+					Skript.debug("Found current release: " + release);
 					current = release;
 					break;
 				}

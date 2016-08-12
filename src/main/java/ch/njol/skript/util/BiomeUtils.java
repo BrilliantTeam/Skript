@@ -42,8 +42,9 @@ public abstract class BiomeUtils {
 		return BiomeMappings.toString(b, flags);
 	}
 	
-	public final static String getAllNames() {
-		return Language.getSpaced("biomes");
+	public final static String getAllNames() { // This is hack for class loading order...
+		return "Biome names; you can use F3 ingame";
+		//return BiomeMappings.getAllNames();
 	}
 	
 }

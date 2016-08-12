@@ -232,6 +232,7 @@ enchantments:
 		unknown_enchant_8: Depth Strider
 		depth_strider: Depth Strider
 		mending: Mending
+		frost_walker: Frost Walker
 
 # -- Potion Effects --
 potions:
@@ -810,6 +811,12 @@ entities:
 	stray:
 		name: stray¦s
 		pattern: stray(|1¦s)
+	golem:
+		name: golem¦s
+		pattern: golem(|1¦s)
+	monster:
+		name: monster¦s
+		pattern: monster(|1¦s)
 
 # -- Damage Causes --
 damage causes:
@@ -834,6 +841,9 @@ damage causes:
 	falling_block: falling block, a falling block
 	suicide: suicide
 	thorns: thorns
+	dragon_breath: dragon's breath, dragonfire
+	fly_into_wall: hitting wall while flying, flying into a wall
+	hot_floor: magma, hot floor
 	custom: unknown, custom, plugin, a plugin
 
 # -- Game Modes --
