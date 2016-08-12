@@ -54,6 +54,7 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -367,7 +368,7 @@ public class SimpleEvents {
 				.description("Called when a world is unloaded. This event might never be called if you don't have a world management plugin.")
 				.examples("")
 				.since("1.0");
-		Skript.registerEvent("Armor Stand Manipulation", SimpleEvent.class, PlayerArmorStandManipulateEvent.class, "armor stand manipulat(e|ion)")
+		Skript.registerEvent("Armor Stand Manipulation", SimpleEvent.class, PlayerInteractAtEntityEvent.class, "armor stand manipulat(e|ion)")
 				.description("Called when player tries to edit contents of the armor stand. Usually this happens by clicking it.")
 				.examples("on armor stand manipulation")
 				.since("2.2-dev19");
