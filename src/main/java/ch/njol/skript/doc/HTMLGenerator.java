@@ -36,8 +36,13 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.classes.ClassInfo;
+import ch.njol.skript.lang.Condition;
+import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.ExpressionInfo;
+import ch.njol.skript.lang.SkriptEventInfo;
 import ch.njol.skript.lang.SyntaxElementInfo;
+import ch.njol.skript.registrations.Classes;
 
 /**
  * Generates HTML based Skript documentation.
@@ -56,7 +61,7 @@ public class HTMLGenerator {
 		this.skeleton = readFile(new File(template + "/template.html")); // Skeleton which contains every other page
 	}
 	
-	void generate() {
+	public void generate() {
 		for (File f : template.listFiles()) {
 			if (f.getName() == "template.html" || !f.getName().endsWith(".html") || f.isDirectory())
 				continue; // Ignore skeleton, README and directories
@@ -81,8 +86,8 @@ public class HTMLGenerator {
 				page = page.replace("${include " + name + "}", temp);
 			}
 			
-			int generate = page.indexOf("${generate"); // Generate expressions etc. TODO
-			if (generate != -1) {
+			int generate = page.indexOf("${generate"); // Generate expressions etc.
+			while (generate != -1) {
 				int nextBracket = page.indexOf("}", generate);
 				String[] genParams = page.substring(generate + 11, nextBracket).split(" ");
 				String generated = "";
@@ -93,14 +98,49 @@ public class HTMLGenerator {
 					Iterator<ExpressionInfo<?,?>> it = Skript.getExpressions();
 					while (it.hasNext()) {
 						ExpressionInfo<?,?> info = it.next();
-						String desc = generateElement(descTemp, info);
+						assert info != null;
+						String desc = generateAnnotated(descTemp, info);
+						generated += desc;
+					}
+				} else if (genType == "effects") {
+					for (SyntaxElementInfo<? extends Effect> info : Skript.getEffects()) {
+						assert info != null;
+						generated += generateAnnotated(descTemp, info);
+					}
+				} else if (genType == "conditions") {
+					for (SyntaxElementInfo<? extends Condition> info : Skript.getConditions()) {
+						assert info != null;
+						generated += generateAnnotated(descTemp, info);
+					}
+				} else if (genType == "events") {
+					for (SkriptEventInfo<?> info : Skript.getEvents()) {
+						assert info != null;
+						generated += generateEvent(descTemp, info);
+					}
+				} else if (genType == "classes") {
+					for (ClassInfo<?> info : Classes.getClassInfos()) {
+						assert info != null;
+						generated += generateClass(descTemp, info);
 					}
 				}
+				
+				page = page.replace(page.substring(generate, nextBracket), generated);
+				
+				generate = page.indexOf("${generate", nextBracket);
 			}
+			
+			writeFile(new File(output + "/" + f.getName()), page);
 		}
 	}
 	
-	String generateElement(String descTemp, SyntaxElementInfo<?> info) {
+	/**
+	 * Generates documentation entry for a type which is documented using
+	 * annotations. This means expressions, effects and conditions.
+	 * @param descTemp Template for description.
+	 * @param info Syntax element info.
+	 * @return Generated HTML entry.
+	 */
+	String generateAnnotated(String descTemp, SyntaxElementInfo<?> info) {
 		String desc = descTemp.replace("${element.name}", info.c.getAnnotation(Name.class).value());
 		desc = desc.replace("${element.since}", info.c.getAnnotation(Since.class).value());
 		desc = desc.replace("${element.desc}", Joiner.on("\n").join(info.c.getAnnotation(Description.class).value()));
@@ -126,7 +166,74 @@ public class HTMLGenerator {
 				patterns += parsed;
 			}
 			
-			desc.replace("${generate element.patterns " + split[1], patterns);
+			desc.replace("${generate element.patterns " + split[1] + "}", patterns);
+		}
+		
+		return desc;
+	}
+	
+	String generateEvent(String descTemp, SkriptEventInfo<?> info) {
+		String desc = descTemp.replace("${element.name}", info.getName());
+		desc = desc.replace("${element.since}", info.getSince());
+		desc = desc.replace("${element.desc}", Joiner.on("\n").join(info.getDescription()));
+		desc = desc.replace("${element.examples}", Joiner.on("\n").join(info.getExamples()));
+		
+		List<String> toGen = Lists.newArrayList();
+		int generate = desc.indexOf("${generate");
+		while (generate != -1) {
+			int nextBracket = desc.indexOf("}", generate);
+			String data = desc.substring(generate + 11, nextBracket);
+			toGen.add(data);
+			
+			generate = desc.indexOf("${generate", nextBracket);
+		}
+		
+		// Assume element.pattern generate; TODO
+		for (String data : toGen) {
+			String[] split = data.split(" ");
+			String pattern = readFile(new File(template + "/template/" + split[1]));
+			String patterns = "";
+			for (String line : info.patterns) {
+				String parsed = pattern.replace("${element.pattern}", line);
+				patterns += parsed;
+			}
+			
+			desc.replace("${generate element.patterns " + split[1] + "}", patterns);
+		}
+		
+		return desc;
+	}
+	
+	String generateClass(String descTemp, ClassInfo<?> info) {
+		String desc = descTemp.replace("${element.name}", info.getDocName());
+		desc = desc.replace("${element.since}", info.getSince());
+		desc = desc.replace("${element.desc}", Joiner.on("\n").join(info.getDescription()));
+		desc = desc.replace("${element.examples}", Joiner.on("\n").join(info.getExamples()));
+		
+		List<String> toGen = Lists.newArrayList();
+		int generate = desc.indexOf("${generate");
+		while (generate != -1) {
+			int nextBracket = desc.indexOf("}", generate);
+			String data = desc.substring(generate + 11, nextBracket);
+			toGen.add(data);
+			
+			generate = desc.indexOf("${generate", nextBracket);
+		}
+		
+		// Assume element.pattern generate; TODO
+		for (String data : toGen) {
+			String[] split = data.split(" ");
+			String pattern = readFile(new File(template + "/template/" + split[1]));
+			String patterns = "";
+			String[] lines = info.getUsage();
+			if (lines == null)
+				continue;
+			for (String line : lines) {
+				String parsed = pattern.replace("${element.pattern}", line);
+				patterns += parsed;
+			}
+			
+			desc.replace("${generate element.patterns " + split[1] + "}", patterns);
 		}
 		
 		return desc;

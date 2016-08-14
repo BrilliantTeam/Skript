@@ -15,6 +15,7 @@ import ch.njol.skript.ScriptLoader.ScriptInfo;
 import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.command.CommandHelp;
+import ch.njol.skript.doc.HTMLGenerator;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.PluralizingArgsMessage;
@@ -338,6 +339,18 @@ public class SkriptCommand implements CommandExecutor {
 					Timings.clear();
 					Skript.adminBroadcast(Language.get("timings.stop message"));
 				}
+			} else if (args[0].equalsIgnoreCase("gen-docs")) {
+				File templateDir = new File(Skript.getInstance().getDataFolder() + "/doc-templates");
+				if (!templateDir.exists()) {
+					Skript.info(sender, "Documentation templates not found. Cannot generate docs!");
+					return true;
+				}
+				File outputDir = new File(Skript.getInstance().getDataFolder() + "/docs");
+				outputDir.mkdirs();
+				HTMLGenerator generator = new HTMLGenerator(templateDir, outputDir);
+				Skript.info(sender, "Generating docs...");
+				generator.generate(); // Try to generate docs... hopefully
+				Skript.info(sender, "Documentation generated!");
 			}
 		} catch (final Exception e) {
 			Skript.exception(e, "Exception occurred in Skript's main command", "Used command: /" + label + " " + StringUtils.join(args, " "));
