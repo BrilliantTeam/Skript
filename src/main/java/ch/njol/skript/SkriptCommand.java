@@ -85,6 +85,12 @@ public class SkriptCommand implements CommandExecutor {
 					.add("stop")
 			).add("help");
 	
+	static {
+		if (new File(Skript.getInstance().getDataFolder() + "/doc-templates").exists()) {
+			skriptCommandHelp.add("gen-docs");
+		}
+	}
+	
 	private final static ArgsMessage m_reloading = new ArgsMessage(NODE + ".reload.reloading");
 	
 	private final static void reloading(final CommandSender sender, String what, final Object... args) {
@@ -340,7 +346,7 @@ public class SkriptCommand implements CommandExecutor {
 					Skript.adminBroadcast(Language.get("timings.stop message"));
 				}
 			} else if (args[0].equalsIgnoreCase("gen-docs")) {
-				File templateDir = new File(Skript.getInstance().getDataFolder() + "/doc-templates");
+				File templateDir = new File(Skript.getInstance().getDataFolder() + "/doc-templates/");
 				if (!templateDir.exists()) {
 					Skript.info(sender, "Documentation templates not found. Cannot generate docs!");
 					return true;

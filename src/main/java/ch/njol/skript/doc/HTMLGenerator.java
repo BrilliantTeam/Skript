@@ -62,9 +62,19 @@ public class HTMLGenerator {
 	}
 	
 	public void generate() {
-		for (File f : template.listFiles()) {
-			if (f.getName() == "template.html" || !f.getName().endsWith(".html") || f.isDirectory())
-				continue; // Ignore skeleton, README and directories
+		for (File f : template.listFiles()) {			
+			if (f.getName().equals("css")) { // Copy CSS files
+				File cssTo = new File(output + "/css");
+				cssTo.mkdirs();
+				for (File css : new File(template + "/css").listFiles()) {
+					writeFile(new File(cssTo + "/" + css.getName()), readFile(css));
+				}
+				continue;
+			} else if (f.isDirectory()) // Ignore other directories
+				continue;
+			if (f.getName().endsWith("template.html") || !f.getName().endsWith(".html"))
+				continue; // Ignore skeleton and README
+			Skript.info("Creating documentation for " + f.getName());
 			
 			String content = readFile(f);
 			String page = skeleton.replace("${content}", content); // Content to inside skeleton
@@ -82,7 +92,7 @@ public class HTMLGenerator {
 			}
 			
 			for (String name : replace) {
-				String temp = readFile(new File(template + "/template/" + name));
+				String temp = readFile(new File(template + "/templates/" + name));
 				page = page.replace("${include " + name + "}", temp);
 			}
 			
@@ -92,39 +102,47 @@ public class HTMLGenerator {
 				String[] genParams = page.substring(generate + 11, nextBracket).split(" ");
 				String generated = "";
 				
-				String descTemp = readFile(new File(template + "/template/" + genParams[1]));
+				String descTemp = readFile(new File(template + "/templates/" + genParams[1]));
 				String genType = genParams[0];
-				if (genType == "expressions") {
+				if (genType.equals("expressions")) {
 					Iterator<ExpressionInfo<?,?>> it = Skript.getExpressions();
 					while (it.hasNext()) {
 						ExpressionInfo<?,?> info = it.next();
 						assert info != null;
+						if (info.c.getAnnotation(NoDoc.class) != null)
+							continue;
 						String desc = generateAnnotated(descTemp, info);
 						generated += desc;
 					}
-				} else if (genType == "effects") {
+				} else if (genType.equals("effects")) {
 					for (SyntaxElementInfo<? extends Effect> info : Skript.getEffects()) {
 						assert info != null;
+						if (info.c.getAnnotation(NoDoc.class) != null)
+							continue;
 						generated += generateAnnotated(descTemp, info);
 					}
-				} else if (genType == "conditions") {
+				} else if (genType.equals("conditions")) {
 					for (SyntaxElementInfo<? extends Condition> info : Skript.getConditions()) {
 						assert info != null;
+						if (info.c.getAnnotation(NoDoc.class) != null)
+							continue;
 						generated += generateAnnotated(descTemp, info);
 					}
-				} else if (genType == "events") {
+				} else if (genType.equals("events")) {
 					for (SkriptEventInfo<?> info : Skript.getEvents()) {
 						assert info != null;
+						if (info.c.getAnnotation(NoDoc.class) != null)
+							continue;
 						generated += generateEvent(descTemp, info);
 					}
-				} else if (genType == "classes") {
+				} else if (genType.equals("classes")) {
 					for (ClassInfo<?> info : Classes.getClassInfos()) {
 						assert info != null;
 						generated += generateClass(descTemp, info);
 					}
 				}
 				
-				page = page.replace(page.substring(generate, nextBracket), generated);
+				page = page.replace(page.substring(generate, nextBracket + 1), generated);
 				
 				generate = page.indexOf("${generate", nextBracket);
 			}
@@ -141,17 +159,30 @@ public class HTMLGenerator {
 	 * @return Generated HTML entry.
 	 */
 	String generateAnnotated(String descTemp, SyntaxElementInfo<?> info) {
-		String desc = descTemp.replace("${element.name}", info.c.getAnnotation(Name.class).value());
-		desc = desc.replace("${element.since}", info.c.getAnnotation(Since.class).value());
-		desc = desc.replace("${element.desc}", Joiner.on("\n").join(info.c.getAnnotation(Description.class).value()));
-		desc = desc.replace("${element.examples}", Joiner.on("\n").join(info.c.getAnnotation(Examples.class).value()));
+		Class<?> c = info.c;
+		String desc = "";
+		
+		Name name = c.getAnnotation(Name.class);
+		if (name != null)
+			desc = descTemp.replace("${element.name}", name.value());
+		Since since = c.getAnnotation(Since.class);
+		if (since != null)
+			desc = desc.replace("${element.since}", since.value());
+		Description description = c.getAnnotation(Description.class);
+		if (description != null)
+			desc = desc.replace("${element.desc}", Joiner.on("\n").join(description.value()));
+		Examples examples = c.getAnnotation(Examples.class);
+		if (examples != null)
+			desc = desc.replace("${element.examples}", Joiner.on("\n<br>").join(examples.value()));
 		
 		List<String> toGen = Lists.newArrayList();
 		int generate = desc.indexOf("${generate");
 		while (generate != -1) {
+			//Skript.info("Found generate!");
 			int nextBracket = desc.indexOf("}", generate);
 			String data = desc.substring(generate + 11, nextBracket);
 			toGen.add(data);
+			//Skript.info("Added " + data);
 			
 			generate = desc.indexOf("${generate", nextBracket);
 		}
@@ -159,24 +190,37 @@ public class HTMLGenerator {
 		// Assume element.pattern generate; TODO
 		for (String data : toGen) {
 			String[] split = data.split(" ");
-			String pattern = readFile(new File(template + "/template/" + split[1]));
+			String pattern = readFile(new File(template + "/templates/" + split[1]));
+			//Skript.info("Pattern is " + pattern);
 			String patterns = "";
 			for (String line : info.patterns) {
 				String parsed = pattern.replace("${element.pattern}", line);
+				//Skript.info("parsed is " + parsed);
 				patterns += parsed;
 			}
 			
-			desc.replace("${generate element.patterns " + split[1] + "}", patterns);
+			String toReplace = "${generate element.patterns " + split[1] + "}";
+			//Skript.info("toReplace " + toReplace);
+			desc = desc.replace(toReplace, patterns);
 		}
 		
 		return desc;
 	}
 	
 	String generateEvent(String descTemp, SkriptEventInfo<?> info) {
-		String desc = descTemp.replace("${element.name}", info.getName());
-		desc = desc.replace("${element.since}", info.getSince());
-		desc = desc.replace("${element.desc}", Joiner.on("\n").join(info.getDescription()));
-		desc = desc.replace("${element.examples}", Joiner.on("\n").join(info.getExamples()));
+		String desc = "";
+		
+		String docName = info.getName();
+		desc = descTemp.replace("${element.name}", docName);
+		String since = info.getSince();
+		if (since != null)
+			desc = desc.replace("${element.since}", since);
+		String[] description = info.getDescription();
+		if (description != null)
+			desc = desc.replace("${element.desc}", Joiner.on("\n").join(description));
+		String[] examples = info.getExamples();
+		if (examples != null)
+			desc = desc.replace("${element.examples}", Joiner.on("\n<br>").join(examples));
 		
 		List<String> toGen = Lists.newArrayList();
 		int generate = desc.indexOf("${generate");
@@ -191,24 +235,34 @@ public class HTMLGenerator {
 		// Assume element.pattern generate; TODO
 		for (String data : toGen) {
 			String[] split = data.split(" ");
-			String pattern = readFile(new File(template + "/template/" + split[1]));
+			String pattern = readFile(new File(template + "/templates/" + split[1]));
 			String patterns = "";
 			for (String line : info.patterns) {
 				String parsed = pattern.replace("${element.pattern}", line);
 				patterns += parsed;
 			}
 			
-			desc.replace("${generate element.patterns " + split[1] + "}", patterns);
+			desc = desc.replace("${generate element.patterns " + split[1] + "}", patterns);
 		}
 		
 		return desc;
 	}
 	
 	String generateClass(String descTemp, ClassInfo<?> info) {
-		String desc = descTemp.replace("${element.name}", info.getDocName());
-		desc = desc.replace("${element.since}", info.getSince());
-		desc = desc.replace("${element.desc}", Joiner.on("\n").join(info.getDescription()));
-		desc = desc.replace("${element.examples}", Joiner.on("\n").join(info.getExamples()));
+		String desc = "";
+		
+		String docName = info.getDocName();
+		if (docName != null)
+			desc = descTemp.replace("${element.name}", docName);
+		String since = info.getSince();
+		if (since != null)
+			desc = desc.replace("${element.since}", since);
+		String[] description = info.getDescription();
+		if (description != null)
+			desc = desc.replace("${element.desc}", Joiner.on("\n").join(description));
+		String[] examples = info.getExamples();
+		if (examples != null)
+			desc = desc.replace("${element.examples}", Joiner.on("\n<br>").join(examples));
 		
 		List<String> toGen = Lists.newArrayList();
 		int generate = desc.indexOf("${generate");
@@ -223,7 +277,7 @@ public class HTMLGenerator {
 		// Assume element.pattern generate; TODO
 		for (String data : toGen) {
 			String[] split = data.split(" ");
-			String pattern = readFile(new File(template + "/template/" + split[1]));
+			String pattern = readFile(new File(template + "/templates/" + split[1]));
 			String patterns = "";
 			String[] lines = info.getUsage();
 			if (lines == null)
@@ -233,7 +287,7 @@ public class HTMLGenerator {
 				patterns += parsed;
 			}
 			
-			desc.replace("${generate element.patterns " + split[1] + "}", patterns);
+			desc = desc.replace("${generate element.patterns " + split[1] + "}", patterns);
 		}
 		
 		return desc;
