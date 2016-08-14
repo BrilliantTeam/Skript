@@ -202,6 +202,12 @@ public abstract class HealthUtils {
 		return 0;
 	}
 	
+	public final static double getFinalDamage(final EntityDamageEvent e) {
+		if (supportsDoubles)
+			return e.getFinalDamage() / 2;
+		return 0;
+	}
+	
 	public final static void setDamage(final EntityDamageEvent e, final double damage) {
 		if (supportsDoubles) {
 			e.setDamage(damage * 2);
