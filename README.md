@@ -41,6 +41,19 @@ On Windows environment, replace `./gradlew` with `gradlew.bat`.
 You can get source code from the releases page. You may also clone this
 repository, but that code might or might not be stable.
 
+### Importing to Eclipse
+With new Eclipse versions, there is integrated Gradle support. However, current release version 
+(included with Eclipse Neon) does not correctly import settings for Skript project. You will need 
+to use STS Gradle plugin, which can be found from Eclipse Marketplace.
+
+If you just intend to compile Skript, you do not need to import it to Eclipse. Using Gradle from 
+command line as instructed above works. However, if you use Eclipse's default Gradle importer, 
+it will mess with compiler settings.
+
+### Importing to IDEA
+Skript IDEA support is not reliable, and even more less so after switching from Maven to Gradle.
+If you have idea how to fix it, please open issue or pull request.
+
 ## Contributing
 So, you want to contribute to Skript? You need to:
 * Have some skills in Java (unless said otherwise)
