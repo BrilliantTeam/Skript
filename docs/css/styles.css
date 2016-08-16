@@ -33,7 +33,27 @@
 
 body {
   font-family:sans-serif;
-  padding: 5px;
+  padding: 0px;
+  margin: 0px;
+}
+
+#global-navigation{
+  background-color: #5BC7F9;
+  padding: 10px;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+#global-navigation a{
+  color: #000000;
+  padding: 10px;
+  display: inline-block;
+}
+
+#global-navigation a:hover,
+#global-navigation a:hover:active{
+  background-color: white;
+  border-radius: 5px;
 }
 
 nav{
@@ -41,7 +61,7 @@ nav{
   background-color: #e6f7ff;
   padding:10px;
   margin-top: 0px;
-  
+
 }
 
 #nav-title{
@@ -102,7 +122,7 @@ td li{
 }
 
 .item-description{
-  
+
 }
 
 a{
