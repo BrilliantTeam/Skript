@@ -140,6 +140,8 @@ public class HTMLGenerator {
 					}
 				} else if (genType.equals("classes")) {
 					for (ClassInfo<?> info : Classes.getClassInfos()) {
+						if (ClassInfo.NO_DOC.equals(info.getDocName()))
+							continue;
 						assert info != null;
 						generated += generateClass(descTemp, info);
 					}

@@ -9,8 +9,8 @@ Njol's Skript. It is supported for **Spigot** (not Bukkit) versions for
 Minecraft 1.9-1.10. Other versions might work, but no guarantees.
 
 ## Documentation
-We have new Skript documentation coming soon. It is not up yet, but in few days
-or weeks, it will!
+Documentation is available [here](http://bensku.github.io/Skript/) for latest
+version of Skript.
 
 ## Reporting Issues
 You should use Github [issue tracker](https://github.com/bensku/Skript/issues)
