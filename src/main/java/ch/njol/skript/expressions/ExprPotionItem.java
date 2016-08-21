@@ -31,6 +31,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -42,6 +46,10 @@ import ch.njol.util.Kleenean;
  * Simple interface for creating vanilla potions (if supported by server).
  * @author bensku
  */
+@Name("Potion (item)")
+@Description("Potion in item form, with advanced parameters.")
+@Examples("strong splash potion of instant damage")
+@Since("unknown (2.2)")
 public class ExprPotionItem extends SimpleExpression<ItemType> {
 	
 	public static final String POTION_MODS = "[(0¦(regular|normal)|1¦(strong|upgraded|level 2)|2¦(extended|long)) ][(20¦(splash|exploding)|40¦lingering) ]";

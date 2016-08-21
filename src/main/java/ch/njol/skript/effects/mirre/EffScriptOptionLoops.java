@@ -26,6 +26,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.events.bukkit.ScriptEvent;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
@@ -34,10 +38,11 @@ import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.util.ScriptOptions;
 import ch.njol.util.Kleenean;
 
-/**
- * @author Peter Güttinger
- *
- */
+@Name("Loop Version")
+@Description("Changes loops to emulate given Skript version's behaviour.")
+@Examples({"use old loops",
+		"use new loops"})
+@Since("unknown (2.2)")
 public class EffScriptOptionLoops extends Effect {
 
 	//use (1¦old|2¦new|1¦2.1.2|2¦2.2) loops

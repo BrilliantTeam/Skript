@@ -32,6 +32,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
@@ -41,6 +45,10 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.PotionEffectUtils;
 import ch.njol.util.Kleenean;
 
+@Name("Raw Name")
+@Description("Raw Minecraft material name for given item. Note that this is not guaranteed to give same results on all servers.")
+@Examples("raw name of tool of player")
+@Since("unknown (2.2)")
 public class ExprRawName extends SimpleExpression<String> {
 	
 	static {

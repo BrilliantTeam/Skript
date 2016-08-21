@@ -31,6 +31,11 @@ import org.bukkit.inventory.PlayerInventory;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.NoDoc;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.effects.Delay;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.util.EquipmentSlot;
@@ -38,11 +43,7 @@ import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.InventorySlot;
 import ch.njol.skript.util.Slot;
 
-/**
- * Offhand tool expression for Minecraft 1.9.
- * @author bensku
- *
- */
+@NoDoc
 public class ExprOffTool extends ExprTool {
 	static {
 		if (Skript.isRunningMinecraft(1, 9)) {
