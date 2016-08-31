@@ -53,8 +53,8 @@ import ch.njol.util.StringUtils;
 public class EffReplace extends Effect {
 	static {
 		Skript.registerEffect(EffReplace.class,
-				"replace (all|every|) %strings% in %string% with %string%",
-				"replace (all|every|) %strings% with %string% in %string%");
+				"replace (all|every|) %strings% in %string% with %strings%",
+				"replace (all|every|) %strings% with %string% in %strings%");
 	}
 	
 	@SuppressWarnings("null")
