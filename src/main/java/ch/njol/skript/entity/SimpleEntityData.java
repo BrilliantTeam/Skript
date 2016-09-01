@@ -26,6 +26,7 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Bat;
@@ -152,7 +153,6 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("bottle of enchanting", ThrownExpBottle.class));
 		types.add(new SimpleEntityDataInfo("tnt", TNTPrimed.class));
 		types.add(new SimpleEntityDataInfo("zombie", Zombie.class)); // TODO husks and zombie villagers (and test that)
-		types.add(new SimpleEntityDataInfo("golem", Golem.class));
 		
 		if (Skript.classExists("org.bukkit.entity.ItemFrame")) {
 			types.add(new SimpleEntityDataInfo("item frame", ItemFrame.class));
@@ -180,6 +180,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("human", HumanEntity.class, true));
 		types.add(new SimpleEntityDataInfo("monster", Monster.class, true)); //I don't know why Njol never included that. I did now ^^
 		types.add(new SimpleEntityDataInfo("creature", Creature.class, true));
+		types.add(new SimpleEntityDataInfo("animal", Animals.class, true));
+		types.add(new SimpleEntityDataInfo("golem", Golem.class, true));
 		types.add(new SimpleEntityDataInfo("projectile", Projectile.class, true));
 		types.add(new SimpleEntityDataInfo("living entity", LivingEntity.class, true));
 		types.add(new SimpleEntityDataInfo("entity", Entity.class, true));
