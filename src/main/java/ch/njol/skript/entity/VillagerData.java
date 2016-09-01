@@ -21,6 +21,10 @@
 
 package ch.njol.skript.entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
@@ -35,6 +39,13 @@ import ch.njol.util.coll.CollectionUtils;
  * @author Peter Güttinger
  */
 public class VillagerData extends EntityData<Villager> {
+	
+	/**
+	 * Professions can be for zombies also. These are the ones which are only
+	 * for villagers.
+	 */
+	private static List<Profession> professions;
+	
 	static {
 		// professions in order!
 		// FARMER(0), LIBRARIAN(1), PRIEST(2), BLACKSMITH(3), BUTCHER(4);
@@ -42,6 +53,12 @@ public class VillagerData extends EntityData<Villager> {
 				"villager", "farmer", "librarian", "priest", "blacksmith", "butcher");
 		
 		Variables.yggdrasil.registerSingleClass(Profession.class, "Villager.Profession");
+		
+		professions = new ArrayList<Profession>();
+		for (Profession prof : Profession.values()) {
+			if (!prof.isZombie())
+				professions.add(prof);
+		}
 	}
 	
 	@Nullable
@@ -73,7 +90,7 @@ public class VillagerData extends EntityData<Villager> {
 		if (v == null)
 			return null;
 		if (profession == null)
-			v.setProfession(CollectionUtils.getRandom(Profession.values()));
+			v.setProfession(CollectionUtils.getRandom(professions));
 		return v;
 	}
 	
