@@ -517,7 +517,7 @@ public class BukkitClasses {
 		
 		final EnumUtils<ClickType> invClicks = new EnumUtils<ClickType>(ClickType.class, "click actions"); // Less boilerplate code!
 		Classes.registerClass(new ClassInfo<ClickType>(ClickType.class, "clickaction")
-				.user("click action?")
+				.user("click actions?")
 				.name("Click Action")
 				.description("Click action, mostly for inventory events. Tells exactly which keys/buttons player pressed, assuming that default keybindings are used in client side.")
 				.usage(invClicks.getAllNames())

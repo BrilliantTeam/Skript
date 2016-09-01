@@ -60,6 +60,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -723,6 +724,13 @@ public final class BukkitEventValues {
 			@Nullable
 			public InventoryAction get(final InventoryClickEvent e) {
 				return e.getAction();
+			}
+		}, 0);
+		EventValues.registerEventValue(InventoryClickEvent.class, ClickType.class, new Getter<ClickType, InventoryClickEvent>() {
+			@Override
+			@Nullable
+			public ClickType get(final InventoryClickEvent e) {
+				return e.getClick();
 			}
 		}, 0);
 		// CraftItemEvent REMIND maybe re-add this when Skript parser is reworked?
