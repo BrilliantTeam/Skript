@@ -26,6 +26,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
@@ -51,7 +52,7 @@ import ch.njol.util.coll.CollectionUtils;
  * @author Peter Güttinger
  */
 @Name("Name / Display Name")
-@Description({"Represents a player's minecraft account name, chat display name, or playerlist name, or the custom name of an item or <a href='../classes/#livingentity'>a living entity</a>.",
+@Description({"Represents a player's minecraft account name, chat display name, or playerlist name, or the custom name of an item, en entity or an inventory.",
 		"The differences between the different names are:",
 		"<ul>",
 		"<li>name: Minecraft account name of a player (unmodifiable), or the custom name of an item or mob (modifiable).</li>",
@@ -63,14 +64,14 @@ import ch.njol.util.coll.CollectionUtils;
 		"	set the player's display name to \"<red>[admin]<gold>%name of player%\"",
 		"	set the player's tablist name to \"<green>%name of player%\"",
 		"set the name of the player's tool to \"Legendary Sword of Awesomeness\""})
-@Since("1.4.6 (players' name & display name), <i>unknown</i> (player list name), 2.0 (item name)")
+@Since("1.4.6 (players' name & display name), <i>unknown</i> (player list name), 2.0 (item name), 2.2-dev20 (inventory name)")
 public class ExprName extends SimplePropertyExpression<Object, String> {
 	
-	final static int ITEMSTACK = 1, ENTITY = 2, PLAYER = 4;
-	final static String[] types = {"itemstacks/slots", "livingentities", "players"};
+	final static int ITEMSTACK = 1, ENTITY = 2, PLAYER = 4, INVENTORY = 8;
+	final static String[] types = {"itemstacks/slots", "livingentities", "players", "inventories"};
 	
 	private static enum NameType {
-		NAME("name", "name[s]", PLAYER | ITEMSTACK | ENTITY, ITEMSTACK | ENTITY) {
+		NAME("name", "name[s]", PLAYER | ITEMSTACK | ENTITY | INVENTORY, ITEMSTACK | ENTITY) {
 			@Override
 			void set(final @Nullable Object o, final @Nullable String s) {
 				if (o == null)
@@ -103,13 +104,15 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return null;
 					final ItemMeta m = ((ItemStack) o).getItemMeta();
 					return m == null || !m.hasDisplayName() ? null : m.getDisplayName();
+				} else if (o instanceof Inventory) {
+					return ((Inventory) o).getName();
 				} else {
 					assert false;
 					return null;
 				}
 			}
 		},
-		DISPLAY_NAME("display name", "(display|nick|chat)[ ]name[s]", PLAYER | ITEMSTACK | ENTITY, PLAYER | ITEMSTACK | ENTITY) {
+		DISPLAY_NAME("display name", "(display|nick|chat)[ ]name[s]", PLAYER | ITEMSTACK | ENTITY | INVENTORY, PLAYER | ITEMSTACK | ENTITY) {
 			@Override
 			void set(final @Nullable Object o, final @Nullable String s) {
 				if (o == null)
@@ -145,6 +148,8 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return null;
 					final ItemMeta m = ((ItemStack) o).getItemMeta();
 					return m == null || !m.hasDisplayName() ? null : m.getDisplayName();
+				} else if (o instanceof Inventory) {
+					return ((Inventory) o).getTitle(); // Title is closest to display name... I guess
 				} else {
 					assert false;
 					return null;
