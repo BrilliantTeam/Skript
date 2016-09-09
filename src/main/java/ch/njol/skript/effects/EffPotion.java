@@ -90,7 +90,7 @@ public class EffPotion extends Effect {
 		if (ts.length == 0)
 			return;
 		if (!apply) {
-			for (LivingEntity en : entities.getAll(e)) {
+			for (LivingEntity en : entities.getArray(e)) {
 				for (final PotionEffectType t : ts)
 					en.removePotionEffect(t);
 			}
