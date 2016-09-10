@@ -29,6 +29,8 @@ are not often checked.
 Finally, there is no guarantee that issue will be resolved. Sometimes it might be
 harder than it sounds to you; in other cases, no one has time to take look at it.
 
+If your having a aliases issue please report that [here](https://github.com/tim740/skAliases/issues).
+
 ## Compiling
 Skript uses Gradle for compilation. Use your command prompt of preference and
 navigate to Skript's source directory. Then you can just call Gradle to compile
