@@ -23,7 +23,7 @@ use common sense: what might Skript developer need to know to solve your issue?
 
 If issue has been reported before, and is open, you can comment to it to ask if there
 has been progress or provide more information. If it has been closed, you can do
-same thing, but then it might be good idea to ping @bensku since closed issues
+same thing, but then it might be good idea to ping `@bensku` since closed issues
 are not often checked.
 
 Finally, there is no guarantee that issue will be resolved. Sometimes it might be
