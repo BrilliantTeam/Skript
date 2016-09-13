@@ -53,7 +53,6 @@ import ch.njol.util.coll.CollectionUtils;
 /**
  * @author Peter Güttinger
  */
-@SuppressWarnings("unchecked")
 public class EvtClick extends SkriptEvent {
 	
 	// Important: a click on an entity fires both an PlayerInteractEntityEvent and a PlayerInteractEvent
@@ -64,6 +63,7 @@ public class EvtClick extends SkriptEvent {
 	private final static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
 	
 	static {
+		@SuppressWarnings("unchecked")
 		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class);
 		Skript.registerEvent("Click", EvtClick.class, eventTypes,
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] [on %-entitydata/itemtype%] [(with|using|holding) %itemtype%]",

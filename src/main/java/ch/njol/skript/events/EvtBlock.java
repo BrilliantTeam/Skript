@@ -84,10 +84,6 @@ public class EvtBlock extends SkriptEvent {
 				.description("Called when a block is created, but not by a player, e.g. snow forms due to snowfall, water freezes in cold biomes, or a block spreads (see <a href='#spread'>spread event</a>).")
 				.examples("on form of snow", "on form of a mushroom")
 				.since("1.0");
-		Skript.registerEvent("Block Growth", EvtBlock.class, BlockGrowEvent.class, "(plant|crop|block) grow[(th|ing)] [[of] %itemtypes%]")
-				.description("Called when a crop grows.")
-				.examples("on crop growth")
-				.since("2.2-Fixes-V10");
 	}
 	
 	@Nullable
