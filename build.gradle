@@ -67,6 +67,7 @@ dependencies {
 
 compileJava {
 	options.fork = true
+	options.encoding = 'UTF-8'
 	options.compilerArgs = ['-properties', '.settings/org.eclipse.jdt.core.prefs', '-encoding', 'UTF-8']
 	options.forkOptions.with {
 		executable = 'java'

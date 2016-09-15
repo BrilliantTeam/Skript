@@ -30,6 +30,7 @@ import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.variables.Variables;
@@ -54,10 +55,16 @@ public class VillagerData extends EntityData<Villager> {
 		
 		Variables.yggdrasil.registerSingleClass(Profession.class, "Villager.Profession");
 		
-		professions = new ArrayList<Profession>();
-		for (Profession prof : Profession.values()) {
-			if (!prof.isZombie())
-				professions.add(prof);
+		if (Skript.isRunningMinecraft(1, 10)) { // Post 1.10: Not all professions go for villagers
+			professions = new ArrayList<Profession>();
+			for (Profession prof : Profession.values()) {
+				if (!prof.isZombie())
+					professions.add(prof);
+			}
+		} else { // Pre 1.10: method Profession#isZombie() doesn't exist
+			List<Profession> prof = Arrays.asList(Profession.values());
+			assert prof != null;
+			professions = prof;
 		}
 	}
 	
