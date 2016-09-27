@@ -88,3 +88,6 @@ good to go!
 * [SkUnity Forums](https://forums.skunity.com/)
 * [Original Skript at BukkitDev](https://dev.bukkit.org/bukkit-plugins/skript/)
 * [Addon Forums @SkUnity](https://forums.skunity.com/c/addons/none)
+* [Skript Chat Discord invite](https://discord.gg/0lx4QhQvwelCZbEX)
+
+Note that these resources are not maintained by me. If you notice something wrong in them, do not contact me.
