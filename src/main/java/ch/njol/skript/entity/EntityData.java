@@ -26,6 +26,7 @@ import java.io.StreamCorruptedException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -395,7 +396,8 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	@SuppressWarnings("null")
 	@Nullable
 	public final static EntityData<?> parse(final String s) {
-		return SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), infos.iterator(), null);
+		final Iterator<? extends SyntaxElementInfo<?>> it = infos.iterator();
+		return (EntityData<?>) SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), it, null);
 	}
 	
 	/**
@@ -407,7 +409,8 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	@SuppressWarnings("null")
 	@Nullable
 	public final static EntityData<?> parseWithoutIndefiniteArticle(final String s) {
-		return SkriptParser.parseStatic(s, infos.iterator(), null);
+		final Iterator<? extends SyntaxElementInfo<?>> it = infos.iterator();
+		return (EntityData<?>) SkriptParser.parseStatic(s, it, null);
 	}
 	
 	@Nullable
