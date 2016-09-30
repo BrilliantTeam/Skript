@@ -203,7 +203,7 @@ public abstract class SkriptEventHandler {
 		timing = null;
 	}
 	
-	static void addTrigger(final Class<? extends Event>[] events, final Trigger trigger) {
+	public static void addTrigger(final Class<? extends Event>[] events, final Trigger trigger) {
 		for (final Class<? extends Event> e : events) {
 			List<Trigger> ts = triggers.get(e);
 			if (ts == null)
@@ -217,7 +217,7 @@ public abstract class SkriptEventHandler {
 	 * 
 	 * @param t Trigger that has already been registered to its event
 	 */
-	static void addSelfRegisteringTrigger(final Trigger t) {
+	public static void addSelfRegisteringTrigger(final Trigger t) {
 		assert t.getEvent() instanceof SelfRegisteringSkriptEvent;
 		selfRegisteredTriggers.add(t);
 	}

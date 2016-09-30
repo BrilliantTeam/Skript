@@ -68,6 +68,7 @@ import ch.njol.skript.config.validate.SectionValidator;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.parser.ScriptProcessor;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
@@ -319,11 +320,11 @@ public abstract class Commands {
 			argumentPattern = Pattern.compile("<\\s*(?:(.+?)\\s*:\\s*)?(.+?)\\s*(?:=\\s*(" + SkriptParser.wildcard + "))?\\s*>");
 	
 	@Nullable
-	public final static ScriptCommand loadCommand(final SectionNode node) {
+	public final static ScriptCommand loadCommand(final SectionNode node, final ScriptProcessor scriptParser) {
 		final String key = node.getKey();
 		if (key == null)
 			return null;
-		final String s = ScriptLoader.replaceOptions(key);
+		final String s = scriptParser.replaceOptions(key);
 		
 		int level = 0;
 		for (int i = 0; i < s.length(); i++) {
@@ -403,7 +404,7 @@ public abstract class Commands {
 		
 		String desc = "/" + command + " ";
 		final boolean wasLocal = Language.setUseLocal(true); // use localised class names in description
-		try {
+		try { // TODO see if this works with multithreaded parser..
 			desc += StringUtils.replaceAll(pattern, "(?<!\\\\)%-?(.+?)%", new Callback<String, Matcher>() {
 				@Override
 				public String run(final @Nullable Matcher m) {
@@ -424,19 +425,19 @@ public abstract class Commands {
 		if (!(node.get("trigger") instanceof SectionNode))
 			return null;
 		
-		final String usage = ScriptLoader.replaceOptions(node.get("usage", desc));
-		final String description = ScriptLoader.replaceOptions(node.get("description", ""));
-		ArrayList<String> aliases = new ArrayList<String>(Arrays.asList(ScriptLoader.replaceOptions(node.get("aliases", "")).split("\\s*,\\s*/?")));
+		final String usage = scriptParser.replaceOptions(node.get("usage", desc));
+		final String description = scriptParser.replaceOptions(node.get("description", ""));
+		ArrayList<String> aliases = new ArrayList<String>(Arrays.asList(scriptParser.replaceOptions(node.get("aliases", "")).split("\\s*,\\s*/?")));
 		if (aliases.get(0).startsWith("/"))
 			aliases.set(0, aliases.get(0).substring(1));
 		else if (aliases.get(0).isEmpty())
 			aliases = new ArrayList<String>(0);
-		final String permission = ScriptLoader.replaceOptions(node.get("permission", ""));
-		final String permissionMessage = ScriptLoader.replaceOptions(node.get("permission message", ""));
+		final String permission = scriptParser.replaceOptions(node.get("permission", ""));
+		final String permissionMessage = scriptParser.replaceOptions(node.get("permission message", ""));
 		final SectionNode trigger = (SectionNode) node.get("trigger");
 		if (trigger == null)
 			return null;
-		final String[] by = ScriptLoader.replaceOptions(node.get("executable by", "console,players")).split("\\s*,\\s*|\\s+(and|or)\\s+");
+		final String[] by = scriptParser.replaceOptions(node.get("executable by", "console,players")).split("\\s*,\\s*|\\s+(and|or)\\s+");
 		int executableBy = 0;
 		for (final String b : by) {
 			if (b.equalsIgnoreCase("console") || b.equalsIgnoreCase("the console")) {
@@ -468,7 +469,7 @@ public abstract class Commands {
 		} finally {
 			Commands.currentArguments = null;
 		}	
-		registerCommand(c);
+		//registerCommand(c); // Register nothing since this is not from main thread... Thread safety
 		
 		if (Skript.logVeryHigh() && !Skript.debug())
 			Skript.info("registered command " + desc);

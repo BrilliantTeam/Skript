@@ -110,7 +110,6 @@ public abstract class Functions {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final static Function<?> loadFunction(final SectionNode node) {
-		SkriptLogger.setNode(node);
 		final String definition = node.getKey();
 		assert definition != null;
 		final Matcher m = functionPattern.matcher(definition);
@@ -126,7 +125,7 @@ public abstract class Functions {
 			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")" + (c != null && p != null ? " :: " + Utils.toEnglishPlural(c.getCodeName(), p.getSecond()) : "") + ":");
 		
 		@SuppressWarnings("null")
-		final Function<?> f = new ScriptFunction<Object>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
+		final Function<?> f = new ScriptFunction<>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
 //		functions.put(name, new FunctionData(f)); // in constructor
 		return f;
 	}

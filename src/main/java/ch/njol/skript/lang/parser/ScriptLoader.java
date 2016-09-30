@@ -51,7 +51,7 @@ public class ScriptLoader implements Runnable {
 	public void run() {
 		try {
 			Config config = new Config(f, true, false, ":");
-			for (Node cnode : config.getMainNode()) {
+			for (final Node cnode : config.getMainNode()) {
 				if (!(cnode instanceof SectionNode)) {
 					Skript.error("invalid line - all code has to be put into triggers");
 					continue;

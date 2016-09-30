@@ -21,30 +21,11 @@
 
 package ch.njol.skript.lang.parser;
 
-import java.io.File;
-import java.util.Queue;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import ch.njol.skript.config.Config;
-
 /**
- *
+ * Several utils, mostly copy-pasted from old parser.
+ * Do not ask what they do - as long they work.
  */
-public class ScriptParser implements Runnable {
+public class ParserUtils {
 	
-	private Config config;
-	private Queue<Config> queue;
-	private AtomicInteger counter;
-	
-	public ScriptParser(Config config, Queue<Config> queue, AtomicInteger counter) {
-		this.config = config;
-		this.queue = queue;
-		this.counter = counter;
-	}
-	
-	@Override
-	public void run() {
-		
-	}
 	
 }

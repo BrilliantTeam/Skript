@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
@@ -40,6 +42,12 @@ public class ScriptManager extends Thread {
 	
 	private AtomicInteger waitLoading = new AtomicInteger();
 	private List<Config> parseList = new ArrayList<>();
+	
+	/**
+	 * Cached thread pool to execute the tasks.
+	 */
+	@SuppressWarnings("null") // Java API is just missing the annotations
+	private ExecutorService pool = Executors.newCachedThreadPool();
 	
 	public void load(File[] files) {
 		int numScripts = 0;
@@ -56,14 +64,25 @@ public class ScriptManager extends Thread {
 		if (numScripts == 0) // Load nothing
 			return;
 		
-		LockSupport.park(); // Wait for loading
+		parseList = new ArrayList<>(numScripts);
+		waitLoading.set(numScripts);
+		
+		for (File f : scripts) {
+			if (f == null) // Non-scripts and disabled scripts
+				continue;
+			pool.execute(new ScriptLoader(f, this));
+		}
+		
+		if (waitLoading.get() > 0) // Only park this thread if work is not done
+			LockSupport.park();
+		
 		
 	}
 	
 	public void loadReady(Config config) {
-		parseList.add(config);
 		int counter = waitLoading.decrementAndGet();
+		parseList.add(config);
 		if (counter < 1)
-			LockSupport.unpark(this); // TODO broken
+			LockSupport.unpark(this);
 	}
 }

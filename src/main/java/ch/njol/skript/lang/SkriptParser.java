@@ -387,6 +387,7 @@ public class SkriptParser {
 		return this;
 	}
 	
+	@SafeVarargs
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final <T> Expression<? extends T> parseExpression(final Class<? extends T>... types) {
@@ -500,54 +501,6 @@ public class SkriptParser {
 				return null;
 			}
 			
-//			String lastExpr = expr;
-//			int end = expr.length();
-//			int expectedEnd = -1;
-//			boolean last = false;
-//			while (m.find() || (last = !last)) {
-//				if (expectedEnd == -1) {
-//					if (last)
-//						break;
-//					expectedEnd = m.start();
-//				}
-//				final int start = last ? 0 : m.end();
-//				final Expression<? extends T> t;
-//				if (context != ParseContext.COMMAND && (start < expr.length() && expr.charAt(start) == '(' || end - 1 > 0 && expr.charAt(end - 1) == ')')) {
-//					if (start < expr.length() && expr.charAt(start) == '(' && end - 1 > 0 && expr.charAt(end - 1) == ')' && next(expr, start, context) == end)
-//						t = new SkriptParser(lastExpr = "" + expr.substring(start + 1, end - 1), flags, context).parseExpression(types);
-//					else
-//						t = null;
-//				} else {
-//					t = new SkriptParser(lastExpr = "" + expr.substring(start, end), flags, context).parseSingleExpr(types);
-//				}
-//				if (t != null) {
-//					isLiteralList &= t instanceof Literal;
-//					if (!last && m.group(1) != null) {
-//						if (and.isUnknown()) {
-//							and = Kleenean.get(!m.group(1).equalsIgnoreCase("or")); // nor is and
-//						} else {
-//							if (and != Kleenean.get(!m.group(1).equalsIgnoreCase("or"))) {
-//								Skript.warning(MULTIPLE_AND_OR);
-//								and = Kleenean.TRUE;
-//							}
-//						}
-//					}
-//					ts.addFirst(t);
-//					if (last)
-//						break;
-//					end = m.start();
-//					m.region(0, end);
-//				} else {
-//					log.clear();
-//					if (last)
-//						end = -2; // fails the test below
-//				}
-//			}
-//			if (end != expectedEnd) {
-//				log.printError("'" + lastExpr + "' " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
-//				return null;
-//			}
-			
 			log.printLog();
 			
 			if (ts.size() == 1)
@@ -563,11 +516,11 @@ public class SkriptParser {
 			if (isLiteralList) {
 				final Literal<T>[] ls = ts.toArray(new Literal[ts.size()]);
 				assert ls != null;
-				return new LiteralList<T>(ls, (Class<T>) Utils.getSuperType(exprRetTypes), !and.isFalse());
+				return new LiteralList<>(ls, (Class<T>) Utils.getSuperType(exprRetTypes), !and.isFalse());
 			} else {
 				final Expression<T>[] es = ts.toArray(new Expression[ts.size()]);
 				assert es != null;
-				return new ExpressionList<T>(es, (Class<T>) Utils.getSuperType(exprRetTypes), !and.isFalse());
+				return new ExpressionList<>(es, (Class<T>) Utils.getSuperType(exprRetTypes), !and.isFalse());
 			}
 		} finally {
 			log.stop();
