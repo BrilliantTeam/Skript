@@ -63,7 +63,7 @@ public class BiomeHook extends Hook<Skript> {
 	protected void loadClasses() throws IOException {
 		if (Skript.isRunningMinecraft(1, 9)) {// Load only if running 1.9+
 			Skript.getAddonInstance().loadClasses(getClass().getPackage().getName());
-			util19 = new EnumUtils<To19Mapping>(To19Mapping.class, "biomes");
+			util19 = new EnumUtils<>(To19Mapping.class, "biomes");
 		}
 	}
 	

@@ -38,7 +38,7 @@ public final class EnumUtils<E extends Enum<E>> {
 	private final String languageNode;
 	
 	private String[] names;
-	private final HashMap<String, E> parseMap = new HashMap<String, E>();
+	private final HashMap<String, E> parseMap = new HashMap<>();
 	
 	public EnumUtils(final Class<E> c, final String languageNode) {
 		assert c != null && c.isEnum() : c;

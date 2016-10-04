@@ -199,7 +199,7 @@ public class DefaultComparators {
 	}
 	
 	// EntityData - ItemType
-	final static LinkedHashMap<Class<? extends Entity>, Material> entityMaterials = new LinkedHashMap<Class<? extends Entity>, Material>();
+	final static LinkedHashMap<Class<? extends Entity>, Material> entityMaterials = new LinkedHashMap<>();
 	static {
 		// to fix comparisons of eggs, arrows, etc. (e.g. 'projectile is an arrow')
 		// TODO !Update with every version [entities]

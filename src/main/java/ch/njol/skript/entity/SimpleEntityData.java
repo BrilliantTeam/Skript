@@ -123,7 +123,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 		}
 	}
 	
-	private final static List<SimpleEntityDataInfo> types = new ArrayList<SimpleEntityDataInfo>();
+	private final static List<SimpleEntityDataInfo> types = new ArrayList<>();
 	static {
 		types.add(new SimpleEntityDataInfo("arrow", Arrow.class));
 		types.add(new SimpleEntityDataInfo("boat", Boat.class));

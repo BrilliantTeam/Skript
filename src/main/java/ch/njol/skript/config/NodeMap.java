@@ -34,7 +34,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public class NodeMap {
 	
-	private final Map<String, Node> map = new HashMap<String, Node>();
+	private final Map<String, Node> map = new HashMap<>();
 	
 	public final static boolean inMap(final Node n) {
 		return n instanceof EntryNode || n instanceof SectionNode;

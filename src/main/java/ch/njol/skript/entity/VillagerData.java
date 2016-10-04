@@ -56,7 +56,7 @@ public class VillagerData extends EntityData<Villager> {
 		Variables.yggdrasil.registerSingleClass(Profession.class, "Villager.Profession");
 		
 		if (Skript.isRunningMinecraft(1, 10)) { // Post 1.10: Not all professions go for villagers
-			professions = new ArrayList<Profession>();
+			professions = new ArrayList<>();
 			for (Profession prof : Profession.values()) {
 				if (!prof.isZombie())
 					professions.add(prof);

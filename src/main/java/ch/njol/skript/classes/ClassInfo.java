@@ -320,7 +320,7 @@ public class ClassInfo<T> implements Debuggable {
 	
 	@Nullable
 	private Set<String> before;
-	private final Set<String> after = new HashSet<String>();
+	private final Set<String> after = new HashSet<>();
 	
 	/**
 	 * Sets one or more classes that this class should occur before in the class info list. This only affects the order in which classes are parsed if it's unknown of which type
@@ -335,7 +335,7 @@ public class ClassInfo<T> implements Debuggable {
 	 */
 	public ClassInfo<T> before(final String... before) {
 		assert this.before == null;
-		this.before = new HashSet<String>(Arrays.asList(before));
+		this.before = new HashSet<>(Arrays.asList(before));
 		return this;
 	}
 	

@@ -55,7 +55,7 @@ public final class DefaultYggdrasilOutputStream extends YggdrasilOutputStream {
 		out.write(t.tag);
 	}
 	
-	private final HashMap<String, Integer> writtenShortStrings = new HashMap<String, Integer>();
+	private final HashMap<String, Integer> writtenShortStrings = new HashMap<>();
 	int nextShortStringID = 0;
 	
 	/**

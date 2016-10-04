@@ -61,7 +61,7 @@ public class ExprLocation extends WrapperExpression<Location> {
 			super.setExpr(Direction.combine((Expression<? extends Direction>) exprs[0], (Expression<? extends Location>) exprs[1]));
 			return true;
 		} else {
-			setExpr(new EventValueExpression<Location>(Location.class));
+			setExpr(new EventValueExpression<>(Location.class));
 			return ((EventValueExpression<Location>) getExpr()).init();
 		}
 	}

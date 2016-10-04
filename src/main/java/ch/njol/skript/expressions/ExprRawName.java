@@ -72,7 +72,7 @@ public class ExprRawName extends SimpleExpression<String> {
 		if (types == null) return null;
 		
 		ItemType[] items = types.getAll(e);
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		for (int i = 0; i < items.length; i++) {
 			names.addAll(items[i].getRawNames());
 		}

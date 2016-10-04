@@ -41,7 +41,7 @@ import ch.njol.util.StringUtils;
  */
 public class Money {
 	static {
-		Classes.registerClass(new ClassInfo<Money>(Money.class, "money")
+		Classes.registerClass(new ClassInfo<>(Money.class, "money")
 				.user("money")
 				.name("Money")
 				.description("A certain amount of money. Please note that this differs from <a href='#number'>numbers</a> as it includes a currency symbol or name, but usually the two are interchangeable, e.g. you can both <code>add 100$ to the player's balance</code> and <code>add 100 to the player's balance</code>.")

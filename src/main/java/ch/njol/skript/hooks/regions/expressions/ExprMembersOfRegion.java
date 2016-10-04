@@ -70,7 +70,7 @@ public class ExprMembersOfRegion extends SimpleExpression<OfflinePlayer> {
 	@SuppressWarnings("null")
 	@Override
 	protected OfflinePlayer[] get(final Event e) {
-		final ArrayList<OfflinePlayer> r = new ArrayList<OfflinePlayer>();
+		final ArrayList<OfflinePlayer> r = new ArrayList<>();
 		for (final Region region : regions.getArray(e)) {
 			r.addAll(owners ? region.getOwners() : region.getMembers());
 		}

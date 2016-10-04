@@ -133,7 +133,7 @@ public abstract class YggdrasilInputStream implements Closeable {
 	
 	// any Objects
 	
-	private final List<Object> readObjects = new ArrayList<Object>();
+	private final List<Object> readObjects = new ArrayList<>();
 	
 	@Nullable
 	public final Object readObject() throws IOException {

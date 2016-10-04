@@ -45,8 +45,8 @@ public class TimingReporter {
 	@SuppressWarnings("null")
 	public static String getReport() {
 		Map<Object,Timing> timings = Timings.timings;
-		Map<String,Long> triggers = new HashMap<String,Long>();
-		Map<Object,Long> events = new HashMap<Object,Long>();
+		Map<String,Long> triggers = new HashMap<>();
+		Map<Object,Long> events = new HashMap<>();
 		
 		for (Entry<Object,Timing> entry : timings.entrySet()) {
 			Object key = entry.getKey();

@@ -106,8 +106,8 @@ public class EnchantmentType implements YggdrasilSerializable {
 		return enchantmentNames.get(e);
 	}
 	
-	final static Map<Enchantment, String> enchantmentNames = new HashMap<Enchantment, String>();
-	final static Map<String, Enchantment> enchantmentPatterns = new HashMap<String, Enchantment>();
+	final static Map<Enchantment, String> enchantmentNames = new HashMap<>();
+	final static Map<String, Enchantment> enchantmentPatterns = new HashMap<>();
 	static {
 		Language.addListener(new LanguageChangeListener() {
 			@Override

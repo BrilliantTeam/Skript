@@ -37,7 +37,7 @@ import ch.njol.skript.Skript;
 public class Message {
 	
 	// this is most likely faster than registering a listener for each Message
-	final static Collection<Message> messages = new ArrayList<Message>(50);
+	final static Collection<Message> messages = new ArrayList<>(50);
 	static boolean firstChange = true;
 	static {
 		Language.addListener(new LanguageChangeListener() {

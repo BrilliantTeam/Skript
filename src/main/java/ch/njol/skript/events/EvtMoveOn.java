@@ -91,7 +91,7 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 	}
 	
 //	private final static HashMap<BlockLocation, List<Trigger>> blockTriggers = new HashMap<BlockLocation, List<Trigger>>();
-	final static HashMap<Integer, List<Trigger>> itemTypeTriggers = new HashMap<Integer, List<Trigger>>();
+	final static HashMap<Integer, List<Trigger>> itemTypeTriggers = new HashMap<>();
 	@SuppressWarnings("null")
 	ItemType[] types = null;
 //	private World world;
@@ -224,7 +224,7 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 					continue;
 				List<Trigger> ts = itemTypeTriggers.get(d.getId());
 				if (ts == null)
-					itemTypeTriggers.put(d.getId(), ts = new ArrayList<Trigger>());
+					itemTypeTriggers.put(d.getId(), ts = new ArrayList<>());
 				ts.add(trigger);
 			}
 		}

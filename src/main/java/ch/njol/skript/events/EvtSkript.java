@@ -59,7 +59,7 @@ public class EvtSkript extends SelfRegisteringSkriptEvent {
 		return true;
 	}
 	
-	private final static Collection<Trigger> start = new ArrayList<Trigger>(), stop = new ArrayList<Trigger>();
+	private final static Collection<Trigger> start = new ArrayList<>(), stop = new ArrayList<>();
 	
 	public static void onSkriptStart() {
 		final Event e = new SkriptStartEvent();

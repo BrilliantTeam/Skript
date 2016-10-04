@@ -36,7 +36,7 @@ import ch.njol.skript.util.EnumUtils;
  */
 public abstract class BiomeMappings {
 	
-	private final static EnumUtils<Biome> util = new EnumUtils<Biome>(Biome.class, "biomes");
+	private final static EnumUtils<Biome> util = new EnumUtils<>(Biome.class, "biomes");
 	
 	private final static boolean mapFor19 = Skript.isRunningMinecraft(1, 9);
 	

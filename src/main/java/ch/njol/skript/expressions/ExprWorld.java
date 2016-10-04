@@ -60,7 +60,7 @@ public class ExprWorld extends PropertyExpression<Object, World> {
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		Expression<?> expr = exprs[0];
 		if (expr == null) {
-			expr = new EventValueExpression<World>(World.class);
+			expr = new EventValueExpression<>(World.class);
 			if (!((EventValueExpression<?>) expr).init())
 				return false;
 		}

@@ -47,7 +47,7 @@ public class Timing {
 	 * Creates a new timing. Only used by {@link Timings}
 	 */
 	protected Timing() {
-		triggerTimes = new LinkedHashMap<Trigger,Long>();
+		triggerTimes = new LinkedHashMap<>();
 		eventTime = 0L;
 	}
 	

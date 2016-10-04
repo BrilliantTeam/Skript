@@ -131,13 +131,13 @@ public abstract class Utils {
 	
 	public final static Pair<String, Integer> getAmount(final String s) {
 		if (s.matches("\\d+ of .+")) {
-			return new Pair<String, Integer>(s.split(" ", 3)[2], Utils.parseInt("" + s.split(" ", 2)[0]));
+			return new Pair<>(s.split(" ", 3)[2], Utils.parseInt("" + s.split(" ", 2)[0]));
 		} else if (s.matches("\\d+ .+")) {
-			return new Pair<String, Integer>(s.split(" ", 2)[1], Utils.parseInt("" + s.split(" ", 2)[0]));
+			return new Pair<>(s.split(" ", 2)[1], Utils.parseInt("" + s.split(" ", 2)[0]));
 		} else if (s.matches("an? .+")) {
-			return new Pair<String, Integer>(s.split(" ", 2)[1], 1);
+			return new Pair<>(s.split(" ", 2)[1], 1);
 		}
-		return new Pair<String, Integer>(s, Integer.valueOf(-1));
+		return new Pair<>(s, Integer.valueOf(-1));
 	}
 	
 //	public final static class AmountResponse {
@@ -230,14 +230,14 @@ public abstract class Utils {
 	public final static NonNullPair<String, Boolean> getEnglishPlural(final String s) {
 		assert s != null;
 		if (s.isEmpty())
-			return new NonNullPair<String, Boolean>("", Boolean.FALSE);
+			return new NonNullPair<>("", Boolean.FALSE);
 		for (final String[] p : plurals) {
 			if (s.endsWith(p[1]))
-				return new NonNullPair<String, Boolean>(s.substring(0, s.length() - p[1].length()) + p[0], Boolean.TRUE);
+				return new NonNullPair<>(s.substring(0, s.length() - p[1].length()) + p[0], Boolean.TRUE);
 			if (s.endsWith(p[1].toUpperCase()))
-				return new NonNullPair<String, Boolean>(s.substring(0, s.length() - p[1].length()) + p[0].toUpperCase(), Boolean.TRUE);
+				return new NonNullPair<>(s.substring(0, s.length() - p[1].length()) + p[0].toUpperCase(), Boolean.TRUE);
 		}
-		return new NonNullPair<String, Boolean>(s, Boolean.FALSE);
+		return new NonNullPair<>(s, Boolean.FALSE);
 	}
 	
 	/**
@@ -371,8 +371,8 @@ public abstract class Utils {
 	}
 	
 	final static ChatColor[] styles = {ChatColor.BOLD, ChatColor.ITALIC, ChatColor.STRIKETHROUGH, ChatColor.UNDERLINE, ChatColor.MAGIC, ChatColor.RESET};
-	final static Map<String, String> chat = new HashMap<String, String>();
-	final static Map<String, String> englishChat = new HashMap<String, String>();
+	final static Map<String, String> chat = new HashMap<>();
+	final static Map<String, String> englishChat = new HashMap<>();
 	static {
 		Language.addListener(new LanguageChangeListener() {
 			@Override
@@ -398,7 +398,6 @@ public abstract class Utils {
 		return chat.get(s);
 	}
 	
-	@SuppressWarnings("null")
 	private final static Pattern stylePattern = Pattern.compile("<([^<>]+)>");
 	
 	/**

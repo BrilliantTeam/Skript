@@ -118,7 +118,7 @@ public class DatabaseStorage extends VariablesStorage {
 	private final Type type;
 	
 	@SuppressWarnings("null")
-	final SynchronizedReference<Database> db = new SynchronizedReference<Database>(null);
+	final SynchronizedReference<Database> db = new SynchronizedReference<>(null);
 	
 	private boolean monitor = false;
 	long monitor_interval;

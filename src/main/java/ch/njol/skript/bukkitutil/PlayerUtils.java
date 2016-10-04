@@ -48,7 +48,7 @@ import ch.njol.skript.util.Task;
 public abstract class PlayerUtils {
 	private PlayerUtils() {}
 	
-	final static Set<Player> inviUpdate = new HashSet<Player>();
+	final static Set<Player> inviUpdate = new HashSet<>();
 	
 	public final static void updateInventory(final @Nullable Player p) {
 		if (p != null)

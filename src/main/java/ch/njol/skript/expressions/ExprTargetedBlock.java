@@ -67,7 +67,7 @@ public class ExprTargetedBlock extends PropertyExpression<Player, Block> {
 	
 	@Nullable
 	private static Event last = null;
-	private final static WeakHashMap<Player, Block> targetedBlocks = new WeakHashMap<Player, Block>();
+	private final static WeakHashMap<Player, Block> targetedBlocks = new WeakHashMap<>();
 	private static long blocksValidForTick = 0;
 	
 	@SuppressWarnings({"unchecked", "null"})

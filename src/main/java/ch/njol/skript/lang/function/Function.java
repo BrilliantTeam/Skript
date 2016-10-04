@@ -132,7 +132,7 @@ public abstract class Function<T> {
 	 */
 	@SuppressWarnings("null")
 	public Signature<T> getSignature() {
-		return new Signature<T>("unknown", name, Arrays.asList(parameters), returnType, null, single);
+		return new Signature<>("unknown", name, Arrays.asList(parameters), returnType, null, single);
 	}
 	
 }

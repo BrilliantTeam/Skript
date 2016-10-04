@@ -45,7 +45,7 @@ public enum WeatherType {
 	@Nullable
 	String adjective;
 	
-	final static Map<String, WeatherType> byName = new HashMap<String, WeatherType>();
+	final static Map<String, WeatherType> byName = new HashMap<>();
 	
 	private WeatherType(final String... names) {
 		this.names = names;

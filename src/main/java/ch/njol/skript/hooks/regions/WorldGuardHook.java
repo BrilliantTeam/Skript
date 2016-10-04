@@ -116,13 +116,13 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		public Collection<OfflinePlayer> getMembers() {
 			if (supportsUUIDs) {
 				final Collection<UUID> ids = region.getMembers().getUniqueIds();
-				final Collection<OfflinePlayer> r = new ArrayList<OfflinePlayer>(ids.size());
+				final Collection<OfflinePlayer> r = new ArrayList<>(ids.size());
 				for (final UUID id : ids)
 					r.add(Bukkit.getOfflinePlayer(id));
 				return r;
 			} else {
 				final Collection<String> ps = region.getMembers().getPlayers();
-				final Collection<OfflinePlayer> r = new ArrayList<OfflinePlayer>(ps.size());
+				final Collection<OfflinePlayer> r = new ArrayList<>(ps.size());
 				for (final String p : ps)
 					r.add(Bukkit.getOfflinePlayer(p));
 				return r;
@@ -143,13 +143,13 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		public Collection<OfflinePlayer> getOwners() {
 			if (supportsUUIDs) {
 				final Collection<UUID> ids = region.getOwners().getUniqueIds();
-				final Collection<OfflinePlayer> r = new ArrayList<OfflinePlayer>(ids.size());
+				final Collection<OfflinePlayer> r = new ArrayList<>(ids.size());
 				for (final UUID id : ids)
 					r.add(Bukkit.getOfflinePlayer(id));
 				return r;
 			} else {
 				final Collection<String> ps = region.getOwners().getPlayers();
-				final Collection<OfflinePlayer> r = new ArrayList<OfflinePlayer>(ps.size());
+				final Collection<OfflinePlayer> r = new ArrayList<>(ps.size());
 				for (final String p : ps)
 					r.add(Bukkit.getOfflinePlayer(p));
 				return r;
@@ -242,7 +242,7 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	@SuppressWarnings("null")
 	@Override
 	public Collection<? extends Region> getRegionsAt_i(final Location l) {
-		final ArrayList<Region> r = new ArrayList<Region>();
+		final ArrayList<Region> r = new ArrayList<>();
 		
 		RegionManager manager = plugin.getRegionManager(l.getWorld());
 		if (manager == null)

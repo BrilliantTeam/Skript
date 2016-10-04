@@ -33,7 +33,7 @@ import ch.njol.skript.SkriptEventHandler;
  */
 public class Timings {
 	
-	protected static Map<Object,Timing> timings = new HashMap<Object,Timing>();
+	protected static Map<Object,Timing> timings = new HashMap<>();
 	private static volatile boolean enabled;
 	protected static volatile long enableTime;
 	protected static volatile long disableTime;

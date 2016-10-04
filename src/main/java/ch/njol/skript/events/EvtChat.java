@@ -55,7 +55,7 @@ public class EvtChat extends SelfRegisteringSkriptEvent {
 				.since("1.4.1");
 	}
 	
-	final static Collection<Trigger> triggers = new ArrayList<Trigger>();
+	final static Collection<Trigger> triggers = new ArrayList<>();
 	
 	private static boolean registeredExecutor = false;
 	private final static EventExecutor executor = new EventExecutor() {

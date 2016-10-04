@@ -41,7 +41,7 @@ import de.slikey.effectlib.util.ParticleEffect;
 
 public class EffectLibHook extends ParticlesPlugin<EffectLib> {
 	
-	public static final Map<String,Object> ID_MAP = new HashMap<String,Object>(); // Map of effect name identifiers
+	public static final Map<String,Object> ID_MAP = new HashMap<>(); // Map of effect name identifiers
 	
 	public EffectLibHook() throws IOException {}
 	

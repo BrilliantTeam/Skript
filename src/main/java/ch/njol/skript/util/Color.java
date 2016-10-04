@@ -83,8 +83,8 @@ public enum Color implements YggdrasilSerializable {
 		}
 	}
 	
-	final static Map<String, Color> byName = new HashMap<String, Color>();
-	final static Map<String, Color> byEnglishName = new HashMap<String, Color>();
+	final static Map<String, Color> byName = new HashMap<>();
+	final static Map<String, Color> byEnglishName = new HashMap<>();
 	static {
 		Language.addListener(new LanguageChangeListener() {
 			@Override

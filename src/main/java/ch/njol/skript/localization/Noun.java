@@ -220,7 +220,7 @@ public class Noun extends Message {
 	 * @return (singular, plural)
 	 */
 	public static NonNullPair<String, String> getPlural(final String s) {
-		final NonNullPair<String, String> r = new NonNullPair<String, String>("", "");
+		final NonNullPair<String, String> r = new NonNullPair<>("", "");
 		int part = 3; // 1 = singular, 2 = plural, 3 = both
 		int i = StringUtils.count(s, '¦');
 		int last = 0, c = -1;
@@ -267,7 +267,7 @@ public class Noun extends Message {
 		return s.substring(0, x) + "¦" + s.substring(x, g) + "¦" + s.substring(g);
 	}
 	
-	final static HashMap<String, Integer> genders = new HashMap<String, Integer>();
+	final static HashMap<String, Integer> genders = new HashMap<>();
 	
 	/**
 	 * @param gender Gender id as defined in [language].lang (i.e. without the leading @)
@@ -309,15 +309,15 @@ public class Noun extends Message {
 			g = getGender("" + s.substring(c + 1).trim(), key);
 			s = "" + s.substring(0, c).trim();
 		}
-		return new NonNullPair<String, Integer>(s, g);
+		return new NonNullPair<>(s, g);
 	}
 	
-	final static List<String> indefiniteArticles = new ArrayList<String>(3);
-	final static List<String> definiteArticles = new ArrayList<String>(3);
+	final static List<String> indefiniteArticles = new ArrayList<>(3);
+	final static List<String> definiteArticles = new ArrayList<>(3);
 	static String definitePluralArticle = "";
 	
-	final static List<String> localIndefiniteArticles = new ArrayList<String>(3);
-	final static List<String> localDefiniteArticles = new ArrayList<String>(3);
+	final static List<String> localIndefiniteArticles = new ArrayList<>(3);
+	final static List<String> localDefiniteArticles = new ArrayList<>(3);
 	static String localDefinitePluralArticle = "";
 	
 	static {

@@ -110,11 +110,11 @@ public class ExprBlocks extends SimpleExpression<Block> {
 			}
 			return bs;
 		}
-		final ArrayList<Block> r = new ArrayList<Block>();
+		final ArrayList<Block> r = new ArrayList<>();
 		final Iterator<Block> iter = iterator(e);
 		if (iter == null)
 			return new Block[0];
-		for (final Block b : new IteratorIterable<Block>(iter))
+		for (final Block b : new IteratorIterable<>(iter))
 			r.add(b);
 		return r.toArray(new Block[r.size()]);
 	}
@@ -126,7 +126,7 @@ public class ExprBlocks extends SimpleExpression<Block> {
 			final Expression<Direction> direction = this.direction;
 			if (direction != null) {
 				if (!from.isSingle()) {
-					return new ArrayIterator<Block>(get(e));
+					return new ArrayIterator<>(get(e));
 				}
 				final Object o = from.getSingle(e);
 				if (o == null)

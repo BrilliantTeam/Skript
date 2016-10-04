@@ -64,7 +64,7 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class CondCompare extends Condition {
 	
-	private final static Patterns<Relation> patterns = new Patterns<Relation>(new Object[][] {
+	private final static Patterns<Relation> patterns = new Patterns<>(new Object[][] {
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) ((greater|more|higher|bigger|larger) than|above)|\\>) %objects%", Relation.GREATER},
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) (greater|more|higher|bigger|larger|above) [than] or (equal to|the same as)|\\>=) %objects%", Relation.GREATER_OR_EQUAL},
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) ((less|smaller) than|below)|\\<) %objects%", Relation.SMALLER},

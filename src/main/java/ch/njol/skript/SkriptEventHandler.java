@@ -56,9 +56,9 @@ import ch.njol.skript.timings.Timings;
 public abstract class SkriptEventHandler {
 	private SkriptEventHandler() {}
 	
-	final static Map<Class<? extends Event>, List<Trigger>> triggers = new HashMap<Class<? extends Event>, List<Trigger>>();
+	final static Map<Class<? extends Event>, List<Trigger>> triggers = new HashMap<>();
 	
-	private final static List<Trigger> selfRegisteredTriggers = new ArrayList<Trigger>();
+	private final static List<Trigger> selfRegisteredTriggers = new ArrayList<>();
 	
 	private final static Iterator<Trigger> getTriggers(final Class<? extends Event> event) {
 		return new Iterator<Trigger>() {
@@ -207,7 +207,7 @@ public abstract class SkriptEventHandler {
 		for (final Class<? extends Event> e : events) {
 			List<Trigger> ts = triggers.get(e);
 			if (ts == null)
-				triggers.put(e, ts = new ArrayList<Trigger>());
+				triggers.put(e, ts = new ArrayList<>());
 			ts.add(trigger);
 		}
 	}
@@ -268,7 +268,7 @@ public abstract class SkriptEventHandler {
 	/**
 	 * Stores which events are currently registered with Bukkit
 	 */
-	private final static Set<Class<? extends Event>> registeredEvents = new HashSet<Class<? extends Event>>();
+	private final static Set<Class<? extends Event>> registeredEvents = new HashSet<>();
 	private final static Listener listener = new Listener() {};
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})

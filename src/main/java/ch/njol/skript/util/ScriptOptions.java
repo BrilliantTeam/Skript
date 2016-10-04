@@ -31,7 +31,7 @@ import java.util.HashMap;
  */
 public class ScriptOptions {
 	
-	private HashMap<File, Boolean> usesNewLoops = new HashMap<File, Boolean>();
+	private HashMap<File, Boolean> usesNewLoops = new HashMap<>();
 	
 	@SuppressWarnings("null")
 	private static ScriptOptions instance = null;

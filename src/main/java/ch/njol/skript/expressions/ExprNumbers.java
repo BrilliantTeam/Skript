@@ -64,7 +64,7 @@ public class ExprNumbers extends SimpleExpression<Number> {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		start = matchedPattern == 0 ? (Expression<Number>) exprs[0] : new SimpleLiteral<Number>(1, false);
+		start = matchedPattern == 0 ? (Expression<Number>) exprs[0] : new SimpleLiteral<>(1, false);
 		end = (Expression<Number>) exprs[1 - matchedPattern];
 		integer = parseResult.mark == 1 || matchedPattern == 1;
 		return true;

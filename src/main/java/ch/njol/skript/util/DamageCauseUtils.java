@@ -30,7 +30,7 @@ import org.eclipse.jdt.annotation.Nullable;
 public abstract class DamageCauseUtils {
 	private DamageCauseUtils() {}
 	
-	private final static EnumUtils<DamageCause> util = new EnumUtils<DamageCause>(DamageCause.class, "damage causes");
+	private final static EnumUtils<DamageCause> util = new EnumUtils<>(DamageCause.class, "damage causes");
 	
 	@Nullable
 	public final static DamageCause parse(final String s) {

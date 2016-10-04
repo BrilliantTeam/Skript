@@ -90,7 +90,7 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 	@SuppressWarnings("null")
 	@Override
 	public Collection<? extends Region> getRegionsAt_i(final Location l) {
-		final List<ResidenceRegion> ress = new ArrayList<ResidenceRegion>();
+		final List<ResidenceRegion> ress = new ArrayList<>();
 		final ClaimedResidence res = Residence.getResidenceManager().getByLoc(l);
 		if (res == null)
 			return Collections.emptyList();

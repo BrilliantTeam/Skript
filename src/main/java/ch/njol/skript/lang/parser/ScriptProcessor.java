@@ -93,6 +93,7 @@ public class ScriptProcessor implements Runnable {
 	private List<ScriptCommand> commands;
 	private List<Trigger> selfRegisteringTriggers;
 	private Map<Class<? extends Event>[],Trigger> triggers;
+	private List<ParseLogHandler> parseLoggers;
 	
 	private String indentation = "";
 	
@@ -118,6 +119,7 @@ public class ScriptProcessor implements Runnable {
 		this.commands = new ArrayList<>();
 		this.selfRegisteringTriggers = new ArrayList<>();
 		this.triggers = new HashMap<>();
+		this.parseLoggers = new ArrayList<>();
 	}
 	
 	/**

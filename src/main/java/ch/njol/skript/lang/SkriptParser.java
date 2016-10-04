@@ -119,7 +119,7 @@ public class SkriptParser {
 	
 	public final static class ParseResult {
 		public final Expression<?>[] exprs;
-		public final List<MatchResult> regexes = new ArrayList<MatchResult>(1);
+		public final List<MatchResult> regexes = new ArrayList<>(1);
 		public final String expr;
 		/**
 		 * Defaults to 0. Any marks encountered in the pattern will be XORed with the existing value, in particular if only one mark is encountered this value will be set to that
@@ -359,7 +359,7 @@ public class SkriptParser {
 				final T t = Classes.parse(expr, c, context);
 				if (t != null) {
 					log.printLog();
-					return new SimpleLiteral<T>(t, false);
+					return new SimpleLiteral<>(t, false);
 				}
 			}
 			log.printError();
@@ -423,11 +423,11 @@ public class SkriptParser {
 			}
 			log.clear();
 			
-			final List<Expression<? extends T>> ts = new ArrayList<Expression<? extends T>>();
+			final List<Expression<? extends T>> ts = new ArrayList<>();
 			Kleenean and = Kleenean.UNKNOWN;
 			boolean isLiteralList = true;
 			
-			final List<int[]> pieces = new ArrayList<int[]>();
+			final List<int[]> pieces = new ArrayList<>();
 			{
 				final Matcher m = listSplitPattern.matcher(expr);
 				int i = 0, j = 0;
@@ -697,7 +697,7 @@ public class SkriptParser {
 //				}
 //			}
 //			@SuppressWarnings("null")
-			final FunctionReference<T> e = new FunctionReference<T>(functionName, SkriptLogger.getNode(), ScriptLoader.currentScript != null ? ScriptLoader.currentScript.getFile() : null, types, params);//.toArray(new Expression[params.size()]));
+			final FunctionReference<T> e = new FunctionReference<>(functionName, SkriptLogger.getNode(), ScriptLoader.currentScript != null ? ScriptLoader.currentScript.getFile() : null, types, params);//.toArray(new Expression[params.size()]));
 			if (!e.validateFunction(true)) {
 				log.printError();
 				return null;
@@ -777,7 +777,7 @@ public class SkriptParser {
 								return null;
 							}
 							log.printLog();
-							return new NonNullPair<SkriptEventInfo<?>, SkriptEvent>(info, e);
+							return new NonNullPair<>(info, e);
 						}
 					} catch (final InstantiationException e) {
 						assert false;
@@ -1210,9 +1210,9 @@ public class SkriptParser {
 	 */
 	@Nullable
 	public final static NonNullPair<String, boolean[]> validatePattern(final String pattern) {
-		final List<Boolean> ps = new ArrayList<Boolean>();
+		final List<Boolean> ps = new ArrayList<>();
 		int groupLevel = 0, optionalLevel = 0;
-		final Deque<Character> groups = new LinkedList<Character>();
+		final Deque<Character> groups = new LinkedList<>();
 		final StringBuilder b = new StringBuilder(pattern.length());
 		int last = 0;
 		for (int i = 0; i < pattern.length(); i++) {
@@ -1275,7 +1275,7 @@ public class SkriptParser {
 		final boolean[] plurals = new boolean[ps.size()];
 		for (int i = 0; i < plurals.length; i++)
 			plurals[i] = ps.get(i);
-		return new NonNullPair<String, boolean[]>("" + b.toString(), plurals);
+		return new NonNullPair<>("" + b.toString(), plurals);
 	}
 	
 	@Nullable

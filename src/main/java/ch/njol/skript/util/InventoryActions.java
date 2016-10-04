@@ -37,7 +37,7 @@ import ch.njol.skript.localization.Noun;
  */
 public class InventoryActions {
 	
-	private final static EnumUtils<InventoryAction> util = new EnumUtils<InventoryAction>(InventoryAction.class, "inventory actions");
+	private final static EnumUtils<InventoryAction> util = new EnumUtils<>(InventoryAction.class, "inventory actions");
 	
 	public static @Nullable InventoryAction parse(String s) {
 		return util.parse(s);

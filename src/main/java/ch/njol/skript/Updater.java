@@ -63,11 +63,11 @@ public class Updater {
 	
 	private static final Gson gson = new Gson();
 	
-	final static AtomicReference<String> error = new AtomicReference<String>();
+	final static AtomicReference<String> error = new AtomicReference<>();
 	public static volatile UpdateState state = UpdateState.NOT_STARTED;
 	
-	public final static List<ResponseEntry> infos = new ArrayList<ResponseEntry>();
-	public final static AtomicReference<ResponseEntry> latest = new AtomicReference<ResponseEntry>();
+	public final static List<ResponseEntry> infos = new ArrayList<>();
+	public final static AtomicReference<ResponseEntry> latest = new AtomicReference<>();
 	
 	// must be down here as they reference 'error' and 'latest' which are defined above
 	public final static Message m_not_started = new Message("updater.not started");
@@ -87,7 +87,7 @@ public class Updater {
 	@Nullable
 	static Task checkerTask;
 	
-	public final static AtomicReference<CommandSender> executor = new AtomicReference<CommandSender>();
+	public final static AtomicReference<CommandSender> executor = new AtomicReference<>();
 	
 	public enum UpdateState {
 		

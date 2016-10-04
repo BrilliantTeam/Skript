@@ -85,7 +85,7 @@ public final class DefaultYggdrasilInputStream extends YggdrasilInputStream {
 		}
 	}
 	
-	private final List<String> readShortStrings = new ArrayList<String>();
+	private final List<String> readShortStrings = new ArrayList<>();
 	
 	private String readShortString() throws IOException {
 		final int length = read();

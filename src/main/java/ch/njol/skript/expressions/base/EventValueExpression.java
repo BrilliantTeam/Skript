@@ -72,7 +72,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	private final Class<? extends T> c;
 	@Nullable
 	private Changer<? super T> changer;
-	private final Map<Class<? extends Event>, Getter<? extends T, ?>> getters = new HashMap<Class<? extends Event>, Getter<? extends T, ?>>();
+	private final Map<Class<? extends Event>, Getter<? extends T, ?>> getters = new HashMap<>();
 	
 	public EventValueExpression(final Class<? extends T> c) {
 		this(c, null);

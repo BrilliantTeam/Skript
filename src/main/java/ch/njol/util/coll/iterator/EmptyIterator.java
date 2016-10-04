@@ -29,7 +29,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public final class EmptyIterator<T> implements Iterator<T> {
 	
-	public final static EmptyIterator<Object> instance = new EmptyIterator<Object>();
+	public final static EmptyIterator<Object> instance = new EmptyIterator<>();
 	
 	@SuppressWarnings("unchecked")
 	public final static <T> EmptyIterator<T> get() {

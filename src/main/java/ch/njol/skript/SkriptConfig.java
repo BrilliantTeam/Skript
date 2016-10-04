@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.bukkit.event.EventPriority;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.classes.Converter;
@@ -97,9 +98,7 @@ public abstract class SkriptConfig {
 	
 	public final static Option<Boolean> usePlayerUUIDsInVariableNames = new Option<Boolean>("use player UUIDs in variable names", false); // TODO change to true later (as well as in the default config)
 	public final static Option<Boolean> enablePlayerVariableFix = new Option<Boolean>("player variable fix", true);
-
 	
-	@SuppressWarnings("null")
 	private final static DateFormat shortDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 	private final static Option<DateFormat> dateFormat = new Option<DateFormat>("date format", shortDateFormat, new Converter<String, DateFormat>() {
 		@Override

@@ -95,7 +95,7 @@ public class EvtRegionBorder extends SelfRegisteringSkriptEvent {
 		return (enter ? "enter" : "leave") + " of " + (r == null ? "a region" : r.toString(e, debug));
 	}
 	
-	private final static Collection<Trigger> triggers = new ArrayList<Trigger>();
+	private final static Collection<Trigger> triggers = new ArrayList<>();
 	
 	@Override
 	public void register(final Trigger t) {

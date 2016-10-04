@@ -34,7 +34,7 @@ public abstract class SoundUtils {
 		assert false;
 	}
 	
-	private final static EnumUtils<Sound> util = new EnumUtils<Sound>(Sound.class, "sounds");
+	private final static EnumUtils<Sound> util = new EnumUtils<>(Sound.class, "sounds");
 	
 	@Nullable
 	public final static Sound parse(final String s) {

@@ -146,7 +146,7 @@ public class ExprLore extends SimpleExpression<String> {
 		if (meta == null)
 			meta = Bukkit.getItemFactory().getItemMeta(Material.STONE);
 		final Number n = line != null ? line.getSingle(e) : null;
-		List<String> lore = meta.hasLore() ? new ArrayList<String>(meta.getLore()) : new ArrayList<String>();
+		List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
 		if (n == null) {
 			if (line != null)
 				return;

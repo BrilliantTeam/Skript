@@ -168,7 +168,7 @@ public abstract class PseudoEnum<T extends PseudoEnum<T>> {
 	private final static <T extends PseudoEnum<T>> List<T> values(final Class<T> c, final Info<T> info) {
 		info.readLock.lock();
 		try {
-			return new ArrayList<T>(info.values);
+			return new ArrayList<>(info.values);
 		} finally {
 			info.readLock.unlock();
 		}
@@ -238,8 +238,8 @@ public abstract class PseudoEnum<T extends PseudoEnum<T>> {
 	
 	@SuppressWarnings("null")
 	private final static class Info<T extends PseudoEnum<T>> {
-		final List<T> values = new ArrayList<T>();
-		final Map<String, T> map = new HashMap<String, T>();
+		final List<T> values = new ArrayList<>();
+		final Map<String, T> map = new HashMap<>();
 		
 		final ReadWriteLock lock = new ReentrantReadWriteLock(true);
 		final Lock readLock = lock.readLock(), writeLock = lock.writeLock();
@@ -250,13 +250,13 @@ public abstract class PseudoEnum<T extends PseudoEnum<T>> {
 	/**
 	 * Must be synchronised
 	 */
-	private final static Map<Class<? extends PseudoEnum<?>>, Info<?>> infos = new HashMap<Class<? extends PseudoEnum<?>>, Info<?>>();
+	private final static Map<Class<? extends PseudoEnum<?>>, Info<?>> infos = new HashMap<>();
 	
 	private final static <T extends PseudoEnum<T>> Info<T> getInfo(final Class<T> c) {
 		synchronized (infos) {
 			Info<T> info = (Info<T>) infos.get(getDeclaringClass(c));
 			if (info == null)
-				infos.put(c, info = new Info<T>());
+				infos.put(c, info = new Info<>());
 			return info;
 		}
 	}

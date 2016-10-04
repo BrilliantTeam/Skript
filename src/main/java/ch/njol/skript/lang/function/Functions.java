@@ -55,7 +55,7 @@ public abstract class Functions {
 	
 	final static class FunctionData {
 		final Function<?> function;
-		final Collection<FunctionReference<?>> calls = new ArrayList<FunctionReference<?>>();
+		final Collection<FunctionReference<?>> calls = new ArrayList<>();
 		
 		public FunctionData(final Function<?> function) {
 			this.function = function;
@@ -65,12 +65,12 @@ public abstract class Functions {
 	@Nullable
 	public static ScriptFunction<?> currentFunction = null;
 	
-	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<String, JavaFunction<?>>();
-	final static Map<String, FunctionData> functions = new HashMap<String, FunctionData>();
-	final static Map<String, Signature<?>> javaSignatures = new HashMap<String, Signature<?>>();
-	final static Map<String, Signature<?>> signatures = new HashMap<String, Signature<?>>();
+	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<>();
+	final static Map<String, FunctionData> functions = new HashMap<>();
+	final static Map<String, Signature<?>> javaSignatures = new HashMap<>();
+	final static Map<String, Signature<?>> signatures = new HashMap<>();
 	
-	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<FunctionReference<?>>();
+	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<>();
 	
 	/**
 	 * @param function
@@ -147,7 +147,7 @@ public abstract class Functions {
 		final String name = "" + m.group(1); // TODO check for name uniqueness (currently functions with same name silently override each other)
 		final String args = m.group(2);
 		final String returnType = m.group(3);
-		final List<Parameter<?>> params = new ArrayList<Parameter<?>>();
+		final List<Parameter<?>> params = new ArrayList<>();
 		int j = 0;
 		for (int i = 0; i <= args.length(); i = SkriptParser.next(args, i, ParseContext.DEFAULT)) {
 			if (i == -1)
@@ -195,7 +195,7 @@ public abstract class Functions {
 		}
 		
 		@SuppressWarnings("unchecked")
-		Signature<?> sign = new Signature<Object>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
+		Signature<?> sign = new Signature<>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
 		Functions.signatures.put(name, sign);
 		return sign;
 	}
@@ -247,7 +247,7 @@ public abstract class Functions {
 		return signatures.get(name);
 	}
 	
-	private final static Collection<FunctionReference<?>> toValidate = new ArrayList<FunctionReference<?>>();
+	private final static Collection<FunctionReference<?>> toValidate = new ArrayList<>();
 	
 	/**
 	 * Remember to call {@link #validateFunctions()} after calling this

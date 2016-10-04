@@ -93,7 +93,7 @@ public class BukkitClasses {
 	public BukkitClasses() {}
 	
 	static {
-		Classes.registerClass(new ClassInfo<Entity>(Entity.class, "entity")
+		Classes.registerClass(new ClassInfo<>(Entity.class, "entity")
 				.user("entit(y|ies)")
 				.name("Entity")
 				.description("An entity is something in a <a href='#world'>world</a> that's not a <a href='#block'>block</a>, " +
@@ -105,7 +105,7 @@ public class BukkitClasses {
 						"projectile is an arrow",
 						"shoot a fireball from the player")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<Entity>(Entity.class))
+				.defaultExpression(new EventValueExpression<>(Entity.class))
 				.parser(new Parser<Entity>() {
 					@Override
 					@Nullable
@@ -135,7 +135,7 @@ public class BukkitClasses {
 				})
 				.changer(DefaultChangers.entityChanger));
 		
-		Classes.registerClass(new ClassInfo<LivingEntity>(LivingEntity.class, "livingentity")
+		Classes.registerClass(new ClassInfo<>(LivingEntity.class, "livingentity")
 				.user("living ?entit(y|ies)")
 				.name("Living Entity")
 				.description("A living <a href='#entity'>entity</a>, i.e. a mob or <a href='#player'>player</a>, not inanimate entities like <a href='#projectile'>projectiles</a> or dropped items.")
@@ -143,10 +143,10 @@ public class BukkitClasses {
 				.examples("spawn 5 powered creepers",
 						"shoot a zombie from the creeper")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<LivingEntity>(LivingEntity.class))
+				.defaultExpression(new EventValueExpression<>(LivingEntity.class))
 				.changer(DefaultChangers.entityChanger));
 		
-		Classes.registerClass(new ClassInfo<Projectile>(Projectile.class, "projectile")
+		Classes.registerClass(new ClassInfo<>(Projectile.class, "projectile")
 				.user("projectiles?")
 				.name("Projectile")
 				.description("A projectile, e.g. an arrow, snowball or thrown potion.")
@@ -154,10 +154,10 @@ public class BukkitClasses {
 				.examples("projectile is a snowball",
 						"shoot an arrow at speed 5 from the player")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<Projectile>(Projectile.class))
+				.defaultExpression(new EventValueExpression<>(Projectile.class))
 				.changer(DefaultChangers.nonLivingEntityChanger));
 		
-		Classes.registerClass(new ClassInfo<Block>(Block.class, "block")
+		Classes.registerClass(new ClassInfo<>(Block.class, "block")
 				.user("blocks?")
 				.name("Block")
 				.description("A block in a <a href='#world'>world</a>. It has a <a href='#location'>location</a> and a <a href='#itemstack'>type</a>, " +
@@ -165,7 +165,7 @@ public class BukkitClasses {
 				.usage("")
 				.examples("")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<Block>(Block.class))
+				.defaultExpression(new EventValueExpression<>(Block.class))
 				.parser(new Parser<Block>() {
 					@Override
 					@Nullable
@@ -260,7 +260,7 @@ public class BukkitClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Location>(Location.class, "location")
+		Classes.registerClass(new ClassInfo<>(Location.class, "location")
 				.user("locations?")
 				.name("Location")
 				.description("A location in a <a href='#world'>world</a>. Locations are world-specific and even store a <a href='#direction'>direction</a>, " +
@@ -268,7 +268,7 @@ public class BukkitClasses {
 				.usage("")
 				.examples("")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<Location>(Location.class))
+				.defaultExpression(new EventValueExpression<>(Location.class))
 				.parser(new Parser<Location>() {
 					@Override
 					@Nullable
@@ -358,7 +358,7 @@ public class BukkitClasses {
 				}));
 		
 		// FIXME update doc
-		Classes.registerClass(new ClassInfo<World>(World.class, "world")
+		Classes.registerClass(new ClassInfo<>(World.class, "world")
 				.user("worlds?")
 				.name("World")
 				.description("One of the server's worlds. Worlds can be put into scripts by surrounding their name with double quotes, e.g. \"world_nether\", " +
@@ -367,7 +367,7 @@ public class BukkitClasses {
 				.examples("broadcast \"Hello!\" to the world \"world_nether\"")
 				.since("1.0, 2.2 (alternate syntax)")
 				.after("string")
-				.defaultExpression(new EventValueExpression<World>(World.class))
+				.defaultExpression(new EventValueExpression<>(World.class))
 				.parser(new Parser<World>() {
 					@SuppressWarnings("null")
 					private final Pattern parsePattern = Pattern.compile("(?:(?:the )?world )?\"(.+)\"", Pattern.CASE_INSENSITIVE);
@@ -438,7 +438,7 @@ public class BukkitClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Inventory>(Inventory.class, "inventory")
+		Classes.registerClass(new ClassInfo<>(Inventory.class, "inventory")
 				.user("inventor(y|ies)")
 				.name("Inventory")
 				.description("An inventory of a <a href='#player'>player</a> or <a href='#block'>block</a>. Inventories have many effects and conditions regarding the items contained.",
@@ -447,7 +447,7 @@ public class BukkitClasses {
 				.usage("")
 				.examples("")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<Inventory>(Inventory.class))
+				.defaultExpression(new EventValueExpression<>(Inventory.class))
 				.parser(new Parser<Inventory>() {
 					@Override
 					@Nullable
@@ -481,14 +481,14 @@ public class BukkitClasses {
 					}
 				}).changer(DefaultChangers.inventoryChanger));
 		
-		Classes.registerClass(new ClassInfo<InventoryAction>(InventoryAction.class, "inventoryaction")
+		Classes.registerClass(new ClassInfo<>(InventoryAction.class, "inventoryaction")
 				.user("inventory actions?")
 				.name("Inventory Action")
 				.description("What player just did in inventory event. Note that when in creative game mode, most actions do not work correctly.")
 				.usage(InventoryActions.getAllNames())
 				.examples("")
 				.since("2.2-dev16")
-				.defaultExpression(new EventValueExpression<InventoryAction>(InventoryAction.class))
+				.defaultExpression(new EventValueExpression<>(InventoryAction.class))
 				.parser(new Parser<InventoryAction>() {
 
 					@Override
@@ -515,15 +515,15 @@ public class BukkitClasses {
 					
 				}));
 		
-		final EnumUtils<ClickType> invClicks = new EnumUtils<ClickType>(ClickType.class, "click actions"); // Less boilerplate code!
-		Classes.registerClass(new ClassInfo<ClickType>(ClickType.class, "clickaction")
+		final EnumUtils<ClickType> invClicks = new EnumUtils<>(ClickType.class, "click actions"); // Less boilerplate code!
+		Classes.registerClass(new ClassInfo<>(ClickType.class, "clickaction")
 				.user("click actions?")
 				.name("Click Action")
 				.description("Click action, mostly for inventory events. Tells exactly which keys/buttons player pressed, assuming that default keybindings are used in client side.")
 				.usage(invClicks.getAllNames())
 				.examples("")
 				.since("2.2-dev16b")
-				.defaultExpression(new EventValueExpression<ClickType>(ClickType.class))
+				.defaultExpression(new EventValueExpression<>(ClickType.class))
 				.parser(new Parser<ClickType>() {
 					@Override
 					@Nullable
@@ -549,7 +549,7 @@ public class BukkitClasses {
 					
 				}));
 		
-		Classes.registerClass(new ClassInfo<Player>(Player.class, "player")
+		Classes.registerClass(new ClassInfo<>(Player.class, "player")
 				.user("players?")
 				.name("Player")
 				.description("A player. Depending on whether a player is online or offline several actions can be performed with them, " +
@@ -560,7 +560,7 @@ public class BukkitClasses {
 				.usage("")
 				.examples("")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<Player>(Player.class))
+				.defaultExpression(new EventValueExpression<>(Player.class))
 				.after("string", "world")
 				.parser(new Parser<Player>() {
 					@Override
@@ -616,7 +616,7 @@ public class BukkitClasses {
 				.changer(DefaultChangers.playerChanger)
 				.serializeAs(OfflinePlayer.class));
 		
-		Classes.registerClass(new ClassInfo<OfflinePlayer>(OfflinePlayer.class, "offlineplayer")
+		Classes.registerClass(new ClassInfo<>(OfflinePlayer.class, "offlineplayer")
 				.user("offline ?players?")
 				.name("Offlineplayer")
 				.description("A player that is possibly offline. See <a href='#player'>player</a> for more information. " +
@@ -624,7 +624,7 @@ public class BukkitClasses {
 				.usage("")
 				.examples("")
 				.since("")
-				.defaultExpression(new EventValueExpression<OfflinePlayer>(OfflinePlayer.class))
+				.defaultExpression(new EventValueExpression<>(OfflinePlayer.class))
 				.after("string", "world")
 				.parser(new Parser<OfflinePlayer>() {
 					@SuppressWarnings("deprecation")
@@ -731,7 +731,7 @@ public class BukkitClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<CommandSender>(CommandSender.class, "commandsender")
+		Classes.registerClass(new ClassInfo<>(CommandSender.class, "commandsender")
 				.user("(commands?)? ?(sender|executor)s?")
 				.name("Command Sender")
 				.description("A player or the console.")
@@ -743,7 +743,7 @@ public class BukkitClasses {
 						"	give coal to the player",
 						"	message \"You got a piece of coal for sending that PM!\"")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<CommandSender>(CommandSender.class))
+				.defaultExpression(new EventValueExpression<>(CommandSender.class))
 				.parser(new Parser<CommandSender>() {
 					@Override
 					@Nullable
@@ -772,11 +772,11 @@ public class BukkitClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<InventoryHolder>(InventoryHolder.class, "inventoryholder")
+		Classes.registerClass(new ClassInfo<>(InventoryHolder.class, "inventoryholder")
 				.name(ClassInfo.NO_DOC)
-				.defaultExpression(new EventValueExpression<InventoryHolder>(InventoryHolder.class)));
+				.defaultExpression(new EventValueExpression<>(InventoryHolder.class)));
 		
-		Classes.registerClass(new ClassInfo<GameMode>(GameMode.class, "gamemode")
+		Classes.registerClass(new ClassInfo<>(GameMode.class, "gamemode")
 				.user("game ?modes?")
 				.name("Game Mode")
 				.description("The game modes survival, creative and adventure.")
@@ -784,7 +784,7 @@ public class BukkitClasses {
 				.examples("player's gamemode is survival",
 						"set the player argument's game mode to creative")
 				.since("1.0")
-				.defaultExpression(new SimpleLiteral<GameMode>(GameMode.SURVIVAL, true))
+				.defaultExpression(new SimpleLiteral<>(GameMode.SURVIVAL, true))
 				.parser(new Parser<GameMode>() {
 					private final Message[] names = new Message[GameMode.values().length];
 					{
@@ -818,9 +818,9 @@ public class BukkitClasses {
 					public String getVariableNamePattern() {
 						return "[a-z]+";
 					}
-				}).serializer(new EnumSerializer<GameMode>(GameMode.class)));
+				}).serializer(new EnumSerializer<>(GameMode.class)));
 		
-		Classes.registerClass(new ClassInfo<ItemStack>(ItemStack.class, "itemstack")
+		Classes.registerClass(new ClassInfo<>(ItemStack.class, "itemstack")
 				.user("item", "material")
 				.name("Item / Material")
 				.description("An item, e.g. a stack of torches, a furnace, or a wooden sword of sharpness 2. " +
@@ -883,12 +883,12 @@ public class BukkitClasses {
 					}
 				}).serializer(new ConfigurationSerializer<ItemStack>()));
 		
-		Classes.registerClass(new ClassInfo<Item>(Item.class, "itementity")
+		Classes.registerClass(new ClassInfo<>(Item.class, "itementity")
 				.name(ClassInfo.NO_DOC)
 				.since("2.0")
 				.changer(DefaultChangers.itemChanger));
 		
-		Classes.registerClass(new ClassInfo<Biome>(Biome.class, "biome")
+		Classes.registerClass(new ClassInfo<>(Biome.class, "biome")
 				.user("biomes?")
 				.name("Biome")
 				.description("All possible biomes Minecraft uses to generate a world.")
@@ -918,10 +918,10 @@ public class BukkitClasses {
 						return "\\S+";
 					}
 				})
-				.serializer(new EnumSerializer<Biome>(Biome.class)));
+				.serializer(new EnumSerializer<>(Biome.class)));
 		
 //		PotionEffect is not used; ItemType is used instead
-		Classes.registerClass(new ClassInfo<PotionEffectType>(PotionEffectType.class, "potioneffecttype")
+		Classes.registerClass(new ClassInfo<>(PotionEffectType.class, "potioneffecttype")
 				.user("potion( ?effect)?( ?type)?s?")
 				.name("Potion Effect Type")
 				.description("A potion effect type, e.g. 'strength' or 'swiftness'.")
@@ -993,7 +993,7 @@ public class BukkitClasses {
 				}));
 		
 		// REMIND make my own damage cause class (that e.g. stores the attacker entity, the projectile, or the attacking block)
-		Classes.registerClass(new ClassInfo<DamageCause>(DamageCause.class, "damagecause")
+		Classes.registerClass(new ClassInfo<>(DamageCause.class, "damagecause")
 				.user("damage causes?")
 				.name("Damage Cause")
 				.description("The cause/type of a <a href='../events/#damage'>damage event</a>, e.g. lava, fall, fire, drowning, explosion, poison, etc.",
@@ -1025,9 +1025,9 @@ public class BukkitClasses {
 						return "[a-z0-9_-]+";
 					}
 				})
-				.serializer(new EnumSerializer<DamageCause>(DamageCause.class)));
+				.serializer(new EnumSerializer<>(DamageCause.class)));
 		
-		Classes.registerClass(new ClassInfo<Chunk>(Chunk.class, "chunk")
+		Classes.registerClass(new ClassInfo<>(Chunk.class, "chunk")
 				.user("chunks?")
 				.name("Chunk")
 				.description("A chunk is a cuboid of 16×16×128 (x×z×y) blocks. Chunks are spread on a fixed rectangular grid in their world.")
@@ -1118,7 +1118,7 @@ public class BukkitClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Enchantment>(Enchantment.class, "enchantment")
+		Classes.registerClass(new ClassInfo<>(Enchantment.class, "enchantment")
 				.user("enchantments?")
 				.name("Enchantment")
 				.description("An enchantment, e.g. 'sharpness' or 'furtune'. Unlike <a href='#enchantmenttype'>enchantment type</a> this type has no level, but you usually don't need to use this type anyway.")

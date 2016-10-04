@@ -94,7 +94,7 @@ public abstract class Commands {
 	public final static Message m_correct_usage = new Message("commands.correct usage");
 	public final static Message m_internal_error = new Message("commands.internal error");
 	
-	private final static Map<String, ScriptCommand> commands = new HashMap<String, ScriptCommand>();
+	private final static Map<String, ScriptCommand> commands = new HashMap<>();
 	
 	@Nullable
 	private static SimpleCommandMap commandMap = null;
@@ -358,7 +358,7 @@ public abstract class Commands {
 		final String arguments = m.group(3) == null ? "" : m.group(3);
 		final StringBuilder pattern = new StringBuilder();
 		
-		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<Argument<?>>(); //Mirre
+		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<>(); //Mirre
 		m = argumentPattern.matcher(arguments);
 		int lastEnd = 0;
 		int optionals = 0;
@@ -427,11 +427,11 @@ public abstract class Commands {
 		
 		final String usage = scriptParser.replaceOptions(node.get("usage", desc));
 		final String description = scriptParser.replaceOptions(node.get("description", ""));
-		ArrayList<String> aliases = new ArrayList<String>(Arrays.asList(scriptParser.replaceOptions(node.get("aliases", "")).split("\\s*,\\s*/?")));
+		ArrayList<String> aliases = new ArrayList<>(Arrays.asList(scriptParser.replaceOptions(node.get("aliases", "")).split("\\s*,\\s*/?")));
 		if (aliases.get(0).startsWith("/"))
 			aliases.set(0, aliases.get(0).substring(1));
 		else if (aliases.get(0).isEmpty())
-			aliases = new ArrayList<String>(0);
+			aliases = new ArrayList<>(0);
 		final String permission = scriptParser.replaceOptions(node.get("permission", ""));
 		final String permissionMessage = scriptParser.replaceOptions(node.get("permission message", ""));
 		final SectionNode trigger = (SectionNode) node.get("trigger");
