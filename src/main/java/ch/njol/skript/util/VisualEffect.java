@@ -48,6 +48,7 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxElement;
 import ch.njol.skript.lang.SyntaxElementInfo;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.LanguageChangeListener;
 import ch.njol.skript.localization.Noun;
@@ -338,11 +339,11 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	}
 	
 	@Nullable
-	public final static VisualEffect parse(final String s) {
+	public final static VisualEffect parse(final String s, final ParserInstance pi) {
 		final SyntaxElementInfo<VisualEffect> info = VisualEffect.info;
 		if (info == null)
 			return null;
-		return SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), new SingleItemIterator<>(info), null);
+		return SkriptParser.parseStatic(pi, Noun.stripIndefiniteArticle(s), new SingleItemIterator<>(info), null);
 	}
 	
 	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e) {

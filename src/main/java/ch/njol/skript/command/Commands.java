@@ -384,7 +384,7 @@ public abstract class Commands {
 				return null;
 			}
 			
-			final Argument<?> arg = Argument.newInstance(m.group(1), c, m.group(3), i, !p.getSecond(), optionals > 0);
+			final Argument<?> arg = Argument.newInstance(scriptParser, m.group(1), c, m.group(3), i, !p.getSecond(), optionals > 0);
 			if (arg == null)
 				return null;
 			currentArguments.add(arg);

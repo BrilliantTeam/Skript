@@ -26,7 +26,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,12 +45,14 @@ import ch.njol.skript.config.Config;
 public class ScriptManager extends Thread {
 	
 	private AtomicInteger waitLoading = new AtomicInteger();
-	private List<Config> parseList = new ArrayList<>();
+	private Map<String,Config> loadMap = new ConcurrentHashMap<>();
+	
+	private AtomicInteger waitParsing = new AtomicInteger();
+	private Map<String,Config> parseMap = new ConcurrentHashMap<>();
 	
 	/**
 	 * Cached thread pool to execute the tasks.
 	 */
-	@SuppressWarnings("null") // Java API is just missing the annotations
 	private ExecutorService pool = Executors.newCachedThreadPool();
 	
 	public void load(File[] files) {
@@ -64,8 +70,11 @@ public class ScriptManager extends Thread {
 		if (numScripts == 0) // Load nothing
 			return;
 		
-		parseList = new ArrayList<>(numScripts);
+		loadMap = new ConcurrentHashMap<>();
 		waitLoading.set(numScripts);
+		
+		parseMap = new ConcurrentHashMap<>();
+		waitParsing.set(numScripts);
 		
 		for (File f : scripts) {
 			if (f == null) // Non-scripts and disabled scripts
@@ -73,15 +82,17 @@ public class ScriptManager extends Thread {
 			pool.execute(new ScriptLoader(f, this));
 		}
 		
-		if (waitLoading.get() > 0) // Only park this thread if work is not done
-			LockSupport.park();
+		while (waitLoading.get() > 0) // Only park this thread if work is not done
+			LockSupport.park(); // Then use while for in case spurious unpark happens
 		
-		
+		for (Entry<String,Config> entry : loadMap.entrySet()) {
+			pool.execute(new ParserInstance(entry.getKey(), entry.getValue(), this));
+		}
 	}
 	
-	public void loadReady(Config config) {
+	public void loadReady(String file, Config config) {
 		int counter = waitLoading.decrementAndGet();
-		parseList.add(config);
+		loadMap.put(file, config);
 		if (counter < 1)
 			LockSupport.unpark(this);
 	}

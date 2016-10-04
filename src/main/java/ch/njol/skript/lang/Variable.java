@@ -50,6 +50,7 @@ import ch.njol.skript.classes.Changer.ChangerUtils;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Comparator.Relation;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Comparators;
@@ -142,7 +143,7 @@ public class Variable<T> implements Expression<T> {
 	 * Prints errors
 	 */
 	@Nullable
-	public static <T> Variable<T> newInstance(String name, final Class<? extends T>[] types) {
+	public static <T> Variable<T> newInstance(final ParserInstance pi, String name, final Class<? extends T>[] types) {
 //		if (name.startsWith(LOCAL_VARIABLE_TOKEN) && name.contains(SEPARATOR)) {
 //			Skript.error("Local variables cannot be lists, i.e. must not contain the separator '" + SEPARATOR + "' (error in variable {" + name + "})");
 //			return null;
@@ -150,7 +151,7 @@ public class Variable<T> implements Expression<T> {
 		name = "" + name.trim();
 		if (!isValidVariableName(name, true, true))
 			return null;
-		final VariableString vs = VariableString.newInstance(name.startsWith(LOCAL_VARIABLE_TOKEN) ? "" + name.substring(LOCAL_VARIABLE_TOKEN.length()).trim() : name, StringMode.VARIABLE_NAME);
+		final VariableString vs = VariableString.newInstance(pi, name.startsWith(LOCAL_VARIABLE_TOKEN) ? "" + name.substring(LOCAL_VARIABLE_TOKEN.length()).trim() : name, StringMode.VARIABLE_NAME);
 		if (vs == null)
 			return null;
 		return new Variable<>(vs, types, name.startsWith(LOCAL_VARIABLE_TOKEN), name.endsWith(SEPARATOR + "*"), null);

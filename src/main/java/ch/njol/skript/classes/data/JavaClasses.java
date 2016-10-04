@@ -593,7 +593,7 @@ public class JavaClasses {
 					@Nullable
 					public String parse(final String s, final ParseContext context) {
 						switch (context) {
-							case DEFAULT: // in DEFAULT, parsing is handled by VariableString
+							case DEFAULT: // in DUMMY, parsing is handled by VariableString
 								assert false;
 								return null;
 							case CONFIG: // duh

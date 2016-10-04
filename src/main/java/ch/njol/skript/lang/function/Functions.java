@@ -40,6 +40,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
@@ -134,10 +135,11 @@ public abstract class Functions {
 	 * Loads the signature of function from given node.
 	 * @param script Script file name (<b>might</b> be used for some checks).
 	 * @param node Section node.
+	 * @param pi Parser instance (for logging).
 	 * @return Signature of function, or null if something went wrong.
 	 */
 	@Nullable
-	public static Signature<?> loadSignature(String script, final SectionNode node) {
+	public static Signature<?> loadSignature(final String script, final SectionNode node, final ParserInstance pi) {
 		SkriptLogger.setNode(node);
 		final String definition = node.getKey();
 		assert definition != null;
@@ -169,7 +171,7 @@ public abstract class Functions {
 					c = Classes.getClassInfoFromUserInput(pl.getFirst());
 				if (c == null)
 					return signError("Cannot recognise the type '" + n.group(2) + "'");
-				final Parameter<?> p = Parameter.newInstance(paramName, c, !pl.getSecond(), n.group(3));
+				final Parameter<?> p = Parameter.newInstance(pi, paramName, c, !pl.getSecond(), n.group(3));
 				if (p == null)
 					return null;
 				params.add(p);

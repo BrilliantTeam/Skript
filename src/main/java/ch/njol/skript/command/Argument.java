@@ -33,6 +33,7 @@ import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -72,7 +73,7 @@ public class Argument<T> {
 	
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public static <T> Argument<T> newInstance(@Nullable final String name, final ClassInfo<T> type, final @Nullable String def, final int index, final boolean single, final boolean forceOptional) {
+	public static <T> Argument<T> newInstance(final ParserInstance pi, @Nullable final String name, final ClassInfo<T> type, final @Nullable String def, final int index, final boolean single, final boolean forceOptional) {
 		if (name != null && !Variable.isValidVariableName(name, false, false)) {
 			Skript.error("An argument's name must be a valid variable name, and cannot be a list variable.");
 			return null;
@@ -82,7 +83,7 @@ public class Argument<T> {
 			if (def.startsWith("%") && def.endsWith("%")) {
 				final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 				try {
-					d = new SkriptParser("" + def.substring(1, def.length() - 1), SkriptParser.PARSE_EXPRESSIONS, ParseContext.COMMAND).parseExpression(type.getC());
+					d = new SkriptParser(pi, "" + def.substring(1, def.length() - 1), SkriptParser.PARSE_EXPRESSIONS, ParseContext.COMMAND).parseExpression(type.getC());
 					if (d == null) {
 						log.printErrors("Can't understand this expression: " + def + "");
 						return null;
@@ -96,11 +97,11 @@ public class Argument<T> {
 				try {
 					if (type.getC() == String.class) {
 						if (def.startsWith("\"") && def.endsWith("\""))
-							d = (Expression<? extends T>) VariableString.newInstance("" + def.substring(1, def.length() - 1));
+							d = (Expression<? extends T>) VariableString.newInstance(pi, "" + def.substring(1, def.length() - 1));
 						else
 							d = (Expression<? extends T>) new SimpleLiteral<>(def, false);
 					} else {
-						d = new SkriptParser(def, SkriptParser.PARSE_LITERALS, ParseContext.DEFAULT).parseExpression(type.getC());
+						d = new SkriptParser(pi, def, SkriptParser.PARSE_LITERALS, ParseContext.DEFAULT).parseExpression(type.getC());
 					}
 					if (d == null) {
 						log.printErrors("Can't understand this expression: '" + def + "'");

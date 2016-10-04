@@ -52,6 +52,7 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxElement;
 import ch.njol.skript.lang.SyntaxElementInfo;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Adjective;
 import ch.njol.skript.localization.Language;
@@ -167,8 +168,8 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 					
 					@Override
 					@Nullable
-					public EntityData parse(final String s, final ParseContext context) {
-						return EntityData.parse(s);
+					public EntityData parse(final String s, final ParseContext context, final ParserInstance pi) {
+						return EntityData.parse(s, pi);
 					}
 					
 					@Override
@@ -395,9 +396,9 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 */
 	@SuppressWarnings("null")
 	@Nullable
-	public final static EntityData<?> parse(final String s) {
+	public final static EntityData<?> parse(final String s, final ParserInstance pi) {
 		final Iterator<? extends SyntaxElementInfo<?>> it = infos.iterator();
-		return (EntityData<?>) SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), it, null);
+		return (EntityData<?>) SkriptParser.parseStatic(pi, Noun.stripIndefiniteArticle(s), it, null);
 	}
 	
 	/**
@@ -408,9 +409,9 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 */
 	@SuppressWarnings("null")
 	@Nullable
-	public final static EntityData<?> parseWithoutIndefiniteArticle(final String s) {
+	public final static EntityData<?> parseWithoutIndefiniteArticle(final String s, final ParserInstance pi) {
 		final Iterator<? extends SyntaxElementInfo<?>> it = infos.iterator();
-		return (EntityData<?>) SkriptParser.parseStatic(s, it, null);
+		return (EntityData<?>) SkriptParser.parseStatic(pi, s, it, null);
 	}
 	
 	@Nullable

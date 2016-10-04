@@ -126,15 +126,17 @@ public class SkriptParser {
 		public final Expression<?>[] exprs;
 		public final List<MatchResult> regexes = new ArrayList<>(1);
 		public final String expr;
+		public final ParserInstance pi;
 		/**
 		 * Defaults to 0. Any marks encountered in the pattern will be XORed with the existing value, in particular if only one mark is encountered this value will be set to that
 		 * mark.
 		 */
 		public int mark = 0;
 		
-		public ParseResult(final SkriptParser parser, final String pattern) {
+		public ParseResult(final SkriptParser parser, final String pattern, final ParserInstance parserInstance) {
 			expr = parser.expr;
 			exprs = new Expression<?>[countUnescaped(pattern, '%') / 2];
+			pi = parserInstance;
 		}
 	}
 	
@@ -277,9 +279,9 @@ public class SkriptParser {
 	 * Prints errors
 	 */
 	@Nullable
-	private final static <T> Variable<T> parseVariable(final String expr, final Class<? extends T>[] returnTypes) {
+	private final static <T> Variable<T> parseVariable(final ParserInstance pi, final String expr, final Class<? extends T>[] returnTypes) {
 		if (varPattern.matcher(expr).matches())
-			return Variable.newInstance("" + expr.substring(expr.indexOf('{') + 1, expr.lastIndexOf('}')), returnTypes);
+			return Variable.newInstance(pi, "" + expr.substring(expr.indexOf('{') + 1, expr.lastIndexOf('}')), returnTypes);
 		return null;
 	}
 	
@@ -295,7 +297,7 @@ public class SkriptParser {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			if (context == ParseContext.DEFAULT || context == ParseContext.EVENT) {
-				final Variable<? extends T> var = parseVariable(expr, types);
+				final Variable<? extends T> var = parseVariable(pi, expr, types);
 				if (var != null) {
 					if ((flags & PARSE_EXPRESSIONS) == 0) {
 						Skript.error("Variables cannot be used here.");
@@ -321,7 +323,7 @@ public class SkriptParser {
 			if ((flags & PARSE_EXPRESSIONS) != 0) {
 				final Expression<?> e;
 				if (expr.startsWith("\"") && expr.endsWith("\"") && expr.length() != 1 && (types[0] == Object.class || CollectionUtils.contains(types, String.class))) {
-					e = VariableString.newInstance("" + expr.substring(1, expr.length() - 1));
+					e = VariableString.newInstance(pi, "" + expr.substring(1, expr.length() - 1));
 				} else {
 					e = (Expression<?>) parse(pi, expr, (Iterator) Skript.getExpressions(types), null);
 				}
@@ -734,6 +736,13 @@ public class SkriptParser {
 	}
 	
 	/**
+	 * Prints parse errors (i.e. must start a ParseLog before calling this method)
+	 */
+	public static boolean parseArguments(final String args, final ScriptCommand command, final ScriptCommandEvent event) {
+		return parseArguments(ParserInstance.DUMMY, args, command, event);
+	}
+	
+	/**
 	 * Parses the text as the given pattern as {@link ParseContext#COMMAND}.
 	 * <p>
 	 * Prints parse errors (i.e. must start a ParseLog before calling this method)
@@ -741,6 +750,16 @@ public class SkriptParser {
 	@Nullable
 	public static ParseResult parse(final ParserInstance pi, final String text, final String pattern) {
 		return new SkriptParser(pi, text, PARSE_LITERALS, ParseContext.COMMAND).parse_i(pattern, 0, 0);
+	}
+	
+	/**
+	 * Parses the text as the given pattern as {@link ParseContext#COMMAND}.
+	 * <p>
+	 * Prints parse errors (i.e. must start a ParseLog before calling this method)
+	 */
+	@Nullable
+	public static ParseResult parse(final String text, final String pattern) {
+		return parse(ParserInstance.DUMMY, text, pattern);
 	}
 	
 	@Nullable
@@ -1202,7 +1221,7 @@ public class SkriptParser {
 			}
 		}
 		if (i == expr.length() && j == pattern.length())
-			return new ParseResult(this, pattern);
+			return new ParseResult(this, pattern, pi);
 		return null;
 	}
 	

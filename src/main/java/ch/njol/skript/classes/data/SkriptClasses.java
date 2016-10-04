@@ -46,6 +46,7 @@ import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.classes.YggdrasilSerializer;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.localization.RegexMessage;
@@ -862,8 +863,8 @@ public class SkriptClasses {
 				.parser(new Parser<VisualEffect>() {
 					@Override
 					@Nullable
-					public VisualEffect parse(final String s, final ParseContext context) {
-						return VisualEffect.parse(s);
+					public VisualEffect parse(final String s, final ParseContext context, final ParserInstance pi) {
+						return VisualEffect.parse(s, pi);
 					}
 					
 					@Override

@@ -141,7 +141,7 @@ public class ParseLogHandler extends LogHandler {
 	 * @param processor Parser instance.
 	 */
 	public void submit(final ParserInstance pi) {
-		pi.submitLog(this);
+		pi.submitErrorLog(this);
 	}
 	
 	public void submitError(final ParserInstance pi, final @Nullable String def, final ErrorQuality quality) {

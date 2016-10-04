@@ -61,8 +61,8 @@ public class ScriptLoader implements Runnable {
 				if (key == null)
 					continue;
 				
-				if (key.toLowerCase().startsWith("function ")) {
-					final Signature<?> func = Functions.loadSignature(config.getFileName(), node);
+				if (key.toLowerCase().startsWith("function ")) { // Just go with dummy parser instance for now
+					final Signature<?> func = Functions.loadSignature(config.getFileName(), node, ParserInstance.DUMMY);
 				}
 			}
 			

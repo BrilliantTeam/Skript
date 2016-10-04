@@ -77,9 +77,21 @@ import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
 
 /**
- *
+ * Instance of Skript parser. Runs asynchronously.
  */
-public class ParserInstance implements Runnable {
+public class ParserInstance implements Runnable, Comparable<ParserInstance> {
+	
+	/**
+	 * Dummy parser instance. Can be used for legacy code.
+	 * All log handles submitted to this will print their contents
+	 * immediately.
+	 */
+	public static final ParserInstance DUMMY = new ParserInstance() {
+		@Override
+		public void submitErrorLog(final ParseLogHandler log) {
+			log.printError();
+		}
+	};
 	
 	private Config config;
 	private ScriptManager manager;
@@ -93,7 +105,9 @@ public class ParserInstance implements Runnable {
 	private List<ScriptCommand> commands;
 	private List<Trigger> selfRegisteringTriggers;
 	private Map<Class<? extends Event>[],Trigger> triggers;
-	private List<ParseLogHandler> parseLoggers;
+	private List<ParseLogHandler> errorLogs;
+	
+	private String fileName;
 	
 	private String indentation = "";
 	
@@ -111,7 +125,11 @@ public class ParserInstance implements Runnable {
 	@Nullable
 	private String currentEventName = null;
 	
-	public ParserInstance(Config config, ScriptManager manager) {
+	@SuppressWarnings("null") // Note: only for dummy object
+	ParserInstance() {}
+	
+	public ParserInstance(String fileName, Config config, ScriptManager manager) {
+		this.fileName = fileName;
 		this.config = config;
 		this.manager = manager;
 		this.aliases = new HashMap<>();
@@ -119,7 +137,7 @@ public class ParserInstance implements Runnable {
 		this.commands = new ArrayList<>();
 		this.selfRegisteringTriggers = new ArrayList<>();
 		this.triggers = new HashMap<>();
-		this.parseLoggers = new ArrayList<>();
+		this.errorLogs = new ArrayList<>();
 	}
 	
 	/**
@@ -215,7 +233,7 @@ public class ParserInstance implements Runnable {
 						hasDelayBefore = Kleenean.UNKNOWN;
 				} else if (StringUtils.startsWithIgnoreCase(name, "while ")) {
 					final String l = "" + name.substring("while ".length());
-					final Condition c = Condition.parse(l, "Can't understand this condition: " + l);
+					final Condition c = Condition.parse(this, l, "Can't understand this condition: " + l);
 					if (c == null)
 						continue;
 					if (Skript.debug() || n.debug())
@@ -241,7 +259,7 @@ public class ParserInstance implements Runnable {
 						continue;
 					}
 					name = "" + name.substring("else if ".length());
-					final Condition cond = Condition.parse(name, "can't understand this condition: '" + name + "'");
+					final Condition cond = Condition.parse(this, name, "can't understand this condition: '" + name + "'");
 					if (cond == null)
 						continue;
 					if (Skript.debug() || n.debug())
@@ -253,7 +271,7 @@ public class ParserInstance implements Runnable {
 				} else {
 					if (StringUtils.startsWithIgnoreCase(name, "if "))
 						name = "" + name.substring(3);
-					final Condition cond = Condition.parse(name, "can't understand this condition: '" + name + "'");
+					final Condition cond = Condition.parse(this, name, "can't understand this condition: '" + name + "'");
 					if (cond == null)
 						continue;
 					if (Skript.debug() || n.debug())
@@ -284,8 +302,8 @@ public class ParserInstance implements Runnable {
 	 * It is not recommended to write anything to log after submitting it.
 	 * @param log Log handler.
 	 */
-	public void submitLog(ParseLogHandler log) {
-		parseLoggers.add(log);
+	public void submitErrorLog(ParseLogHandler log) {
+		errorLogs.add(log);
 	}
 	
 	@Override
@@ -456,6 +474,12 @@ public class ParserInstance implements Runnable {
 			
 			numTriggers++;
 		}
+	}
+
+	@Override
+	public int compareTo(@Nullable ParserInstance o) {
+		assert o != null;
+		return fileName.compareTo(o.fileName);
 	}
 	
 }

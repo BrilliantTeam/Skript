@@ -257,7 +257,7 @@ public abstract class BlockUtils {
 		
 		// REMIND rails?
 		
-		// DEFAULT
+		// DUMMY
 		b.setTypeIdAndData(type, any ? 0 : (byte) Utils.random(dataMin, dataMax + 1), applyPhysics);
 		return true;
 	}

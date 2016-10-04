@@ -28,6 +28,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.classes.YggdrasilSerializer;
 import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.registrations.Classes;
@@ -50,8 +51,8 @@ public class EntityType implements Cloneable, YggdrasilSerializable {
 				.parser(new Parser<EntityType>() {
 					@Override
 					@Nullable
-					public EntityType parse(final String s, final ParseContext context) {
-						return EntityType.parse(s);
+					public EntityType parse(final String s, final ParseContext context, final ParserInstance pi) {
+						return EntityType.parse(s, pi);
 					}
 					
 					@Override
@@ -152,7 +153,7 @@ public class EntityType implements Cloneable, YggdrasilSerializable {
 	
 	@SuppressWarnings("null")
 	@Nullable
-	public static EntityType parse(String s) {
+	public static EntityType parse(String s, ParserInstance pi) {
 		assert s != null && s.length() != 0;
 		int amount = -1;
 		if (s.matches("\\d+ .+")) {
@@ -163,7 +164,7 @@ public class EntityType implements Cloneable, YggdrasilSerializable {
 		}
 //		final Pair<String, Boolean> p = Utils.getPlural(s, amount != 1 && amount != -1);
 //		s = p.first;
-		final EntityData<?> data = EntityData.parseWithoutIndefiniteArticle(s);
+		final EntityData<?> data = EntityData.parseWithoutIndefiniteArticle(s, pi);
 		if (data == null)
 			return null;
 		return new EntityType(data, amount);

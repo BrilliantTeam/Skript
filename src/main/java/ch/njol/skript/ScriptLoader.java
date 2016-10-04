@@ -769,7 +769,7 @@ final public class ScriptLoader {
 					final RetainingLogHandler h = SkriptLogger.startRetainingLog();
 					Expression<?> loopedExpr;
 					try {
-						loopedExpr = new SkriptParser(l).parseExpression(Object.class);
+						loopedExpr = new SkriptParser(pi, l).parseExpression(Object.class);
 						if (loopedExpr != null)
 							loopedExpr = loopedExpr.getConvertedExpression(Object.class);
 						if (loopedExpr == null) {

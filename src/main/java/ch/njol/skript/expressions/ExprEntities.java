@@ -46,6 +46,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.BlockingLogHandler;
 import ch.njol.skript.log.LogHandler;
@@ -88,6 +89,9 @@ public class ExprEntities extends SimpleExpression<Entity> {
 	@Nullable
 	private Expression<? extends Entity> centerEntity;
 	
+	@SuppressWarnings("null")
+	private ParserInstance pi;
+	
 	Class<? extends Entity> returnType = Entity.class;
 	
 	private int matchedPattern;
@@ -118,6 +122,7 @@ public class ExprEntities extends SimpleExpression<Entity> {
 		if (types instanceof Literal && ((Literal<EntityData<?>>) types).getAll().length == 1) {
 			returnType = ((Literal<EntityData<?>>) types).getSingle().getType();
 		}
+		pi = parseResult.pi;
 		return true;
 	}
 	
@@ -154,7 +159,7 @@ public class ExprEntities extends SimpleExpression<Entity> {
 			return false;
 		final LogHandler h = SkriptLogger.startLogHandler(new BlockingLogHandler());
 		try {
-			final EntityData<?> d = EntityData.parseWithoutIndefiniteArticle(s);
+			final EntityData<?> d = EntityData.parseWithoutIndefiniteArticle(s, pi);
 			if (d != null) {
 				for (final EntityData<?> t : ((Literal<EntityData<?>>) types).getAll()) {
 					assert t != null;
