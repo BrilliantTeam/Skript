@@ -79,7 +79,7 @@ import ch.njol.util.StringUtils;
 /**
  *
  */
-public class ScriptProcessor implements Runnable {
+public class ParserInstance implements Runnable {
 	
 	private Config config;
 	private ScriptManager manager;
@@ -111,7 +111,7 @@ public class ScriptProcessor implements Runnable {
 	@Nullable
 	private String currentEventName = null;
 	
-	public ScriptProcessor(Config config, ScriptManager manager) {
+	public ParserInstance(Config config, ScriptManager manager) {
 		this.config = config;
 		this.manager = manager;
 		this.aliases = new HashMap<>();
@@ -192,7 +192,7 @@ public class ScriptProcessor implements Runnable {
 					final RetainingLogHandler h = SkriptLogger.startRetainingLog();
 					Expression<?> loopedExpr;
 					try {
-						loopedExpr = new SkriptParser(l).parseExpression(Object.class);
+						loopedExpr = new SkriptParser(this, l).parseExpression(Object.class);
 						if (loopedExpr != null)
 							loopedExpr = loopedExpr.getConvertedExpression(Object.class);
 						if (loopedExpr == null) {
@@ -275,6 +275,17 @@ public class ScriptProcessor implements Runnable {
 			indentation = "" + indentation.substring(0, indentation.length() - 4);
 		
 		return items;
+	}
+	
+	/**
+	 * Submits a parse log handler. Errors will be displayed
+	 * when enabling scripts, which allows them to be ordered.
+	 * 
+	 * It is not recommended to write anything to log after submitting it.
+	 * @param log Log handler.
+	 */
+	public void submitLog(ParseLogHandler log) {
+		parseLoggers.add(log);
 	}
 	
 	@Override
@@ -421,7 +432,7 @@ public class ScriptProcessor implements Runnable {
 			
 			event = replaceOptions(event);
 			
-			final NonNullPair<SkriptEventInfo<?>, SkriptEvent> parsedEvent = SkriptParser.parseEvent(event, "can't understand this event: '" + node.getKey() + "'");
+			final NonNullPair<SkriptEventInfo<?>, SkriptEvent> parsedEvent = SkriptParser.parseEvent(this, event, "can't understand this event: '" + node.getKey() + "'");
 			if (parsedEvent == null)
 				continue;
 			

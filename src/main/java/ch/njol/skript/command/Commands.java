@@ -68,7 +68,7 @@ import ch.njol.skript.config.validate.SectionValidator;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.skript.lang.parser.ScriptProcessor;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
@@ -320,7 +320,7 @@ public abstract class Commands {
 			argumentPattern = Pattern.compile("<\\s*(?:(.+?)\\s*:\\s*)?(.+?)\\s*(?:=\\s*(" + SkriptParser.wildcard + "))?\\s*>");
 	
 	@Nullable
-	public final static ScriptCommand loadCommand(final SectionNode node, final ScriptProcessor scriptParser) {
+	public final static ScriptCommand loadCommand(final SectionNode node, final ParserInstance scriptParser) {
 		final String key = node.getKey();
 		if (key == null)
 			return null;
