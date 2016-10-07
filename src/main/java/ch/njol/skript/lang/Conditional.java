@@ -25,6 +25,7 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.lang.parser.ParserInstance;
 
 /**
  * Represents a conditional trigger section.
@@ -41,10 +42,12 @@ public class Conditional extends TriggerSection {
 	
 	@Nullable
 	private TriggerSection elseClause = null;
+	private ParserInstance pi;
 	
-	public Conditional(final Condition cond, final SectionNode node) {
-		super(node);
+	public Conditional(final Condition cond, final SectionNode node, final ParserInstance pi) {
+		super(node, pi);
 		this.cond = cond;
+		this.pi = pi;
 	}
 	
 	@Override
@@ -71,7 +74,7 @@ public class Conditional extends TriggerSection {
 			((Conditional) elseClause).loadElseClause(node);
 			return;
 		}
-		elseClause = new TriggerSection(node) {
+		elseClause = new TriggerSection(node, pi) {
 			@Override
 			@Nullable
 			public TriggerItem walk(final Event e) {
@@ -93,7 +96,7 @@ public class Conditional extends TriggerSection {
 			((Conditional) elseClause).loadElseIf(cond, n);
 			return;
 		}
-		elseClause = new Conditional(cond, n)
+		elseClause = new Conditional(cond, n, pi)
 				.setParent(getParent())
 				.setNext(getNext());
 	}

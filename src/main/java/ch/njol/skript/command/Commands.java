@@ -274,7 +274,6 @@ public abstract class Commands {
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
 	final static boolean handleEffectCommand(final CommandSender sender, String command) {
 		if (!(sender instanceof ConsoleCommandSender || sender.hasPermission("skript.effectcommands") || SkriptConfig.allowOpsToUseEffectCommands.value() && sender.isOp()))
 			return false;
@@ -283,9 +282,7 @@ public abstract class Commands {
 			command = "" + command.substring(SkriptConfig.effectCommandToken.value().length()).trim();
 			final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 			try {
-				ScriptLoader.setCurrentEvent("effect command", EffectCommandEvent.class);
 				final Effect e = Effect.parse(command, null);
-				ScriptLoader.deleteCurrentEvent();
 				
 				if (e != null) {
 					log.clear(); // ignore warnings and stuff

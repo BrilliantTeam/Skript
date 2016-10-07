@@ -38,6 +38,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.TriggerSection;
 import ch.njol.skript.lang.While;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
 
@@ -71,26 +72,27 @@ public class EffExit extends Effect { // TODO [code style] warn user about code 
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
+		final ParserInstance pi = parser.pi;
 		switch (matchedPattern) {
 			case 0:
-				breakLevels = ScriptLoader.currentSections.size() + 1;
+				breakLevels = pi.currentSections.size() + 1;
 				type = EVERYTHING;
 				break;
 			case 1:
 			case 2:
 				breakLevels = matchedPattern == 1 ? 1 : Integer.parseInt(parser.regexes.get(0).group());
 				type = parser.mark;
-				if (breakLevels > numLevels(type)) {
-					if (numLevels(type) == 0)
+				if (breakLevels > numLevels(type, pi)) {
+					if (numLevels(type, pi) == 0)
 						Skript.error("can't stop any " + names[type] + " as there are no " + names[type] + " present", ErrorQuality.SEMANTIC_ERROR);
 					else
-						Skript.error("can't stop " + breakLevels + " " + names[type] + " as there are only " + numLevels(type) + " " + names[type] + " present", ErrorQuality.SEMANTIC_ERROR);
+						Skript.error("can't stop " + breakLevels + " " + names[type] + " as there are only " + numLevels(type, pi) + " " + names[type] + " present", ErrorQuality.SEMANTIC_ERROR);
 					return false;
 				}
 				break;
 			case 3:
 				type = parser.mark;
-				breakLevels = numLevels(type);
+				breakLevels = numLevels(type, pi);
 				if (breakLevels == 0) {
 					Skript.error("can't stop any " + names[type] + " as there are no " + names[type] + " present", ErrorQuality.SEMANTIC_ERROR);
 					return false;
@@ -100,11 +102,11 @@ public class EffExit extends Effect { // TODO [code style] warn user about code 
 		return true;
 	}
 	
-	private final static int numLevels(final int type) {
+	private final static int numLevels(final int type, final ParserInstance pi) {
 		if (type == EVERYTHING)
-			return ScriptLoader.currentSections.size();
+			return pi.currentSections.size();
 		int r = 0;
-		for (final TriggerSection s : ScriptLoader.currentSections) {
+		for (final TriggerSection s : pi.currentSections) {
 			if (type == CONDITIONALS ? s instanceof Conditional : s instanceof Loop || s instanceof While)
 				r++;
 		}

@@ -31,6 +31,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.ContainerExpression;
 import ch.njol.skript.util.Container;
 import ch.njol.skript.util.Container.ContainerType;
@@ -51,7 +52,7 @@ public class Loop extends TriggerSection {
 	private TriggerItem actualNext;
 	
 	@SuppressWarnings("unchecked")
-	public <T> Loop(final Expression<?> expr, final SectionNode node) {
+	public <T> Loop(final Expression<?> expr, final SectionNode node, final ParserInstance pi) {
 		assert expr != null;
 		assert node != null;
 		if (Container.class.isAssignableFrom(expr.getReturnType())) {
@@ -62,13 +63,13 @@ public class Loop extends TriggerSection {
 		} else {
 			this.expr = expr;
 		}
-		ScriptLoader.currentSections.add(this);
-		ScriptLoader.currentLoops.add(this);
+		pi.currentSections.add(this);
+		pi.currentLoops.add(this);
 		try {
-			setTriggerItems(ScriptLoader.loadItems(node));
+			setTriggerItems(pi.loadItems(node));
 		} finally {
-			ScriptLoader.currentLoops.remove(ScriptLoader.currentLoops.size() - 1);
-			ScriptLoader.currentSections.remove(ScriptLoader.currentSections.size() - 1);
+			pi.currentLoops.remove(pi.currentLoops.size() - 1);
+			pi.currentSections.remove(pi.currentSections.size() - 1);
 		}
 		super.setNext(this);
 	}

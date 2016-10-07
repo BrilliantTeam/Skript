@@ -61,6 +61,7 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.Statement;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
+import ch.njol.skript.lang.TriggerSection;
 import ch.njol.skript.lang.While;
 import ch.njol.skript.lang.function.Function;
 import ch.njol.skript.lang.function.FunctionEvent;
@@ -104,10 +105,13 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	private int numTriggers;
 	
 	public final List<ScriptCommand> commands;
-	public final List<Trigger> selfRegisteringTriggers;
+	public final Map<NonNullPair<SkriptEventInfo<?>, SkriptEvent>,Trigger> selfRegisteringTriggers;
 	public final Map<Class<? extends Event>[],Trigger> triggers;
 	public final List<ScriptFunction<?>> functions;
 	public final List<ParseLogHandler> errorLogs;
+	
+	public final List<TriggerSection> currentSections;
+	public final List<Loop> currentLoops;
 	
 	private String fileName;
 	
@@ -136,6 +140,8 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		triggers = null;
 		functions = null;
 		errorLogs = null;
+		currentSections = null;
+		currentLoops = null;
 	}
 	
 	public ParserInstance(String fileName, Config config, ScriptManager manager) {
@@ -145,10 +151,12 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		this.aliases = new HashMap<>();
 		this.options = new HashMap<>();
 		this.commands = new ArrayList<>();
-		this.selfRegisteringTriggers = new ArrayList<>();
+		this.selfRegisteringTriggers = new HashMap<>();
 		this.triggers = new HashMap<>();
 		this.functions = new ArrayList<>();
 		this.errorLogs = new ArrayList<>();
+		this.currentSections = new ArrayList<>();
+		this.currentLoops = new ArrayList<>();
 	}
 	
 	/**
@@ -168,6 +176,15 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		currentEventName = null;
 		currentEvents = null;
 		hasDelayBefore = Kleenean.FALSE;
+	}
+	
+	/**
+	 * Gets name of current event.
+	 * @return Name or null if not found.
+	 */
+	@Nullable
+	public String getCurrentEventName() {
+		return currentEventName;
 	}
 	
 	public String replaceOptions(final String s) {
@@ -239,7 +256,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 					if (Skript.debug() || n.debug())
 						Skript.debug(indentation + "loop " + loopedExpr.toString(null, true) + ":");
 					final Kleenean hadDelayBefore = hasDelayBefore;
-					items.add(new Loop(loopedExpr, (SectionNode) n));
+					items.add(new Loop(loopedExpr, (SectionNode) n, this));
 					if (hadDelayBefore != Kleenean.TRUE && hasDelayBefore != Kleenean.FALSE)
 						hasDelayBefore = Kleenean.UNKNOWN;
 				} else if (StringUtils.startsWithIgnoreCase(name, "while ")) {
@@ -250,7 +267,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 					if (Skript.debug() || n.debug())
 						Skript.debug(indentation + "while " + c.toString(null, true) + ":");
 					final Kleenean hadDelayBefore = hasDelayBefore;
-					items.add(new While(c, (SectionNode) n));
+					items.add(new While(c, (SectionNode) n, this));
 					if (hadDelayBefore != Kleenean.TRUE && hasDelayBefore != Kleenean.FALSE)
 						hasDelayBefore = Kleenean.UNKNOWN;
 				} else if (name.equalsIgnoreCase("else")) {
@@ -289,7 +306,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 						Skript.debug(indentation + cond.toString(null, true) + ":");
 					final Kleenean hadDelayBefore = hasDelayBefore;
 					hadDelayBeforeLastIf = hadDelayBefore;
-					items.add(new Conditional(cond, (SectionNode) n));
+					items.add(new Conditional(cond, (SectionNode) n, this));
 					hasDelayBefore = hadDelayBefore.or(hasDelayBefore.and(Kleenean.UNKNOWN));
 				}
 			}
@@ -480,8 +497,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 			}
 			
 			if (parsedEvent.getSecond() instanceof SelfRegisteringSkriptEvent) {
-				((SelfRegisteringSkriptEvent) parsedEvent.getSecond()).register(trigger);
-				selfRegisteringTriggers.add(trigger);
+				selfRegisteringTriggers.put(parsedEvent, trigger);
 			} else {
 				triggers.put(parsedEvent.getFirst().events, trigger);
 			}

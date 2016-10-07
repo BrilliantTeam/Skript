@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
 import org.bukkit.event.Event;
@@ -105,39 +106,8 @@ final public class ScriptLoader {
 	 * use {@link #setCurrentEvent(String, Class...)}
 	 */
 	@Nullable
-	private static String currentEventName = null;
-	
-	@Nullable
-	public static String getCurrentEventName() {
-		return currentEventName;
-	}
-	
-	/**
-	 * use {@link #setCurrentEvent(String, Class...)}
-	 */
-	@Nullable
 	private static Class<? extends Event>[] currentEvents = null;
 	
-	/**
-	 * Call {@link #deleteCurrentEvent()} after parsing
-	 * 
-	 * @param name
-	 * @param events
-	 */
-	public static void setCurrentEvent(final String name, final @Nullable Class<? extends Event>... events) {
-		currentEventName = name;
-		currentEvents = events;
-		hasDelayBefore = Kleenean.FALSE;
-	}
-	
-	public static void deleteCurrentEvent() {
-		currentEventName = null;
-		currentEvents = null;
-		hasDelayBefore = Kleenean.FALSE;
-	}
-	
-	public static List<TriggerSection> currentSections = new ArrayList<>();
-	public static List<Loop> currentLoops = new ArrayList<>();
 	private final static Map<String, ItemType> currentAliases = new HashMap<>();
 	final static HashMap<String, String> currentOptions = new HashMap<>();
 	
@@ -266,7 +236,10 @@ final public class ScriptLoader {
 		final boolean wasLocal = Language.setUseLocal(false);
 		try {
 			List<ParserInstance> parsed = manager.load(files);
-			
+			for (ParserInstance pi : parsed) {
+				assert pi != null;
+				enableScript(pi, i);
+			}
 		} finally {
 			if (wasLocal)
 				Language.setUseLocal(true);
@@ -281,20 +254,32 @@ final public class ScriptLoader {
 		return i;
 	}
 	
+	/**
+	 * Enables scripts from parser instance. This is meant to be ran from main thread.
+	 * @param pi Parser instance.
+	 * @param i Script info - for statistics, e.g. loaded stuff counts.
+	 */
 	@SuppressWarnings("null")
 	private final static void enableScript(ParserInstance pi, ScriptInfo i) {
 		final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
 		try {
-			for (ScriptCommand cmd : pi.commands) {
+			for (ScriptCommand cmd : pi.commands) { // Register commands
 				i.commands++;
 				Commands.registerCommand(cmd);
 			}
-			for (ScriptFunction<?> func : pi.functions) {
+			for (ScriptFunction<?> func : pi.functions) { // Register functions
 				i.functions++;
 				Functions.functions.put(func.getName(), new FunctionData(func));
 			}
-			
-			// TODO rest of registering stuff... WIP
+			for (Entry<Class<? extends Event>[], Trigger> trigger : pi.triggers.entrySet()) { // Register normal triggers
+				i.triggers++;
+				SkriptEventHandler.addTrigger(trigger.getKey(), trigger.getValue());
+			}
+			// "Register" self-registering triggers
+			for (Entry<NonNullPair<SkriptEventInfo<?>, SkriptEvent>, Trigger> trigger : pi.selfRegisteringTriggers.entrySet()) {
+				((SelfRegisteringSkriptEvent) trigger.getKey().getSecond()).register(trigger.getValue());
+				SkriptEventHandler.addSelfRegisteringTrigger(trigger.getValue());
+			}
 		} finally {
 			numErrors.stop();
 		}
@@ -347,13 +332,15 @@ final public class ScriptLoader {
 	}
 	
 	/**
-	 * For unit testing
+	 * For unit testing (and only that).
 	 * 
 	 * @param node
 	 * @return The loaded Trigger
 	 */
-	/*@Nullable
+	@Nullable
 	static Trigger loadTrigger(final SectionNode node) {
+		final ParserInstance pi = ParserInstance.DUMMY;
+		
 		String event = node.getKey();
 		if (event == null) {
 			assert false : node;
@@ -362,19 +349,19 @@ final public class ScriptLoader {
 		if (event.toLowerCase().startsWith("on "))
 			event = "" + event.substring("on ".length());
 		
-		final NonNullPair<SkriptEventInfo<?>, SkriptEvent> parsedEvent = SkriptParser.parseEvent(event, "can't understand this event: '" + node.getKey() + "'");
+		final NonNullPair<SkriptEventInfo<?>, SkriptEvent> parsedEvent = SkriptParser.parseEvent(pi, event, "can't understand this event: '" + node.getKey() + "'");
 		if (parsedEvent == null) {
 			assert false;
 			return null;
 		}
 		
-		setCurrentEvent("unit test", parsedEvent.getFirst().events);
+		pi.setCurrentEvent("unit test", parsedEvent.getFirst().events);
 		try {
-			return new Trigger(null, event, parsedEvent.getSecond(), loadItems(node));
+			return new Trigger(null, event, parsedEvent.getSecond(), pi.loadItems(node));
 		} finally {
-			deleteCurrentEvent();
+			pi.deleteCurrentEvent();
 		}
-	}*/
+	}
 	
 	public final static int loadedScripts() {
 		synchronized (loadedScripts) {

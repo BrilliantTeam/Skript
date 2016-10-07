@@ -39,6 +39,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.lang.DefaultExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -125,7 +126,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	
 	@SuppressWarnings("null")
 	@Override
-	public boolean init() {
+	public boolean init(final ParserInstance pi) {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			boolean hasValue = false;
@@ -146,7 +147,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 				}
 			}
 			if (!hasValue) {
-				log.printError("There's no " + Classes.getSuperClassInfo(c).getName() + " in " + Utils.a(ScriptLoader.getCurrentEventName()) + " event");
+				log.printError("There's no " + Classes.getSuperClassInfo(c).getName() + " in " + Utils.a(pi.getCurrentEventName()) + " event");
 				return false;
 			}
 			log.printLog();

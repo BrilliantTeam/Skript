@@ -28,6 +28,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.lang.parser.ParserInstance;
 
 /**
  * Represents a section of a trigger, e.g. a conditional or a loop
@@ -50,12 +51,12 @@ public abstract class TriggerSection extends TriggerItem {
 		setTriggerItems(items);
 	}
 	
-	protected TriggerSection(final SectionNode node) {
-		ScriptLoader.currentSections.add(this);
+	protected TriggerSection(final SectionNode node, final ParserInstance pi) {
+		pi.currentSections.add(this);
 		try {
-			setTriggerItems(ScriptLoader.loadItems(node));
+			setTriggerItems(pi.loadItems(node));
 		} finally {
-			ScriptLoader.currentSections.remove(ScriptLoader.currentSections.size() - 1);
+			pi.currentSections.remove(pi.currentSections.size() - 1);
 		}
 	}
 	

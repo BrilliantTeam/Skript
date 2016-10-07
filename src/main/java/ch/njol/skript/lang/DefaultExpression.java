@@ -21,6 +21,8 @@
 
 package ch.njol.skript.lang;
 
+import ch.njol.skript.lang.parser.ParserInstance;
+
 /**
  * Represents an expression that can be used as the default value of a certain type and event.
  * 
@@ -28,7 +30,13 @@ package ch.njol.skript.lang;
  */
 public interface DefaultExpression<T> extends Expression<T> {
 	
-	public boolean init();
+	public default boolean init(final ParserInstance pi) {
+		return init();
+	}
+	
+	public default boolean init() {
+		throw new UnsupportedOperationException("init not implemented");
+	}
 	
 	/**
 	 * @return Usually true, though this is not required, as e.g. SimpleLiteral implements DefaultExpression but is usually not the default of an event.

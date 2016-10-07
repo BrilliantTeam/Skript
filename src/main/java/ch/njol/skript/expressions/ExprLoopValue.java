@@ -100,7 +100,7 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 		
 		@SuppressWarnings("null")
 		boolean b = ScriptOptions.getInstance().usesNewLoops(ScriptLoader.currentScript.getFile());
-		for (final Loop l : ScriptLoader.currentLoops) {
+		for (final Loop l : parser.pi.currentLoops) {
 			if ((c != null && c.isAssignableFrom(l.getLoopedExpression().getReturnType())) || (b ? "value".equals(s) : false) || l.getLoopedExpression().isLoopOf(s)) {
 				if (j < i) {
 					j++;
