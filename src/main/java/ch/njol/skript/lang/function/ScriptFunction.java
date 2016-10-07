@@ -30,6 +30,7 @@ import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.effects.EffReturn;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.function.Functions.FunctionData;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.skript.variables.Variables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,15 +43,15 @@ public class ScriptFunction<T> extends Function<T> {
 	final Trigger trigger;
 	
 	@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-	public ScriptFunction(final String name, final Parameter<?>[] parameters, final SectionNode node, @Nullable final ClassInfo<T> returnType, final boolean single) {
+	public ScriptFunction(final ParserInstance pi, final String name, final Parameter<?>[] parameters, final SectionNode node, @Nullable final ClassInfo<T> returnType, final boolean single) {
 		super(name, parameters, returnType, single);
 		
-		// here to allow recursion
-		Functions.functions.put(name, new FunctionData(this));
+		// Disabled due to multithreaded parser
+		//Functions.functions.put(name, new FunctionData(this));
 		
 		Functions.currentFunction = this;
 		try {
-			trigger = new Trigger(node.getConfig().getFile(), "function " + name, new SimpleEvent(), ScriptLoader.loadItems(node));
+			trigger = new Trigger(node.getConfig().getFile(), "function " + name, new SimpleEvent(), pi.loadItems(node));
 		} finally {
 			Functions.currentFunction = null;
 		}

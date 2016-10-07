@@ -37,6 +37,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.bukkit.scheduler.BukkitRunnable;
+
+import ch.njol.skript.Skript;
 import ch.njol.skript.config.Config;
 
 /**
@@ -48,51 +51,57 @@ public class ScriptManager extends Thread {
 	private Map<String,Config> loadMap = new ConcurrentHashMap<>();
 	
 	private AtomicInteger waitParsing = new AtomicInteger();
-	private Map<String,Config> parseMap = new ConcurrentHashMap<>();
-	
+	@SuppressWarnings("null")
+	private List<ParserInstance> parsed = Collections.synchronizedList(new ArrayList<>());	
 	/**
 	 * Cached thread pool to execute the tasks.
 	 */
+	@SuppressWarnings("null")
 	private ExecutorService pool = Executors.newCachedThreadPool();
 	
-	public void load(File[] files) {
+	@SuppressWarnings("null")
+	public List<ParserInstance> load(File[] files) {
 		int numScripts = 0;
 		
-		File[] scripts = new File[files.length]; // All to-be-loaded scripts
-		for (int i = 0; i < files.length; i++) {
-			String name = files[i].getName();
-			if (!name.startsWith("-") && name.endsWith(".sk")) {
-				scripts[i] = files[i];
-				numScripts++;
-			}
-		}
-		
 		if (numScripts == 0) // Load nothing
-			return;
+			return Collections.emptyList();
 		
 		loadMap = new ConcurrentHashMap<>();
 		waitLoading.set(numScripts);
 		
-		parseMap = new ConcurrentHashMap<>();
+		parsed = Collections.synchronizedList(new ArrayList<>());
 		waitParsing.set(numScripts);
 		
-		for (File f : scripts) {
+		for (File f : files) {
 			if (f == null) // Non-scripts and disabled scripts
 				continue;
-			pool.execute(new ScriptLoader(f, this));
+			pool.execute(new LoaderInstance(f.getName(), f, this, pool));
 		}
 		
 		while (waitLoading.get() > 0) // Only park this thread if work is not done
-			LockSupport.park(); // Then use while for in case spurious unpark happens
+			LockSupport.park(); // Then use while in case spurious unpark happens
 		
 		for (Entry<String,Config> entry : loadMap.entrySet()) {
 			pool.execute(new ParserInstance(entry.getKey(), entry.getValue(), this));
 		}
+		
+		while (waitParsing.get() > 0)
+			LockSupport.park();
+		
+		parsed.sort(null); // Sort alphabetically to not break everything
+		return new ArrayList<>(parsed); // Return non-synchronized copy for speed
 	}
 	
 	public void loadReady(String file, Config config) {
 		int counter = waitLoading.decrementAndGet();
 		loadMap.put(file, config);
+		if (counter < 1)
+			LockSupport.unpark(this);
+	}
+	
+	public void parseReady(ParserInstance pi) {
+		int counter = waitParsing.decrementAndGet();
+		parsed.add(pi);
 		if (counter < 1)
 			LockSupport.unpark(this);
 	}

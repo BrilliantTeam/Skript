@@ -32,7 +32,7 @@ import ch.njol.util.coll.CollectionUtils;
  * @author Peter Güttinger
  */
 public abstract class Function<T> {
-	
+
 	final String name;
 	
 	final Parameter<?>[] parameters;

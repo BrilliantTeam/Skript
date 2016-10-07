@@ -65,6 +65,7 @@ import ch.njol.skript.lang.While;
 import ch.njol.skript.lang.function.Function;
 import ch.njol.skript.lang.function.FunctionEvent;
 import ch.njol.skript.lang.function.Functions;
+import ch.njol.skript.lang.function.ScriptFunction;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -95,17 +96,18 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	
 	private Config config;
 	private ScriptManager manager;
-	Map<String, ItemType> aliases;
-	Map<String, String> options;
+	public final Map<String, ItemType> aliases;
+	public final Map<String, String> options;
 	
 	private int numCommands;
 	private int numFunctions;
 	private int numTriggers;
 	
-	private List<ScriptCommand> commands;
-	private List<Trigger> selfRegisteringTriggers;
-	private Map<Class<? extends Event>[],Trigger> triggers;
-	private List<ParseLogHandler> errorLogs;
+	public final List<ScriptCommand> commands;
+	public final List<Trigger> selfRegisteringTriggers;
+	public final Map<Class<? extends Event>[],Trigger> triggers;
+	public final List<ScriptFunction<?>> functions;
+	public final List<ParseLogHandler> errorLogs;
 	
 	private String fileName;
 	
@@ -126,7 +128,15 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	private String currentEventName = null;
 	
 	@SuppressWarnings("null") // Note: only for dummy object
-	ParserInstance() {}
+	ParserInstance() {
+		aliases = null;
+		options = null;
+		commands = null;
+		selfRegisteringTriggers = null;
+		triggers = null;
+		functions = null;
+		errorLogs = null;
+	}
 	
 	public ParserInstance(String fileName, Config config, ScriptManager manager) {
 		this.fileName = fileName;
@@ -137,6 +147,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		this.commands = new ArrayList<>();
 		this.selfRegisteringTriggers = new ArrayList<>();
 		this.triggers = new HashMap<>();
+		this.functions = new ArrayList<>();
 		this.errorLogs = new ArrayList<>();
 	}
 	
@@ -432,10 +443,13 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 				
 				setCurrentEvent("function", FunctionEvent.class);
 				
-				final Function<?> func = Functions.loadFunction(node);
+				final Function<?> func = Functions.loadFunction(node, this);
 				if (func != null) {
 					numFunctions++;
 				}
+				
+				if (func instanceof ScriptFunction)
+					functions.add((ScriptFunction<?>) func);
 				
 				deleteCurrentEvent();
 				

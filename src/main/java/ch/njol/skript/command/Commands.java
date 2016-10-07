@@ -465,7 +465,7 @@ public abstract class Commands {
 		Commands.currentArguments = currentArguments;
 		final ScriptCommand c;
 		try {
-			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage, aliases, permission, permissionMessage, executableBy, ScriptLoader.loadItems(trigger));
+			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage, aliases, permission, permissionMessage, executableBy, scriptParser.loadItems(trigger));
 		} finally {
 			Commands.currentArguments = null;
 		}	

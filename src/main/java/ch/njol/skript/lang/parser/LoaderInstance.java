@@ -24,6 +24,7 @@ package ch.njol.skript.lang.parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import ch.njol.skript.Skript;
@@ -37,18 +38,29 @@ import ch.njol.skript.lang.function.Signature;
 /**
  * Loads script from disk to memory and registers function signatures.
  */
-public class ScriptLoader implements Runnable {
+public class LoaderInstance implements Runnable {
 	
+	private String name;
 	private File f;
 	private ScriptManager manager;
+	private ExecutorService pool;
 	
-	public ScriptLoader(File f, ScriptManager manager) {
+	public LoaderInstance(String name, File f, ScriptManager manager, ExecutorService pool) {
+		this.name = name;
 		this.f = f;
 		this.manager = manager;
+		this.pool = pool;
 	}
 	
+	@SuppressWarnings("null")
 	@Override
 	public void run() {
+		if (f.isDirectory()) { // Delegate directory parsing...
+			for (File f2 : f.listFiles())
+				pool.execute(new LoaderInstance(name + "/" + f2.getName(), f2, manager, pool));
+			return;
+		}
+		
 		try {
 			Config config = new Config(f, true, false, ":");
 			for (final Node cnode : config.getMainNode()) {
@@ -62,11 +74,11 @@ public class ScriptLoader implements Runnable {
 					continue;
 				
 				if (key.toLowerCase().startsWith("function ")) { // Just go with dummy parser instance for now
-					final Signature<?> func = Functions.loadSignature(config.getFileName(), node, ParserInstance.DUMMY);
+					Functions.loadSignature(config.getFileName(), node, ParserInstance.DUMMY);
 				}
 			}
 			
-			manager.loadReady(config);
+			manager.loadReady(f.getName(), config);
 		} catch (IOException e) {
 			// TODO report error
 		}

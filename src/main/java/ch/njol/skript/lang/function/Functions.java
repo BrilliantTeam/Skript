@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,7 +55,7 @@ import ch.njol.util.StringUtils;
 public abstract class Functions {
 	private Functions() {}
 	
-	final static class FunctionData {
+	public static class FunctionData {
 		final Function<?> function;
 		final Collection<FunctionReference<?>> calls = new ArrayList<>();
 		
@@ -67,9 +68,9 @@ public abstract class Functions {
 	public static ScriptFunction<?> currentFunction = null;
 	
 	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<>();
-	final static Map<String, FunctionData> functions = new HashMap<>();
+	public final static Map<String, FunctionData> functions = new HashMap<>();
 	final static Map<String, Signature<?>> javaSignatures = new HashMap<>();
-	final static Map<String, Signature<?>> signatures = new HashMap<>();
+	final static Map<String, Signature<?>> signatures = new ConcurrentHashMap<>();
 	
 	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<>();
 	
@@ -110,7 +111,7 @@ public abstract class Functions {
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public final static Function<?> loadFunction(final SectionNode node) {
+	public final static Function<?> loadFunction(final SectionNode node, final ParserInstance pi) {
 		final String definition = node.getKey();
 		assert definition != null;
 		final Matcher m = functionPattern.matcher(definition);
@@ -126,13 +127,13 @@ public abstract class Functions {
 			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")" + (c != null && p != null ? " :: " + Utils.toEnglishPlural(c.getCodeName(), p.getSecond()) : "") + ":");
 		
 		@SuppressWarnings("null")
-		final Function<?> f = new ScriptFunction<>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
+		final Function<?> f = new ScriptFunction<>(pi, name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
 //		functions.put(name, new FunctionData(f)); // in constructor
 		return f;
 	}
 	
 	/**
-	 * Loads the signature of function from given node.
+	 * Loads the signature of function from given node. Can be called asynchronously.
 	 * @param script Script file name (<b>might</b> be used for some checks).
 	 * @param node Section node.
 	 * @param pi Parser instance (for logging).

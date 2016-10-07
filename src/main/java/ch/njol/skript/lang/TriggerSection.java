@@ -65,12 +65,12 @@ public abstract class TriggerSection extends TriggerItem {
 	protected TriggerSection() {}
 	
 	/**
-	 * Remember to add this section to {@link ScriptLoader#currentSections} before parsing child elements!
+	 * Remember to add this section to {@link LoaderInstance#currentSections} before parsing child elements!
 	 * 
 	 * <pre>
-	 * ScriptLoader.currentSections.add(this);
-	 * setTriggerItems(ScriptLoader.loadItems(node));
-	 * ScriptLoader.currentSections.remove(ScriptLoader.currentSections.size() - 1);
+	 * LoaderInstance.currentSections.add(this);
+	 * setTriggerItems(LoaderInstance.loadItems(node));
+	 * LoaderInstance.currentSections.remove(LoaderInstance.currentSections.size() - 1);
 	 * </pre>
 	 * 
 	 * @param items
