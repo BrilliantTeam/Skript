@@ -363,7 +363,7 @@ public class SkriptParser {
 			for (final Class<? extends T> c : types) {
 				log.clear();
 				assert c != null;
-				final T t = Classes.parse(expr, c, context);
+				final T t = Classes.parse(pi, expr, c, context);
 				if (t != null) {
 					log.printLog();
 					return new SimpleLiteral<>(t, false);

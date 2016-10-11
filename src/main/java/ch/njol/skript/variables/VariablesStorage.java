@@ -32,6 +32,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
@@ -88,12 +89,12 @@ public abstract class VariablesStorage implements Closeable {
 	}
 	
 	@Nullable
-	protected String getValue(final SectionNode n, final String key) {
-		return getValue(n, key, String.class);
+	protected String getValue(final ParserInstance pi, final SectionNode n, final String key) {
+		return getValue(pi, n, key, String.class);
 	}
 	
 	@Nullable
-	protected <T> T getValue(final SectionNode n, final String key, final Class<T> type) {
+	protected <T> T getValue(final ParserInstance pi, final SectionNode n, final String key, final Class<T> type) {
 		final String v = n.getValue(key);
 		if (v == null) {
 			Skript.error("The config is missing the entry for '" + key + "' in the database '" + databaseName + "'");
@@ -101,19 +102,19 @@ public abstract class VariablesStorage implements Closeable {
 		}
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
-			final T r = Classes.parse(v, type, ParseContext.CONFIG);
+			final T r = Classes.parse(pi, v, type, ParseContext.CONFIG);
 			if (r == null)
 				log.printError("The entry for '" + key + "' in the database '" + databaseName + "' must be " + Classes.getSuperClassInfo(type).getName().withIndefiniteArticle());
 			else
 				log.printLog();
 			return r;
 		} finally {
-			log.stop();
+			log.submit(pi);
 		}
 	}
 	
-	public final boolean load(final SectionNode n) {
-		final String pattern = getValue(n, "pattern");
+	public final boolean load(final SectionNode n, final ParserInstance pi) {
+		final String pattern = getValue(pi, n, "pattern");
 		if (pattern == null)
 			return false;
 		try {
@@ -124,7 +125,7 @@ public abstract class VariablesStorage implements Closeable {
 		}
 		
 		if (requiresFile()) {
-			final String f = getValue(n, "file");
+			final String f = getValue(pi, n, "file");
 			if (f == null)
 				return false;
 			final File file = getFile(f).getAbsoluteFile();
@@ -157,14 +158,14 @@ public abstract class VariablesStorage implements Closeable {
 				return false;
 			}
 			
-			if (!"0".equals(getValue(n, "backup interval"))) {
-				final Timespan backupInterval = getValue(n, "backup interval", Timespan.class);
+			if (!"0".equals(getValue(pi, n, "backup interval"))) {
+				final Timespan backupInterval = getValue(pi, n, "backup interval", Timespan.class);
 				if (backupInterval != null)
 					startBackupTask(backupInterval);
 			}
 		}
 		
-		if (!load_i(n))
+		if (!load_i(n, pi))
 			return false;
 		
 		writeThread.start();
@@ -178,7 +179,7 @@ public abstract class VariablesStorage implements Closeable {
 	 * 
 	 * @return Whether the database could be loaded successfully, i.e. whether the config is correct and all variables could be loaded
 	 */
-	protected abstract boolean load_i(SectionNode n);
+	protected abstract boolean load_i(SectionNode n, ParserInstance pi);
 	
 	/**
 	 * Called after all storages have been loaded, and variables have been redistributed if settings have changed. This should commit the first transaction (which is not empty if

@@ -165,8 +165,6 @@ final public class ScriptLoader {
 		if (!scriptsFolder.isDirectory())
 			scriptsFolder.mkdirs();
 		
-		final Date start = new Date();
-		
 		final ScriptInfo i;
 		
 		final ErrorDescLogHandler h = SkriptLogger.startLogHandler(new ErrorDescLogHandler(null, null, m_no_errors.toString()));
@@ -174,19 +172,10 @@ final public class ScriptLoader {
 			Language.setUseLocal(false);
 			
 			i = loadScripts(scriptsFolder);
-			
-			synchronized (loadedScripts) {
-				loadedScripts.add(i);
-			}
 		} finally {
 			Language.setUseLocal(true);
 			h.stop();
 		}
-		
-		if (i.files == 0)
-			Skript.warning(m_no_scripts.toString());
-		if (Skript.logNormal() && i.files > 0)
-			Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
 		
 		SkriptEventHandler.registerBukkitEvents();
 		
@@ -210,44 +199,53 @@ final public class ScriptLoader {
 	 * @return Info on the loaded scripts
 	 */
 	public final static ScriptInfo loadScripts(final File directory) {
-		final ScriptInfo i = new ScriptInfo();
 		final boolean wasLocal = Language.setUseLocal(false);
 		try {
 			final File[] files = directory.listFiles(scriptFilter);
 			assert files != null;
-			loadScripts(files);
+			return loadScripts(files);
 		} finally {
 			if (wasLocal)
 				Language.setUseLocal(true);
 		}
-		
-		return i;
 	}
 	
 	/**
 	 * Loads the specified scripts.
 	 * 
-	 * @param files
-	 * @return Info on the loaded scripts
+	 * @param files Script files.
+	 * @return Empty info for API compatibility.
 	 */
 	public final static ScriptInfo loadScripts(final File[] files) {
-		Arrays.sort(files);
 		final ScriptInfo i = new ScriptInfo();
-		final boolean wasLocal = Language.setUseLocal(false);
-		try {
-			List<ParserInstance> parsed = manager.load(files);
-			for (ParserInstance pi : parsed) {
-				assert pi != null;
-				enableScript(pi, i);
-			}
-		} finally {
-			if (wasLocal)
-				Language.setUseLocal(true);
+		manager.loadAndEnable(files);
+		
+		return i;
+	}
+	
+	/**
+	 * Enables scripts from parser instances.
+	 * @param parsed
+	 * @return
+	 */
+	public final static ScriptInfo enableScripts(final List<ParserInstance> parsed) {
+		final Date start = new Date();
+		Skript.debug("Enabling scripts...");
+		
+		final ScriptInfo i = new ScriptInfo();
+		for (ParserInstance pi : parsed) {
+			assert pi != null;
+			enableScript(pi, i);
 		}
 		
 		synchronized (loadedScripts) {
 			loadedScripts.add(i);
 		}
+		
+		if (i.files == 0)
+			Skript.warning(m_no_scripts.toString());
+		if (Skript.logNormal() && i.files > 0)
+			Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
 		
 		SkriptEventHandler.registerBukkitEvents();
 		
@@ -283,6 +281,8 @@ final public class ScriptLoader {
 		} finally {
 			numErrors.stop();
 		}
+		
+		i.files++; // Increment script counter
 	}
 	
 	/**
@@ -321,6 +321,20 @@ final public class ScriptLoader {
 		Functions.clearFunctions(script);
 		//Functions.validateFunctions();
 		return r;
+	}
+	
+	public final static ScriptInfo unloadScripts(final File[] files) {
+		ScriptInfo i = new ScriptInfo();
+		for (File f : files) {
+			assert f != null;
+			ScriptInfo r = unloadScript(f);
+			i.commands += r.commands;
+			i.files += 1;
+			i.functions += r.functions;
+			i.triggers += r.functions;
+		}
+		
+		return i;
 	}
 	
 	private final static ScriptInfo unloadScript_(final File script) {
@@ -385,22 +399,6 @@ final public class ScriptLoader {
 		synchronized (loadedScripts) {
 			return loadedScripts.triggers;
 		}
-	}
-	
-	public final static boolean isCurrentEvent(final @Nullable Class<? extends Event> event) {
-		return CollectionUtils.containsSuperclass(currentEvents, event);
-	}
-	
-	public final static boolean isCurrentEvent(final Class<? extends Event>... events) {
-		return CollectionUtils.containsAnySuperclass(currentEvents, events);
-	}
-	
-	/**
-	 * Use this sparingly; {@link #isCurrentEvent(Class)} or {@link #isCurrentEvent(Class...)} should be used in most cases.
-	 */
-	@Nullable
-	public static Class<? extends Event>[] getCurrentEvents() {
-		return currentEvents;
 	}
 	
 }

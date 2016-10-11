@@ -31,11 +31,11 @@ import ch.njol.skript.lang.parser.ParserInstance;
 public interface DefaultExpression<T> extends Expression<T> {
 	
 	public default boolean init(final ParserInstance pi) {
-		return init();
+		throw new UnsupportedOperationException("init not implemented");
 	}
 	
 	public default boolean init() {
-		throw new UnsupportedOperationException("init not implemented");
+		return init(ParserInstance.DUMMY);
 	}
 	
 	/**

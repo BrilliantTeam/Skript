@@ -43,6 +43,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Task;
@@ -76,12 +77,12 @@ public class DatabaseStorage extends VariablesStorage {
 				") CHARACTER SET ucs2 COLLATE ucs2_bin") {// MySQL treats UTF16 as 4 byte charset, resulting in a short max name length. UCS2 uses 2 bytes.
 			@Override
 			@Nullable
-			protected Object initialise(final DatabaseStorage s, final SectionNode n) {
-				final String host = s.getValue(n, "host");
-				final Integer port = s.getValue(n, "port", Integer.class);
-				final String user = s.getValue(n, "user");
-				final String password = s.getValue(n, "password");
-				final String database = s.getValue(n, "database");
+			protected Object initialise(final DatabaseStorage s, final SectionNode n, final ParserInstance pi) {
+				final String host = s.getValue(pi, n, "host");
+				final Integer port = s.getValue(pi, n, "port", Integer.class);
+				final String user = s.getValue(pi, n, "user");
+				final String password = s.getValue(pi, n, "password");
+				final String database = s.getValue(pi, n, "database");
 				if (host == null || port == null || user == null || password == null || database == null)
 					return null;
 				return new MySQL(SkriptLogger.LOGGER, "[Skript]", host, port, database, user, password);
@@ -95,7 +96,7 @@ public class DatabaseStorage extends VariablesStorage {
 				")") {// SQLite uses Unicode exclusively
 			@Override
 			@Nullable
-			protected Object initialise(final DatabaseStorage s, final SectionNode config) {
+			protected Object initialise(final DatabaseStorage s, final SectionNode config, final ParserInstance pi) {
 				final File f = s.file;
 				if (f == null)
 					return null;
@@ -112,7 +113,7 @@ public class DatabaseStorage extends VariablesStorage {
 		}
 		
 		@Nullable
-		protected abstract Object initialise(DatabaseStorage s, SectionNode config);
+		protected abstract Object initialise(DatabaseStorage s, SectionNode config, ParserInstance pi);
 	}
 	
 	private final Type type;
@@ -140,7 +141,7 @@ public class DatabaseStorage extends VariablesStorage {
 	 * {@link Variables#variableLoaded(String, Object, VariablesStorage)}).
 	 */
 	@Override
-	protected boolean load_i(final SectionNode n) {
+	protected boolean load_i(final SectionNode n, final ParserInstance pi) {
 		synchronized (db) {
 			final Plugin p = Bukkit.getPluginManager().getPlugin("SQLibrary");
 			if (p == null || !(p instanceof SQLibrary)) {
@@ -148,8 +149,8 @@ public class DatabaseStorage extends VariablesStorage {
 				return false;
 			}
 			
-			final Boolean monitor_changes = getValue(n, "monitor changes", Boolean.class);
-			final Timespan monitor_interval = getValue(n, "monitor interval", Timespan.class);
+			final Boolean monitor_changes = getValue(pi, n, "monitor changes", Boolean.class);
+			final Timespan monitor_interval = getValue(pi, n, "monitor interval", Timespan.class);
 			if (monitor_changes == null || monitor_interval == null)
 				return false;
 			monitor = monitor_changes;
@@ -157,7 +158,7 @@ public class DatabaseStorage extends VariablesStorage {
 			
 			final Database db;
 			try {
-				final Object o = type.initialise(this, n);
+				final Object o = type.initialise(this, n, pi);
 				if (o == null)
 					return false;
 				this.db.set(db = (Database) o);
@@ -694,7 +695,7 @@ public class DatabaseStorage extends VariablesStorage {
 			}
 			
 			@Override
-			protected boolean load_i(final SectionNode n) {
+			protected boolean load_i(final SectionNode n, final ParserInstance pi) {
 				assert false;
 				return false;
 			}

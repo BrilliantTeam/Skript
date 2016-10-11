@@ -52,6 +52,7 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.Variable;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.variables.DatabaseStorage.Type;
@@ -187,7 +188,7 @@ public abstract class Variables {
 					if (Skript.logVeryHigh())
 						Skript.info("Loading database '" + node.getKey() + "'...");
 					
-					if (s.load(n))
+					if (s.load(n, ParserInstance.DUMMY))
 						storages.add(s);
 					else
 						successful = false;

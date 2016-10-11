@@ -77,6 +77,7 @@ import ch.njol.util.Callback;
 import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * Instance of Skript parser. Runs asynchronously.
@@ -187,6 +188,22 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		return currentEventName;
 	}
 	
+	public final boolean isCurrentEvent(final @Nullable Class<? extends Event> event) {
+		return CollectionUtils.containsSuperclass(currentEvents, event);
+	}
+	
+	public final boolean isCurrentEvent(final Class<? extends Event>... events) {
+		return CollectionUtils.containsAnySuperclass(currentEvents, events);
+	}
+	
+	/**
+	 * Use this sparingly; {@link #isCurrentEvent(Class)} or {@link #isCurrentEvent(Class...)} should be used in most cases.
+	 */
+	@Nullable
+	public Class<? extends Event>[] getCurrentEvents() {
+		return currentEvents;
+	}
+	
 	public String replaceOptions(final String s) {
 		final String r = StringUtils.replaceAll(s, "\\{@(.+?)\\}", new Callback<String, Matcher>() {
 			@Override
@@ -220,7 +237,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 				final String s = replaceOptions("" + e.getKey());
 				if (!SkriptParser.validateLine(s))
 					continue;
-				final Statement stmt = Statement.parse(s, "Can't understand this condition/effect: " + s);
+				final Statement stmt = Statement.parse(s, "Can't understand this condition/effect: " + s, this);
 				if (stmt == null)
 					continue;
 				if (Skript.debug() || n.debug())
@@ -409,7 +426,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 					Object o;
 					final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 					try {
-						o = Classes.parseSimple(((EntryNode) n).getValue(), Object.class, ParseContext.SCRIPT);
+						o = Classes.parseSimple(this, ((EntryNode) n).getValue(), Object.class, ParseContext.SCRIPT);
 						if (o == null) {
 							log.printError("Can't understand the value '" + ((EntryNode) n).getValue() + "'");
 							continue;

@@ -23,6 +23,7 @@ package ch.njol.skript.lang.parser;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,14 +39,18 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bukkit.scheduler.BukkitRunnable;
+import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.Config;
 
 /**
  * Manages loading of ALL scripts.
+ * 
+ * There should never be more than one instace of this in use at same time.
  */
-public class ScriptManager extends Thread {
+public class ScriptManager {
 	
 	private AtomicInteger waitLoading = new AtomicInteger();
 	private Map<String,Config> loadMap = new ConcurrentHashMap<>();
@@ -59,9 +64,47 @@ public class ScriptManager extends Thread {
 	@SuppressWarnings("null")
 	private ExecutorService pool = Executors.newCachedThreadPool();
 	
+	@Nullable
+	private Thread lockedThread;
+	
+	private static final ReentrantLock lock = new ReentrantLock(true);
+	
+	/**
+	 * Loads and then enables given scripts. This method is ran asynchronously,
+	 * then synchronously to enable scripts in server's main thread.
+	 * 
+	 * This method will wait (on another thread) if script loading is
+	 * in progress. When it has finished, this will load whatever was originally
+	 * asked.
+	 * @param files
+	 */
+	public void loadAndEnable(File[] files) {
+		pool.execute(new Runnable() {
+
+			@Override
+			public void run() {
+				Skript.debug("Trying to load scripts asynchronously...");
+				List<ParserInstance> parsed = load(files); // Parsed scripts; this is blocking operation
+				ScriptLoader.unloadScripts(files); // Unload what was reloaded
+				ScriptLoader.enableScripts(parsed); // Re-enable what was unloaded
+			}
+			
+		});
+	}
+	
+	/**
+	 * Loads scripts from given files. Note that this is run in caller thread, which is
+	 * then parked - do use separate thread to call this.
+	 * @param files List of scripts.
+	 * @return Parser instances that were completed.
+	 */
 	@SuppressWarnings("null")
 	public List<ParserInstance> load(File[] files) {
-		int numScripts = 0;
+		lock.lock();
+		Skript.debug("Lock acquired for loading scripts");
+		lockedThread = Thread.currentThread();
+		
+		int numScripts = files.length;
 		
 		if (numScripts == 0) // Load nothing
 			return Collections.emptyList();
@@ -88,6 +131,8 @@ public class ScriptManager extends Thread {
 		while (waitParsing.get() > 0)
 			LockSupport.park();
 		
+		
+		lock.unlock();
 		parsed.sort(null); // Sort alphabetically to not break everything
 		return new ArrayList<>(parsed); // Return non-synchronized copy for speed
 	}
@@ -96,13 +141,13 @@ public class ScriptManager extends Thread {
 		int counter = waitLoading.decrementAndGet();
 		loadMap.put(file, config);
 		if (counter < 1)
-			LockSupport.unpark(this);
+			LockSupport.unpark(lockedThread);
 	}
 	
 	public void parseReady(ParserInstance pi) {
 		int counter = waitParsing.decrementAndGet();
 		parsed.add(pi);
 		if (counter < 1)
-			LockSupport.unpark(this);
+			LockSupport.unpark(lockedThread);
 	}
 }
