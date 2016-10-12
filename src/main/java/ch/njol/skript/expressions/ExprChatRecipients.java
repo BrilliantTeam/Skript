@@ -78,7 +78,7 @@ public class ExprChatRecipients extends SimpleExpression<Player> {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!(ScriptLoader.isCurrentEvent(AsyncPlayerChatEvent.class))) {
+		if (!(parseResult.pi.isCurrentEvent(AsyncPlayerChatEvent.class))) {
 			Skript.error("Cannot use chat recipients expression outside of a chat event", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}

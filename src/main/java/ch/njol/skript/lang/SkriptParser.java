@@ -188,7 +188,7 @@ public class SkriptParser {
 			log.submitError(pi, defaultError);
 			return null;
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 	}
 	
@@ -210,7 +210,7 @@ public class SkriptParser {
 			log.submitError(pi, defaultError);
 			return null;
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 	}
 	
@@ -245,7 +245,7 @@ public class SkriptParser {
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' is not a single-element expression. Change your pattern to allow multiple elements or make the expression mandatory [pattern: " + info.patterns[i] + "]");
 										if (vi.time != 0 && !expr.setTime(vi.time))
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' does not have distinct time states. [pattern: " + info.patterns[i] + "]");
-										if (!expr.init())
+										if (!expr.init(pi))
 											continue patternsLoop;
 										res.exprs[j] = expr;
 									}
@@ -268,7 +268,7 @@ public class SkriptParser {
 			log.submit(pi);
 			return null;
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 	}
 	
@@ -372,7 +372,7 @@ public class SkriptParser {
 			log.submit(pi);
 			return null;
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 	}
 	
@@ -530,7 +530,7 @@ public class SkriptParser {
 				return new ExpressionList<>(es, (Class<T>) Utils.getSuperType(exprRetTypes), !and.isFalse());
 			}
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 	}
 	
@@ -711,7 +711,7 @@ public class SkriptParser {
 			log.printLog();
 			return e;
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 	}
 	
@@ -774,7 +774,7 @@ public class SkriptParser {
 			log.printErrors(defaultError);
 			return null;
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 	}
 	
@@ -812,7 +812,7 @@ public class SkriptParser {
 			log.submit(pi);
 			return null;
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 	}
 	
@@ -1037,7 +1037,7 @@ public class SkriptParser {
 							log.printLog();
 						return res;
 					} finally {
-						log.stop();
+						//log.stop();
 					}
 				}
 				case '(': {
@@ -1074,7 +1074,7 @@ public class SkriptParser {
 						log.submit(pi);
 						return null;
 					} finally {
-						log.stop();
+						//log.stop();
 					}
 				}
 				case '%': {
@@ -1176,7 +1176,7 @@ public class SkriptParser {
 						log.submit(pi);
 						return null;
 					} finally {
-						log.stop();
+						//log.stop();
 					}
 				}
 				case ']':

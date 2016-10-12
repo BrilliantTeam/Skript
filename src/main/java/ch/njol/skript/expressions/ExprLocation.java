@@ -62,7 +62,7 @@ public class ExprLocation extends WrapperExpression<Location> {
 			return true;
 		} else {
 			setExpr(new EventValueExpression<>(Location.class));
-			return ((EventValueExpression<Location>) getExpr()).init();
+			return ((EventValueExpression<Location>) getExpr()).init(parseResult.pi);
 		}
 	}
 	

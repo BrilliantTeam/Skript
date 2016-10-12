@@ -96,7 +96,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		}
 	};
 	
-	private Config config;
+	public final Config config;
 	private ScriptManager manager;
 	public final Map<String, ItemType> aliases;
 	public final Map<String, String> options;
@@ -134,6 +134,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	
 	@SuppressWarnings("null") // Note: only for dummy object
 	ParserInstance() {
+		config = null;
 		aliases = null;
 		options = null;
 		commands = null;
@@ -192,6 +193,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		return CollectionUtils.containsSuperclass(currentEvents, event);
 	}
 	
+	@SafeVarargs
 	public final boolean isCurrentEvent(final Class<? extends Event>... events) {
 		return CollectionUtils.containsAnySuperclass(currentEvents, events);
 	}

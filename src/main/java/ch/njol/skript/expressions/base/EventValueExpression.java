@@ -121,7 +121,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		if (exprs.length != 0)
 			throw new SkriptAPIException(this.getClass().getName() + " has expressions in its pattern but does not override init(...)");
-		return init();
+		return init(parser.pi);
 	}
 	
 	@SuppressWarnings("null")
@@ -130,7 +130,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			boolean hasValue = false;
-			final Class<? extends Event>[] es = ScriptLoader.getCurrentEvents();
+			final Class<? extends Event>[] es = pi.getCurrentEvents();
 			if (es == null) {
 				assert false;
 				return false;
