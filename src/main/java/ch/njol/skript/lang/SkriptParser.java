@@ -299,11 +299,11 @@ public class SkriptParser {
 			if (context == ParseContext.DEFAULT || context == ParseContext.EVENT) {
 				final Variable<? extends T> var = parseVariable(pi, expr, types);
 				if (var != null) {
-					if ((flags & PARSE_EXPRESSIONS) == 0) {
-						Skript.error("Variables cannot be used here.");
-						log.submit(pi);
-						return null;
-					}
+//					if ((flags & PARSE_EXPRESSIONS) == 0) {
+//						Skript.error("Variables cannot be used here.");
+//						log.submit(pi);
+//						return null;
+//					}
 					log.printLog();
 					return var;
 				} else if (log.hasError()) {

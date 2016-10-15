@@ -67,7 +67,7 @@ public class ExprAttacked extends SimpleExpression<Entity> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		if (!ScriptLoader.isCurrentEvent(EntityDamageEvent.class, EntityDeathEvent.class)) {
+		if (!parser.pi.isCurrentEvent(EntityDamageEvent.class, EntityDeathEvent.class)) {
 			Skript.error("The expression 'victim' can only be used in a damage or death event", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}

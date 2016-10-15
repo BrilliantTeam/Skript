@@ -85,8 +85,15 @@ public class ScriptManager {
 			public void run() {
 				Skript.debug("Trying to load scripts asynchronously...");
 				List<ParserInstance> parsed = load(files); // Parsed scripts; this is blocking operation
-				ScriptLoader.unloadScripts(files); // Unload what was reloaded
-				ScriptLoader.enableScripts(parsed); // Re-enable what was unloaded
+				new BukkitRunnable() { // This needs to be done synchronously
+
+					@Override
+					public void run() {
+						ScriptLoader.unloadScripts(files); // Unload what was reloaded
+						ScriptLoader.enableScripts(parsed); // Re-enable what was unloaded
+					}
+					
+				}.runTask(Skript.getInstance());
 			}
 			
 		});
