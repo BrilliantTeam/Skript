@@ -523,6 +523,8 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 			
 			numTriggers++;
 		}
+		
+		manager.parseReady(this);
 	}
 
 	@Override

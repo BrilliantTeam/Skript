@@ -85,6 +85,7 @@ public class ScriptManager {
 			public void run() {
 				Skript.debug("Trying to load scripts asynchronously...");
 				List<ParserInstance> parsed = load(files); // Parsed scripts; this is blocking operation
+				Skript.debug("Done parsing scripts");
 				new BukkitRunnable() { // This needs to be done synchronously
 
 					@Override

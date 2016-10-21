@@ -21,6 +21,8 @@
 
 package ch.njol.skript.conditions;
 
+import java.util.Arrays;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
@@ -112,7 +114,6 @@ public class CondCompare extends Condition {
 	@SuppressWarnings("null")
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		
 		first = vars[0];
 		second = vars[1];
 		if (vars.length == 3)

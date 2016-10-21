@@ -198,7 +198,8 @@ public class FunctionReference<T> {
 	@SuppressWarnings("unchecked")
 	public Class<? extends T> getReturnType() {
 		if (signature == null) {
-			throw new SkriptAPIException("Signature of function is null when return type is asked!");
+			//throw new SkriptAPIException("Signature of function is null when return type is asked!");
+			return (Class<? extends T>) Unknown.class;
 		}
 		assert signature != null;
 		@SuppressWarnings("null") // Wait what, Eclipse? Already asserted this...

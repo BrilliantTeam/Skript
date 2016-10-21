@@ -260,6 +260,7 @@ final public class ScriptLoader {
 	@SuppressWarnings("null")
 	private final static void enableScript(ParserInstance pi, ScriptInfo i) {
 		final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
+		Skript.debug("Enabling script " + pi.config.getFileName());
 		try {
 			for (ScriptCommand cmd : pi.commands) { // Register commands
 				i.commands++;
@@ -328,6 +329,7 @@ final public class ScriptLoader {
 	}
 	
 	public final static ScriptInfo unloadScripts(final File[] files) {
+		Skript.debug("Unloading (some) scripts...");
 		ScriptInfo i = new ScriptInfo();
 		for (File f : files) {
 			assert f != null;

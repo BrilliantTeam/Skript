@@ -408,20 +408,20 @@ public class SkriptParser {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			//Mirre
-			if (isObject){
-				if ((flags & PARSE_LITERALS) != 0) {
-					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
-					final SkriptParser p = new SkriptParser(pi, expr, PARSE_LITERALS, context);
-					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
-						final Expression<?> e = p.parseExpression(c);
-						if (e != null) {
-							log.printLog();
-							return (Expression<? extends T>) e;
-						}
-						log.clear();
-					}
-				}
-			}
+//			if (isObject){
+//				if ((flags & PARSE_LITERALS) != 0) {
+//					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
+//					final SkriptParser p = new SkriptParser(pi, expr, PARSE_LITERALS, context);
+//					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
+//						final Expression<?> e = p.parseExpression(c); // Wow this breaks stuff -bensku, 21.10.2016
+//						if (e != null) {
+//							log.printLog();
+//							return (Expression<? extends T>) e;
+//						}
+//						log.clear();
+//					}
+//				}
+//			}
 			//Mirre
 			final Expression<? extends T> r = parseSingleExpr(false, null, types);
 			if (r != null) {
