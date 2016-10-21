@@ -368,9 +368,5 @@ public class SimpleEvents {
 				.description("Called when a world is unloaded. This event might never be called if you don't have a world management plugin.")
 				.examples("")
 				.since("1.0");
-		Skript.registerEvent("Armor Stand Manipulation", SimpleEvent.class, PlayerInteractAtEntityEvent.class, "armor stand manipulat(e|ion)")
-				.description("Called when player tries to edit contents of the armor stand. Usually this happens by clicking it.")
-				.examples("on armor stand manipulation")
-				.since("2.2-dev19");
 	}
 }

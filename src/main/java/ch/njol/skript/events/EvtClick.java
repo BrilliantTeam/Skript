@@ -21,6 +21,8 @@
 
 package ch.njol.skript.events;
 
+import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -31,6 +33,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -63,8 +66,14 @@ public class EvtClick extends SkriptEvent {
 	private final static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
 	
 	static {
+		Class<? extends PlayerEvent> clickEvent;
+		if (twoHanded) // Armor stand support!
+			clickEvent = PlayerInteractAtEntityEvent.class;
+		else
+			clickEvent = PlayerInteractEntityEvent.class;
+		
 		@SuppressWarnings("unchecked")
-		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class);
+		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, clickEvent);
 		Skript.registerEvent("Click", EvtClick.class, eventTypes,
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] [on %-entitydata/itemtype%] [(with|using|holding) %itemtype%]",
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] (with|using|holding) %itemtype% on %entitydata/itemtype%")
@@ -103,6 +112,7 @@ public class EvtClick extends SkriptEvent {
 	
 	@Override
 	public boolean check(final Event e) {
+		Skript.info(e.getEventName());
 		final Block block;
 		final Entity entity;
 		
@@ -122,10 +132,13 @@ public class EvtClick extends SkriptEvent {
 				}
 			}
 			
+			Skript.info("" + click);
+			Skript.info("" + types);
 			if (click == LEFT || types == null) // types == null  will be handled by the PlayerInteractEvent that is fired as well
 				return false;
 			entity = clickEvent.getRightClicked();
 			block = null;
+			Skript.info("Got to the end");
 		} else if (e instanceof PlayerInteractEvent) {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
 			if (twoHanded) {
