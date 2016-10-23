@@ -27,6 +27,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 
 /**
@@ -38,10 +39,17 @@ import ch.njol.util.Kleenean;
  */
 public abstract class SimplePropertyExpression<F, T> extends PropertyExpression<F, T> implements Converter<F, T> {
 	
+	/**
+	 * Parser instance, stored from init() automatically.
+	 */
+	@SuppressWarnings("null")
+	protected ParserInstance pi;
+	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		setExpr((Expression<? extends F>) exprs[0]);
+		pi = parseResult.pi;
 		return true;
 	}
 	

@@ -36,6 +36,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Checker;
@@ -244,8 +245,8 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	 * @see #setTime(int, Expression, Class...)
 	 */
 	@Override
-	public boolean setTime(final int time) {
-		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
+	public boolean setTime(final int time, final ParserInstance pi) {
+		if (pi.hasDelayBefore == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}

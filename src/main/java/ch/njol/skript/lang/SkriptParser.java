@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -253,7 +254,7 @@ public class SkriptParser {
 								x = x2;
 							}
 							final T t = info.c.newInstance();
-							if (t.init(res.exprs, i, ScriptLoader.hasDelayBefore, res)) {
+							if (t.init(res.exprs, i, pi.hasDelayBefore, res)) {
 								log.printLog();
 								return t;
 							}
@@ -1015,6 +1016,8 @@ public class SkriptParser {
 	 */
 	@Nullable
 	private final ParseResult parse_i(final String pattern, int i, int j) {
+		Skript.info("parse_i on " + pattern);
+		
 		ParseResult res;
 		int end, i2;
 		
@@ -1078,6 +1081,7 @@ public class SkriptParser {
 					}
 				}
 				case '%': {
+					Skript.info("i is " + i + " of " + expr.length());
 					if (i == expr.length())
 						return null;
 					end = pattern.indexOf('%', j + 1);
@@ -1119,7 +1123,7 @@ public class SkriptParser {
 											if (vi.time != 0) {
 												if (e instanceof Literal<?>)
 													return null;
-												if (ScriptLoader.hasDelayBefore == Kleenean.TRUE) {
+												if (pi.hasDelayBefore == Kleenean.TRUE) {
 													log.error("Cannot use time states after the event has already passed", ErrorQuality.SEMANTIC_ERROR);
 													return null;
 												}

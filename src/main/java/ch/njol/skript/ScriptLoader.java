@@ -122,8 +122,6 @@ final public class ScriptLoader {
 	 */
 	private final static ScriptInfo loadedScripts = new ScriptInfo();
 	
-	public static Kleenean hasDelayBefore = Kleenean.FALSE;
-	
 	public static class ScriptInfo {
 		public int files, triggers, commands, functions;
 		

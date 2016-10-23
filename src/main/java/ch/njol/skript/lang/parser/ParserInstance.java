@@ -118,7 +118,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	
 	private String indentation = "";
 	
-	private Kleenean hasDelayBefore = Kleenean.FALSE;
+	public Kleenean hasDelayBefore = Kleenean.FALSE;
 	
 	/**
 	 * use {@link #setCurrentEvent(String, Class...)}

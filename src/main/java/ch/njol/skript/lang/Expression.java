@@ -33,6 +33,7 @@ import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.Changer.ChangerUtils;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.conditions.CondIsSet;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
@@ -171,7 +172,11 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 	 * @see SimpleExpression#setTime(int, Expression, Class...)
 	 * @see LoaderInstance#isCurrentEvent(Class...)
 	 */
-	public boolean setTime(int time);
+	public boolean setTime(int time, ParserInstance pi);
+	
+	public default boolean setTime(int time) {
+		return setTime(time, ParserInstance.DUMMY);
+	}
 	
 	/**
 	 * @return The value passed to {@link #setTime(int)} or 0 if it was never changed.
