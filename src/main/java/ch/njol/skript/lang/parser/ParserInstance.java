@@ -437,7 +437,6 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 					} finally {
 						log.stop();
 					}
-					@SuppressWarnings("null")
 					final ClassInfo<?> ci = Classes.getSuperClassInfo(o.getClass());
 					if (ci.getSerializer() == null) {
 						Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");

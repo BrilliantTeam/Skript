@@ -336,7 +336,7 @@ public class HTMLGenerator {
 	@SuppressWarnings("null")
 	String readFile(File f) {
 		try {
-			return Files.toString(f, Charset.defaultCharset());
+			return Files.toString(f, Charset.forName("UTF-8"));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "";
@@ -345,7 +345,7 @@ public class HTMLGenerator {
 	
 	void writeFile(File f, String data) {
 		try {
-			Files.write(data, f, Charset.defaultCharset());
+			Files.write(data, f, Charset.forName("UTF-8"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
