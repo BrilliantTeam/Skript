@@ -35,19 +35,19 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
-@Name("Glowing")
-@Description("Indicates if targeted entity is glowing (new 1.9 effect) or not. Glowing entities can be seen through walls.")
-@Examples({"set glowing of player on"})
-@Since("2.2-dev18")
-public class ExprGlowing extends SimplePropertyExpression<Entity, Boolean> {
+@Name("Gravity")
+@Description("If entity is affected by gravity or not, i.e. if it has Minecraft 1.10+ NoGravity flag.")
+@Examples({"set gravity of player off"})
+@Since("2.2-dev21")
+public class ExprGravity extends SimplePropertyExpression<Entity, Boolean> {
 	
 	static {
-		register(ExprGlowing.class, Boolean.class, "glowing", "entities");
+		register(ExprGlowing.class, Boolean.class, "gravity", "entities");
 	}
 	
 	@Override
 	public Boolean convert(final Entity e) {
-		return e.isGlowing();
+		return e.hasGravity();
 	}
 	
 	@Override
@@ -71,6 +71,6 @@ public class ExprGlowing extends SimplePropertyExpression<Entity, Boolean> {
 	@Override
 	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) throws UnsupportedOperationException {
 		for (final Entity entity : getExpr().getArray(e))
-			entity.setGlowing(delta == null ? false : (Boolean) delta[0]);
+			entity.setGravity(delta == null ? true : (Boolean) delta[0]);
 	}
 }

@@ -89,7 +89,8 @@ public class TimingReporter {
 	
 	public static void saveToFile(String str) {
 		File folder = Skript.getInstance().getDataFolder();
-		File file = new File(folder + "/timings-" + DateFormat.getTimeInstance().format(System.currentTimeMillis()) + ".log");
+		String timestamp = DateFormat.getTimeInstance().format(System.currentTimeMillis()).replaceAll(":", "_");
+		File file = new File(folder + "/timings-" + timestamp + ".log");
 		if (!file.exists())
 			try {
 				file.createNewFile();
