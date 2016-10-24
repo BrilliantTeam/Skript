@@ -40,6 +40,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
@@ -368,5 +369,10 @@ public class SimpleEvents {
 				.description("Called when a world is unloaded. This event might never be called if you don't have a world management plugin.")
 				.examples("")
 				.since("1.0");
+		Skript.registerEvent("Gliding State Change", SimpleEvent.class, EntityToggleGlideEvent.class, "(gliding state change|toggling gliding)")
+				.description("Called when an entity toggles glider on or off, or when server toggles gliding state of an entity forcibly.")
+				.examples("on toggling gliding:",
+						"	cancel the event # bad idea, but you CAN do it!")
+				.since("2.2-dev21");
 	}
 }

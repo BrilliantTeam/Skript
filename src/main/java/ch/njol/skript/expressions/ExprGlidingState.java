@@ -21,40 +21,38 @@
 
 package ch.njol.skript.expressions;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Events;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
-@Name("Gravity")
-@Description("If entity is affected by gravity or not, i.e. if it has Minecraft 1.10+ NoGravity flag.")
-@Examples({"set gravity of player off"})
+@Name("Gliding State")
+@Description("Sets of gets gliding state of player. It allows you to set gliding state of entity even if they do not have <a href=\"http://minecraft.gamepedia.com/Elytra\">Elytra</a> equipped.")
+@Examples({"set gliding of player to off"})
 @Since("2.2-dev21")
-public class ExprGravity extends SimplePropertyExpression<Entity, Boolean> {
+public class ExprGlidingState extends SimplePropertyExpression<LivingEntity, Boolean> {
 	
 	static {
-		if (Skript.isRunningMinecraft(1, 10))
-			register(ExprGravity.class, Boolean.class, "gravity", "entities");
+		if (Skript.isRunningMinecraft(1, 9))
+			register(ExprGlidingState.class, Boolean.class, "(gliding|glider) [state]", "entities");
 	}
 	
 	@Override
-	public Boolean convert(final Entity e) {
-		return e.hasGravity();
+	public Boolean convert(final LivingEntity e) {
+		return e.isGliding();
 	}
 	
 	@Override
 	protected String getPropertyName() {
-		return "gravity";
+		return "gliding state";
 	}
 	
 	@Override
@@ -72,7 +70,7 @@ public class ExprGravity extends SimplePropertyExpression<Entity, Boolean> {
 	
 	@Override
 	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) throws UnsupportedOperationException {
-		for (final Entity entity : getExpr().getArray(e))
-			entity.setGravity(delta == null ? true : (Boolean) delta[0]);
+		for (final LivingEntity entity : getExpr().getArray(e))
+			entity.setGliding(delta == null ? false : (Boolean) delta[0]);
 	}
 }
