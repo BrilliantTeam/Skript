@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Bat;
@@ -173,6 +174,9 @@ public class SimpleEntityData extends EntityData<Entity> {
 		}
 		if (Skript.classExists("org.bukkit.entity.PolarBear")) {
 			types.add(new SimpleEntityDataInfo("polar bear", PolarBear.class));
+		}
+		if (Skript.classExists("org.bukkit.entity.AreaEffectCloud")) {
+			types.add(new SimpleEntityDataInfo("area effect cloud", AreaEffectCloud.class));
 		}
 		// TODO !Update with every version [entities]
 		

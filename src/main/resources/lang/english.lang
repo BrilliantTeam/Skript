@@ -814,6 +814,9 @@ entities:
 	polar bear:
 		name: polar bear¦s
 		pattern: polar bear(|1¦s)
+	area effect cloud:
+		name: area effect cloud¦s
+		pattern: area effect cloud(|1¦s)
 	monster:
 		name: monster¦s
 		pattern: monster(|1¦s)

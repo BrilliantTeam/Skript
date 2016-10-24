@@ -33,6 +33,7 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
@@ -46,6 +47,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.SheepRegrowWoolEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -369,10 +371,20 @@ public class SimpleEvents {
 				.description("Called when a world is unloaded. This event might never be called if you don't have a world management plugin.")
 				.examples("")
 				.since("1.0");
-		Skript.registerEvent("Gliding State Change", SimpleEvent.class, EntityToggleGlideEvent.class, "(gliding state change|toggling gliding)")
-				.description("Called when an entity toggles glider on or off, or when server toggles gliding state of an entity forcibly.")
-				.examples("on toggling gliding:",
-						"	cancel the event # bad idea, but you CAN do it!")
+		if (Skript.isRunningMinecraft(1, 9)) {
+			Skript.registerEvent("Gliding State Change", SimpleEvent.class, EntityToggleGlideEvent.class, "(gliding state change|toggling gliding)")
+					.description("Called when an entity toggles glider on or off, or when server toggles gliding state of an entity forcibly.")
+					.examples("on toggling gliding:",
+							"	cancel the event # bad idea, but you CAN do it!")
+					.since("2.2-dev21");
+			Skript.registerEvent("AoE Cloud Effect", SimpleEvent.class, AreaEffectCloudApplyEvent.class, "(area effect|AoE cloud) effect")
+					.description("Called when area effect cloud applies it's potion effect. This happens every 5 ticks by default.")
+					.examples("")
+					.since("2.2-dev21");
+		}
+		Skript.registerEvent("Sheep Regrow Wool", SimpleEvent.class, SheepRegrowWoolEvent.class, "sheep [re]grow[ing] wool")
+				.description("Called when sheep regrows it's sheared wool back.")
+				.examples("")
 				.since("2.2-dev21");
 	}
 }
