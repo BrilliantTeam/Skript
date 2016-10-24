@@ -52,7 +52,7 @@ public class ExprEventExpression extends WrapperExpression<Object> {
 		final ClassInfo<?> ci = ((Literal<ClassInfo<?>>) exprs[0]).getSingle();
 		final EventValueExpression<?> e = new EventValueExpression<Object>(ci.getC());
 		setExpr(e);
-		return e.init(parser.pi);
+		return e.init();
 	}
 	
 	@Override

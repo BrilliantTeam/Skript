@@ -79,6 +79,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 		this(c, null);
 	}
 	
+	@SuppressWarnings("null")
 	public EventValueExpression(final Class<? extends T> c, final @Nullable Changer<? super T> changer) {
 		assert c != null;
 		this.c = c;
@@ -121,12 +122,12 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		if (exprs.length != 0)
 			throw new SkriptAPIException(this.getClass().getName() + " has expressions in its pattern but does not override init(...)");
-		return init(parser.pi);
+		return init();
 	}
 	
 	@SuppressWarnings("null")
 	@Override
-	public boolean init(final ParserInstance pi) {
+	public boolean init() {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			boolean hasValue = false;

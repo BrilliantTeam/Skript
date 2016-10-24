@@ -72,7 +72,6 @@ public class EffExit extends Effect { // TODO [code style] warn user about code 
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		final ParserInstance pi = parser.pi;
 		switch (matchedPattern) {
 			case 0:
 				breakLevels = pi.currentSections.size() + 1;

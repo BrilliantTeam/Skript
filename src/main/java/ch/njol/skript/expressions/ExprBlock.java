@@ -75,7 +75,7 @@ public class ExprBlock extends WrapperExpression<Block> {
 			return true;
 		} else {
 			setExpr(new EventValueExpression<>(Block.class));
-			return ((EventValueExpression<Block>) getExpr()).init(parser.pi);
+			return ((EventValueExpression<Block>) getExpr()).init();
 		}
 	}
 	

@@ -172,11 +172,7 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 	 * @see SimpleExpression#setTime(int, Expression, Class...)
 	 * @see LoaderInstance#isCurrentEvent(Class...)
 	 */
-	public boolean setTime(int time, ParserInstance pi);
-	
-	public default boolean setTime(int time) {
-		return setTime(time, ParserInstance.DUMMY);
-	}
+	public boolean setTime(int time);
 	
 	/**
 	 * @return The value passed to {@link #setTime(int)} or 0 if it was never changed.

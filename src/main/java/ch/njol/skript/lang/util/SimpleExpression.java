@@ -54,6 +54,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	
 	private int time = 0;
 	
+	@SuppressWarnings("null") // Parser instance should never be null
 	protected SimpleExpression() {}
 	
 	@Override
@@ -245,7 +246,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	 * @see #setTime(int, Expression, Class...)
 	 */
 	@Override
-	public boolean setTime(final int time, final ParserInstance pi) {
+	public boolean setTime(final int time) {
 		if (pi.hasDelayBefore == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
@@ -255,7 +256,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	}
 	
 	protected final boolean setTime(final int time, final Class<? extends Event> applicableEvent, final Expression<?>... mustbeDefaultVars) {
-		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
+		if (pi.hasDelayBefore == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
@@ -271,7 +272,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	}
 	
 	protected final boolean setTime(final int time, final Expression<?> mustbeDefaultVar, final Class<? extends Event>... applicableEvents) {
-		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
+		if (pi.hasDelayBefore == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
@@ -327,4 +328,13 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 		return true;
 	}
 	
+	/**
+	 * Parser instance which is being used or was used to parse this element.
+	 */
+	protected ParserInstance pi;
+	
+	@Override
+	public void setParserInstance(ParserInstance pi) {
+		this.pi = pi;
+	}
 }

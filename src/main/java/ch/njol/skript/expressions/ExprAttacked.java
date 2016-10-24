@@ -67,7 +67,7 @@ public class ExprAttacked extends SimpleExpression<Entity> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		if (!parser.pi.isCurrentEvent(EntityDamageEvent.class, EntityDeathEvent.class)) {
+		if (!pi.isCurrentEvent(EntityDamageEvent.class, EntityDeathEvent.class)) {
 			Skript.error("The expression 'victim' can only be used in a damage or death event", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}
@@ -75,7 +75,7 @@ public class ExprAttacked extends SimpleExpression<Entity> {
 		if (type == null) {
 			this.type = EntityData.fromClass(Entity.class);
 		} else {
-			final EntityData<?> t = EntityData.parse(type, parser.pi);
+			final EntityData<?> t = EntityData.parse(type, pi);
 			if (t == null) {
 				Skript.error("'" + type + "' is not an entity type", ErrorQuality.NOT_AN_EXPRESSION);
 				return false;

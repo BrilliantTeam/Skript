@@ -66,4 +66,16 @@ public abstract class Statement extends TriggerItem implements SyntaxElement {
 		return parse(s, defaultError, ParserInstance.DUMMY);
 	}
 	
+	/**
+	 * Parser instance which is being used or was used to parse this element.
+	 * Note that this variable is naturally not used for static methods.
+	 */
+	@SuppressWarnings("null")
+	protected ParserInstance pi;
+	
+	@Override
+	public void setParserInstance(ParserInstance pi) {
+		this.pi = pi;
+	}
+	
 }

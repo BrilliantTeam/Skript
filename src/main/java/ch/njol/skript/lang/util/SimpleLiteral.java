@@ -92,7 +92,7 @@ public class SimpleLiteral<T> implements Literal<T>, DefaultExpression<T> {
 	}
 	
 	@Override
-	public boolean init(ParserInstance pi) {
+	public boolean init() {
 		return true;
 	}
 	

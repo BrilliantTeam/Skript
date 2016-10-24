@@ -55,7 +55,13 @@ public abstract class WrapperExpression<T> extends SimpleExpression<T> {
 		this.expr = expr;
 	}
 	
+	/**
+	 * Sets wrapped expression. Parser instance is automatically copied from
+	 * this expression.
+	 * @param expr Wrapped expression.
+	 */
 	protected void setExpr(final Expression<? extends T> expr) {
+		expr.setParserInstance(pi);
 		this.expr = expr;
 	}
 	

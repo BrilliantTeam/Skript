@@ -127,17 +127,15 @@ public class SkriptParser {
 		public final Expression<?>[] exprs;
 		public final List<MatchResult> regexes = new ArrayList<>(1);
 		public final String expr;
-		public final ParserInstance pi;
 		/**
 		 * Defaults to 0. Any marks encountered in the pattern will be XORed with the existing value, in particular if only one mark is encountered this value will be set to that
 		 * mark.
 		 */
 		public int mark = 0;
 		
-		public ParseResult(final SkriptParser parser, final String pattern, final ParserInstance parserInstance) {
+		public ParseResult(final SkriptParser parser, final String pattern) {
 			expr = parser.expr;
 			exprs = new Expression<?>[countUnescaped(pattern, '%') / 2];
-			pi = parserInstance;
 		}
 	}
 	
@@ -240,20 +238,25 @@ public class SkriptParser {
 											throw new SkriptAPIException("The class '" + vi.classes[0].getCodeName() + "' does not provide a default expression. Either allow null (with %-" + vi.classes[0].getCodeName() + "%) or make it mandatory [pattern: " + info.patterns[i] + "]");
 										if (!(expr instanceof Literal) && (vi.flagMask & PARSE_EXPRESSIONS) == 0)
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' is not a literal. Either allow null (with %-*" + vi.classes[0].getCodeName() + "%) or make it mandatory [pattern: " + info.patterns[i] + "]");
+										
+										expr.setParserInstance(pi);	// If we got there, add parser instance
+										
 										if (expr instanceof Literal && (vi.flagMask & PARSE_LITERALS) == 0)
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' is a literal. Either allow null (with %-~" + vi.classes[0].getCodeName() + "%) or make it mandatory [pattern: " + info.patterns[i] + "]");
 										if (!vi.isPlural[0] && !expr.isSingle())
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' is not a single-element expression. Change your pattern to allow multiple elements or make the expression mandatory [pattern: " + info.patterns[i] + "]");
 										if (vi.time != 0 && !expr.setTime(vi.time))
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' does not have distinct time states. [pattern: " + info.patterns[i] + "]");
-										if (!expr.init(pi))
+										if (!expr.init())
 											continue patternsLoop;
 										res.exprs[j] = expr;
+										Skript.info("" + expr);
 									}
 								}
 								x = x2;
 							}
 							final T t = info.c.newInstance();
+							t.setParserInstance(pi);
 							if (t.init(res.exprs, i, pi.hasDelayBefore, res)) {
 								log.printLog();
 								return t;
@@ -794,6 +797,7 @@ public class SkriptParser {
 						final ParseResult res = parse_i(pattern, 0, 0);
 						if (res != null) {
 							final SkriptEvent e = info.c.newInstance();
+							e.setParserInstance(pi);
 							final Literal<?>[] ls = Arrays.copyOf(res.exprs, res.exprs.length, Literal[].class);
 							assert ls != null;
 							if (!e.init(ls, i, res)) {
@@ -1016,8 +1020,6 @@ public class SkriptParser {
 	 */
 	@Nullable
 	private final ParseResult parse_i(final String pattern, int i, int j) {
-		Skript.info("parse_i on " + pattern);
-		
 		ParseResult res;
 		int end, i2;
 		
@@ -1081,7 +1083,6 @@ public class SkriptParser {
 					}
 				}
 				case '%': {
-					Skript.info("i is " + i + " of " + expr.length());
 					if (i == expr.length())
 						return null;
 					end = pattern.indexOf('%', j + 1);
@@ -1108,8 +1109,8 @@ public class SkriptParser {
 										if ((flags & vi.flagMask) == 0)
 											continue;
 										log2.clear();
-										@SuppressWarnings("unchecked")
 										final Expression<?> e = new SkriptParser(pi, "" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
+										Skript.info("e is " + e);
 										if (e != null) {
 											if (!vi.isPlural[k] && !e.isSingle()) {
 												if (context == ParseContext.COMMAND) {
@@ -1135,6 +1136,7 @@ public class SkriptParser {
 											log2.printLog();
 											log.printLog();
 											res.exprs[countUnescaped(pattern, '%', 0, j) / 2] = e;
+											Skript.info("exprs is " + Arrays.toString(res.exprs));
 											return res;
 										}
 									}
@@ -1225,7 +1227,7 @@ public class SkriptParser {
 			}
 		}
 		if (i == expr.length() && j == pattern.length())
-			return new ParseResult(this, pattern, pi);
+			return new ParseResult(this, pattern);
 		return null;
 	}
 	

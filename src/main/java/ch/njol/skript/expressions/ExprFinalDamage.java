@@ -52,16 +52,12 @@ public class ExprFinalDamage extends SimpleExpression<Double> {
 		Skript.registerExpression(ExprFinalDamage.class, Double.class, ExpressionType.SIMPLE, "[the] final damage");
 	}
 	
-	@SuppressWarnings("null")
-	private Kleenean delay;
-	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		if (!parseResult.pi.isCurrentEvent(EntityDamageEvent.class)) {
+		if (!pi.isCurrentEvent(EntityDamageEvent.class)) {
 			Skript.error("The expression 'final damage' can only be used in damage events", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}
-		delay = isDelayed;
 		return true;
 	}
 	

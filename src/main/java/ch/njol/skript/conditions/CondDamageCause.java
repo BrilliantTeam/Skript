@@ -70,7 +70,8 @@ public class CondDamageCause extends Condition {
 		cause = new EventValueExpression<>(DamageCause.class);
 		expected = (Expression<DamageCause>) exprs[0];
 		setNegated(parseResult.mark == 1);
-		return ((EventValueExpression<DamageCause>) cause).init(parseResult.pi);
+		cause.setParserInstance(pi);
+		return ((EventValueExpression<DamageCause>) cause).init();
 	}
 	
 	@Override

@@ -99,8 +99,8 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 		Loop loop = null;
 		
 		@SuppressWarnings("null")
-		boolean b = ScriptOptions.getInstance().usesNewLoops(parser.pi.config.getFile());
-		for (final Loop l : parser.pi.currentLoops) {
+		boolean b = ScriptOptions.getInstance().usesNewLoops(pi.config.getFile());
+		for (final Loop l : pi.currentLoops) {
 			if ((c != null && c.isAssignableFrom(l.getLoopedExpression().getReturnType())) || (b ? "value".equals(s) : false) || l.getLoopedExpression().isLoopOf(s)) {
 				if (j < i) {
 					j++;

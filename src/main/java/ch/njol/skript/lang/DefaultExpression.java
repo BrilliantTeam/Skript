@@ -30,13 +30,7 @@ import ch.njol.skript.lang.parser.ParserInstance;
  */
 public interface DefaultExpression<T> extends Expression<T> {
 	
-	public default boolean init(final ParserInstance pi) {
-		throw new UnsupportedOperationException("init not implemented");
-	}
-	
-	public default boolean init() {
-		return init(ParserInstance.DUMMY);
-	}
+	public boolean init();
 	
 	/**
 	 * @return Usually true, though this is not required, as e.g. SimpleLiteral implements DefaultExpression but is usually not the default of an event.

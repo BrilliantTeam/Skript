@@ -33,6 +33,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.conditions.CondCompare;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Checker;
@@ -57,6 +58,7 @@ public class ExpressionList<T> implements Expression<T> {
 		this(expressions, returnType, and, null);
 	}
 	
+	@SuppressWarnings("null")
 	protected ExpressionList(final Expression<? extends T>[] expressions, final Class<T> returnType, final boolean and, final @Nullable ExpressionList<?> source) {
 		assert expressions != null && expressions.length > 1;
 		this.expressions = expressions;
@@ -337,6 +339,16 @@ public class ExpressionList<T> implements Expression<T> {
 			return new LiteralList<>(ls, returnType, and);
 		}
 		return this;
+	}
+	
+	/**
+	 * Parser instance which is being used or was used to parse this expression.
+	 */
+	protected ParserInstance pi;
+	
+	@Override
+	public void setParserInstance(ParserInstance pi) {
+		this.pi = pi;
 	}
 	
 }

@@ -89,9 +89,6 @@ public class ExprEntities extends SimpleExpression<Entity> {
 	@Nullable
 	private Expression<? extends Entity> centerEntity;
 	
-	@SuppressWarnings("null")
-	private ParserInstance pi;
-	
 	Class<? extends Entity> returnType = Entity.class;
 	
 	private int matchedPattern;
@@ -122,7 +119,6 @@ public class ExprEntities extends SimpleExpression<Entity> {
 		if (types instanceof Literal && ((Literal<EntityData<?>>) types).getAll().length == 1) {
 			returnType = ((Literal<EntityData<?>>) types).getSingle().getType();
 		}
-		pi = parseResult.pi;
 		return true;
 	}
 	

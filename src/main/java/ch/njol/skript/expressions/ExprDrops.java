@@ -68,7 +68,7 @@ public class ExprDrops extends SimpleExpression<ItemStack> {
 	
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		if (!parser.pi.isCurrentEvent(EntityDeathEvent.class)) {
+		if (!pi.isCurrentEvent(EntityDeathEvent.class)) {
 			Skript.error("The expression 'drops' can only be used in death events", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}

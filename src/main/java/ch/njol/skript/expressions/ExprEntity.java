@@ -85,7 +85,7 @@ public class ExprEntity extends SimpleExpression<Entity> {
 				
 			}
 			
-			final EntityData<?> type = EntityData.parseWithoutIndefiniteArticle("" + parseResult.regexes.get(0).group(), parseResult.pi);
+			final EntityData<?> type = EntityData.parseWithoutIndefiniteArticle("" + parseResult.regexes.get(0).group(), pi);
 			log.clear();
 			log.printLog();
 			if (type == null || type.isPlural().isTrue())
@@ -95,7 +95,8 @@ public class ExprEntity extends SimpleExpression<Entity> {
 			log.stop();
 		}
 		entity = new EventValueExpression<>(type.getType());
-		return entity.init(parseResult.pi);
+		entity.setParserInstance(pi);
+		return entity.init();
 	}
 	
 	@Override
