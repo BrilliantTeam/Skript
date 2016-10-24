@@ -96,7 +96,7 @@ public class EvtClick extends SkriptEvent {
 	
 	@Override
 	public boolean init(final Literal<?>[] args, final int matchedPattern, final ParseResult parser) {
-		Thread.dumpStack();
+		Skript.info("matchedPattern is " + matchedPattern);
 		Skript.info("args is " + Arrays.toString(args));
 		click = parser.mark == 0 ? ANY : parser.mark;
 		types = args[matchedPattern];
