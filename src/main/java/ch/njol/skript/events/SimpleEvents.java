@@ -50,6 +50,8 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepRegrowWoolEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -384,6 +386,14 @@ public class SimpleEvents {
 		}
 		Skript.registerEvent("Sheep Regrow Wool", SimpleEvent.class, SheepRegrowWoolEvent.class, "sheep [re]grow[ing] wool")
 				.description("Called when sheep regrows it's sheared wool back.")
+				.examples("")
+				.since("2.2-dev21");
+		Skript.registerEvent("Inventory Open", SimpleEvent.class, InventoryOpenEvent.class, "inventory open[ed]")
+				.description("Called when an inventory is opened for player.")
+				.examples("")
+				.since("2.2-dev21");
+		Skript.registerEvent("Inventory Close", SimpleEvent.class, InventoryCloseEvent.class, "inventory close[d]")
+				.description("Called when player's currently viewed inventory is closed.")
 				.examples("")
 				.since("2.2-dev21");
 	}
