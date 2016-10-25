@@ -403,7 +403,9 @@ public final class Skript extends JavaPlugin implements Listener {
 				if (logNormal())
 					info("Loaded " + Variables.numVariables() + " variables in " + ((vld / 100) / 10.) + " seconds");
 				
-				ScriptLoader.loadScripts();
+				CommandSender console = Bukkit.getConsoleSender();
+				assert console != null;
+				ScriptLoader.loadScripts(console);
 				
 				Skript.info(m_finished_loading.toString());
 				
@@ -679,19 +681,19 @@ public final class Skript extends JavaPlugin implements Listener {
 	/**
 	 * Prints errors from reloading the config & scripts
 	 */
-	final static void reload() {
+	final static void reload(final CommandSender viewer) {
 		disableScripts();
 		reloadMainConfig();
 		reloadAliases();
-		ScriptLoader.loadScripts();
+		ScriptLoader.loadScripts(viewer);
 	}
 	
 	/**
 	 * Prints errors
 	 */
-	final static void reloadScripts() {
+	final static void reloadScripts(final CommandSender viewer) {
 		disableScripts();
-		ScriptLoader.loadScripts();
+		ScriptLoader.loadScripts(viewer);
 	}
 	
 	/**

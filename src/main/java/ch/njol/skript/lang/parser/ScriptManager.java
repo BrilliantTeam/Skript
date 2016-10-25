@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -48,7 +49,7 @@ import ch.njol.skript.config.Config;
 /**
  * Manages loading of ALL scripts.
  * 
- * There should never be more than one instace of this in use at same time.
+ * There should never be more than one instance of this in use at same time.
  */
 public class ScriptManager {
 	
@@ -69,6 +70,9 @@ public class ScriptManager {
 	
 	private static final ReentrantLock lock = new ReentrantLock(true);
 	
+	@SuppressWarnings("null")
+	private CommandSender viewer;
+	
 	/**
 	 * Loads and then enables given scripts. This method is ran asynchronously,
 	 * then synchronously to enable scripts in server's main thread.
@@ -76,9 +80,10 @@ public class ScriptManager {
 	 * This method will wait (on another thread) if script loading is
 	 * in progress. When it has finished, this will load whatever was originally
 	 * asked.
-	 * @param files
+	 * @param files List of script files.
+	 * @param viewer Command sender, which should receive all log messages from parsing.
 	 */
-	public void loadAndEnable(File[] files) {
+	public void loadAndEnable(File[] files, CommandSender viewer) {
 		pool.execute(new Runnable() {
 
 			@Override
@@ -91,7 +96,7 @@ public class ScriptManager {
 					@Override
 					public void run() {
 						ScriptLoader.unloadScripts(files); // Unload what was reloaded
-						ScriptLoader.enableScripts(parsed); // Re-enable what was unloaded
+						ScriptLoader.enableScripts(parsed, viewer); // Re-enable what was unloaded
 					}
 					
 				}.runTask(Skript.getInstance());

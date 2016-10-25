@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -158,7 +159,7 @@ final public class ScriptLoader {
 	
 	private static String indentation = "";
 	
-	static ScriptInfo loadScripts() {
+	static ScriptInfo loadScripts(final CommandSender viewer) {
 		final File scriptsFolder = new File(Skript.getInstance().getDataFolder(), Skript.SCRIPTSFOLDER + File.separator);
 		if (!scriptsFolder.isDirectory())
 			scriptsFolder.mkdirs();
@@ -169,7 +170,7 @@ final public class ScriptLoader {
 		try {
 			Language.setUseLocal(false);
 			
-			i = loadScripts(scriptsFolder);
+			i = loadScripts(scriptsFolder, viewer);
 		} finally {
 			Language.setUseLocal(true);
 			h.stop();
@@ -196,12 +197,12 @@ final public class ScriptLoader {
 	 * @param directory
 	 * @return Info on the loaded scripts
 	 */
-	public final static ScriptInfo loadScripts(final File directory) {
+	public final static ScriptInfo loadScripts(final File directory, final CommandSender viewer) {
 		final boolean wasLocal = Language.setUseLocal(false);
 		try {
 			final File[] files = directory.listFiles(scriptFilter);
 			assert files != null;
-			return loadScripts(files);
+			return loadScripts(files, viewer);
 		} finally {
 			if (wasLocal)
 				Language.setUseLocal(true);
@@ -214,9 +215,9 @@ final public class ScriptLoader {
 	 * @param files Script files.
 	 * @return Empty info for API compatibility.
 	 */
-	public final static ScriptInfo loadScripts(final File[] files) {
+	public final static ScriptInfo loadScripts(final File[] files, final CommandSender viewer) {
 		final ScriptInfo i = new ScriptInfo();
-		manager.loadAndEnable(files);
+		manager.loadAndEnable(files, viewer);
 		
 		return i;
 	}
@@ -224,9 +225,10 @@ final public class ScriptLoader {
 	/**
 	 * Enables scripts from parser instances.
 	 * @param parsed
+	 * @param viewer 
 	 * @return
 	 */
-	public final static ScriptInfo enableScripts(final List<ParserInstance> parsed) {
+	public final static ScriptInfo enableScripts(final List<ParserInstance> parsed, final CommandSender viewer) {
 		final Date start = new Date();
 		Skript.debug("Enabling scripts...");
 		
@@ -241,9 +243,9 @@ final public class ScriptLoader {
 		}
 		
 		if (i.files == 0)
-			Skript.warning(m_no_scripts.toString());
+			Skript.info(viewer, m_no_scripts.toString());
 		if (Skript.logNormal() && i.files > 0)
-			Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
+			Skript.info(viewer, m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
 		
 		SkriptEventHandler.registerBukkitEvents();
 		
