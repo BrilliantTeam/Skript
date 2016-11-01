@@ -34,6 +34,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -83,6 +84,7 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.ExceptionUtils;
+import ch.njol.skript.util.Utils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Callback;
 import ch.njol.util.Kleenean;
@@ -235,7 +237,7 @@ final public class ScriptLoader {
 		final ScriptInfo i = new ScriptInfo();
 		for (ParserInstance pi : parsed) {
 			assert pi != null;
-			enableScript(pi, i);
+			enableScript(pi, i, viewer);
 		}
 		
 		synchronized (loadedScripts) {
@@ -258,7 +260,7 @@ final public class ScriptLoader {
 	 * @param i Script info - for statistics, e.g. loaded stuff counts.
 	 */
 	@SuppressWarnings("null")
-	private final static void enableScript(ParserInstance pi, ScriptInfo i) {
+	private final static void enableScript(ParserInstance pi, ScriptInfo i, CommandSender viewer) {
 		final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
 		Skript.debug("Enabling script " + pi.config.getFileName());
 		try {
@@ -280,7 +282,10 @@ final public class ScriptLoader {
 				SkriptEventHandler.addSelfRegisteringTrigger(trigger.getValue());
 			}
 			for (ParseLogHandler log : pi.errorLogs) {
-				log.printError();
+				if (viewer instanceof ConsoleCommandSender)
+					log.printError();
+				else
+					viewer.sendMessage(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(log.getError().getMessage()));
 				//log.stop();
 			}
 		} finally {
