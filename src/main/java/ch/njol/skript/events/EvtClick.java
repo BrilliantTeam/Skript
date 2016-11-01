@@ -96,8 +96,8 @@ public class EvtClick extends SkriptEvent {
 	
 	@Override
 	public boolean init(final Literal<?>[] args, final int matchedPattern, final ParseResult parser) {
-		Skript.info("matchedPattern is " + matchedPattern);
-		Skript.info("args is " + Arrays.toString(args));
+		//Skript.info("matchedPattern is " + matchedPattern); // TODO there is something wrong here...
+		//Skript.info("args is " + Arrays.toString(args));
 		click = parser.mark == 0 ? ANY : parser.mark;
 		types = args[matchedPattern];
 		if (types != null && !ItemType.class.isAssignableFrom(types.getReturnType())) {

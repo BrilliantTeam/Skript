@@ -250,7 +250,6 @@ public class SkriptParser {
 										if (!expr.init())
 											continue patternsLoop;
 										res.exprs[j] = expr;
-										Skript.info("" + expr);
 									}
 								}
 								x = x2;
@@ -1110,7 +1109,6 @@ public class SkriptParser {
 											continue;
 										log2.clear();
 										final Expression<?> e = new SkriptParser(pi, "" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
-										Skript.info("e is " + e);
 										if (e != null) {
 											if (!vi.isPlural[k] && !e.isSingle()) {
 												if (context == ParseContext.COMMAND) {
@@ -1136,7 +1134,6 @@ public class SkriptParser {
 											log2.printLog();
 											log.printLog();
 											res.exprs[countUnescaped(pattern, '%', 0, j) / 2] = e;
-											Skript.info("exprs is " + Arrays.toString(res.exprs));
 											return res;
 										}
 									}
