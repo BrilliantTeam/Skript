@@ -29,7 +29,8 @@ are not often checked.
 Finally, there is no guarantee that issue will be resolved. Sometimes it might be
 harder than it sounds to you; in other cases, no one has time to take look at it.
 
-If your having a aliases issue please report that [here](https://github.com/tim740/skAliases/issues).
+If your having a aliases issue please report that
+[here](https://github.com/tim740/skAliases/issues) instead.
 
 ## Compiling
 Skript uses Gradle for compilation. Use your command prompt of preference and
@@ -44,13 +45,12 @@ You can get source code from the releases page. You may also clone this
 repository, but that code might or might not be stable.
 
 ### Importing to Eclipse
-With new Eclipse versions, there is integrated Gradle support. However, current release version 
-(included with Eclipse Neon) does not correctly import settings for Skript project. You will need 
-to use STS Gradle plugin, which can be found from Eclipse Marketplace.
+With new Eclipse versions, there is integrated Gradle support. And it actually works now.
+So, first get latest Eclipse, then import Skript as any Gradle project. Just
+make sure to **keep** the configuration when importer asks that!
 
-If you just intend to compile Skript, you do not need to import it to Eclipse. Using Gradle from 
-command line as instructed above works. However, if you use Eclipse's default Gradle importer, 
-it will mess with compiler settings.
+Gradle STS can also be used, but it is not recommended anymore. It is being
+phased out in favor of Eclipse's integrated Gradle support.
 
 ### Importing to IDEA
 Skript IDEA support is not reliable, and even more less so after switching from Maven to Gradle.
