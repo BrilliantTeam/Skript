@@ -282,9 +282,9 @@ final public class ScriptLoader {
 				SkriptEventHandler.addSelfRegisteringTrigger(trigger.getValue());
 			}
 			for (ParseLogHandler log : pi.errorLogs) {
-				if (viewer instanceof ConsoleCommandSender)
+				if (viewer instanceof ConsoleCommandSender) // Console -> normal logging
 					log.printError();
-				else
+				else if (log.hasError()) // Non-console -> ugly hack
 					viewer.sendMessage(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(log.getError().getMessage()));
 				//log.stop();
 			}
