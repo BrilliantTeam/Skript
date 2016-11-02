@@ -260,7 +260,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
-		if (!ScriptLoader.isCurrentEvent(applicableEvent))
+		if (!pi.isCurrentEvent(applicableEvent))
 			return false;
 		for (final Expression<?> var : mustbeDefaultVars) {
 			if (!var.isDefault()) {
@@ -279,7 +279,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 		if (!mustbeDefaultVar.isDefault())
 			return false;
 		for (final Class<? extends Event> e : applicableEvents) {
-			if (ScriptLoader.isCurrentEvent(e)) {
+			if (pi.isCurrentEvent(e)) {
 				this.time = time;
 				return true;
 			}

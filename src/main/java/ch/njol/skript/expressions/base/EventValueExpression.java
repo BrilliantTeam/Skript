@@ -195,7 +195,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	
 	@Override
 	public boolean setTime(final int time) {
-		final Class<? extends Event>[] es = ScriptLoader.getCurrentEvents();
+		final Class<? extends Event>[] es = pi.getCurrentEvents();
 		if (es == null) {
 			assert false;
 			return false;

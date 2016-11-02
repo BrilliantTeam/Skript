@@ -412,20 +412,20 @@ final public class ScriptLoader {
 		}
 	}
 	
-	public final static boolean isCurrentEvent(final @Nullable Class<? extends Event> event) {
-		return CollectionUtils.containsSuperclass(currentEvents, event);
-	}
-	
-	@SafeVarargs
-	public final static boolean isCurrentEvent(final Class<? extends Event>... events) {
-		return CollectionUtils.containsAnySuperclass(currentEvents, events);
-	}
-	
-	/**
-	 * Use this sparingly; {@link #isCurrentEvent(Class)} or {@link #isCurrentEvent(Class...)} should be used in most cases.
-	 */
-	@Nullable
-	public static Class<? extends Event>[] getCurrentEvents() {
-		return currentEvents;
-	}
+//	public final static boolean isCurrentEvent(final @Nullable Class<? extends Event> event) {
+//		return CollectionUtils.containsSuperclass(currentEvents, event);
+//	}
+//	
+//	@SafeVarargs
+//	public final static boolean isCurrentEvent(final Class<? extends Event>... events) {
+//		return CollectionUtils.containsAnySuperclass(currentEvents, events);
+//	}
+//	
+//	/**
+//	 * Use this sparingly; {@link #isCurrentEvent(Class)} or {@link #isCurrentEvent(Class...)} should be used in most cases.
+//	 */
+//	@Nullable
+//	public static Class<? extends Event>[] getCurrentEvents() {
+//		return currentEvents;
+//	}
 }

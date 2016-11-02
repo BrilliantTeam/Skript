@@ -61,11 +61,10 @@ public class ExprCommand extends SimpleExpression<String> {
 	private final static int FULL = 0, LABEL = 1, ARGS = 2;
 	private int what;
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		what = matchedPattern;
-		if (!ScriptLoader.isCurrentEvent(PlayerCommandPreprocessEvent.class, ServerCommandEvent.class)) {
+		if (!pi.isCurrentEvent(PlayerCommandPreprocessEvent.class, ServerCommandEvent.class)) {
 			if (what != ARGS) // ExprArgument has the same syntax
 				Skript.error("The 'command' expression can only be used in a command event");
 			return false;
