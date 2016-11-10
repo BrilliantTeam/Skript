@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
 import org.bukkit.command.CommandSender;
@@ -250,6 +251,7 @@ final public class ScriptLoader {
 			Skript.info(viewer, m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
 		
 		SkriptEventHandler.registerBukkitEvents();
+		parseThreads.clear(); // Clear so this doesn't memory leak
 		
 		return i;
 	}
@@ -412,20 +414,33 @@ final public class ScriptLoader {
 		}
 	}
 	
-//	public final static boolean isCurrentEvent(final @Nullable Class<? extends Event> event) {
-//		return CollectionUtils.containsSuperclass(currentEvents, event);
-//	}
-//	
-//	@SafeVarargs
-//	public final static boolean isCurrentEvent(final Class<? extends Event>... events) {
-//		return CollectionUtils.containsAnySuperclass(currentEvents, events);
-//	}
-//	
-//	/**
-//	 * Use this sparingly; {@link #isCurrentEvent(Class)} or {@link #isCurrentEvent(Class...)} should be used in most cases.
-//	 */
-//	@Nullable
-//	public static Class<? extends Event>[] getCurrentEvents() {
-//		return currentEvents;
-//	}
+	public final static boolean isCurrentEvent(final @Nullable Class<? extends Event> event) {
+		return CollectionUtils.containsSuperclass(getCurrentEvents(), event);
+	}
+	
+	@SafeVarargs
+	public final static boolean isCurrentEvent(final Class<? extends Event>... events) {
+		return CollectionUtils.containsAnySuperclass(getCurrentEvents(), events);
+	}
+	
+	/**
+	 * Use this sparingly; {@link #isCurrentEvent(Class)} or {@link #isCurrentEvent(Class...)} should be used in most cases.
+	 */
+	@Nullable
+	public static Class<? extends Event>[] getCurrentEvents() {
+		return parseThreads.get(Thread.currentThread()).getCurrentEvents();
+	}
+	
+	private static final Map<Thread,ParserInstance> parseThreads = new ConcurrentHashMap<>();
+	
+	/**
+	 * Only for internal use.
+	 * 
+	 * Registers caller thread for given parser, so static event checking methods work.
+	 * These methods are slow, however, so this is only for compatibility.
+	 */
+	public static void registerParseThread(ParserInstance pi) {
+		parseThreads.put(Thread.currentThread(), pi);
+	}
+	
 }

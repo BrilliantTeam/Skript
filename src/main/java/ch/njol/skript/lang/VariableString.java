@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
@@ -114,7 +115,7 @@ public class VariableString implements Expression<String> {
 		return newInstance(pi, s, StringMode.MESSAGE);
 	}
 	
-	public final static Map<String, Pattern> variableNames = new HashMap<>();
+	public final static Map<String, Pattern> variableNames = new ConcurrentHashMap<>(); // Concurrent since https://github.com/bensku/Skript/issues/232
 	
 	/**
 	 * Tests whether a string is correctly quoted, i.e. only has doubled double quotes in it.

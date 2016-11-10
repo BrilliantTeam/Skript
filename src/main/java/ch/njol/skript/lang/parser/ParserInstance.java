@@ -34,6 +34,7 @@ import java.util.regex.Matcher;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptCommand;
 import ch.njol.skript.SkriptEventHandler;
@@ -355,6 +356,8 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	
 	@Override
 	public void run() {
+		ScriptLoader.registerParseThread(this); // This is hack for old addons
+		
 		for (final Node cnode : config.getMainNode()) {
 			if (!(cnode instanceof SectionNode)) {
 				Skript.error("invalid line - all code has to be put into triggers");
