@@ -21,6 +21,9 @@
 
 package ch.njol.skript.expressions;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
 import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -49,7 +52,16 @@ public class ExprIP extends SimplePropertyExpression<Player, String> {
 	@Override
 	@Nullable
 	public String convert(final Player p) {
-		return p.getAddress().getAddress().getHostAddress();
+		InetSocketAddress socketAddr = p.getAddress();
+		if (socketAddr == null)
+			return "unknown";
+		InetAddress addr = socketAddr.getAddress();
+		if (addr == null)
+			return "unresolved";
+		String hostAddr = addr.getHostAddress();
+		if (hostAddr == null)
+			return "unresolved";
+		return hostAddr;
 	}
 	
 	@Override
