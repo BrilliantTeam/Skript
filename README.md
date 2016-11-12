@@ -84,6 +84,39 @@ not need to be an expert. If you can write code that works and doesn't contain
 too much [spaghetti](https://en.wikipedia.org/wiki/Spaghetti_code), you're
 good to go!
 
+### Maven repository
+If you use Skript as (soft) dependency for your plugin, and use maven or Gradle,
+this is for you.
+
+First, you need the repository. Skript is not in Maven Central.
+```
+maven {
+    url "https://raw.githubusercontent.com/bensku/mvn-repo/master"
+}
+```
+
+Or, if you use Maven:
+```
+<repository>
+    <id>bensku-repo</id>
+    <url>https://raw.githubusercontent.com/bensku/mvn-repo/master</url>
+</repository>
+```
+
+Then you alse need to add Skript as dependency.
+```
+compile "ch.njol:Skript:2.2-RELEASE_TAG"
+```
+
+Or, if you use Maven:
+```
+<dependency>
+    <groupId>ch.njol</groupId>
+    <artifactId>Skript</artifactId>
+    <version>2.2-RELEASE_TAG</version>
+</dependency>
+```
+
 ## Relevant Links
 * [SkUnity Forums](https://forums.skunity.com/)
 * [Original Skript at BukkitDev](https://dev.bukkit.org/bukkit-plugins/skript/)
