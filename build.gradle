@@ -1,7 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'java'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
 repositories {
 	jcenter()
@@ -75,10 +75,10 @@ compileJava {
 	}
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
+uploadArchives {
+    repositories.mavenDeployer {
+        pom.groupId = "ch.njol"
+        repository(url: "file:///itemapi_repo/")
     }
 }
+
