@@ -78,6 +78,7 @@ import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.PluralizingArgsMessage;
 import ch.njol.skript.log.CountingLogHandler;
 import ch.njol.skript.log.ErrorDescLogHandler;
+import ch.njol.skript.log.LogHandler;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -283,12 +284,20 @@ final public class ScriptLoader {
 				((SelfRegisteringSkriptEvent) trigger.getKey().getSecond()).register(trigger.getValue());
 				SkriptEventHandler.addSelfRegisteringTrigger(trigger.getValue());
 			}
-			for (ParseLogHandler log : pi.errorLogs) {
-				if (viewer instanceof ConsoleCommandSender) // Console -> normal logging
-					log.printError();
-				else if (log.hasError()) // Non-console -> ugly hack
-					viewer.sendMessage(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(log.getError().getMessage()));
-				//log.stop();
+			for (LogHandler log : pi.logs) {
+				if (log instanceof ParseLogHandler) {
+					ParseLogHandler parseLog = (ParseLogHandler) log;
+					if (parseLog.hasError()) { // Print error
+						if (viewer instanceof ConsoleCommandSender) // Console -> normal logging
+							parseLog.printError();
+						else // Non-console -> ugly hack
+							viewer.sendMessage(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(parseLog.getError().getMessage()));
+					} else { // No error? Print the log!
+						parseLog.printLog(viewer);
+					}
+				} else {
+					
+				}
 			}
 		} finally {
 			numErrors.stop();

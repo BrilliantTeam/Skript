@@ -25,10 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.parser.ParserInstance;
+import ch.njol.skript.util.Utils;
 
 /**
  * @author Peter Güttinger
@@ -85,6 +88,15 @@ public class ParseLogHandler extends LogHandler {
 		SkriptLogger.logAll(log);
 		if (error != null)
 			error.discarded("not printed");
+	}
+	
+	public void printLog(CommandSender sender) {
+		if (sender instanceof ConsoleCommandSender) {
+			printLog();
+		} else {
+			for (final LogEntry e : log)
+				sender.sendMessage(Utils.replaceEnglishChatStyles(e.getMessage()));
+		}
 	}
 	
 	public void printError() {

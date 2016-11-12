@@ -257,7 +257,7 @@ public class SkriptParser {
 							final T t = info.c.newInstance();
 							t.setParserInstance(pi);
 							if (t.init(res.exprs, i, pi.hasDelayBefore, res)) {
-								log.printLog();
+								log.submit(pi);
 								return t;
 							}
 						}

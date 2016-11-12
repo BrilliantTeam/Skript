@@ -68,6 +68,7 @@ import ch.njol.skript.lang.function.Function;
 import ch.njol.skript.lang.function.FunctionEvent;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.lang.function.ScriptFunction;
+import ch.njol.skript.log.LogHandler;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -110,7 +111,8 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	public final Map<NonNullPair<SkriptEventInfo<?>, SkriptEvent>,Trigger> selfRegisteringTriggers;
 	public final Map<Class<? extends Event>[],Trigger> triggers;
 	public final List<ScriptFunction<?>> functions;
-	public final List<ParseLogHandler> errorLogs;
+	
+	public final List<LogHandler> logs;
 	
 	public final List<TriggerSection> currentSections;
 	public final List<Loop> currentLoops;
@@ -142,7 +144,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		selfRegisteringTriggers = null;
 		triggers = null;
 		functions = null;
-		errorLogs = null;
+		logs = null;
 		currentSections = null;
 		currentLoops = null;
 	}
@@ -157,7 +159,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		this.selfRegisteringTriggers = new HashMap<>();
 		this.triggers = new HashMap<>();
 		this.functions = new ArrayList<>();
-		this.errorLogs = new ArrayList<>();
+		this.logs = new ArrayList<>();
 		this.currentSections = new ArrayList<>();
 		this.currentLoops = new ArrayList<>();
 	}
@@ -351,7 +353,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	 * @param log Log handler.
 	 */
 	public void submitErrorLog(ParseLogHandler log) {
-		errorLogs.add(log);
+		logs.add(log);
 	}
 	
 	@Override
