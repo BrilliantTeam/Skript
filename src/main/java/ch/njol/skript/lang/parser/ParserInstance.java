@@ -68,6 +68,7 @@ import ch.njol.skript.lang.function.Function;
 import ch.njol.skript.lang.function.FunctionEvent;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.lang.function.ScriptFunction;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.log.LogHandler;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
@@ -113,6 +114,8 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	public final List<ScriptFunction<?>> functions;
 	
 	public final List<LogHandler> logs;
+	@Nullable
+	private RetainingLogHandler nodeLog;
 	
 	public final List<TriggerSection> currentSections;
 	public final List<Loop> currentLoops;
@@ -356,6 +359,23 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		logs.add(log);
 	}
 	
+	public void error(String msg, ErrorQuality quality) {
+		
+	}
+	
+	public void warning(String msg) {
+		
+	}
+	
+	public void info(String msg) {
+		
+	}
+	
+	public void debug(String msg) {
+		if (Skript.debug())
+			info(msg);
+	}
+ 	
 	@Override
 	public void run() {
 		ScriptLoader.registerParseThread(this); // This is hack for old addons
