@@ -54,6 +54,12 @@ public class UnresolvedOfflinePlayer implements OfflinePlayer {
 		@SuppressWarnings("deprecation")
 		@Override
 		public void run() {
+			if (toResolve == null) {
+				Skript.exception(new NullPointerException("null offline player resolve queue"), "An error happened when trying to enably resolving offline players, so"
+						+ " the feature has been turned off. Please report this at https://github.com/bensku/Skript/issues/237");
+				return;
+			}
+			
 			while (true) {
 				try {
 					final UnresolvedOfflinePlayer p = toResolve.take();
