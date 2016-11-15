@@ -287,16 +287,16 @@ final public class ScriptLoader {
 			for (LogHandler log : pi.logs) {
 				if (log instanceof ParseLogHandler) {
 					ParseLogHandler parseLog = (ParseLogHandler) log;
-					if (parseLog.hasError()) { // Print error
+					if (parseLog.hasError() && !parseLog.prefersLog()) { // Print error
 						if (viewer instanceof ConsoleCommandSender) // Console -> normal logging
 							parseLog.printError();
 						else // Non-console -> ugly hack
 							viewer.sendMessage(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(parseLog.getError().getMessage()));
-					} else { // No error? Print the log!
+					} else { // No error or we were asked to ignore it? Print the log!
 						parseLog.printLog(viewer);
 					}
-				} else {
-					
+				} else if (log instanceof RetainingLogHandler) {
+					((RetainingLogHandler) log).printLog();
 				}
 			}
 		} finally {

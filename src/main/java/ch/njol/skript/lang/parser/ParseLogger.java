@@ -27,6 +27,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.log.LogEntry;
+import ch.njol.skript.log.LogHandler;
 import ch.njol.skript.log.ParseLogHandler;
 
 /**
@@ -41,7 +42,9 @@ public interface ParseLogger {
 	 * It is not recommended to write anything to log after submitting it.
 	 * @param log Log handler.
 	 */
-	void submitErrorLog(ParseLogHandler log);
+	void submitErrorLog(LogHandler log);
+	
+	void submitParseLog(ParseLogHandler log);
 	
 	void error(String msg, ErrorQuality quality);
 	
@@ -62,7 +65,7 @@ public interface ParseLogger {
 	 * Sets node for this parser instance.
 	 * @param node Node.
 	 */
-	void setNode(Node node);
+	void setNode(@Nullable Node node);
 	
 	/**
 	 * Gets node from this parser instance.

@@ -96,8 +96,13 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	 */
 	public static final ParserInstance DUMMY = new ParserInstance() {
 		@Override
-		public void submitErrorLog(final ParseLogHandler log) {
-			log.printError();
+		public void submitErrorLog(final LogHandler log) {
+			// TODO - for now, ignore
+		}
+		
+		@Override
+		public void submitParseLog(ParseLogHandler log) {
+			// TODO - for now, ignore
 		}
 	};
 	
@@ -223,7 +228,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 			public String run(final Matcher m) {
 				final String option = options.get(m.group(1));
 				if (option == null) {
-					Skript.error("undefined option " + m.group());
+					error("undefined option " + m.group());
 					return m.group();
 				}
 				return option;
@@ -243,11 +248,11 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 		Kleenean hadDelayBeforeLastIf = Kleenean.FALSE;
 		
 		for (final Node n : node) {
-			SkriptLogger.setNode(n);
+			setNode(n);
 			if (n instanceof SimpleNode) {
 				final SimpleNode e = (SimpleNode) n;
 				final String s = replaceOptions("" + e.getKey());
-				if (!SkriptParser.validateLine(s))
+				if (!SkriptParser.validateLine(this, s))
 					continue;
 				final Statement stmt = Statement.parse(s, "Can't understand this condition/effect: " + s, this);
 				if (stmt == null)
@@ -259,7 +264,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 					hasDelayBefore = Kleenean.TRUE;
 			} else if (n instanceof SectionNode) {
 				String name = replaceOptions("" + n.getKey());
-				if (!SkriptParser.validateLine(name))
+				if (!SkriptParser.validateLine(this, name))
 					continue;
 				
 				if (StringUtils.startsWithIgnoreCase(name, "loop ")) {
@@ -279,7 +284,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 						h.stop();
 					}
 					if (loopedExpr.isSingle()) {
-						Skript.error("Can't loop " + loopedExpr + " because it's only a single value");
+						error("Can't loop " + loopedExpr + " because it's only a single value");
 						continue;
 					}
 					if (Skript.debug() || n.debug())
@@ -301,7 +306,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 						hasDelayBefore = Kleenean.UNKNOWN;
 				} else if (name.equalsIgnoreCase("else")) {
 					if (items.size() == 0 || !(items.get(items.size() - 1) instanceof Conditional) || ((Conditional) items.get(items.size() - 1)).hasElseClause()) {
-						Skript.error("'else' has to be placed just after an 'if' or 'else if' section");
+						error("'else' has to be placed just after an 'if' or 'else if' section");
 						continue;
 					}
 					if (Skript.debug() || n.debug())
@@ -312,7 +317,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 					hasDelayBefore = hadDelayBeforeLastIf.or(hadDelayAfterLastIf.and(hasDelayBefore));
 				} else if (StringUtils.startsWithIgnoreCase(name, "else if ")) {
 					if (items.size() == 0 || !(items.get(items.size() - 1) instanceof Conditional) || ((Conditional) items.get(items.size() - 1)).hasElseClause()) {
-						Skript.error("'else if' has to be placed just after another 'if' or 'else if' section");
+						error("'else if' has to be placed just after another 'if' or 'else if' section");
 						continue;
 					}
 					name = "" + name.substring("else if ".length());
@@ -344,7 +349,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 		for (int i = 0; i < items.size() - 1; i++)
 			items.get(i).setNext(items.get(i + 1));
 		
-		SkriptLogger.setNode(node);
+		setNode(node);
 		
 		if (Skript.debug())
 			indentation = "" + indentation.substring(0, indentation.length() - 4);
@@ -353,31 +358,41 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	}
 	
 	@Override
-	public void submitErrorLog(ParseLogHandler log) {
+	public void submitErrorLog(LogHandler log) {
+		logs.add(log);
+	}
+	
+	@Override
+	public void submitParseLog(ParseLogHandler log) {
+		log.preferLog(true);
 		logs.add(log);
 	}
 	
 	@SuppressWarnings("null")
 	@Override
-	public void error(String msg, ErrorQuality quality) {
-		log(new LogEntry(Level.SEVERE, quality, msg, node));
+	public void error(@Nullable String msg, ErrorQuality quality) {
+		if (msg != null)
+			log(new LogEntry(Level.SEVERE, quality, msg, node));
 	}
 	
 	@Override
-	public void error(String msg) {
-		error(msg, ErrorQuality.SEMANTIC_ERROR);
-	}
-	
-	@SuppressWarnings("null")
-	@Override
-	public void warning(String msg) {
-		log(new LogEntry(Level.WARNING, msg, node));
+	public void error(@Nullable String msg) {
+		if (msg != null)
+			error(msg, ErrorQuality.SEMANTIC_ERROR);
 	}
 	
 	@SuppressWarnings("null")
 	@Override
-	public void info(String msg) {
-		log(new LogEntry(Level.INFO, msg, node));
+	public void warning(@Nullable String msg) {
+		if (msg != null)
+			log(new LogEntry(Level.WARNING, msg, node));
+	}
+	
+	@SuppressWarnings("null")
+	@Override
+	public void info(@Nullable String msg) {
+		if (msg != null)
+			log(new LogEntry(Level.INFO, msg, node));
 	}
 	
 	@Override
@@ -389,7 +404,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	}
 	
 	@Override
-	public void setNode(Node node) {
+	public void setNode(@Nullable Node node) {
 		this.node = node;
 	}
 	
@@ -416,7 +431,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 		
 		for (final Node cnode : config.getMainNode()) {
 			if (!(cnode instanceof SectionNode)) {
-				Skript.error("invalid line - all code has to be put into triggers");
+				error("invalid line - all code has to be put into triggers");
 				continue;
 			}
 			
@@ -429,7 +444,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 				node.convertToEntries(0, "=");
 				for (final Node n : node) {
 					if (!(n instanceof EntryNode)) {
-						Skript.error("invalid line in aliases section");
+						error("invalid line in aliases section");
 						continue;
 					}
 					final ItemType t = Aliases.parseAlias(((EntryNode) n).getValue());
@@ -442,7 +457,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 				node.convertToEntries(0);
 				for (final Node n : node) {
 					if (!(n instanceof EntryNode)) {
-						Skript.error("invalid line in options");
+						error("invalid line in options");
 						continue;
 					}
 					options.put(((EntryNode) n).getKey(), ((EntryNode) n).getValue());
@@ -453,7 +468,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 				node.convertToEntries(0, "=");
 				for (final Node n : node) {
 					if (!(n instanceof EntryNode)) {
-						Skript.error("Invalid line in variables section");
+						error("Invalid line in variables section");
 						continue;
 					}
 					String name = ((EntryNode) n).getKey().toLowerCase(Locale.ENGLISH);
@@ -465,12 +480,12 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 						@Nullable
 						public String run(final Matcher m) {
 							if (m.group(1).contains("{") || m.group(1).contains("}") || m.group(1).contains("%")) {
-								Skript.error("'" + var + "' is not a valid name for a default variable");
+								error("'" + var + "' is not a valid name for a default variable");
 								return null;
 							}
 							final ClassInfo<?> ci = Classes.getClassInfoFromUserInput("" + m.group(1));
 							if (ci == null) {
-								Skript.error("Can't understand the type '" + m.group(1) + "'");
+								error("Can't understand the type '" + m.group(1) + "'");
 								return null;
 							}
 							return "<" + ci.getCodeName() + ">";
@@ -479,7 +494,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 					if (name == null) {
 						continue;
 					} else if (name.contains("%")) {
-						Skript.error("Invalid use of percent signs in variable name");
+						error("Invalid use of percent signs in variable name");
 						continue;
 					}
 					if (Variables.getVariable(name, null, false) != null)
@@ -498,7 +513,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 					}
 					final ClassInfo<?> ci = Classes.getSuperClassInfo(o.getClass());
 					if (ci.getSerializer() == null) {
-						Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
+						error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
 						continue;
 					} else if (ci.getSerializeAs() != null) {
 						final ClassInfo<?> as = Classes.getExactClassInfo(ci.getSerializeAs());
@@ -508,7 +523,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 						}
 						o = Converters.convert(o, as.getC());
 						if (o == null) {
-							Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
+							error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
 							continue;
 						}
 					}
@@ -517,7 +532,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 				continue;
 			}
 			
-			if (!SkriptParser.validateLine(event))
+			if (!SkriptParser.validateLine(this, event))
 				continue;
 			
 			if (event.toLowerCase().startsWith("command ")) {

@@ -174,14 +174,14 @@ public class SkriptParser {
 	public final static <T extends SyntaxElement> T parse(final ParserInstance pi, String expr, final Iterator<? extends SyntaxElementInfo<T>> source, final @Nullable String defaultError) {
 		expr = "" + expr.trim();
 		if (expr.isEmpty()) {
-			Skript.error(defaultError);
+			pi.error(defaultError);
 			return null;
 		}
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			final T e = new SkriptParser(pi, expr).parse(source);
 			if (e != null) {
-				log.printLog();
+				log.submitLog(pi);
 				return e;
 			}
 			log.submitError(pi, defaultError);
@@ -195,7 +195,7 @@ public class SkriptParser {
 	public final static <T extends SyntaxElement> T parseStatic(final ParserInstance pi, String expr, final Iterator<? extends SyntaxElementInfo<? extends T>> source, final @Nullable String defaultError) {
 		expr = "" + expr.trim();
 		if (expr.isEmpty()) {
-			Skript.error(defaultError);
+			pi.error(defaultError);
 			return null;
 		}
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
@@ -203,7 +203,7 @@ public class SkriptParser {
 		try {
 			e = new SkriptParser(pi, expr, PARSE_LITERALS).parse(source);
 			if (e != null) {
-				log.printLog();
+				log.submitLog(pi);
 				return e;
 			}
 			log.submitError(pi, defaultError);
@@ -307,7 +307,7 @@ public class SkriptParser {
 //						log.submit(pi);
 //						return null;
 //					}
-					log.printLog();
+					log.submitLog(pi);
 					return var;
 				} else if (log.hasError()) {
 					log.submit(pi);
@@ -315,7 +315,7 @@ public class SkriptParser {
 				}
 				final FunctionReference<T> fr = parseFunction(types);
 				if (fr != null) {
-					log.printLog();
+					log.submitLog(pi);
 					return new ExprFunctionCall(fr);
 				} else if (log.hasError()) {
 					log.submit(pi);
@@ -333,14 +333,14 @@ public class SkriptParser {
 				if (e != null) {
 					for (final Class<? extends T> t : types) {
 						if (t.isAssignableFrom(e.getReturnType())) {
-							log.printLog();
+							log.submitLog(pi);
 							return (Expression<? extends T>) e;
 						}
 					}
 					for (final Class<? extends T> t : types) {
 						final Expression<? extends T> r = e.getConvertedExpression(t);
 						if (r != null) {
-							log.printLog();
+							log.submitLog(pi);
 							return r;
 						}
 					}
@@ -359,7 +359,7 @@ public class SkriptParser {
 					return null;
 				}
 				log.clear();
-				log.printLog();
+				log.submitLog(pi);
 				final LogEntry e = log.getError();
 				return (Literal<? extends T>) new UnparsedLiteral(expr, e != null && (error == null || e.quality > error.quality) ? e : error);
 			}
@@ -368,7 +368,7 @@ public class SkriptParser {
 				assert c != null;
 				final T t = Classes.parse(pi, expr, c, context);
 				if (t != null) {
-					log.printLog();
+					log.submitLog(pi);
 					return new SimpleLiteral<>(t, false);
 				}
 			}
@@ -428,7 +428,7 @@ public class SkriptParser {
 			//Mirre
 			final Expression<? extends T> r = parseSingleExpr(false, null, types);
 			if (r != null) {
-				log.printLog();
+				log.submitLog(pi);
 				return r;
 			}
 			log.clear();
@@ -459,12 +459,12 @@ public class SkriptParser {
 			if (pieces.size() == 1) { // not a list of expressions, and a single one has failed to parse above
 				if (expr.startsWith("(") && expr.endsWith(")") && next(expr, 0, context) == expr.length()) {
 					log.clear();
-					log.printLog();
+					log.submitLog(pi);
 					return new SkriptParser(this, "" + expr.substring(1, expr.length() - 1)).parseExpression(types);
 				}
 				if (isObject && (flags & PARSE_LITERALS) != 0) { // single expression - can return an UnparsedLiteral now
 					log.clear();
-					log.printLog();
+					log.submitLog(pi);
 					return (Expression<? extends T>) new UnparsedLiteral(expr, log.getError());
 				}
 				// results in useless errors most of the time
@@ -497,7 +497,7 @@ public class SkriptParser {
 									and = Kleenean.get(!d.equalsIgnoreCase("or")); // nor is and
 								} else {
 									if (and != Kleenean.get(!d.equalsIgnoreCase("or"))) {
-										Skript.warning(MULTIPLE_AND_OR + " List: " + expr);
+										pi.warning(MULTIPLE_AND_OR + " List: " + expr);
 										and = Kleenean.TRUE;
 									}
 								}
@@ -511,13 +511,13 @@ public class SkriptParser {
 				return null;
 			}
 			
-			log.printLog();
+			log.submitLog(pi);
 			
 			if (ts.size() == 1)
 				return ts.get(0);
 			
 			if (and.isUnknown() && !suppressMissingAndOrWarnings)
-				Skript.warning(MISSING_AND_OR + ": " + expr);
+				pi.warning(MISSING_AND_OR + ": " + expr);
 			
 			final Class<? extends T>[] exprRetTypes = new Class[ts.size()];
 			for (int i = 0; i < ts.size(); i++)
@@ -658,11 +658,11 @@ public class SkriptParser {
 		try {
 			final Matcher m = functionCallPattern.matcher(expr);
 			if (!m.matches()) {
-				log.printLog();
+				log.submitLog(pi);
 				return null;
 			}
 			if ((flags & PARSE_EXPRESSIONS) == 0) {
-				Skript.error("Functions cannot be used here.");
+				pi.error("Functions cannot be used here.");
 				log.submit(pi);
 				return null;
 			}
@@ -711,7 +711,7 @@ public class SkriptParser {
 				log.submit(pi);
 				return null;
 			}
-			log.printLog();
+			log.submitLog(pi);
 			return e;
 		} finally {
 			//log.stop();
@@ -771,10 +771,10 @@ public class SkriptParser {
 		try {
 			final NonNullPair<SkriptEventInfo<?>, SkriptEvent> e = new SkriptParser(pi, event, PARSE_LITERALS, ParseContext.EVENT).parseEvent();
 			if (e != null) {
-				log.printLog();
+				pi.submitErrorLog(log);
 				return e;
 			}
-			log.printErrors(defaultError);
+			pi.submitErrorLog(log);
 			return null;
 		} finally {
 			//log.stop();
@@ -803,7 +803,7 @@ public class SkriptParser {
 								log.printError();
 								return null;
 							}
-							log.printLog();
+							log.submitLog(pi);
 							return new NonNullPair<>(info, e);
 						}
 					} catch (final InstantiationException e) {
@@ -1029,7 +1029,7 @@ public class SkriptParser {
 					try {
 						res = parse_i(pattern, i, j + 1);
 						if (res != null) {
-							log.printLog();
+							log.submitLog(pi);
 							return res;
 						}
 						log.clear();
@@ -1038,7 +1038,7 @@ public class SkriptParser {
 						if (res == null)
 							log.submit(pi);
 						else
-							log.printLog();
+							log.submitLog(pi);
 						return res;
 					} finally {
 						//log.stop();
@@ -1063,7 +1063,7 @@ public class SkriptParser {
 								}
 								res = parse_i(pattern, i, j + 1);
 								if (res != null) {
-									log.printLog();
+									log.submitLog(pi);
 									res.mark ^= mark; // doesn't do anything if no mark was set as x ^ 0 == x
 									return res;
 								}
@@ -1131,8 +1131,8 @@ public class SkriptParser {
 													return null;
 												}
 											}
-											log2.printLog();
-											log.printLog();
+											log2.submitLog(pi);
+											log.submitLog(pi);
 											res.exprs[countUnescaped(pattern, '%', 0, j) / 2] = e;
 											return res;
 										}
@@ -1171,7 +1171,7 @@ public class SkriptParser {
 								res = parse_i(pattern, i2, end + 1);
 								if (res != null) {
 									res.regexes.add(0, m.toMatchResult());
-									log.printLog();
+									log.submitLog(pi);
 									return res;
 								}
 							}
@@ -1235,7 +1235,7 @@ public class SkriptParser {
 	 * @return The pattern with %codenames% and a boolean array that contains whetehr the expressions are plural or not
 	 */
 	@Nullable
-	public final static NonNullPair<String, boolean[]> validatePattern(final String pattern) {
+	public final static NonNullPair<String, boolean[]> validatePattern(final ParserInstance pi, final String pattern) {
 		final List<Boolean> ps = new ArrayList<>();
 		int groupLevel = 0, optionalLevel = 0;
 		final Deque<Character> groups = new LinkedList<>();
@@ -1248,14 +1248,14 @@ public class SkriptParser {
 				groups.addLast(c);
 			} else if (c == '|') {
 				if (groupLevel == 0 || groups.peekLast() != '(' && groups.peekLast() != '|')
-					return error("Cannot use the pipe character '|' outside of groups. Escape it if you want to match a literal pipe: '\\|'");
+					return error(pi, "Cannot use the pipe character '|' outside of groups. Escape it if you want to match a literal pipe: '\\|'");
 				groups.removeLast();
 				groups.addLast(c);
 			} else if (c == ')') {
 				if (groupLevel == 0 || groups.peekLast() != '(' && groups.peekLast() != '|')
-					return error("Unexpected closing group bracket ')'. Escape it if you want to match a literal bracket: '\\)'");
+					return error(pi, "Unexpected closing group bracket ')'. Escape it if you want to match a literal bracket: '\\)'");
 				if (groups.peekLast() == '(')
-					return error("(...|...) groups have to contain at least one pipe character '|' to separate it into parts. Escape the brackets if you want to match literal brackets: \"\\(not a group\\)\"");
+					return error(pi, "(...|...) groups have to contain at least one pipe character '|' to separate it into parts. Escape the brackets if you want to match literal brackets: \"\\(not a group\\)\"");
 				groupLevel--;
 				groups.removeLast();
 			} else if (c == '[') {
@@ -1263,29 +1263,29 @@ public class SkriptParser {
 				groups.addLast(c);
 			} else if (c == ']') {
 				if (optionalLevel == 0 || groups.peekLast() != '[')
-					return error("Unexpected closing optional bracket ']'. Escape it if you want to match a literal bracket: '\\]'");
+					return error(pi, "Unexpected closing optional bracket ']'. Escape it if you want to match a literal bracket: '\\]'");
 				optionalLevel--;
 				groups.removeLast();
 			} else if (c == '<') {
 				final int j = pattern.indexOf('>', i + 1);
 				if (j == -1)
-					return error("Missing closing regex bracket '>'. Escape the '<' if you want to match a literal bracket: '\\<'");
+					return error(pi, "Missing closing regex bracket '>'. Escape the '<' if you want to match a literal bracket: '\\<'");
 				try {
 					Pattern.compile(pattern.substring(i + 1, j));
 				} catch (final PatternSyntaxException e) {
-					return error("Invalid Regular Expression '" + pattern.substring(i + 1, j) + "': " + e.getLocalizedMessage());
+					return error(pi, "Invalid Regular Expression '" + pattern.substring(i + 1, j) + "': " + e.getLocalizedMessage());
 				}
 				i = j;
 			} else if (c == '>') {
-				return error("Unexpected closing regex bracket '>'. Escape it if you want to match a literal bracket: '\\>'");
+				return error(pi, "Unexpected closing regex bracket '>'. Escape it if you want to match a literal bracket: '\\>'");
 			} else if (c == '%') {
 				final int j = pattern.indexOf('%', i + 1);
 				if (j == -1)
-					return error("Missing end sign '%' of expression. Escape the percent sign to match a literal '%': '\\%'");
+					return error(pi, "Missing end sign '%' of expression. Escape the percent sign to match a literal '%': '\\%'");
 				final NonNullPair<String, Boolean> p = Utils.getEnglishPlural("" + pattern.substring(i + 1, j));
 				final ClassInfo<?> ci = Classes.getClassInfoFromUserInput(p.getFirst());
 				if (ci == null)
-					return error("The type '" + p.getFirst() + "' could not be found. Please check your spelling or escape the percent signs if you want to match literal %s: \"\\%not an expression\\%\"");
+					return error(pi, "The type '" + p.getFirst() + "' could not be found. Please check your spelling or escape the percent signs if you want to match literal %s: \"\\%not an expression\\%\"");
 				ps.add(p.getSecond());
 				b.append(pattern.substring(last, i + 1));
 				b.append(Utils.toEnglishPlural(ci.getCodeName(), p.getSecond()));
@@ -1293,7 +1293,7 @@ public class SkriptParser {
 				i = j;
 			} else if (c == '\\') {
 				if (i == pattern.length() - 1)
-					return error("Pattern must not end in an unescaped backslash. Add another backslash to escape it, or remove it altogether.");
+					return error(pi, "Pattern must not end in an unescaped backslash. Add another backslash to escape it, or remove it altogether.");
 				i++;
 			}
 		}
@@ -1305,22 +1305,22 @@ public class SkriptParser {
 	}
 	
 	@Nullable
-	private final static NonNullPair<String, boolean[]> error(final String error) {
-		Skript.error("Invalid pattern: " + error);
+	private final static NonNullPair<String, boolean[]> error(final ParserInstance pi, final String error) {
+		pi.error("Invalid pattern: " + error);
 		return null;
 	}
 	
 	private final static Message m_quotes_error = new Message("skript.quotes error");
 	private final static Message m_brackets_error = new Message("skript.brackets error");
 	
-	public final static boolean validateLine(final String line) {
+	public final static boolean validateLine(final ParserInstance pi, final String line) {
 		if (StringUtils.count(line, '"') % 2 != 0) {
-			Skript.error(m_quotes_error.toString());
+			pi.error(m_quotes_error.toString());
 			return false;
 		}
 		for (int i = 0; i < line.length(); i = next(line, i, ParseContext.DEFAULT)) {
 			if (i == -1) {
-				Skript.error(m_brackets_error.toString());
+				pi.error(m_brackets_error.toString());
 				return false;
 			}
 		}

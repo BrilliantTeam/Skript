@@ -60,6 +60,13 @@ public class ParseLogHandler extends LogHandler {
 	
 	boolean printedErrorOrLog = false;
 	
+	/**
+	 * If this log handler prefers to print the log and discard errors instead
+	 * of doing the other way around. This affects only parse logs printed by
+	 * {@link ch.njol.skript.ScriptLoader}.
+	 */
+	boolean preferLog = false;
+	
 	@Override
 	public void onStop() {
 		if (!printedErrorOrLog && Skript.testing())
@@ -164,6 +171,30 @@ public class ParseLogHandler extends LogHandler {
 	
 	public void submitError(final ParserInstance pi, final @Nullable String def) {
 		submitError(pi, def, ErrorQuality.SEMANTIC_ERROR);
+	}
+	
+	public void submitLog(final ParserInstance pi) {
+		pi.submitParseLog(this);
+	}
+	
+	/**
+	 * Sets if this log handler prefers to print the log and discard errors instead
+	 * of doing the other way around. This affects only parse logs printed by
+	 * {@link ch.njol.skript.ScriptLoader}.
+	 * @param preferLog Flag.
+	 */
+	public void preferLog(boolean preferLog) {
+		this.preferLog = preferLog;
+	}
+	
+	/**
+	 * Checks if this log handler prefers to print the log and discard errors instead
+	 * of doing the other way around. This affects only parse logs printed by
+	 * {@link ch.njol.skript.ScriptLoader}.
+	 * @return If this would rather print the log, not errors.
+	 */
+	public boolean prefersLog() {
+		return preferLog;
 	}
 	
 }
