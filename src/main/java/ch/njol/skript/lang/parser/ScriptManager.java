@@ -53,23 +53,46 @@ import ch.njol.skript.config.Config;
  */
 public class ScriptManager {
 	
+	/**
+	 * Count of scripts yet to be loaded.
+	 */
 	private AtomicInteger waitLoading = new AtomicInteger();
+	/**
+	 * Loaded scripts.
+	 */
 	private Map<String,Config> loadMap = new ConcurrentHashMap<>();
 	
+	/**
+	 * Count of scripts yet to be parsed.
+	 */
 	private AtomicInteger waitParsing = new AtomicInteger();
+	/**
+	 * List of parsed scripts.
+	 */
 	@SuppressWarnings("null")
 	private List<ParserInstance> parsed = Collections.synchronizedList(new ArrayList<>());	
+	
 	/**
 	 * Cached thread pool to execute the tasks.
 	 */
 	@SuppressWarnings("null")
 	private ExecutorService pool = Executors.newCachedThreadPool();
 	
+	/**
+	 * Thread on which this script manager currently resides.
+	 * Will change each time something is parsed.
+	 */
 	@Nullable
 	private Thread lockedThread;
 	
+	/**
+	 * Lock for {@link #lockedThread}
+	 */
 	private static final ReentrantLock lock = new ReentrantLock(true);
 	
+	/**
+	 * The one who should recieve all messages from parsing.
+	 */
 	@SuppressWarnings("null")
 	private CommandSender viewer;
 	
@@ -150,6 +173,12 @@ public class ScriptManager {
 		return new ArrayList<>(parsed); // Return non-synchronized copy for speed
 	}
 	
+	/**
+	 * Tells the script manager that file with given name
+	 * was successfully loaded.
+	 * @param file Name or path of file.
+	 * @param config Config (the thing that was loaded!).
+	 */
 	public void loadReady(String file, Config config) {
 		int counter = waitLoading.decrementAndGet();
 		loadMap.put(file, config);
@@ -157,6 +186,10 @@ public class ScriptManager {
 			LockSupport.unpark(lockedThread);
 	}
 	
+	/**
+	 * Tells the script manager that given parser instance has finished parsing.
+	 * @param pi Parser instance - must be done with parsing.
+	 */
 	public void parseReady(ParserInstance pi) {
 		int counter = waitParsing.decrementAndGet();
 		parsed.add(pi);

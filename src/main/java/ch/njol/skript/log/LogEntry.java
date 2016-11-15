@@ -62,7 +62,7 @@ public class LogEntry {
 		this(level, ErrorQuality.SEMANTIC_ERROR.quality(), message, node);
 	}
 	
-	public LogEntry(final Level level, final ErrorQuality quality, final String message, final Node node) {
+	public LogEntry(final Level level, final ErrorQuality quality, final String message, final @Nullable Node node) {
 		this(level, quality.quality(), message, node);
 	}
 	

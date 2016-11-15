@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 
 import org.bukkit.event.Event;
@@ -69,6 +70,7 @@ import ch.njol.skript.lang.function.FunctionEvent;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.lang.function.ScriptFunction;
 import ch.njol.skript.log.ErrorQuality;
+import ch.njol.skript.log.LogEntry;
 import ch.njol.skript.log.LogHandler;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
@@ -85,7 +87,7 @@ import ch.njol.util.coll.CollectionUtils;
 /**
  * Instance of Skript parser. Runs asynchronously.
  */
-public class ParserInstance implements Runnable, Comparable<ParserInstance> {
+public class ParserInstance implements Runnable, Comparable<ParserInstance>, ParseLogger {
 	
 	/**
 	 * Dummy parser instance. Can be used for legacy code.
@@ -116,6 +118,8 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 	public final List<LogHandler> logs;
 	@Nullable
 	private RetainingLogHandler nodeLog;
+	@Nullable
+	private Node node;
 	
 	public final List<TriggerSection> currentSections;
 	public final List<Loop> currentLoops;
@@ -348,32 +352,62 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance> {
 		return items;
 	}
 	
-	/**
-	 * Submits a parse log handler. Errors will be displayed
-	 * when enabling scripts, which allows them to be ordered.
-	 * 
-	 * It is not recommended to write anything to log after submitting it.
-	 * @param log Log handler.
-	 */
+	@Override
 	public void submitErrorLog(ParseLogHandler log) {
 		logs.add(log);
 	}
 	
+	@SuppressWarnings("null")
+	@Override
 	public void error(String msg, ErrorQuality quality) {
-		
+		log(new LogEntry(Level.SEVERE, quality, msg, node));
 	}
 	
+	@Override
+	public void error(String msg) {
+		error(msg, ErrorQuality.SEMANTIC_ERROR);
+	}
+	
+	@SuppressWarnings("null")
+	@Override
 	public void warning(String msg) {
-		
+		log(new LogEntry(Level.WARNING, msg, node));
 	}
 	
+	@SuppressWarnings("null")
+	@Override
 	public void info(String msg) {
-		
+		log(new LogEntry(Level.INFO, msg, node));
 	}
 	
-	public void debug(String msg) {
-		if (Skript.debug())
-			info(msg);
+	@Override
+	public void log(LogEntry entry) {
+		if (nodeLog != null)
+			nodeLog.log(entry);
+		else
+			SkriptLogger.log(entry);
+	}
+	
+	@Override
+	public void setNode(Node node) {
+		this.node = node;
+	}
+	
+	@Override
+	@Nullable
+	public Node getNode() {
+		return node;
+	}
+	
+	@Override
+	public void enterNode() {
+		nodeLog = SkriptLogger.startRetainingLog();
+	}
+	
+	@Override
+	public void exitNode() {
+		logs.add(nodeLog);
+		nodeLog = null;
 	}
  	
 	@Override
