@@ -247,8 +247,11 @@ public class SkriptParser {
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' is not a single-element expression. Change your pattern to allow multiple elements or make the expression mandatory [pattern: " + info.patterns[i] + "]");
 										if (vi.time != 0 && !expr.setTime(vi.time))
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' does not have distinct time states. [pattern: " + info.patterns[i] + "]");
-										if (!expr.init())
+										
+										if (!expr.init()) {
+											pi.exitNode();
 											continue patternsLoop;
+										}
 										res.exprs[j] = expr;
 									}
 								}

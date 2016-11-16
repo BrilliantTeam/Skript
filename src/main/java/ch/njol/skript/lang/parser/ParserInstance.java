@@ -421,7 +421,8 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	
 	@Override
 	public void exitNode() {
-		logs.add(nodeLog);
+		if (nodeLog != null)
+			logs.add(nodeLog);
 		nodeLog = null;
 	}
  	
