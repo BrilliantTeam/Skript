@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-	compile 'org.spigotmc:spigot-api:1.10.2-R0.1-SNAPSHOT'
+	compile 'org.spigotmc:spigot-api:1.11-R0.1-SNAPSHOT'
 	compile 'org.eclipse.jdt:org.eclipse.jdt.annotation:1.1.0'
 	compile 'com.google.code.findbugs:findbugs:2.0.3'
 	compile 'de.slikey:EffectLib:5.0'
@@ -62,7 +62,7 @@ configurations {
 }
 
 dependencies {
-	ecj 'org.eclipse.jdt.core.compiler:ecj:4.5.1'
+	ecj 'org.eclipse.jdt.core.compiler:ecj:4.6.1'
 }
 
 compileJava {
