@@ -532,4 +532,20 @@ public abstract class Utils {
 		}
 	}
 	
+	/**
+	 * Gets class for name. Throws RuntimeException instead of checked one.
+	 * Use this only when absolutely necessary.
+	 * @param name Class name.
+	 * @return The class.
+	 */
+	public final static Class<?> classForName(String name) {
+		Class<?> c;
+		try {
+			c = Class.forName(name);
+			return c;
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Class not found!");
+		}
+	}
+	
 }

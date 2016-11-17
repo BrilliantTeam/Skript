@@ -79,7 +79,7 @@ public enum Color implements YggdrasilSerializable {
 	private final static Color[] byWool = new Color[16];
 	static {
 		for (final Color c : values()) {
-			byWool[c.wool.getData()] = c;
+			byWool[c.wool.getWoolData()] = c;
 		}
 	}
 	
@@ -105,7 +105,7 @@ public enum Color implements YggdrasilSerializable {
 	}
 	
 	public byte getDye() {
-		return (byte) (15 - wool.getData());
+		return (byte) (15 - wool.getWoolData());
 	}
 	
 	public DyeColor getWoolColor() {
@@ -113,7 +113,7 @@ public enum Color implements YggdrasilSerializable {
 	}
 	
 	public byte getWool() {
-		return wool.getData();
+		return wool.getWoolData();
 	}
 	
 	public String getChat() {
@@ -160,7 +160,7 @@ public enum Color implements YggdrasilSerializable {
 	}
 	
 	public final static Color byWoolColor(final DyeColor color) {
-		return byWool(color.getData());
+		return byWool(color.getWoolData());
 	}
 	
 	public final org.bukkit.Color getBukkitColor() {

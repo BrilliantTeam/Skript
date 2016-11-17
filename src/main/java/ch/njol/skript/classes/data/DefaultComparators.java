@@ -41,11 +41,9 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
-import org.bukkit.entity.PoweredMinecart;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Snowball;
-import org.bukkit.entity.StorageMinecart;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownExpBottle;
 import org.bukkit.entity.ThrownPotion;
@@ -225,10 +223,18 @@ public class DefaultComparators {
 			entityMaterials.put(HopperMinecart.class, Material.HOPPER_MINECART);
 			entityMaterials.put(ExplosiveMinecart.class, Material.EXPLOSIVE_MINECART);
 			entityMaterials.put(Minecart.class, Material.MINECART);
-		} else {
-			entityMaterials.put(StorageMinecart.class, Material.STORAGE_MINECART);
-			entityMaterials.put(PoweredMinecart.class, Material.POWERED_MINECART);
-			entityMaterials.put(Minecart.class, Material.MINECART);
+		} else { // 1.11 does not have these classes, and we compile against 1.11+ API now
+			try {
+				@SuppressWarnings("unchecked")
+				Class<Entity> storageCart = (Class<Entity>) Class.forName("org.bukkit.entity.StorageMinecart");
+				entityMaterials.put(storageCart, Material.STORAGE_MINECART);
+				@SuppressWarnings("unchecked")
+				Class<Entity> poweredCart = (Class<Entity>) Class.forName("org.bukkit.entity.PoweredMinecart");
+				entityMaterials.put(poweredCart, Material.POWERED_MINECART);
+				entityMaterials.put(Minecart.class, Material.MINECART);
+			} catch (ClassNotFoundException e) {
+				Skript.exception(e, "Cannot initialize material support for minecarts");
+			}
 		}
 	}
 	public final static Comparator<EntityData, ItemType> entityItemComparator = new Comparator<EntityData, ItemType>() {
