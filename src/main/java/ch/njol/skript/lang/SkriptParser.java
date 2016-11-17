@@ -249,7 +249,6 @@ public class SkriptParser {
 											throw new SkriptAPIException("The default expression of '" + vi.classes[0].getCodeName() + "' does not have distinct time states. [pattern: " + info.patterns[i] + "]");
 										
 										if (!expr.init()) {
-											pi.exitNode();
 											continue patternsLoop;
 										}
 										res.exprs[j] = expr;
@@ -774,10 +773,10 @@ public class SkriptParser {
 		try {
 			final NonNullPair<SkriptEventInfo<?>, SkriptEvent> e = new SkriptParser(pi, event, PARSE_LITERALS, ParseContext.EVENT).parseEvent();
 			if (e != null) {
-				pi.submitErrorLog(log);
+				pi.submitParseLog(log);
 				return e;
 			}
-			pi.submitErrorLog(log);
+			pi.submitParseLog(log);
 			return null;
 		} finally {
 			//log.stop();

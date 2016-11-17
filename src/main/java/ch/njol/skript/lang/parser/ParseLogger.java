@@ -21,6 +21,9 @@
 
 package ch.njol.skript.lang.parser;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -42,24 +45,28 @@ public interface ParseLogger {
 	 * It is not recommended to write anything to log after submitting it.
 	 * @param log Log handler.
 	 */
-	void submitErrorLog(LogHandler log);
+	void submitErrorLog(ParseLogHandler log);
 	
-	void submitParseLog(ParseLogHandler log);
+	void submitParseLog(LogHandler log);
 	
-	void error(String msg, ErrorQuality quality);
+	void error(@Nullable String msg, ErrorQuality quality);
 	
-	void error(String msg);
+	void error(@Nullable String msg);
 	
-	void warning(String msg);
+	void warning(@Nullable String msg);
 	
-	void info(String msg);
+	void info(@Nullable String msg);
 	
-	default void debug(String msg) {
+	default void debug(@Nullable String msg) {
 		if (Skript.debug())
 			info(msg);
 	}
 	
-	void log(LogEntry entry);
+	void log(@Nullable LogEntry entry);
+	
+	default void logAll(Collection<LogEntry> entries) {
+		entries.forEach(entry -> log(entry));
+	}
 	
 	/**
 	 * Sets node for this parser instance.
@@ -73,16 +80,4 @@ public interface ParseLogger {
 	 */
 	@Nullable
 	Node getNode();
-	
-	/**
-	 * Enters current node set using {@link #setNode(Node)}. This allows using
-	 * logging methods, e.g. {@link #error(String, ErrorQuality)}.
-	 */
-	void enterNode();
-	
-	/**
-	 * Exits node that was entered using {@link #enterNode()}. This will commit
-	 * the log to be printed when enabling scripts.
-	 */
-	void exitNode();
 }

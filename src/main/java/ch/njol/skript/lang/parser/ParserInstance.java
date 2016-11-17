@@ -96,12 +96,12 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	 */
 	public static final ParserInstance DUMMY = new ParserInstance() {
 		@Override
-		public void submitErrorLog(final LogHandler log) {
+		public void submitErrorLog(final ParseLogHandler log) {
 			// TODO - for now, ignore
 		}
 		
 		@Override
-		public void submitParseLog(ParseLogHandler log) {
+		public void submitParseLog(LogHandler log) {
 			// TODO - for now, ignore
 		}
 	};
@@ -120,9 +120,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	public final Map<Class<? extends Event>[],Trigger> triggers;
 	public final List<ScriptFunction<?>> functions;
 	
-	public final List<LogHandler> logs;
-	@Nullable
-	private RetainingLogHandler nodeLog;
+	public final RetainingLogHandler log;
 	@Nullable
 	private Node node;
 	
@@ -156,9 +154,9 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 		selfRegisteringTriggers = null;
 		triggers = null;
 		functions = null;
-		logs = null;
 		currentSections = null;
 		currentLoops = null;
+		log = null;
 	}
 	
 	public ParserInstance(String fileName, Config config, ScriptManager manager) {
@@ -171,7 +169,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 		this.selfRegisteringTriggers = new HashMap<>();
 		this.triggers = new HashMap<>();
 		this.functions = new ArrayList<>();
-		this.logs = new ArrayList<>();
+		this.log = SkriptLogger.startRetainingLog();
 		this.currentSections = new ArrayList<>();
 		this.currentLoops = new ArrayList<>();
 	}
@@ -358,14 +356,16 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	}
 	
 	@Override
-	public void submitErrorLog(LogHandler log) {
-		logs.add(log);
+	public void submitErrorLog(ParseLogHandler log) {
+		log(log.getError());
 	}
 	
 	@Override
-	public void submitParseLog(ParseLogHandler log) {
-		log.preferLog(true);
-		logs.add(log);
+	public void submitParseLog(LogHandler log) {
+		if (log instanceof ParseLogHandler)
+			logAll(((ParseLogHandler) log).getLog());
+		else if (log instanceof RetainingLogHandler)
+			logAll(((RetainingLogHandler) log).getLog());
 	}
 	
 	@SuppressWarnings("null")
@@ -396,11 +396,9 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	}
 	
 	@Override
-	public void log(LogEntry entry) {
-		if (nodeLog != null)
-			nodeLog.log(entry);
-		else
-			SkriptLogger.log(entry);
+	public void log(@Nullable LogEntry entry) {
+		if (entry != null)
+			log.log(entry);
 	}
 	
 	@Override
@@ -412,18 +410,6 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	@Nullable
 	public Node getNode() {
 		return node;
-	}
-	
-	@Override
-	public void enterNode() {
-		nodeLog = SkriptLogger.startRetainingLog();
-	}
-	
-	@Override
-	public void exitNode() {
-		if (nodeLog != null)
-			logs.add(nodeLog);
-		nodeLog = null;
 	}
  	
 	@Override

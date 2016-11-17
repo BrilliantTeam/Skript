@@ -22,6 +22,7 @@
 package ch.njol.skript.log;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -59,13 +60,6 @@ public class ParseLogHandler extends LogHandler {
 	}
 	
 	boolean printedErrorOrLog = false;
-	
-	/**
-	 * If this log handler prefers to print the log and discard errors instead
-	 * of doing the other way around. This affects only parse logs printed by
-	 * {@link ch.njol.skript.ScriptLoader}.
-	 */
-	boolean preferLog = false;
 	
 	@Override
 	public void onStop() {
@@ -152,6 +146,10 @@ public class ParseLogHandler extends LogHandler {
 		return error;
 	}
 	
+	public Collection<LogEntry> getLog() {
+		return new ArrayList<>(log);
+	}
+	
 	/**
 	 * Submits this to given parser instance. Errors will be displayed
 	 * when enabling scripts, which allows them to be ordered.
@@ -175,26 +173,6 @@ public class ParseLogHandler extends LogHandler {
 	
 	public void submitLog(final ParserInstance pi) {
 		pi.submitParseLog(this);
-	}
-	
-	/**
-	 * Sets if this log handler prefers to print the log and discard errors instead
-	 * of doing the other way around. This affects only parse logs printed by
-	 * {@link ch.njol.skript.ScriptLoader}.
-	 * @param preferLog Flag.
-	 */
-	public void preferLog(boolean preferLog) {
-		this.preferLog = preferLog;
-	}
-	
-	/**
-	 * Checks if this log handler prefers to print the log and discard errors instead
-	 * of doing the other way around. This affects only parse logs printed by
-	 * {@link ch.njol.skript.ScriptLoader}.
-	 * @return If this would rather print the log, not errors.
-	 */
-	public boolean prefersLog() {
-		return preferLog;
 	}
 	
 }

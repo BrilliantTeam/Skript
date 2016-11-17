@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 
 import org.bukkit.command.CommandSender;
@@ -284,20 +285,15 @@ final public class ScriptLoader {
 				((SelfRegisteringSkriptEvent) trigger.getKey().getSecond()).register(trigger.getValue());
 				SkriptEventHandler.addSelfRegisteringTrigger(trigger.getValue());
 			}
-			for (LogHandler log : pi.logs) {
-				if (log instanceof ParseLogHandler) {
-					ParseLogHandler parseLog = (ParseLogHandler) log;
-					if (parseLog.hasError() && !parseLog.prefersLog()) { // Print error
-						if (viewer instanceof ConsoleCommandSender) // Console -> normal logging
-							parseLog.printError();
-						else // Non-console -> ugly hack
-							viewer.sendMessage(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(parseLog.getError().getMessage()));
-					} else { // No error or we were asked to ignore it? Print the log!
-						parseLog.printLog(viewer);
-					}
-				} else if (log instanceof RetainingLogHandler) {
-					((RetainingLogHandler) log).printLog();
-				}
+			if (viewer instanceof ConsoleCommandSender) {
+				pi.log.printLog();
+			} else {
+				pi.log.getLog().forEach(entry -> {
+					if (entry.level.intValue() >= Level.SEVERE.intValue())
+						viewer.sendMessage(Skript.SKRIPT_PREFIX + Utils.replaceEnglishChatStyles(entry.getMessage()));
+					else
+						viewer.sendMessage(Utils.replaceEnglishChatStyles(entry.getMessage()));
+				});
 			}
 		} finally {
 			numErrors.stop();
