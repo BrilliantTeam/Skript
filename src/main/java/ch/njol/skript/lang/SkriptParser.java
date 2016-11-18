@@ -365,12 +365,11 @@ public class SkriptParser {
 				final LogEntry e = log.getError();
 				return (Literal<? extends T>) new UnparsedLiteral(expr, e != null && (error == null || e.quality > error.quality) ? e : error);
 			}
-			Skript.info("Types: " + Arrays.toString(types));
 			for (final Class<? extends T> c : types) {
 				log.clear();
 				assert c != null;
 				final T t = Classes.parse(pi, expr, c, context);
-				Skript.info("Parsed: " + t);
+				Skript.info("Parsed: " + t + " from " + c + " using " + expr);
 				if (t != null) {
 					log.submitLog(pi);
 					return new SimpleLiteral<>(t, false);
@@ -405,6 +404,7 @@ public class SkriptParser {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final <T> Expression<? extends T> parseExpression(final Class<? extends T>... types) {
+		Skript.info("parseExpression for " + Arrays.toString(types));
 		if (expr.length() == 0)
 			return null;
 		
@@ -415,20 +415,20 @@ public class SkriptParser {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			//Mirre
-			if (isObject){
-				if ((flags & PARSE_LITERALS) != 0) {
-					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
-					final SkriptParser p = new SkriptParser(pi, expr, PARSE_LITERALS, context);
-					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
-						final Expression<?> e = p.parseExpression(c); // Wow this breaks stuff -bensku, 21.10.2016
-						if (e != null) {
-							log.printLog();
-							return (Expression<? extends T>) e;
-						}
-						log.clear();
-					}
-				}
-			}
+//			if (isObject){
+//				if ((flags & PARSE_LITERALS) != 0) {
+//					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
+//					final SkriptParser p = new SkriptParser(pi, expr, PARSE_LITERALS, context);
+//					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
+//						final Expression<?> e = p.parseExpression(c); // Wow this breaks stuff -bensku, 21.10.2016
+//						if (e != null) {
+//							log.printLog();
+//							return (Expression<? extends T>) e;
+//						}
+//						log.clear();
+//					}
+//				}
+//			}
 			//Mirre
 			final Expression<? extends T> r = parseSingleExpr(false, null, types);
 			if (r != null) {

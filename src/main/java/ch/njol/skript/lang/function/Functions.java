@@ -200,6 +200,7 @@ public abstract class Functions {
 		@SuppressWarnings("unchecked")
 		Signature<?> sign = new Signature<>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
 		Functions.signatures.put(name, sign);
+		Skript.debug("Loaded function signature for " + name);
 		return sign;
 	}
 	
