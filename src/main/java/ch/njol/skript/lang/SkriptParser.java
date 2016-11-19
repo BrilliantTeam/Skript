@@ -331,6 +331,7 @@ public class SkriptParser {
 					e = VariableString.newInstance(pi, "" + expr.substring(1, expr.length() - 1));
 				} else {
 					e = (Expression<?>) parse(pi, expr, (Iterator) Skript.getExpressions(types), null);
+					Skript.info(Arrays.toString(types));
 				}
 				if (e != null) {
 					for (final Class<? extends T> t : types) {
@@ -404,7 +405,10 @@ public class SkriptParser {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final <T> Expression<? extends T> parseExpression(final Class<? extends T>... types) {
-		Skript.info("parseExpression for " + Arrays.toString(types));
+		if (types[0].equals(Number.class)) {
+			Thread.dumpStack();
+			Skript.info("parseExpression for " + Arrays.toString(types));
+		}
 		if (expr.length() == 0)
 			return null;
 		
@@ -459,6 +463,7 @@ public class SkriptParser {
 					return null;
 				}
 			}
+			Skript.info("pieces: " + Arrays.deepToString(pieces.toArray()));
 			
 			if (pieces.size() == 1) { // not a list of expressions, and a single one has failed to parse above
 				if (expr.startsWith("(") && expr.endsWith(")") && next(expr, 0, context) == expr.length()) {
@@ -483,6 +488,7 @@ public class SkriptParser {
 						continue;
 					final int x = pieces.get(b)[0], y = pieces.get(b + a - 1)[1];
 					final String subExpr = "" + expr.substring(x, y).trim();
+					Skript.info("subExpr: " + subExpr);
 					assert subExpr.length() < expr.length() : subExpr;
 					
 					final Expression<? extends T> t;
@@ -1093,6 +1099,7 @@ public class SkriptParser {
 						throw new MalformedPatternException(pattern, "Odd number of '%'");
 					final String name = "" + pattern.substring(j + 1, end);
 					final ExprInfo vi = getExprInfo(name);
+					Skript.info("exprInfo classes for " + name + ": " + Arrays.toString(vi.classes));
 					if (end == pattern.length() - 1) {
 						i2 = expr.length();
 					} else {
@@ -1109,6 +1116,7 @@ public class SkriptParser {
 								final ParseLogHandler log2 = SkriptLogger.startParseLogHandler();
 								try {
 									for (int k = 0; k < vi.classes.length; k++) {
+										Skript.info("class " + vi.classes[k]);
 										if ((flags & vi.flagMask) == 0)
 											continue;
 										log2.clear();
