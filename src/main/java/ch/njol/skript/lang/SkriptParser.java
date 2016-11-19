@@ -47,6 +47,7 @@ import ch.njol.skript.command.Commands;
 import ch.njol.skript.command.ScriptCommand;
 import ch.njol.skript.command.ScriptCommandEvent;
 import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.expressions.ExprParse;
 import ch.njol.skript.lang.function.ExprFunctionCall;
 import ch.njol.skript.lang.function.Function;
@@ -180,6 +181,7 @@ public class SkriptParser {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			final T e = new SkriptParser(pi, expr).parse(source);
+			Skript.info("e: " + e);
 			if (e != null) {
 				log.submitLog(pi);
 				return e;
@@ -371,6 +373,8 @@ public class SkriptParser {
 				assert c != null;
 				final T t = Classes.parse(pi, expr, c, context);
 				Skript.info("Parsed: " + t + " from " + c + " using " + expr);
+				if (c.equals(EntityData.class))
+					Thread.dumpStack();
 				if (t != null) {
 					log.submitLog(pi);
 					return new SimpleLiteral<>(t, false);
@@ -435,6 +439,7 @@ public class SkriptParser {
 //			}
 			//Mirre
 			final Expression<? extends T> r = parseSingleExpr(false, null, types);
+			Skript.info("r is " +  r);
 			if (r != null) {
 				log.submitLog(pi);
 				return r;
@@ -678,6 +683,7 @@ public class SkriptParser {
 			}
 			final String functionName = "" + m.group(1);
 			final String args = m.group(2);
+			Skript.info("function args: " + args);
 			final Expression<?>[] params;
 			if (args.length() != 0) {
 				final Expression<?> ps = new SkriptParser(pi, args, flags | PARSE_LITERALS, context).suppressMissingAndOrWarnings().parseExpression(Object.class);
@@ -716,7 +722,7 @@ public class SkriptParser {
 //				}
 //			}
 //			@SuppressWarnings("null")
-			final FunctionReference<T> e = new FunctionReference<>(functionName, SkriptLogger.getNode(), ScriptLoader.currentScript != null ? ScriptLoader.currentScript.getFile() : null, types, params);//.toArray(new Expression[params.size()]));
+			final FunctionReference<T> e = new FunctionReference<>(functionName, pi.getNode(), pi.config != null ? pi.config.getFile() : null, types, params);//.toArray(new Expression[params.size()]));
 			if (!e.validateFunction(true)) {
 				log.submit(pi);
 				return null;
@@ -1107,19 +1113,24 @@ public class SkriptParser {
 						if (i2 == -1)
 							return null;
 					}
+					Skript.info("made it to try block");
 					final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 					try {
 						for (; i2 != -1; i2 = next(expr, i2, context)) {
 							log.clear();
 							res = parse_i(pattern, i2, end + 1);
+							Skript.info("res: " + res + ", pattern: " + pattern + ", expr: " + expr);
+							Thread.dumpStack();
 							if (res != null) {
 								final ParseLogHandler log2 = SkriptLogger.startParseLogHandler();
 								try {
 									for (int k = 0; k < vi.classes.length; k++) {
-										Skript.info("class " + vi.classes[k]);
+										if (vi.classes[k].toString().equals("entity type"))
+											continue;
 										if ((flags & vi.flagMask) == 0)
 											continue;
 										log2.clear();
+										Skript.info("vi.classes[k]: " + vi.classes[k]);
 										final Expression<?> e = new SkriptParser(pi, "" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
 										if (e != null) {
 											if (!vi.isPlural[k] && !e.isSingle()) {
@@ -1161,6 +1172,8 @@ public class SkriptParser {
 						if (!log.isStopped())
 							log.submit(pi);
 					}
+					Skript.info("Returning null!");
+					//Thread.dumpStack();
 					return null;
 				}
 				case '<': {
