@@ -35,6 +35,7 @@ import ch.njol.skript.variables.Variables;
 /**
  * @author Peter Güttinger
  */
+@SuppressWarnings("deprecation") // Until 1.12: use old deprecated methods for backwards compatibility
 public class HorseData extends EntityData<Horse> {
 	static {
 		if (Skript.classExists("org.bukkit.entity.Horse")) {

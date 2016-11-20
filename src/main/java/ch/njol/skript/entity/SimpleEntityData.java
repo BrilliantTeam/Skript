@@ -50,6 +50,7 @@ import org.bukkit.entity.Giant;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.Guardian;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Husk;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -153,7 +154,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("squid", Squid.class));
 		types.add(new SimpleEntityDataInfo("bottle of enchanting", ThrownExpBottle.class));
 		types.add(new SimpleEntityDataInfo("tnt", TNTPrimed.class));
-		types.add(new SimpleEntityDataInfo("zombie", Zombie.class)); // TODO husks and zombie villagers (and test that)
+		types.add(new SimpleEntityDataInfo("zombie", Zombie.class));
 		
 		if (Skript.classExists("org.bukkit.entity.ItemFrame")) {
 			types.add(new SimpleEntityDataInfo("item frame", ItemFrame.class));
@@ -177,6 +178,9 @@ public class SimpleEntityData extends EntityData<Entity> {
 		}
 		if (Skript.classExists("org.bukkit.entity.AreaEffectCloud")) {
 			types.add(new SimpleEntityDataInfo("area effect cloud", AreaEffectCloud.class));
+		}
+		if (Skript.classExists("org.bukkit.entity.Husk")) {
+			types.add(new SimpleEntityDataInfo("husk", Husk.class));
 		}
 		// TODO !Update with every version [entities]
 		

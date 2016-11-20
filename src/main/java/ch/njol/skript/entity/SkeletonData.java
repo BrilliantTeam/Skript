@@ -33,6 +33,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 /**
  * @author Peter Güttinger
  */
+@SuppressWarnings("deprecation") // Until 1.12: use deprecated methods for compatibility
 public class SkeletonData extends EntityData<Skeleton> {
 	
 	private final static boolean hasWither = Skript.methodExists(Skeleton.class, "getSkeletonType");

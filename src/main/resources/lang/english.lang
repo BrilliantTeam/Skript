@@ -817,6 +817,27 @@ entities:
 	area effect cloud:
 		name: area effect cloud¦s
 		pattern: area effect cloud(|1¦s)
+	husk:
+		name: husk¦s
+		pattern: husk(|1¦s)
+	zombie villager:
+		name: zombie villager¦s
+		pattern: zombie villager(|1¦s)
+	zombie farmer:
+		name: zombie farmer¦s
+		pattern: zombie farmer(|1¦s)
+	zombie librarian:
+		name: zombie librarian¦s
+		pattern: zombie librarian(|1¦s)
+	zombie priest:
+		name: zombie priest¦s
+		pattern: zombie priest(|1¦s)
+	zombie blacksmith:
+		name: zombie blacksmith¦s
+		pattern: zombie blacksmith(|1¦s)
+	zombie butcher:
+		name: zombie butcher¦s
+		pattern: zombie butcher(|1¦s)
 	monster:
 		name: monster¦s
 		pattern: monster(|1¦s)
