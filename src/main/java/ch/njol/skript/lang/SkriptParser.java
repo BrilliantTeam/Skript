@@ -182,6 +182,7 @@ public class SkriptParser {
 		try {
 			final T e = new SkriptParser(pi, expr).parse(source);
 			Skript.info("e: " + e);
+			Thread.dumpStack();
 			if (e != null) {
 				log.submitLog(pi);
 				return e;
@@ -373,8 +374,6 @@ public class SkriptParser {
 				assert c != null;
 				final T t = Classes.parse(pi, expr, c, context);
 				Skript.info("Parsed: " + t + " from " + c + " using " + expr);
-				if (c.equals(EntityData.class))
-					Thread.dumpStack();
 				if (t != null) {
 					log.submitLog(pi);
 					return new SimpleLiteral<>(t, false);
@@ -409,10 +408,7 @@ public class SkriptParser {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final <T> Expression<? extends T> parseExpression(final Class<? extends T>... types) {
-		if (types[0].equals(Number.class)) {
-			Thread.dumpStack();
-			Skript.info("parseExpression for " + Arrays.toString(types));
-		}
+		Skript.info("parseExpression: " + expr + " for " + Arrays.toString(types));
 		if (expr.length() == 0)
 			return null;
 		
@@ -423,20 +419,20 @@ public class SkriptParser {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			//Mirre
-//			if (isObject){
-//				if ((flags & PARSE_LITERALS) != 0) {
-//					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
-//					final SkriptParser p = new SkriptParser(pi, expr, PARSE_LITERALS, context);
-//					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
-//						final Expression<?> e = p.parseExpression(c); // Wow this breaks stuff -bensku, 21.10.2016
-//						if (e != null) {
-//							log.printLog();
-//							return (Expression<? extends T>) e;
-//						}
-//						log.clear();
-//					}
-//				}
-//			}
+			if (isObject){
+				if ((flags & PARSE_LITERALS) != 0) {
+					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
+					final SkriptParser p = new SkriptParser(pi, expr, PARSE_LITERALS, context);
+					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
+						final Expression<?> e = p.parseExpression(c); // Wow this breaks stuff -bensku, 21.10.2016
+						if (e != null) {
+							log.printLog();
+							return (Expression<? extends T>) e;
+						}
+						log.clear();
+					}
+				}
+			}
 			//Mirre
 			final Expression<? extends T> r = parseSingleExpr(false, null, types);
 			Skript.info("r is " +  r);
@@ -1035,6 +1031,7 @@ public class SkriptParser {
 	 */
 	@Nullable
 	private final ParseResult parse_i(final String pattern, int i, int j) {
+		Skript.info("parse_i: " + pattern + "; " + i + ", " + j);
 		ParseResult res;
 		int end, i2;
 		
@@ -1120,13 +1117,15 @@ public class SkriptParser {
 							log.clear();
 							res = parse_i(pattern, i2, end + 1);
 							Skript.info("res: " + res + ", pattern: " + pattern + ", expr: " + expr);
-							Thread.dumpStack();
+							//Thread.dumpStack();
 							if (res != null) {
+								Skript.info("res expr: " + res.expr);
+								//Thread.dumpStack();
 								final ParseLogHandler log2 = SkriptLogger.startParseLogHandler();
 								try {
 									for (int k = 0; k < vi.classes.length; k++) {
-										if (vi.classes[k].toString().equals("entity type"))
-											continue;
+										//if (vi.classes[k].toString().equals("entity type"))
+										//	continue;
 										if ((flags & vi.flagMask) == 0)
 											continue;
 										log2.clear();

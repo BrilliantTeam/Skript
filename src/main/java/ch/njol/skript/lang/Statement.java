@@ -50,13 +50,13 @@ public abstract class Statement extends TriggerItem implements SyntaxElement {
 				log.printLog();
 				return f;
 			} else if (log.hasError()) {
-				log.printError();
+				log.submit(pi);
 				return null;
 			} else {
-				log.printError();
+				log.submit(pi);
 			}
 		} finally {
-			log.stop();
+			//log.stop();
 		}
 		return (Statement) SkriptParser.parse(pi, s, (Iterator) Skript.getStatements().iterator(), defaultError);
 	}
