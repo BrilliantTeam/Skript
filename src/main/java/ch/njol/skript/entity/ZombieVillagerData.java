@@ -39,13 +39,13 @@ public class ZombieVillagerData extends EntityData<ZombieVillager> {
 	
 	static {
 		if (villagerSupport)
-			register(SkeletonData.class, "zombie villager", Skeleton.class, 0,
+			register(ZombieVillagerData.class, "zombie villager", ZombieVillager.class, 0,
 					"zombie villager", "zombie farmer", "zombie librarian", "zombie priest", "zombie blacksmith", "zombie butcher");
 		
 		
 	}
 	
-	private Villager.Profession profession = Villager.Profession.NITWIT; // 0 means normal zombie, everything else -> villagers
+	private Villager.Profession profession = Villager.Profession.FARMER;
 	
 	public ZombieVillagerData() {}
 	

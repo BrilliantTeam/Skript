@@ -64,16 +64,19 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.entity.Silverfish;
+import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.SmallFireball;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.Spider;
 import org.bukkit.entity.Squid;
+import org.bukkit.entity.Stray;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownExpBottle;
 import org.bukkit.entity.Witch;
 import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Zombie;
 import org.eclipse.jdt.annotation.Nullable;
@@ -181,6 +184,11 @@ public class SimpleEntityData extends EntityData<Entity> {
 		}
 		if (Skript.classExists("org.bukkit.entity.Husk")) {
 			types.add(new SimpleEntityDataInfo("husk", Husk.class));
+		}
+		if (Skript.isRunningMinecraft(1, 11)) { // Override SkeletonData on 1.11+ due to Bukkit API changes
+			types.add(new SimpleEntityDataInfo("skeleton", Skeleton.class));
+			types.add(new SimpleEntityDataInfo("wither skeleton", WitherSkeleton.class));
+			types.add(new SimpleEntityDataInfo("stray", Stray.class));
 		}
 		// TODO !Update with every version [entities]
 		

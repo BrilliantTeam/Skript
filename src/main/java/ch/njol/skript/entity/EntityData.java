@@ -244,8 +244,8 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		register(dataClass, codeName, entityClass, 0, codeName);
 	}
 	
-	public static <E extends Entity, T extends EntityData<E>> void register(final Class<T> dataClass, final String name, final Class<E> entityClass, final int defaultName, final String... codeNames) throws IllegalArgumentException {
-		final EntityDataInfo<T> info = new EntityDataInfo<>(dataClass, name, codeNames, defaultName, entityClass);
+	public static <E extends Entity, T extends EntityData<E>> void register(final Class<? extends T> dataClass, final String name, final Class<E> entityClass, final int defaultName, final String... codeNames) throws IllegalArgumentException {
+		final EntityDataInfo<? extends T> info = new EntityDataInfo<>(dataClass, name, codeNames, defaultName, entityClass);
 		for (int i = 0; i < infos.size(); i++) {
 			if (infos.get(i).entityClass.isAssignableFrom(entityClass)) {
 				infos.add(i, info);

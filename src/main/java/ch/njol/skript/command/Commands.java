@@ -282,7 +282,7 @@ public abstract class Commands {
 			command = "" + command.substring(SkriptConfig.effectCommandToken.value().length()).trim();
 			final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 			try {
-				final Effect e = Effect.parse(command, null);
+				final Effect e = Effect.parse(command, null, ParserInstance.forEffectCommand());
 				
 				if (e != null) {
 					log.clear(); // ignore warnings and stuff

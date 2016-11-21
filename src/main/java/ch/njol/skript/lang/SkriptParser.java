@@ -181,8 +181,8 @@ public class SkriptParser {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			final T e = new SkriptParser(pi, expr).parse(source);
-			Skript.info("e: " + e);
-			Thread.dumpStack();
+			//Skript.info("e: " + e);
+			//Thread.dumpStack();
 			if (e != null) {
 				log.submitLog(pi);
 				return e;
@@ -334,7 +334,7 @@ public class SkriptParser {
 					e = VariableString.newInstance(pi, "" + expr.substring(1, expr.length() - 1));
 				} else {
 					e = (Expression<?>) parse(pi, expr, (Iterator) Skript.getExpressions(types), null);
-					Skript.info(Arrays.toString(types));
+					//Skript.info(Arrays.toString(types));
 				}
 				if (e != null) {
 					for (final Class<? extends T> t : types) {
@@ -373,7 +373,7 @@ public class SkriptParser {
 				log.clear();
 				assert c != null;
 				final T t = Classes.parse(pi, expr, c, context);
-				Skript.info("Parsed: " + t + " from " + c + " using " + expr);
+				//Skript.info("Parsed: " + t + " from " + c + " using " + expr);
 				if (t != null) {
 					log.submitLog(pi);
 					return new SimpleLiteral<>(t, false);
@@ -408,7 +408,7 @@ public class SkriptParser {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final <T> Expression<? extends T> parseExpression(final Class<? extends T>... types) {
-		Skript.info("parseExpression: " + expr + " for " + Arrays.toString(types));
+		//Skript.info("parseExpression: " + expr + " for " + Arrays.toString(types));
 		if (expr.length() == 0)
 			return null;
 		
@@ -435,7 +435,7 @@ public class SkriptParser {
 			}
 			//Mirre
 			final Expression<? extends T> r = parseSingleExpr(false, null, types);
-			Skript.info("r is " +  r);
+			//Skript.info("r is " +  r);
 			if (r != null) {
 				log.submitLog(pi);
 				return r;
@@ -464,7 +464,7 @@ public class SkriptParser {
 					return null;
 				}
 			}
-			Skript.info("pieces: " + Arrays.deepToString(pieces.toArray()));
+			//Skript.info("pieces: " + Arrays.deepToString(pieces.toArray()));
 			
 			if (pieces.size() == 1) { // not a list of expressions, and a single one has failed to parse above
 				if (expr.startsWith("(") && expr.endsWith(")") && next(expr, 0, context) == expr.length()) {
@@ -489,7 +489,7 @@ public class SkriptParser {
 						continue;
 					final int x = pieces.get(b)[0], y = pieces.get(b + a - 1)[1];
 					final String subExpr = "" + expr.substring(x, y).trim();
-					Skript.info("subExpr: " + subExpr);
+					//Skript.info("subExpr: " + subExpr);
 					assert subExpr.length() < expr.length() : subExpr;
 					
 					final Expression<? extends T> t;
@@ -679,7 +679,7 @@ public class SkriptParser {
 			}
 			final String functionName = "" + m.group(1);
 			final String args = m.group(2);
-			Skript.info("function args: " + args);
+			//Skript.info("function args: " + args);
 			final Expression<?>[] params;
 			if (args.length() != 0) {
 				final Expression<?> ps = new SkriptParser(pi, args, flags | PARSE_LITERALS, context).suppressMissingAndOrWarnings().parseExpression(Object.class);
@@ -1031,7 +1031,7 @@ public class SkriptParser {
 	 */
 	@Nullable
 	private final ParseResult parse_i(final String pattern, int i, int j) {
-		Skript.info("parse_i: " + pattern + "; " + i + ", " + j);
+		//Skript.info("parse_i: " + pattern + "; " + i + ", " + j);
 		ParseResult res;
 		int end, i2;
 		
@@ -1102,7 +1102,7 @@ public class SkriptParser {
 						throw new MalformedPatternException(pattern, "Odd number of '%'");
 					final String name = "" + pattern.substring(j + 1, end);
 					final ExprInfo vi = getExprInfo(name);
-					Skript.info("exprInfo classes for " + name + ": " + Arrays.toString(vi.classes));
+					//Skript.info("exprInfo classes for " + name + ": " + Arrays.toString(vi.classes));
 					if (end == pattern.length() - 1) {
 						i2 = expr.length();
 					} else {
@@ -1110,17 +1110,14 @@ public class SkriptParser {
 						if (i2 == -1)
 							return null;
 					}
-					Skript.info("made it to try block");
 					final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 					try {
 						for (; i2 != -1; i2 = next(expr, i2, context)) {
 							log.clear();
 							res = parse_i(pattern, i2, end + 1);
-							Skript.info("res: " + res + ", pattern: " + pattern + ", expr: " + expr);
-							//Thread.dumpStack();
+							//Skript.info("res: " + res + ", pattern: " + pattern + ", expr: " + expr);
 							if (res != null) {
-								Skript.info("res expr: " + res.expr);
-								//Thread.dumpStack();
+								//Skript.info("res expr: " + res.expr);
 								final ParseLogHandler log2 = SkriptLogger.startParseLogHandler();
 								try {
 									for (int k = 0; k < vi.classes.length; k++) {
@@ -1129,7 +1126,7 @@ public class SkriptParser {
 										if ((flags & vi.flagMask) == 0)
 											continue;
 										log2.clear();
-										Skript.info("vi.classes[k]: " + vi.classes[k]);
+										//Skript.info("vi.classes[k]: " + vi.classes[k]);
 										final Expression<?> e = new SkriptParser(pi, "" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
 										if (e != null) {
 											if (!vi.isPlural[k] && !e.isSingle()) {
@@ -1171,8 +1168,7 @@ public class SkriptParser {
 						if (!log.isStopped())
 							log.submit(pi);
 					}
-					Skript.info("Returning null!");
-					//Thread.dumpStack();
+					//Skript.info("Returning null!");
 					return null;
 				}
 				case '<': {

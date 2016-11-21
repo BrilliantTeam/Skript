@@ -38,15 +38,18 @@ public class SkeletonData extends EntityData<Skeleton> {
 	
 	private final static boolean hasWither = Skript.methodExists(Skeleton.class, "getSkeletonType");
 	private final static boolean hasStray = Skript.isRunningMinecraft(1, 10);
+	private final static boolean separateClasses = Skript.isRunningMinecraft(1, 11);
 	
 	static {
-		if (hasStray)
-			register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton", "stray");
-		else if (hasWither)
-			register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton");
-		else
-			register(SkeletonData.class, "skeleton", Skeleton.class, "skeleton");
-		
+		// Register nothing on 1.11+ (see SimpleEntityData instead)
+		if (!separateClasses) {
+			if (hasStray)
+				register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton", "stray");
+			else if (hasWither)
+				register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton");
+			else
+				register(SkeletonData.class, "skeleton", Skeleton.class, "skeleton");
+		}
 	}
 	
 	private int type;

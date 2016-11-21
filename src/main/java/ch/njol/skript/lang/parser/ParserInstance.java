@@ -106,6 +106,16 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 		}
 	};
 	
+	public static ParserInstance forScript(String fileName, Config cfg, ScriptManager manager) {
+		return new ParserInstance(fileName, cfg, manager);
+	}
+	
+	public static ParserInstance forEffectCommand() {
+		ParserInstance pi = new ParserInstance();
+		pi.setCurrentEvent("effect command", CommandEvent.class);
+		return pi;
+	}
+	
 	public final Config config;
 	private ScriptManager manager;
 	public final Map<String, ItemType> aliases;
@@ -146,7 +156,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 	private String currentEventName = null;
 	
 	@SuppressWarnings("null") // Note: only for dummy object
-	ParserInstance() {
+	protected ParserInstance() {
 		config = null;
 		aliases = null;
 		options = null;
@@ -159,7 +169,7 @@ public class ParserInstance implements Runnable, Comparable<ParserInstance>, Par
 		log = null;
 	}
 	
-	public ParserInstance(String fileName, Config config, ScriptManager manager) {
+	protected ParserInstance(String fileName, Config config, ScriptManager manager) {
 		this.fileName = fileName;
 		this.config = config;
 		this.manager = manager;
