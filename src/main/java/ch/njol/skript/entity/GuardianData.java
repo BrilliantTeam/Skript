@@ -31,7 +31,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 public class GuardianData extends EntityData<Guardian> {
 
 	static {
-		if(Skript.classExists("org.bukkit.entity.Guardian")){
+		if(Skript.classExists("org.bukkit.entity.Guardian") && !Skript.isRunningMinecraft(1, 11)){
 			EntityData.register(GuardianData.class, "guardian", Guardian.class, 1, "normal guardian", "guardian", "elder guardian");
 		}
 	}

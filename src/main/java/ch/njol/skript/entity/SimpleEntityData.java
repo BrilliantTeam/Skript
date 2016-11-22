@@ -37,25 +37,33 @@ import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Donkey;
 import org.bukkit.entity.Egg;
+import org.bukkit.entity.ElderGuardian;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Endermite;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Evoker;
+import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Giant;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.Guardian;
+import org.bukkit.entity.Horse;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Husk;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Llama;
+import org.bukkit.entity.LlamaSpit;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Mule;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.PigZombie;
@@ -65,6 +73,7 @@ import org.bukkit.entity.Shulker;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.SkeletonHorse;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.SmallFireball;
 import org.bukkit.entity.Snowball;
@@ -74,11 +83,14 @@ import org.bukkit.entity.Squid;
 import org.bukkit.entity.Stray;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownExpBottle;
+import org.bukkit.entity.Vex;
+import org.bukkit.entity.Vindicator;
 import org.bukkit.entity.Witch;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Zombie;
+import org.bukkit.entity.ZombieHorse;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -189,6 +201,22 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("skeleton", Skeleton.class));
 			types.add(new SimpleEntityDataInfo("wither skeleton", WitherSkeleton.class));
 			types.add(new SimpleEntityDataInfo("stray", Stray.class));
+			types.add(new SimpleEntityDataInfo("guardian", Guardian.class));
+			types.add(new SimpleEntityDataInfo("elder guardian", ElderGuardian.class));
+			
+			types.add(new SimpleEntityDataInfo("horse", Horse.class));
+			types.add(new SimpleEntityDataInfo("donkey", Donkey.class));
+			types.add(new SimpleEntityDataInfo("mule", Mule.class));
+			types.add(new SimpleEntityDataInfo("undead horse", ZombieHorse.class));
+			types.add(new SimpleEntityDataInfo("skeleton horse", SkeletonHorse.class));
+			
+			types.add(new SimpleEntityDataInfo("llama", Llama.class));
+			types.add(new SimpleEntityDataInfo("llama spit", LlamaSpit.class));
+			
+			types.add(new SimpleEntityDataInfo("evoker", Evoker.class));
+			types.add(new SimpleEntityDataInfo("evoker fangs", EvokerFangs.class));
+			types.add(new SimpleEntityDataInfo("vex", Vex.class));
+			types.add(new SimpleEntityDataInfo("vindicator", Vindicator.class));
 		}
 		// TODO !Update with every version [entities]
 		
