@@ -229,6 +229,7 @@ public class SkriptParser {
 						assert pattern != null;
 						final ParseResult res = parse_i(pattern, 0, 0);
 						if (res != null) {
+							Skript.info("For pattern " + pattern + " exprs are " + Arrays.toString(res.exprs));
 							int x = -1;
 							for (int j = 0; (x = nextUnescaped(pattern, '%', x + 1)) != -1; j++) {
 								final int x2 = nextUnescaped(pattern, '%', x + 1);
@@ -1031,7 +1032,6 @@ public class SkriptParser {
 	 */
 	@Nullable
 	private final ParseResult parse_i(final String pattern, int i, int j) {
-		//Skript.info("parse_i: " + pattern + "; " + i + ", " + j);
 		ParseResult res;
 		int end, i2;
 		
@@ -1101,8 +1101,9 @@ public class SkriptParser {
 					if (end == -1)
 						throw new MalformedPatternException(pattern, "Odd number of '%'");
 					final String name = "" + pattern.substring(j + 1, end);
+					Skript.info("name: " + name + " with pattern: " + pattern);
 					final ExprInfo vi = getExprInfo(name);
-					//Skript.info("exprInfo classes for " + name + ": " + Arrays.toString(vi.classes));
+					Skript.info("exprInfo: " + Arrays.toString(vi.classes));
 					if (end == pattern.length() - 1) {
 						i2 = expr.length();
 					} else {
@@ -1115,9 +1116,8 @@ public class SkriptParser {
 						for (; i2 != -1; i2 = next(expr, i2, context)) {
 							log.clear();
 							res = parse_i(pattern, i2, end + 1);
-							//Skript.info("res: " + res + ", pattern: " + pattern + ", expr: " + expr);
 							if (res != null) {
-								//Skript.info("res expr: " + res.expr);
+								Skript.info("res expr: " + res.expr);
 								final ParseLogHandler log2 = SkriptLogger.startParseLogHandler();
 								try {
 									for (int k = 0; k < vi.classes.length; k++) {
@@ -1126,7 +1126,7 @@ public class SkriptParser {
 										if ((flags & vi.flagMask) == 0)
 											continue;
 										log2.clear();
-										//Skript.info("vi.classes[k]: " + vi.classes[k]);
+										Skript.info("vi.classes[k]: " + vi.classes[k]);
 										final Expression<?> e = new SkriptParser(pi, "" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
 										if (e != null) {
 											if (!vi.isPlural[k] && !e.isSingle()) {

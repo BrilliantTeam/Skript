@@ -114,8 +114,10 @@ public class CondCompare extends Condition {
 	@SuppressWarnings("null")
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
+		Skript.info("Initing compare for " + parser.expr);
 		first = vars[0];
 		second = vars[1];
+		Skript.info("first: " + first + "second: " + second);
 		if (vars.length == 3)
 			third = vars[2];
 		relation = patterns.getInfo(matchedPattern);
@@ -215,6 +217,7 @@ public class CondCompare extends Condition {
 		}
 		*///else
 		
+		Skript.info("f: " + f + ", s: " + s);
 		comp = Comparators.getComparator(f, s);
 		
 		return comp != null;
