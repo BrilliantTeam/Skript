@@ -289,6 +289,8 @@ public class SkriptParser {
 	 */
 	@Nullable
 	private final static <T> Variable<T> parseVariable(final ParserInstance pi, final String expr, final Class<? extends T>[] returnTypes) {
+		Skript.info("Testing variable " + expr + " with types " + Arrays.toString(returnTypes));
+		Thread.dumpStack();
 		if (varPattern.matcher(expr).matches())
 			return Variable.newInstance(pi, "" + expr.substring(expr.indexOf('{') + 1, expr.lastIndexOf('}')), returnTypes);
 		return null;
@@ -421,18 +423,18 @@ public class SkriptParser {
 		try {
 			//Mirre
 			if (isObject){
-				if ((flags & PARSE_LITERALS) != 0) {
-					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
-					final SkriptParser p = new SkriptParser(pi, expr, PARSE_LITERALS, context);
-					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
-						final Expression<?> e = p.parseExpression(c); // Wow this breaks stuff -bensku, 21.10.2016
-						if (e != null) {
-							log.printLog();
-							return (Expression<? extends T>) e;
-						}
-						log.clear();
-					}
-				}
+//				if ((flags & PARSE_LITERALS) != 0) {
+//					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
+//					final SkriptParser p = new SkriptParser(pi, expr, PARSE_LITERALS, context);
+//					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
+//						final Expression<?> e = p.parseExpression(c); // Wow this breaks stuff -bensku, 21.10.2016
+//						if (e != null) {
+//							log.printLog();
+//							return (Expression<? extends T>) e;
+//						}
+//						log.clear();
+//					}
+//				}
 			}
 			//Mirre
 			final Expression<? extends T> r = parseSingleExpr(false, null, types);
@@ -1129,6 +1131,7 @@ public class SkriptParser {
 										Skript.info("vi.classes[k]: " + vi.classes[k]);
 										final Expression<?> e = new SkriptParser(pi, "" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
 										if (e != null) {
+											Skript.info("e is " + e  + " and returns " + e.getReturnType());
 											if (!vi.isPlural[k] && !e.isSingle()) {
 												if (context == ParseContext.COMMAND) {
 													log.error(Commands.m_too_many_arguments.toString(vi.classes[k].getName().getIndefiniteArticle(), vi.classes[k].getName().toString()), ErrorQuality.SEMANTIC_ERROR);
