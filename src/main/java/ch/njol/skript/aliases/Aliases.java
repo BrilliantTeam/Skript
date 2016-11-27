@@ -635,7 +635,6 @@ public abstract class Aliases {
 						(d.toString().equals(type) ?
 								"Please crate an alias for '" + type + (type.equals(s) ? "" : " or '" + s + "'") + "' (" + Material.getMaterial(d.getId()).name() + ") in aliases-english.sk or the script's aliases section and use that instead." :
 								"Please replace '" + s + "' with e.g. '" + d.toString(true, false) + "'."));
-				Thread.dumpStack();
 			}
 			t.add(d);
 			return t;

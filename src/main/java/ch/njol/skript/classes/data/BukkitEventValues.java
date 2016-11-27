@@ -431,13 +431,15 @@ public final class BukkitEventValues {
 				return e.getBlock();
 			}
 		}, 0);
-		EventValues.registerEventValue(AreaEffectCloudApplyEvent.class, PotionEffectType.class, new Getter<PotionEffectType, AreaEffectCloudApplyEvent>() {
-			@Override
-			@Nullable
-			public PotionEffectType get(AreaEffectCloudApplyEvent e) {
-				return e.getEntity().getBasePotionData().getType().getEffectType(); // Whoops this is a bit long call...
-			}
-		}, 0);
+		if (Skript.classExists("org.bukkit.event.entity.AreaEffectCloudApplyEvent")) {
+			EventValues.registerEventValue(AreaEffectCloudApplyEvent.class, PotionEffectType.class, new Getter<PotionEffectType, AreaEffectCloudApplyEvent>() {
+				@Override
+				@Nullable
+				public PotionEffectType get(AreaEffectCloudApplyEvent e) {
+					return e.getEntity().getBasePotionData().getType().getEffectType(); // Whoops this is a bit long call...
+				}
+			}, 0);
+		}
 		
 		// --- PlayerEvents ---
 		EventValues.registerEventValue(PlayerEvent.class, Player.class, new Getter<Player, PlayerEvent>() {
