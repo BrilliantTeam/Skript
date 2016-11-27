@@ -229,7 +229,7 @@ public class SkriptParser {
 						assert pattern != null;
 						final ParseResult res = parse_i(pattern, 0, 0);
 						if (res != null) {
-							Skript.info("For pattern " + pattern + " exprs are " + Arrays.toString(res.exprs));
+							//Skript.info("For pattern " + pattern + " exprs are " + Arrays.toString(res.exprs));
 							int x = -1;
 							for (int j = 0; (x = nextUnescaped(pattern, '%', x + 1)) != -1; j++) {
 								final int x2 = nextUnescaped(pattern, '%', x + 1);
@@ -289,8 +289,6 @@ public class SkriptParser {
 	 */
 	@Nullable
 	private final static <T> Variable<T> parseVariable(final ParserInstance pi, final String expr, final Class<? extends T>[] returnTypes) {
-		Skript.info("Testing variable " + expr + " with types " + Arrays.toString(returnTypes));
-		Thread.dumpStack();
 		if (varPattern.matcher(expr).matches())
 			return Variable.newInstance(pi, "" + expr.substring(expr.indexOf('{') + 1, expr.lastIndexOf('}')), returnTypes);
 		return null;
@@ -1103,9 +1101,9 @@ public class SkriptParser {
 					if (end == -1)
 						throw new MalformedPatternException(pattern, "Odd number of '%'");
 					final String name = "" + pattern.substring(j + 1, end);
-					Skript.info("name: " + name + " with pattern: " + pattern);
+					//Skript.info("name: " + name + " with pattern: " + pattern);
 					final ExprInfo vi = getExprInfo(name);
-					Skript.info("exprInfo: " + Arrays.toString(vi.classes));
+					//Skript.info("exprInfo: " + Arrays.toString(vi.classes));
 					if (end == pattern.length() - 1) {
 						i2 = expr.length();
 					} else {
@@ -1119,19 +1117,15 @@ public class SkriptParser {
 							log.clear();
 							res = parse_i(pattern, i2, end + 1);
 							if (res != null) {
-								Skript.info("res expr: " + res.expr);
 								final ParseLogHandler log2 = SkriptLogger.startParseLogHandler();
 								try {
 									for (int k = 0; k < vi.classes.length; k++) {
-										//if (vi.classes[k].toString().equals("entity type"))
-										//	continue;
 										if ((flags & vi.flagMask) == 0)
 											continue;
 										log2.clear();
-										Skript.info("vi.classes[k]: " + vi.classes[k]);
 										final Expression<?> e = new SkriptParser(pi, "" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
 										if (e != null) {
-											Skript.info("e is " + e  + " and returns " + e.getReturnType());
+											//Skript.info("e is " + e  + " and returns " + e.getReturnType());
 											if (!vi.isPlural[k] && !e.isSingle()) {
 												if (context == ParseContext.COMMAND) {
 													log.error(Commands.m_too_many_arguments.toString(vi.classes[k].getName().getIndefiniteArticle(), vi.classes[k].getName().toString()), ErrorQuality.SEMANTIC_ERROR);
