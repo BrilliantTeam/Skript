@@ -26,6 +26,7 @@ import java.util.Calendar;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.classes.ClassInfo;
@@ -368,6 +369,22 @@ public class DefaultFunctions {
 				"A time zone and DST offset can be specified as well (in minutes), if they are left out the server's time zone and DST offset are used (the created date will not retain this information).")
 				.examples("date(2014, 10, 1) # 0:00, 1st October 2014", "date(1990, 3, 5, 14, 30) # 14:30, 5th May 1990", "date(1999, 12, 31, 23, 59, 59, 999, -3*60, 0) # almost year 2000 in parts of Brazil (-3 hours offset, no DST)")
 				.since("2.2"));
+		
+		Functions.registerFunction(new JavaFunction<Vector>("vector", new Parameter[] {
+				new Parameter<>("x", numberClass, true, null), new Parameter<>("y", numberClass, true, null), new Parameter<>("z", numberClass, true, null)
+		}, Classes.getExactClassInfo(Vector.class), true) {
+
+			@Override
+			@Nullable
+			public Vector[] execute(FunctionEvent e, Object[][] params) {
+				return new Vector[] {new Vector(((Number)params[0][0]).doubleValue(), ((Number)params[1][0]).doubleValue(), ((Number)params[2][0]).doubleValue())};
+			}
+			
+		}
+		.description("Constructs a vector.")
+		.examples("vector(0, 0, 0)")
+		.since("2.2-dev23")
+		);
 		
 	}
 	

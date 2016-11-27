@@ -55,6 +55,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -301,7 +302,6 @@ public class BukkitClasses {
 						return "(" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + "|yaw=" + l.getYaw() + "/pitch=" + l.getPitch() + ")";
 					}
 				}).serializer(new Serializer<Location>() {
-					@SuppressWarnings("null")
 					@Override
 					public Fields serialize(final Location l) throws NotSerializableException {
 						final Fields f = new Fields();
@@ -356,6 +356,79 @@ public class BukkitClasses {
 						}
 					}
 				}));
+		Classes.registerClass(new ClassInfo<>(Vector.class, "vector")
+				.user("vectors?")
+				.name("Vector")
+				.description("Vector is a collection of numbers. In Minecraft, 3D vectors are used to express velocities of entities.")
+				.usage("vector(x, y, z)")
+				.examples("")
+				.since("2.2-dev23")
+				.defaultExpression(new EventValueExpression<>(Vector.class))
+				.parser(new Parser<Vector>() {
+					@Override
+					@Nullable
+					public Vector parse(final String s, final ParseContext context) {
+						return null;
+					}
+					
+					@Override
+					public boolean canParse(final ParseContext context) {
+						return false;
+					}
+					
+					@Override
+					public String toString(final Vector vec, final int flags) {
+						return "x: " + Skript.toString(vec.getX()) + ", y: " + Skript.toString(vec.getY()) + ", z: " + Skript.toString(vec.getZ());
+					}
+					
+					@Override
+					public String toVariableNameString(final Vector vec) {
+						return "vector:" + vec.getX() + "," + vec.getY() + "," + vec.getZ();
+					}
+					
+					@Override
+					public String getVariableNamePattern() {
+						return "\\S:-?\\d+(\\.\\d+)?,-?\\d+(\\.\\d+)?,-?\\d+(\\.\\d+)?";
+					}
+					
+					@Override
+					public String getDebugMessage(final Vector vec) {
+						return "(" + vec.getX() + "," + vec.getY() + "," + vec.getZ() + ")";
+					}
+				})
+				.serializer(new Serializer<Vector>() {
+
+					@Override
+					public Fields serialize(Vector o) throws NotSerializableException {
+						Fields f = new Fields();
+						f.putPrimitive("x", o.getX());
+						f.putPrimitive("y", o.getY());
+						f.putPrimitive("z", o.getZ());
+						return f;
+					}
+
+					@Override
+					public void deserialize(Vector o, Fields f) throws StreamCorruptedException, NotSerializableException {
+						assert false;
+					}
+					
+					@Override
+					public Vector deserialize(final Fields f) throws StreamCorruptedException, NotSerializableException {
+						return new Vector(f.getPrimitive("x", double.class), f.getPrimitive("y", double.class), f.getPrimitive("z", double.class));
+					}
+
+					@Override
+					public boolean mustSyncDeserialization() {
+						return false;
+					}
+
+					@Override
+					protected boolean canBeInstantiated() {
+						return false;
+					}
+					
+				})
+				);
 		
 		// FIXME update doc
 		Classes.registerClass(new ClassInfo<>(World.class, "world")
