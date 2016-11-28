@@ -1,5 +1,6 @@
 #!/bin/bash
 # Builds the old parser version of Skript
+# Note: uses lots of grep and sed
 
 cp -R src src_store
 cp -R oldparser/* src
