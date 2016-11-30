@@ -54,7 +54,7 @@ processResources {
 }
 
 jar {
-	archiveName 'Skript.jar'
+	archiveName System.getenv('SKRIPT_JAR_NAME') == null ? 'Skript.jar' : System.getenv("SKRIPT_JAR_NAME")
 }
 
 configurations {
@@ -81,4 +81,3 @@ uploadArchives {
         repository(url: "file:///itemapi_repo/")
     }
 }
-
