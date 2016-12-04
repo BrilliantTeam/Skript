@@ -114,7 +114,6 @@ public class EvtClick extends SkriptEvent {
 	
 	@Override
 	public boolean check(final Event e) {
-		Skript.info(e.getEventName());
 		final Block block;
 		final Entity entity;
 		
