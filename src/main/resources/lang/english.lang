@@ -233,6 +233,8 @@ enchantments:
 		depth_strider: Depth Strider
 		mending: Mending
 		frost_walker: Frost Walker
+		vanishing_curse: Curse of Vanishing
+		binding_curse: Curse of Binding
 
 # -- Potion Effects --
 potions:
@@ -895,6 +897,7 @@ damage causes:
 	dragon_breath: dragon's breath, dragonfire
 	fly_into_wall: hitting wall while flying, flying into a wall
 	hot_floor: magma, hot floor
+	cramming: cramming
 	custom: unknown, custom, plugin, a plugin
 
 # -- Game Modes --
