@@ -133,13 +133,10 @@ public class EvtClick extends SkriptEvent {
 				}
 			}
 			
-			Skript.info("" + click);
-			Skript.info("" + types);
 			if (click == LEFT || types == null) // types == null  will be handled by the PlayerInteractEvent that is fired as well
 				return false;
 			entity = clickEvent.getRightClicked();
 			block = null;
-			Skript.info("Got to the end");
 		} else if (e instanceof PlayerInteractEvent) {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
 			if (twoHanded) {
