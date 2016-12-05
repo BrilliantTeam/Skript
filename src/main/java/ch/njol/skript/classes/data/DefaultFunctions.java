@@ -363,7 +363,7 @@ public class DefaultFunctions {
 					if (field != Calendar.ZONE_OFFSET || field != Calendar.DST_OFFSET || !Double.isNaN(v))
 						c.set(field, v);
 				}
-				return new Date[] {new Date(c.getTimeInMillis())};
+				return new Date[] {new Date(c.getTimeInMillis(), c.getTimeZone())};
 			}
 		}.description("Creates a date from a year, month, and day, and optionally also from hour, minute, second and millisecond.",
 				"A time zone and DST offset can be specified as well (in minutes), if they are left out the server's time zone and DST offset are used (the created date will not retain this information).")
