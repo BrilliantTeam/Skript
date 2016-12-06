@@ -640,7 +640,7 @@ public class BukkitClasses {
 					@Nullable
 					public Player parse(final String s, final ParseContext context) {
 						if (context == ParseContext.COMMAND) {
-							if (s.matches("(?i)[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}")
+							if (s.matches("(?i)[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}"))
 								return Bukkit.getPlayer(UUID.fromString(s));
 							final List<Player> ps = Bukkit.matchPlayer(s);
 							if (ps.size() == 1)
@@ -707,7 +707,7 @@ public class BukkitClasses {
 					@Nullable
 					public OfflinePlayer parse(final String s, final ParseContext context) {
 						if (context == ParseContext.COMMAND) {
-							if (s.matches("(?i)[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}")
+							if (s.matches("(?i)[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}"))
 								return Bukkit.getOfflinePlayer(UUID.fromString(s));
 							else if (!s.matches("\\S+") || s.length() > 16)
 								return null;

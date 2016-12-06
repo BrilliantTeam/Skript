@@ -22,10 +22,12 @@
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.eclipse.jdt.annotation.Nullable;
@@ -75,7 +77,7 @@ public class ExprClicked extends SimpleExpression<Object> {
 		final Object type = exprs[0] == null ? null : ((Literal<?>) exprs[0]).getSingle();
 		if (type instanceof EntityData) {
 			entityType = (EntityData<?>) type;
-			if (!pi.isCurrentEvent(PlayerInteractEntityEvent.class)) {
+			if (!pi.isCurrentEvent(PlayerInteractEntityEvent.class) && !pi.isCurrentEvent(PlayerInteractAtEntityEvent.class)) {
 				Skript.error("The expression 'clicked entity' can only be used in a click event", ErrorQuality.SEMANTIC_ERROR);
 				return false;
 			}
