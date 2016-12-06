@@ -1362,6 +1362,7 @@ default aliases:
 	hopper(_| )minecart¦s = 408
 	prismarine(_| )shard¦s = 409:0
 	prismarine(_| )crystal¦s = 410
+	[<any>](_| )rabbit meat = 411, 412
 	raw(_| )rabbit = 411
 	cooked(_| )rabbit = 412
 	rabbit(_| )stew = 413
@@ -1374,6 +1375,7 @@ default aliases:
 	lead¦s = 420
 	name(_| )tag¦s = 421
 	command(_| )block(_| )minecart¦¦s¦ = 422
+	[<any>](_| )mutton = 423, 424
 	raw(_| )mutton = 423
 	cooked(_| )mutton = 424
 	any(_| )banner = 176:0-15, 177:0-15, 425:0-15
