@@ -42,6 +42,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.api.ResidenceApi;
+import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.bekvon.bukkit.residence.protection.ResidencePermissions;
@@ -80,18 +81,18 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 	
 	@Override
 	public boolean canBuild_i(final Player p, final Location l) {
-		final ClaimedResidence res = Residence.getResidenceManager().getByLoc(l);
+		final ClaimedResidence res = Residence.getInstance().getResidenceManager().getByLoc(l);
 		if (res == null)
 			return true; // No claim here
 		ResidencePermissions perms = res.getPermissions();
-		return perms.playerHas(p, "build", true);
+		return perms.playerHas(p, Flags.build, true);
 	}
 	
 	@SuppressWarnings("null")
 	@Override
 	public Collection<? extends Region> getRegionsAt_i(final Location l) {
 		final List<ResidenceRegion> ress = new ArrayList<>();
-		final ClaimedResidence res = Residence.getResidenceManager().getByLoc(l);
+		final ClaimedResidence res = Residence.getInstance().getResidenceManager().getByLoc(l);
 		if (res == null)
 			return Collections.emptyList();
 		ress.add(new ResidenceRegion(l.getWorld(), res));
@@ -101,7 +102,7 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 	@Override
 	@Nullable
 	public Region getRegion_i(final World world, final String name) {
-		final ClaimedResidence res = Residence.getResidenceManager().getByName(name);
+		final ClaimedResidence res = Residence.getInstance().getResidenceManager().getByName(name);
 		if (res == null)
 			return null;
 		return new ResidenceRegion(world, res);
@@ -150,7 +151,7 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 			if (!(region instanceof String))
 				throw new StreamCorruptedException("Tried to deserialize Residence region with no valid name!");
 			fields.setFields(this);
-			ClaimedResidence res = Residence.getResidenceManager().getByName((String) region);
+			ClaimedResidence res = Residence.getInstance().getResidenceManager().getByName((String) region);
 			if (res == null)
 				throw new StreamCorruptedException("Invalid region " + region + " in world " + world);
 			this.res = res;
@@ -163,7 +164,7 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 
 		@Override
 		public boolean isMember(OfflinePlayer p) {
-			return res.getPermissions().playerHas(p.getName(), "build", false);
+			return res.getPermissions().playerHas(p.getName(), Flags.build, false);
 		}
 
 		@SuppressWarnings("null")
@@ -174,7 +175,7 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 
 		@Override
 		public boolean isOwner(OfflinePlayer p) {
-			return res.getPermissions().playerHas(p.getName(), "build", false);
+			return res.getPermissions().playerHas(p.getName(), Flags.build, false);
 		}
 
 		@SuppressWarnings("null")
