@@ -295,7 +295,8 @@ public class DefaultComparators {
 		Comparators.registerComparator(OfflinePlayer.class, String.class, new Comparator<OfflinePlayer, String>() {
 			@Override
 			public Relation compare(final OfflinePlayer p, final String name) {
-				return Relation.get(p.getName().equalsIgnoreCase(name));
+				String offlineName = p.getName();
+				return offlineName == null ? Relation.NOT_EQUAL : Relation.get(offlineName.equalsIgnoreCase(name));
 			}
 			
 			@Override
