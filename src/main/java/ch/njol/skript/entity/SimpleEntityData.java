@@ -26,6 +26,7 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.ArmorStand;
@@ -34,6 +35,7 @@ import org.bukkit.entity.Bat;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.CaveSpider;
+import org.bukkit.entity.ChestedHorse;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creature;
@@ -198,19 +200,27 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("husk", Husk.class));
 		}
 		if (Skript.isRunningMinecraft(1, 11)) { // Override SkeletonData on 1.11+ due to Bukkit API changes
-			types.add(new SimpleEntityDataInfo("skeleton", Skeleton.class));
 			types.add(new SimpleEntityDataInfo("wither skeleton", WitherSkeleton.class));
 			types.add(new SimpleEntityDataInfo("stray", Stray.class));
-			types.add(new SimpleEntityDataInfo("guardian", Guardian.class));
-			types.add(new SimpleEntityDataInfo("elder guardian", ElderGuardian.class));
+			types.add(new SimpleEntityDataInfo("skeleton", Skeleton.class, true));
 			
-			types.add(new SimpleEntityDataInfo("horse", Horse.class));
+			// Guardians
+			types.add(new SimpleEntityDataInfo("elder guardian", ElderGuardian.class));
+			types.add(new SimpleEntityDataInfo("normal guardian", Guardian.class));
+			types.add(new SimpleEntityDataInfo("guardian", Guardian.class, true));
+			
+			// Horses
 			types.add(new SimpleEntityDataInfo("donkey", Donkey.class));
 			types.add(new SimpleEntityDataInfo("mule", Mule.class));
+			types.add(new SimpleEntityDataInfo("llama", Llama.class));
 			types.add(new SimpleEntityDataInfo("undead horse", ZombieHorse.class));
 			types.add(new SimpleEntityDataInfo("skeleton horse", SkeletonHorse.class));
+			types.add(new SimpleEntityDataInfo("horse", Horse.class));
 			
-			types.add(new SimpleEntityDataInfo("llama", Llama.class));
+			// New 1.11 horse supertypes
+			types.add(new SimpleEntityDataInfo("chested horse", ChestedHorse.class, true));
+			types.add(new SimpleEntityDataInfo("any horse", AbstractHorse.class, true));
+			
 			types.add(new SimpleEntityDataInfo("llama spit", LlamaSpit.class));
 			
 			types.add(new SimpleEntityDataInfo("evoker", Evoker.class));

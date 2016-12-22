@@ -308,11 +308,11 @@ public class SkriptParser {
 			if (context == ParseContext.DEFAULT || context == ParseContext.EVENT) {
 				final Variable<? extends T> var = parseVariable(pi, expr, types);
 				if (var != null) {
-//					if ((flags & PARSE_EXPRESSIONS) == 0) {
-//						Skript.error("Variables cannot be used here.");
-//						log.submit(pi);
-//						return null;
-//					}
+					if ((flags & PARSE_EXPRESSIONS) == 0) {
+						Skript.error("Variables cannot be used here.");
+						log.submit(pi);
+						return null;
+					}
 					log.submitLog(pi);
 					return var;
 				} else if (log.hasError()) {
@@ -680,7 +680,6 @@ public class SkriptParser {
 			}
 			final String functionName = "" + m.group(1);
 			final String args = m.group(2);
-			//Skript.info("function args: " + args);
 			final Expression<?>[] params;
 			if (args.length() != 0) {
 				final Expression<?> ps = new SkriptParser(pi, args, flags | PARSE_LITERALS, context).suppressMissingAndOrWarnings().parseExpression(Object.class);

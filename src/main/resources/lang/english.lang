@@ -756,12 +756,18 @@ entities:
 	mule:
 		name: mule¦s
 		pattern: <age> mule(|1¦s)
+	chested horse:
+		name: chested horse¦s
+		pattern: <age> chested horse(|1¦s)
 	undead horse:
 		name: undead horse¦s @an
 		pattern: <age> undead horse(|1¦s)|undead <age> horse(|1¦s)|undead (4¦)foal(|1¦s)
 	skeleton horse:
 		name: skeleton horse¦s
 		pattern: <age> skeleton horse(|1¦s)|skeleton <age> horse(|1¦s)|skeleton (4¦)foal(|1¦s)
+	any horse:
+		name: any horse¦s
+		pattern: <age> any horse(|1¦s)|(4¦)foal(|1¦s)
 	llama:
 		name: llama¦s
 		pattern: llama(|1¦s)
