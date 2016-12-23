@@ -48,7 +48,7 @@ import ch.njol.util.Closeable;
 @SuppressWarnings("null")
 public class UnresolvedOfflinePlayer implements OfflinePlayer {
 	
-	final static LinkedBlockingQueue<UnresolvedOfflinePlayer> toResolve = new LinkedBlockingQueue<UnresolvedOfflinePlayer>();
+	final static LinkedBlockingQueue<UnresolvedOfflinePlayer> toResolve;
 	
 	final static Thread resolverThread = Skript.newThread(new Runnable() {
 		@SuppressWarnings("deprecation")
@@ -72,6 +72,7 @@ public class UnresolvedOfflinePlayer implements OfflinePlayer {
 		}
 	}, "Skript offline player resolver thread (fetches UUIDs from the minecraft servers)");
 	static {
+		toResolve = new LinkedBlockingQueue<UnresolvedOfflinePlayer>();
 		resolverThread.start();
 		Skript.closeOnDisable(new Closeable() {
 			@Override
