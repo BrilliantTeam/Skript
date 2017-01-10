@@ -23,6 +23,7 @@ package ch.njol.skript.entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -47,6 +48,8 @@ public class VillagerData extends EntityData<Villager> {
 	 */
 	private static List<Profession> professions;
 	
+	private static final boolean hasNitwit = Skript.isRunningMinecraft(1, 11);
+	
 	static {
 		// professions in order!
 		// NORMAL(-1), FARMER(0), LIBRARIAN(1), PRIEST(2), BLACKSMITH(3), BUTCHER(4), NITWIT(5);
@@ -66,7 +69,6 @@ public class VillagerData extends EntityData<Villager> {
 		} else { // Pre 1.10: method Profession#isZombie() doesn't exist
 			register(VillagerData.class, "villager", Villager.class, 0,
 					"villager", "farmer", "librarian", "priest", "blacksmith", "butcher", "nitwit");
-			// Normal is for zombie villagers, but needs to be here, since someone thought changing first element in enum was good idea :(
 			
 			List<Profession> prof = Arrays.asList(Profession.values());
 			assert prof != null;
@@ -102,8 +104,13 @@ public class VillagerData extends EntityData<Villager> {
 		final Villager v = super.spawn(loc);
 		if (v == null)
 			return null;
-		if (profession == null)
-			v.setProfession(CollectionUtils.getRandom(professions));
+		if (profession == null) { // Randomize profession
+			profession = CollectionUtils.getRandom(professions);
+			v.setProfession(profession);
+		}
+		if (hasNitwit && profession == Profession.NITWIT)
+			v.setRecipes(Collections.emptyList()); // Remove trades from nitwit
+			
 		return v;
 	}
 	
