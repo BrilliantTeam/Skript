@@ -26,6 +26,7 @@ import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -244,6 +245,8 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	public Collection<? extends Region> getRegionsAt_i(final Location l) {
 		final ArrayList<Region> r = new ArrayList<>();
 		
+		if (l.getWorld() == null) // Working around possible cause of issue #280
+			return Collections.emptyList();
 		RegionManager manager = plugin.getRegionManager(l.getWorld());
 		if (manager == null)
 			return r;
