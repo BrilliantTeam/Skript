@@ -21,6 +21,8 @@
 
 package ch.njol.skript.classes.data;
 
+import java.util.List;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +32,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Painting;
@@ -759,6 +762,19 @@ public final class BukkitEventValues {
 			@Nullable
 			public Slot get(final PrepareItemCraftEvent e) {
 				return new InventorySlot(e.getInventory(), 9);
+			}
+		}, 0);
+		EventValues.registerEventValue(PrepareItemCraftEvent.class, Player.class, new Getter<Player, PrepareItemCraftEvent>() {
+			@Override
+			@Nullable
+			public Player get(final PrepareItemCraftEvent e) {
+				List<HumanEntity> viewers = e.getInventory().getViewers(); // Get all viewers
+				if (viewers.size() == 0) // ... if we don't have any
+					return null;
+				HumanEntity first = viewers.get(0); // Get first viewer and hope it is crafter
+				if (first instanceof Player) // Needs to be player... Usually it is
+					return (Player) first;
+				return null;
 			}
 		}, 0);
 	}
