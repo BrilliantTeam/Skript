@@ -6,7 +6,7 @@ for prototyping etc.
 
 This Github fork fork of Skript is based on Mirreski's improvements on original
 Njol's Skript. It is supported for **Spigot** (not Bukkit) versions for
-Minecraft 1.9-1.10. Other versions might work, but no guarantees.
+Minecraft 1.9-1.11. Other versions might work, but no guarantees.
 
 ## Documentation
 Documentation is available [here](http://bensku.github.io/Skript/) for latest
