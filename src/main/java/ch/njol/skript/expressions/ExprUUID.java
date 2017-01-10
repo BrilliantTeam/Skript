@@ -60,9 +60,17 @@ public class ExprUUID extends SimplePropertyExpression<Object, String> {
 	@Nullable
 	public String convert(final Object o) {
 		if (o instanceof OfflinePlayer) {
-			if (offlineUUIDSupported)
-				return ((OfflinePlayer) o).getUniqueId().toString();
-			else
+			if (offlineUUIDSupported) {
+				try {
+					return ((OfflinePlayer) o).getUniqueId().toString();
+				} catch (UnsupportedOperationException e) {
+					// Some plugins (ProtocolLib) try to emulate offline players, but fail miserably
+					// They will throw this exception... and somehow server may freeze when this happens
+					Skript.warning("A script tried to get uuid of an offline player, which was faked by another plugin (probably ProtocolLib).");
+					e.printStackTrace();
+					return null;
+				}
+			} else
 				return ((Player) o).getUniqueId().toString();
 		} else if (o instanceof World) {
 			return ((World) o).getUID().toString();
