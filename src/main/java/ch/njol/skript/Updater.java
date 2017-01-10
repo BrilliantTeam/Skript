@@ -61,7 +61,8 @@ public class Updater {
 	
 	public static final String RELEASES_URL  = "https://api.github.com/repos/bensku/Skript/releases";
 	
-	private static final Gson gson = new Gson();
+	@Nullable
+	private static Gson gson;
 	
 	final static AtomicReference<String> error = new AtomicReference<>();
 	public static volatile UpdateState state = UpdateState.NOT_STARTED;
@@ -161,6 +162,9 @@ public class Updater {
 		assert str != null : "Cannot deserialize null string";
 		@SuppressWarnings("serial")
 		Type listType = new TypeToken<List<ResponseEntry>>() {}.getType();
+		if (gson == null) // Initialize GSON if it wasn't initialized before
+			gson = new Gson();
+		assert gson != null;
 		List<ResponseEntry> responses = gson.fromJson(str, listType);
 		assert responses != null;
 		
