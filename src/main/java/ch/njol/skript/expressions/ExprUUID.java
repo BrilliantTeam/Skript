@@ -23,6 +23,7 @@ package ch.njol.skript.expressions;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -37,9 +38,9 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
  * @author Peter Güttinger
  */
 @Name("UUID")
-@Description({"The UUID of a player or world.",
+@Description({"The UUID of a player, entity or world.",
 		"In the future there will be an option to use a player's UUID instead of the name in variable names (i.e. when %player% is used), but for now this can be used.",
-		"<em>Please note that this expression does not work for offline players!</em>"})
+		"<em>Please note that this expression does not work for offline players if you are under 1.8!</em>"}) 
 // TODO [UUID] update documentation after release. Add note about requiring Bukkit 1.7.(9/10)?
 @Examples({"# prevents people from joining the server if they use the name of a player",
 		"# who has played on this server at least once since this script has been added",
@@ -49,11 +50,11 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 		"		kick player due to \"Someone with your name has played on this server before\"",
 		"	else:",
 		"		set {uuids.%name of player%} to UUID of player"})
-@Since("2.1.2, 2.2 (offline players' UUIDs)")
+@Since("2.1.2, 2.2 (offline players' UUIDs), 2.2-dev23a (entitiy's UUIDs)")
 public class ExprUUID extends SimplePropertyExpression<Object, String> {
 	private final static boolean offlineUUIDSupported = Skript.methodExists(OfflinePlayer.class, "getUniqueId");
 	static {
-		register(ExprUUID.class, String.class, "UUID", (offlineUUIDSupported ? "offlineplayers" : "players") + "/worlds");
+		register(ExprUUID.class, String.class, "UUID", "entities/" + (offlineUUIDSupported ? "offlineplayers" : "players") + "/worlds");
 	}
 	
 	@Override
@@ -72,6 +73,8 @@ public class ExprUUID extends SimplePropertyExpression<Object, String> {
 				}
 			} else
 				return ((Player) o).getUniqueId().toString();
+		} else if (o instanceof Entity) {
+			return ((Entity)o).getUniqueId().toString();
 		} else if (o instanceof World) {
 			return ((World) o).getUID().toString();
 		}
