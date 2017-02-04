@@ -1,4 +1,4 @@
-package src.main.java.ch.njol.skript.expressions;
+package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
