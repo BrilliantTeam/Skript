@@ -12,6 +12,10 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings({"unused", "unchecked"})
+@Name("Item Amount")
+@Description("Gets the amout of an <a href='../classes/#itemstack'>item stack</a>.")
+@Examples("send \"You have got %item amount of player's tool% %player's tool% in your hand !\" to player")
+@Since("2.2-dev23a") //I guess.
 public class SExprItemAmount extends SimpleExpression<Number>{
     static {
         Skript.registerExpression(SExprItemAmount.class, Number.class, ExpressionType.PROPERTY, "item[[ ]stack] (amount|size|number) of %itemstack%");
