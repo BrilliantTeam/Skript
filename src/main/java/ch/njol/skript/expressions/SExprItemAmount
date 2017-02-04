@@ -1,4 +1,4 @@
-package fr.syst3ms.quarsk.expressions;
+package src.main.java.ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
