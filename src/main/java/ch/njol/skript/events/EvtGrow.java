@@ -83,7 +83,7 @@ public class EvtGrow extends SkriptEvent {
 	
 	@Override
 	public boolean check(final Event e) {
-		if (evtType == STRUCTURE  && types != null && e instanceof StructureGrowEvent) {
+		if (types != null) {
 			return types.check(e, new Checker<StructureType>() {
 				@SuppressWarnings("null")
 				@Override
@@ -91,7 +91,7 @@ public class EvtGrow extends SkriptEvent {
 					return t.is(((StructureGrowEvent) e).getSpecies());
 				}
 			});
-		} else if (evtType == BLOCK && blocks != null && e instanceof BlockGrowEvent) {
+		} else if (blocks != null) {
 			return blocks.check(e, new Checker<ItemType>() {
 				@SuppressWarnings("null")
 				@Override
