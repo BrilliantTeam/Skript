@@ -22,6 +22,7 @@
 package ch.njol.skript.expressions.base;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -132,6 +133,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 		try {
 			boolean hasValue = false;
 			final Class<? extends Event>[] es = ScriptLoader.getCurrentEvents();
+			Skript.info("es: " + Arrays.toString(es));
 			if (es == null) {
 				assert false;
 				return false;
@@ -142,6 +144,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 					continue;
 				}
 				final Getter<? extends T, ?> getter = EventValues.getEventValueGetter(e, c, getTime());
+				Skript.info("getter: " + getter);
 				if (getter != null) {
 					getters.put(e, getter);
 					hasValue = true;
