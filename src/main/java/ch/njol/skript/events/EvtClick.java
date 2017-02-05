@@ -56,6 +56,7 @@ import ch.njol.util.coll.CollectionUtils;
 /**
  * @author Peter Güttinger
  */
+@SuppressWarnings("unchecked")
 public class EvtClick extends SkriptEvent {
 	
 	// Important: a click on an entity fires both an PlayerInteractEntityEvent and a PlayerInteractEvent
@@ -66,6 +67,7 @@ public class EvtClick extends SkriptEvent {
 	private final static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
 	
 	static {
+<<<<<<< HEAD
 		Class<? extends PlayerEvent> clickEvent;
 		if (twoHanded) // Armor stand support!
 			clickEvent = PlayerInteractAtEntityEvent.class;
@@ -74,6 +76,9 @@ public class EvtClick extends SkriptEvent {
 		
 		@SuppressWarnings("unchecked")
 		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, clickEvent);
+=======
+		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class);
+>>>>>>> parent of d767136... Kinda fix grow event, though has other bugginess here
 		Skript.registerEvent("Click", EvtClick.class, eventTypes,
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] [on %-entitydata/itemtype%] [(with|using|holding) %itemtype%]",
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] (with|using|holding) %itemtype% on %entitydata/itemtype%")
