@@ -60,7 +60,7 @@ public class EffRespawn extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		players = (Expression<Player>) exprs[0];
-		if (pi.isCurrentEvent(PlayerDeathEvent.class) && pi.hasDelayBefore.isTrue()) // Then we will internally force you to wait
+		if (ScriptLoader.isCurrentEvent(PlayerDeathEvent.class) && ScriptLoader.hasDelayBefore.isTrue()) // Then we will internally force you to wait
 			hasDelay = true;
 
 		return true;

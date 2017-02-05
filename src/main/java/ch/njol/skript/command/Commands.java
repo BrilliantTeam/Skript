@@ -68,7 +68,6 @@ import ch.njol.skript.config.validate.SectionValidator;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
@@ -94,7 +93,7 @@ public abstract class Commands {
 	public final static Message m_correct_usage = new Message("commands.correct usage");
 	public final static Message m_internal_error = new Message("commands.internal error");
 	
-	private final static Map<String, ScriptCommand> commands = new HashMap<>();
+	private final static Map<String, ScriptCommand> commands = new HashMap<String, ScriptCommand>();
 	
 	@Nullable
 	private static SimpleCommandMap commandMap = null;
@@ -274,6 +273,7 @@ public abstract class Commands {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	final static boolean handleEffectCommand(final CommandSender sender, String command) {
 		if (!(sender instanceof ConsoleCommandSender || sender.hasPermission("skript.effectcommands") || SkriptConfig.allowOpsToUseEffectCommands.value() && sender.isOp()))
 			return false;
@@ -282,7 +282,9 @@ public abstract class Commands {
 			command = "" + command.substring(SkriptConfig.effectCommandToken.value().length()).trim();
 			final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 			try {
-				final Effect e = Effect.parse(command, null, ParserInstance.forEffectCommand());
+				ScriptLoader.setCurrentEvent("effect command", EffectCommandEvent.class);
+				final Effect e = Effect.parse(command, null);
+				ScriptLoader.deleteCurrentEvent();
 				
 				if (e != null) {
 					log.clear(); // ignore warnings and stuff
@@ -317,11 +319,11 @@ public abstract class Commands {
 			argumentPattern = Pattern.compile("<\\s*(?:(.+?)\\s*:\\s*)?(.+?)\\s*(?:=\\s*(" + SkriptParser.wildcard + "))?\\s*>");
 	
 	@Nullable
-	public final static ScriptCommand loadCommand(final SectionNode node, final ParserInstance scriptParser) {
+	public final static ScriptCommand loadCommand(final SectionNode node) {
 		final String key = node.getKey();
 		if (key == null)
 			return null;
-		final String s = scriptParser.replaceOptions(key);
+		final String s = ScriptLoader.replaceOptions(key);
 		
 		int level = 0;
 		for (int i = 0; i < s.length(); i++) {
@@ -355,7 +357,7 @@ public abstract class Commands {
 		final String arguments = m.group(3) == null ? "" : m.group(3);
 		final StringBuilder pattern = new StringBuilder();
 		
-		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<>(); //Mirre
+		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<Argument<?>>(); //Mirre
 		m = argumentPattern.matcher(arguments);
 		int lastEnd = 0;
 		int optionals = 0;
@@ -381,7 +383,7 @@ public abstract class Commands {
 				return null;
 			}
 			
-			final Argument<?> arg = Argument.newInstance(scriptParser, m.group(1), c, m.group(3), i, !p.getSecond(), optionals > 0);
+			final Argument<?> arg = Argument.newInstance(m.group(1), c, m.group(3), i, !p.getSecond(), optionals > 0);
 			if (arg == null)
 				return null;
 			currentArguments.add(arg);
@@ -401,7 +403,7 @@ public abstract class Commands {
 		
 		String desc = "/" + command + " ";
 		final boolean wasLocal = Language.setUseLocal(true); // use localised class names in description
-		try { // TODO see if this works with multithreaded parser..
+		try {
 			desc += StringUtils.replaceAll(pattern, "(?<!\\\\)%-?(.+?)%", new Callback<String, Matcher>() {
 				@Override
 				public String run(final @Nullable Matcher m) {
@@ -422,19 +424,19 @@ public abstract class Commands {
 		if (!(node.get("trigger") instanceof SectionNode))
 			return null;
 		
-		final String usage = scriptParser.replaceOptions(node.get("usage", desc));
-		final String description = scriptParser.replaceOptions(node.get("description", ""));
-		ArrayList<String> aliases = new ArrayList<>(Arrays.asList(scriptParser.replaceOptions(node.get("aliases", "")).split("\\s*,\\s*/?")));
+		final String usage = ScriptLoader.replaceOptions(node.get("usage", desc));
+		final String description = ScriptLoader.replaceOptions(node.get("description", ""));
+		ArrayList<String> aliases = new ArrayList<String>(Arrays.asList(ScriptLoader.replaceOptions(node.get("aliases", "")).split("\\s*,\\s*/?")));
 		if (aliases.get(0).startsWith("/"))
 			aliases.set(0, aliases.get(0).substring(1));
 		else if (aliases.get(0).isEmpty())
-			aliases = new ArrayList<>(0);
-		final String permission = scriptParser.replaceOptions(node.get("permission", ""));
-		final String permissionMessage = scriptParser.replaceOptions(node.get("permission message", ""));
+			aliases = new ArrayList<String>(0);
+		final String permission = ScriptLoader.replaceOptions(node.get("permission", ""));
+		final String permissionMessage = ScriptLoader.replaceOptions(node.get("permission message", ""));
 		final SectionNode trigger = (SectionNode) node.get("trigger");
 		if (trigger == null)
 			return null;
-		final String[] by = scriptParser.replaceOptions(node.get("executable by", "console,players")).split("\\s*,\\s*|\\s+(and|or)\\s+");
+		final String[] by = ScriptLoader.replaceOptions(node.get("executable by", "console,players")).split("\\s*,\\s*|\\s+(and|or)\\s+");
 		int executableBy = 0;
 		for (final String b : by) {
 			if (b.equalsIgnoreCase("console") || b.equalsIgnoreCase("the console")) {
@@ -462,11 +464,11 @@ public abstract class Commands {
 		Commands.currentArguments = currentArguments;
 		final ScriptCommand c;
 		try {
-			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage, aliases, permission, permissionMessage, executableBy, scriptParser.loadItems(trigger));
+			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage, aliases, permission, permissionMessage, executableBy, ScriptLoader.loadItems(trigger));
 		} finally {
 			Commands.currentArguments = null;
 		}	
-		//registerCommand(c); // Register nothing since this is not from main thread... Thread safety
+		registerCommand(c);
 		
 		if (Skript.logVeryHigh() && !Skript.debug())
 			Skript.info("registered command " + desc);

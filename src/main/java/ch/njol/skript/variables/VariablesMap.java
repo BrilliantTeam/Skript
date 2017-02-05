@@ -72,8 +72,8 @@ final class VariablesMap {
 		}
 	};
 	
-	final HashMap<String, Object> hashMap = new HashMap<>();
-	final TreeMap<String, Object> treeMap = new TreeMap<>();
+	final HashMap<String, Object> hashMap = new HashMap<String, Object>();
+	final TreeMap<String, Object> treeMap = new TreeMap<String, Object>();
 	
 	/**
 	 * Returns the internal value of the requested variable.
@@ -137,7 +137,7 @@ final class VariablesMap {
 						parent.put(n, value);
 					break;
 				} else if (value != null) {
-					parent.put(n, current = new TreeMap<>(variableNameComparator));
+					parent.put(n, current = new TreeMap<String, Object>(variableNameComparator));
 					parent = (TreeMap<String, Object>) current;
 					continue;
 				} else {
@@ -171,7 +171,7 @@ final class VariablesMap {
 						parent.put(n, value);
 					break;
 				} else if (value != null) {
-					final TreeMap<String, Object> c = new TreeMap<>(variableNameComparator);
+					final TreeMap<String, Object> c = new TreeMap<String, Object>(variableNameComparator);
 					c.put(null, current);
 					parent.put(n, c);
 					parent = c;

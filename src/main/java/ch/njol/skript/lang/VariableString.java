@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
@@ -43,7 +42,6 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.config.Config;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Noun;
@@ -85,37 +83,33 @@ public class VariableString implements Expression<String> {
 	private final String simple;
 	private final StringMode mode;
 	
-	private final ParserInstance pi;
-	
-	private VariableString(final String s, final ParserInstance pi) {
+	private VariableString(final String s) {
 		isSimple = true;
 		simple = s;
 		
 		orig = s;
 		string = null;
 		mode = StringMode.MESSAGE;
-		this.pi = pi;
 	}
 	
-	private VariableString(final String orig, final Object[] string, final StringMode mode, final ParserInstance pi) {
+	private VariableString(final String orig, final Object[] string, final StringMode mode) {
 		this.orig = orig;
 		this.string = string;
 		this.mode = mode;
 		
 		isSimple = false;
 		simple = null;
-		this.pi = pi;
 	}
 	
 	/**
 	 * Prints errors
 	 */
 	@Nullable
-	public static VariableString newInstance(final ParserInstance pi, final String s) {
-		return newInstance(pi, s, StringMode.MESSAGE);
+	public static VariableString newInstance(final String s) {
+		return newInstance(s, StringMode.MESSAGE);
 	}
 	
-	public final static Map<String, Pattern> variableNames = new ConcurrentHashMap<>(); // Concurrent since https://github.com/bensku/Skript/issues/232
+	public final static Map<String, Pattern> variableNames = new HashMap<String, Pattern>();
 	
 	/**
 	 * Tests whether a string is correctly quoted, i.e. only has doubled double quotes in it.
@@ -161,7 +155,7 @@ public class VariableString implements Expression<String> {
 	 * @return A new VariableString instance
 	 */
 	@Nullable
-	public static VariableString newInstance(final ParserInstance pi, final String orig, final StringMode mode) {
+	public static VariableString newInstance(final String orig, final StringMode mode) {
 		if (!isQuotedCorrectly(orig, false))
 			return null;
 		final int n = StringUtils.count(orig, '%');
@@ -170,7 +164,7 @@ public class VariableString implements Expression<String> {
 			return null;
 		}
 		final String s = Utils.replaceChatStyles("" + orig.replace("\"\"", "\""));
-		final ArrayList<Object> string = new ArrayList<>(n / 2 + 2);
+		final ArrayList<Object> string = new ArrayList<Object>(n / 2 + 2);
 		int c = s.indexOf('%');
 		if (c != -1) {
 			if (c != 0)
@@ -200,7 +194,7 @@ public class VariableString implements Expression<String> {
 					final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 					try {
 						@SuppressWarnings("unchecked")
-						final Expression<?> expr = new SkriptParser(pi, "" + s.substring(c + 1, c2), SkriptParser.PARSE_EXPRESSIONS, ParseContext.DEFAULT).parseExpression(Object.class);
+						final Expression<?> expr = new SkriptParser("" + s.substring(c + 1, c2), SkriptParser.PARSE_EXPRESSIONS, ParseContext.DEFAULT).parseExpression(Object.class);
 						if (expr == null) {
 							log.printErrors("Can't understand this expression: " + s.substring(c + 1, c2));
 							return null;
@@ -257,10 +251,10 @@ public class VariableString implements Expression<String> {
 		checkVariableConflicts(s, mode, string);
 		
 		if (string.size() == 1 && string.get(0) instanceof String)
-			return new VariableString("" + string.get(0), pi);
+			return new VariableString("" + string.get(0));
 		final Object[] sa = string.toArray();
 		assert sa != null;
-		return new VariableString(orig, sa, mode, pi);
+		return new VariableString(orig, sa, mode);
 	}
 	
 	private static void checkVariableConflicts(final String name, final StringMode mode, final @Nullable Iterable<Object> string) {
@@ -325,11 +319,11 @@ public class VariableString implements Expression<String> {
 		return -1;
 	}
 	
-	public static VariableString[] makeStrings(final String[] args, final ParserInstance pi) {
+	public static VariableString[] makeStrings(final String[] args) {
 		VariableString[] strings = new VariableString[args.length];
 		int j = 0;
 		for (int i = 0; i < args.length; i++) {
-			final VariableString vs = newInstance(pi, "" + args[i]);
+			final VariableString vs = newInstance("" + args[i]);
 			if (vs != null)
 				strings[j++] = vs;
 		}
@@ -344,11 +338,11 @@ public class VariableString implements Expression<String> {
 	 * @return a new array containing all newly created VariableStrings, or null if one is invalid
 	 */
 	@Nullable
-	public static VariableString[] makeStringsFromQuoted(final List<String> args, final ParserInstance pi) {
+	public static VariableString[] makeStringsFromQuoted(final List<String> args) {
 		final VariableString[] strings = new VariableString[args.size()];
 		for (int i = 0; i < args.size(); i++) {
 			assert args.get(i).startsWith("\"") && args.get(i).endsWith("\"");
-			final VariableString vs = newInstance(pi, "" + args.get(i).substring(1, args.get(i).length() - 1));
+			final VariableString vs = newInstance("" + args.get(i).substring(1, args.get(i).length() - 1));
 			if (vs == null)
 				return null;
 			strings[i] = vs;
@@ -468,7 +462,7 @@ public class VariableString implements Expression<String> {
 			return this;
 		final BlockingLogHandler h = SkriptLogger.startLogHandler(new BlockingLogHandler());
 		try {
-			final VariableString vs = newInstance(pi, orig, mode);
+			final VariableString vs = newInstance(orig, mode);
 			if (vs == null) {
 				assert false : this + "; " + mode;
 				return this;
@@ -561,7 +555,7 @@ public class VariableString implements Expression<String> {
 	
 	@Override
 	public Iterator<? extends String> iterator(final Event e) {
-		return new SingleItemIterator<>(toString(e));
+		return new SingleItemIterator<String>(toString(e));
 	}
 	
 	@Override

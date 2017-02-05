@@ -118,7 +118,7 @@ public class ExprParse extends SimpleExpression<Object> {
 				}
 			}
 			pattern = "" + b.toString();
-			final NonNullPair<String, boolean[]> p = SkriptParser.validatePattern(pi, pattern);
+			final NonNullPair<String, boolean[]> p = SkriptParser.validatePattern(pattern);
 			if (p == null)
 				return false;
 			this.pattern = p.getFirst();

@@ -45,7 +45,7 @@ public abstract class Converters {
 	
 	private Converters() {}
 	
-	private static List<ConverterInfo<?, ?>> converters = new ArrayList<>(50);
+	private static List<ConverterInfo<?, ?>> converters = new ArrayList<ConverterInfo<?, ?>>(50);
 	
 	@SuppressWarnings("null")
 	public static List<ConverterInfo<?, ?>> getConverters() {
@@ -70,7 +70,7 @@ public abstract class Converters {
 	
 	public static <F, T> void registerConverter(final Class<F> from, final Class<T> to, final Converter<F, T> converter, final int options) {
 		Skript.checkAcceptRegistrations();
-		final ConverterInfo<F, T> info = new ConverterInfo<>(from, to, converter, options);
+		final ConverterInfo<F, T> info = new ConverterInfo<F, T>(from, to, converter, options);
 		for (int i = 0; i < converters.size(); i++) {
 			final ConverterInfo<?, ?> info2 = converters.get(i);
 			if (info2.from.isAssignableFrom(from) && to.isAssignableFrom(info2.to)) {
@@ -114,7 +114,7 @@ public abstract class Converters {
 	
 	@SuppressWarnings("unchecked")
 	private static <F, M, T> ConverterInfo<F, T> createChainedConverter(final ConverterInfo<?, ?> first, final ConverterInfo<?, ?> second) {
-		return new ConverterInfo<>((Class<F>) first.from, (Class<T>) second.to, new ChainedConverter<>((Converter<F, M>) first.converter, (Converter<M, T>) second.converter), first.options | second.options);
+		return new ConverterInfo<F, T>((Class<F>) first.from, (Class<T>) second.to, new ChainedConverter<F, M, T>((Converter<F, M>) first.converter, (Converter<M, T>) second.converter), first.options | second.options);
 	}
 	
 	/**
@@ -182,7 +182,7 @@ public abstract class Converters {
 			return null;
 		if (to.isAssignableFrom(o.getClass().getComponentType()))
 			return (T[]) o;
-		final List<T> l = new ArrayList<>(o.length);
+		final List<T> l = new ArrayList<T>(o.length);
 		for (final Object e : o) {
 			final T c = convert(e, to);
 			if (c != null)
@@ -209,7 +209,7 @@ public abstract class Converters {
 		for (final Class<? extends T> t : to)
 			if (t.isAssignableFrom(o.getClass().getComponentType()))
 				return (T[]) o;
-		final List<T> l = new ArrayList<>(o.length);
+		final List<T> l = new ArrayList<T>(o.length);
 		for (final Object e : o) {
 			final T c = convert(e, to);
 			if (c != null)
@@ -220,7 +220,7 @@ public abstract class Converters {
 		return r;
 	}
 	
-	private final static Map<Pair<Class<?>, Class<?>>, Converter<?, ?>> convertersCache = new HashMap<>();
+	private final static Map<Pair<Class<?>, Class<?>>, Converter<?, ?>> convertersCache = new HashMap<Pair<Class<?>, Class<?>>, Converter<?, ?>>();
 	
 	/**
 	 * Tests whether a converter between the given classes exists.
@@ -254,7 +254,7 @@ public abstract class Converters {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final static <F, T> Converter<? super F, ? extends T> getConverter(final Class<F> from, final Class<T> to) {
-		final Pair<Class<?>, Class<?>> p = new Pair<>(from, to);
+		final Pair<Class<?>, Class<?>> p = new Pair<Class<?>, Class<?>>(from, to);
 		if (convertersCache.containsKey(p)) // can contain null to denote nonexistence of a converter
 			return (Converter<? super F, ? extends T>) convertersCache.get(p);
 		final Converter<? super F, ? extends T> c = getConverter_i(from, to);

@@ -69,8 +69,8 @@ public abstract class Aliases {
 	/**
 	 * Note to self: never use this, use {@link #getAlias_i(String)} instead.
 	 */
-	private final static HashMap<String, ItemType> aliases_english = new HashMap<>(10000);
-	private final static HashMap<String, ItemType> aliases_localised = new HashMap<>(1000);
+	private final static HashMap<String, ItemType> aliases_english = new HashMap<String, ItemType>(10000);
+	private final static HashMap<String, ItemType> aliases_localised = new HashMap<String, ItemType>(1000);
 	
 	private final static HashMap<String, ItemType> getAliases() {
 		return Language.isUsingLocal() ? aliases_localised : aliases_english;
@@ -84,8 +84,8 @@ public abstract class Aliases {
 		return getAliases().get(s);
 	}
 	
-	private final static HashMap<Integer, MaterialName> materialNames_english = new HashMap<>(Material.values().length);
-	private final static HashMap<Integer, MaterialName> materialNames_localised = new HashMap<>(Material.values().length);
+	private final static HashMap<Integer, MaterialName> materialNames_english = new HashMap<Integer, MaterialName>(Material.values().length);
+	private final static HashMap<Integer, MaterialName> materialNames_localised = new HashMap<Integer, MaterialName>(Material.values().length);
 	
 	private final static HashMap<Integer, MaterialName> getMaterialNames() {
 		return Language.isUsingLocal() ? materialNames_localised : materialNames_english;
@@ -184,7 +184,7 @@ public abstract class Aliases {
 	 * @return A map containing all parsed aliases
 	 */
 	static LinkedHashMap<String, ItemType> getAliases(final String name, final ItemType value, final Variations variations) {
-		final LinkedHashMap<String, ItemType> r = new LinkedHashMap<>(); // LinkedHashMap to preserve order for item names
+		final LinkedHashMap<String, ItemType> r = new LinkedHashMap<String, ItemType>(); // LinkedHashMap to preserve order for item names
 		
 		if ((name.contains("potion") || name.contains("water bottle") || name.contains("bottle of water")) && newPotions) { // 1.9 new potions hack
 			return r;
@@ -415,7 +415,7 @@ public abstract class Aliases {
 					if (n == null)
 						materialNames.put(Integer.valueOf(d.getId()), n = new MaterialName(d.getId(), "" + d.getId(), "" + d.getId(), g.getSecond()));
 					@SuppressWarnings("null")
-					final NonNullPair<Short, Short> data = new NonNullPair<>(Short.valueOf(d.dataMin), Short.valueOf(d.dataMax));
+					final NonNullPair<Short, Short> data = new NonNullPair<Short, Short>(Short.valueOf(d.dataMin), Short.valueOf(d.dataMax));
 					n.names.put(data, p);
 				}
 			}
@@ -569,7 +569,7 @@ public abstract class Aliases {
 			}
 			if (t2.numTypes() == 0)
 				continue;
-			final Map<Enchantment, Integer> enchantments = new HashMap<>();
+			final Map<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>();
 			final String[] enchs = lc.substring(c + of.length(), lc.length()).split("\\s*(,|" + Pattern.quote(Language.get("and")) + ")\\s*");
 			for (final String ench : enchs) {
 				final EnchantmentType e = EnchantmentType.parse("" + ench);
@@ -610,7 +610,6 @@ public abstract class Aliases {
 			data = parseData("" + s.substring(c + 1));
 			if (data == null) {
 				Skript.error(m_invalid_item_data.toString(s.substring(c)));
-				//Thread.dumpStack();
 				return null;
 			}
 		}
@@ -770,7 +769,7 @@ public abstract class Aliases {
 					return;
 				}
 				
-				final ArrayList<String> aliasNodes = new ArrayList<>();
+				final ArrayList<String> aliasNodes = new ArrayList<String>();
 				
 				aliasConfig.validate(
 						new SectionValidator()
@@ -838,7 +837,7 @@ public abstract class Aliases {
 								Skript.error(m_unexpected_non_variation_section.toString());
 								continue;
 							}
-							final HashMap<String, ItemType> vs = new HashMap<>();
+							final HashMap<String, ItemType> vs = new HashMap<String, ItemType>();
 							for (final Node a : (SectionNode) n) {
 								if (a instanceof SectionNode) {
 									Skript.error(m_unexpected_section.toString());

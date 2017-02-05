@@ -77,13 +77,13 @@ public class ExprClicked extends SimpleExpression<Object> {
 		final Object type = exprs[0] == null ? null : ((Literal<?>) exprs[0]).getSingle();
 		if (type instanceof EntityData) {
 			entityType = (EntityData<?>) type;
-			if (!pi.isCurrentEvent(PlayerInteractEntityEvent.class) && !pi.isCurrentEvent(PlayerInteractAtEntityEvent.class)) {
+			if (!ScriptLoader.isCurrentEvent(PlayerInteractEntityEvent.class) && !ScriptLoader.isCurrentEvent(PlayerInteractAtEntityEvent.class)) {
 				Skript.error("The expression 'clicked entity' can only be used in a click event", ErrorQuality.SEMANTIC_ERROR);
 				return false;
 			}
 		} else {
 			itemType = (ItemType) type;
-			if (!pi.isCurrentEvent(PlayerInteractEvent.class)) {
+			if (!ScriptLoader.isCurrentEvent(PlayerInteractEvent.class)) {
 				Skript.error("The expression 'clicked block' can only be used in a click event", ErrorQuality.SEMANTIC_ERROR);
 				return false;
 			}

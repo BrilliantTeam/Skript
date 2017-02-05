@@ -42,40 +42,30 @@ public abstract class Statement extends TriggerItem implements SyntaxElement {
 	
 	@SuppressWarnings({"rawtypes", "unchecked", "null"})
 	@Nullable
-	public static Statement parse(final String s, final String defaultError, final ParserInstance pi) {
+	public static Statement parse(final String s, final String defaultError) {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
-			final EffFunctionCall f = EffFunctionCall.parse(s, pi);
+			final EffFunctionCall f = EffFunctionCall.parse(s);
 			if (f != null) {
 				log.printLog();
 				return f;
 			} else if (log.hasError()) {
-				log.submit(pi);
+				log.printError();
 				return null;
 			} else {
-				log.submit(pi);
+				log.printError();
 			}
 		} finally {
-			//log.stop();
+			log.stop();
 		}
-		return (Statement) SkriptParser.parse(pi, s, (Iterator) Skript.getStatements().iterator(), defaultError);
+		return (Statement) SkriptParser.parse(s, (Iterator) Skript.getStatements().iterator(), defaultError);
 	}
-	
-	@Nullable
-	public static Statement parse(final String s, final String defaultError) {
-		return parse(s, defaultError, ParserInstance.DUMMY);
-	}
-	
+
 	/**
 	 * Parser instance which is being used or was used to parse this element.
 	 * Note that this variable is naturally not used for static methods.
 	 */
 	@SuppressWarnings("null")
 	protected ParserInstance pi;
-	
-	@Override
-	public void setParserInstance(ParserInstance pi) {
-		this.pi = pi;
-	}
 	
 }

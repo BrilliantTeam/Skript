@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +40,6 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
@@ -55,9 +53,9 @@ import ch.njol.util.StringUtils;
 public abstract class Functions {
 	private Functions() {}
 	
-	public static class FunctionData {
+	final static class FunctionData {
 		final Function<?> function;
-		final Collection<FunctionReference<?>> calls = new ArrayList<>();
+		final Collection<FunctionReference<?>> calls = new ArrayList<FunctionReference<?>>();
 		
 		public FunctionData(final Function<?> function) {
 			this.function = function;
@@ -67,12 +65,12 @@ public abstract class Functions {
 	@Nullable
 	public static ScriptFunction<?> currentFunction = null;
 	
-	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<>();
-	public final static Map<String, FunctionData> functions = new HashMap<>();
-	final static Map<String, Signature<?>> javaSignatures = new HashMap<>();
-	final static Map<String, Signature<?>> signatures = new ConcurrentHashMap<>();
+	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<String, JavaFunction<?>>();
+	final static Map<String, FunctionData> functions = new HashMap<String, FunctionData>();
+	final static Map<String, Signature<?>> javaSignatures = new HashMap<String, Signature<?>>();
+	final static Map<String, Signature<?>> signatures = new HashMap<String, Signature<?>>();
 	
-	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<>();
+	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<FunctionReference<?>>();
 	
 	/**
 	 * @param function
@@ -111,7 +109,8 @@ public abstract class Functions {
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public final static Function<?> loadFunction(final SectionNode node, final ParserInstance pi) {
+	public final static Function<?> loadFunction(final SectionNode node) {
+		SkriptLogger.setNode(node);
 		final String definition = node.getKey();
 		assert definition != null;
 		final Matcher m = functionPattern.matcher(definition);
@@ -127,20 +126,19 @@ public abstract class Functions {
 			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")" + (c != null && p != null ? " :: " + Utils.toEnglishPlural(c.getCodeName(), p.getSecond()) : "") + ":");
 		
 		@SuppressWarnings("null")
-		final Function<?> f = new ScriptFunction<>(pi, name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
+		final Function<?> f = new ScriptFunction<Object>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
 //		functions.put(name, new FunctionData(f)); // in constructor
 		return f;
 	}
 	
 	/**
-	 * Loads the signature of function from given node. Can be called asynchronously.
+	 * Loads the signature of function from given node.
 	 * @param script Script file name (<b>might</b> be used for some checks).
 	 * @param node Section node.
-	 * @param pi Parser instance (for logging).
 	 * @return Signature of function, or null if something went wrong.
 	 */
 	@Nullable
-	public static Signature<?> loadSignature(final String script, final SectionNode node, final ParserInstance pi) {
+	public static Signature<?> loadSignature(String script, final SectionNode node) {
 		SkriptLogger.setNode(node);
 		final String definition = node.getKey();
 		assert definition != null;
@@ -150,7 +148,7 @@ public abstract class Functions {
 		final String name = "" + m.group(1); // TODO check for name uniqueness (currently functions with same name silently override each other)
 		final String args = m.group(2);
 		final String returnType = m.group(3);
-		final List<Parameter<?>> params = new ArrayList<>();
+		final List<Parameter<?>> params = new ArrayList<Parameter<?>>();
 		int j = 0;
 		for (int i = 0; i <= args.length(); i = SkriptParser.next(args, i, ParseContext.DEFAULT)) {
 			if (i == -1)
@@ -172,7 +170,7 @@ public abstract class Functions {
 					c = Classes.getClassInfoFromUserInput(pl.getFirst());
 				if (c == null)
 					return signError("Cannot recognise the type '" + n.group(2) + "'");
-				final Parameter<?> p = Parameter.newInstance(pi, paramName, c, !pl.getSecond(), n.group(3));
+				final Parameter<?> p = Parameter.newInstance(paramName, c, !pl.getSecond(), n.group(3));
 				if (p == null)
 					return null;
 				params.add(p);
@@ -198,9 +196,8 @@ public abstract class Functions {
 		}
 		
 		@SuppressWarnings("unchecked")
-		Signature<?> sign = new Signature<>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
+		Signature<?> sign = new Signature<Object>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
 		Functions.signatures.put(name, sign);
-		Skript.debug("Loaded function signature for " + name);
 		return sign;
 	}
 	
@@ -251,7 +248,7 @@ public abstract class Functions {
 		return signatures.get(name);
 	}
 	
-	private final static Collection<FunctionReference<?>> toValidate = new ArrayList<>();
+	private final static Collection<FunctionReference<?>> toValidate = new ArrayList<FunctionReference<?>>();
 	
 	/**
 	 * Remember to call {@link #validateFunctions()} after calling this

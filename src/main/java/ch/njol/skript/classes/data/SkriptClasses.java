@@ -864,7 +864,7 @@ public class SkriptClasses {
 					@Override
 					@Nullable
 					public VisualEffect parse(final String s, final ParseContext context, final ParserInstance pi) {
-						return VisualEffect.parse(s, pi);
+						return VisualEffect.parse(s);
 					}
 					
 					@Override

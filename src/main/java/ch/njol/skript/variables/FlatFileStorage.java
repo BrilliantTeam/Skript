@@ -43,7 +43,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.Variable;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.ExceptionUtils;
@@ -68,7 +67,7 @@ public class FlatFileStorage extends VariablesStorage {
 	/**
 	 * A Lock on this object must be acquired after connectionLock (if that lock is used) (and thus also after {@link Variables#getReadLock()}).
 	 */
-	private final NotifyingReference<PrintWriter> changesWriter = new NotifyingReference<>();
+	private final NotifyingReference<PrintWriter> changesWriter = new NotifyingReference<PrintWriter>();
 	
 	private volatile boolean loaded = false;
 	
@@ -89,7 +88,7 @@ public class FlatFileStorage extends VariablesStorage {
 	 */
 	@SuppressWarnings({"deprecation"})
 	@Override
-	protected boolean load_i(final SectionNode n, final ParserInstance pi) {
+	protected boolean load_i(final SectionNode n) {
 		SkriptLogger.setNode(null);
 		
 		IOException ioEx = null;
@@ -253,7 +252,7 @@ public class FlatFileStorage extends VariablesStorage {
 	final static String[] splitCSV(final String line) {
 		final Matcher m = csv.matcher(line);
 		int lastEnd = 0;
-		final ArrayList<String> r = new ArrayList<>();
+		final ArrayList<String> r = new ArrayList<String>();
 		while (m.find()) {
 			if (lastEnd != m.start())
 				return null;

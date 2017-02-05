@@ -74,7 +74,7 @@ public class EffExit extends Effect { // TODO [code style] warn user about code 
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		switch (matchedPattern) {
 			case 0:
-				breakLevels = pi.currentSections.size() + 1;
+				breakLevels = ScriptLoader.currentSections.size() + 1;
 				type = EVERYTHING;
 				break;
 			case 1:
@@ -103,9 +103,9 @@ public class EffExit extends Effect { // TODO [code style] warn user about code 
 	
 	private final static int numLevels(final int type, final ParserInstance pi) {
 		if (type == EVERYTHING)
-			return pi.currentSections.size();
+			return ScriptLoader.currentSections.size();
 		int r = 0;
-		for (final TriggerSection s : pi.currentSections) {
+		for (final TriggerSection s : ScriptLoader.currentSections) {
 			if (type == CONDITIONALS ? s instanceof Conditional : s instanceof Loop || s instanceof While)
 				r++;
 		}

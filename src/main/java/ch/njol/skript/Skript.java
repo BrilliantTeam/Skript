@@ -314,7 +314,7 @@ public final class Skript extends JavaPlugin implements Listener {
 				try {
 					final JarFile jar = new JarFile(getFile());
 					try {
-						for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
+						for (final JarEntry e : new EnumerationIterable<JarEntry>(jar.entries())) {
 							if (e.getName().startsWith("ch/njol/skript/hooks/") && e.getName().endsWith("Hook.class") && StringUtils.count("" + e.getName(), '/') <= 5) {
 								final String c = e.getName().replace('/', '.').substring(0, e.getName().length() - ".class".length());
 								try {
@@ -403,9 +403,7 @@ public final class Skript extends JavaPlugin implements Listener {
 				if (logNormal())
 					info("Loaded " + Variables.numVariables() + " variables in " + ((vld / 100) / 10.) + " seconds");
 				
-				CommandSender console = Bukkit.getConsoleSender();
-				assert console != null;
-				ScriptLoader.loadScripts(console);
+				ScriptLoader.loadScripts();
 				
 				Skript.info(m_finished_loading.toString());
 				
@@ -681,19 +679,19 @@ public final class Skript extends JavaPlugin implements Listener {
 	/**
 	 * Prints errors from reloading the config & scripts
 	 */
-	final static void reload(final CommandSender viewer) {
+	final static void reload() {
 		disableScripts();
 		reloadMainConfig();
 		reloadAliases();
-		ScriptLoader.loadScripts(viewer);
+		ScriptLoader.loadScripts();
 	}
 	
 	/**
 	 * Prints errors
 	 */
-	final static void reloadScripts(final CommandSender viewer) {
+	final static void reloadScripts() {
 		disableScripts();
-		ScriptLoader.loadScripts(viewer);
+		ScriptLoader.loadScripts();
 	}
 	
 	/**
@@ -759,7 +757,7 @@ public final class Skript extends JavaPlugin implements Listener {
 					modifiers.setAccessible(true);
 					final JarFile jar = new JarFile(getFile());
 					try {
-						for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
+						for (final JarEntry e : new EnumerationIterable<JarEntry>(jar.entries())) {
 							if (e.getName().endsWith(".class")) {
 								try {
 									final Class<?> c = Class.forName(e.getName().replace('/', '.').substring(0, e.getName().length() - ".class".length()), false, getClassLoader());
@@ -884,7 +882,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ ADDONS ================
 	
-	private final static HashMap<String, SkriptAddon> addons = new HashMap<>();
+	private final static HashMap<String, SkriptAddon> addons = new HashMap<String, SkriptAddon>();
 	
 	/**
 	 * Registers an addon to Skript. This is currently not required for addons to work, but the returned {@link SkriptAddon} provides useful methods for registering syntax elements
@@ -933,9 +931,9 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ CONDITIONS & EFFECTS ================
 	
-	private final static Collection<SyntaxElementInfo<? extends Condition>> conditions = new ArrayList<>(50);
-	private final static Collection<SyntaxElementInfo<? extends Effect>> effects = new ArrayList<>(50);
-	private final static Collection<SyntaxElementInfo<? extends Statement>> statements = new ArrayList<>(100);
+	private final static Collection<SyntaxElementInfo<? extends Condition>> conditions = new ArrayList<SyntaxElementInfo<? extends Condition>>(50);
+	private final static Collection<SyntaxElementInfo<? extends Effect>> effects = new ArrayList<SyntaxElementInfo<? extends Effect>>(50);
+	private final static Collection<SyntaxElementInfo<? extends Statement>> statements = new ArrayList<SyntaxElementInfo<? extends Statement>>(100);
 	
 	/**
 	 * registers a {@link Condition}.
@@ -945,7 +943,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	 */
 	public static <E extends Condition> void registerCondition(final Class<E> condition, final String... patterns) throws IllegalArgumentException {
 		checkAcceptRegistrations();
-		final SyntaxElementInfo<E> info = new SyntaxElementInfo<>(patterns, condition);
+		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(patterns, condition);
 		conditions.add(info);
 		statements.add(info);
 	}
@@ -958,7 +956,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	 */
 	public static <E extends Effect> void registerEffect(final Class<E> effect, final String... patterns) throws IllegalArgumentException {
 		checkAcceptRegistrations();
-		final SyntaxElementInfo<E> info = new SyntaxElementInfo<>(patterns, effect);
+		final SyntaxElementInfo<E> info = new SyntaxElementInfo<E>(patterns, effect);
 		effects.add(info);
 		statements.add(info);
 	}
@@ -977,7 +975,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ EXPRESSIONS ================
 	
-	private final static List<ExpressionInfo<?, ?>> expressions = new ArrayList<>(100);
+	private final static List<ExpressionInfo<?, ?>> expressions = new ArrayList<ExpressionInfo<?, ?>>(100);
 	
 	private final static int[] expressionTypesStartIndices = new int[ExpressionType.values().length];
 	
@@ -994,7 +992,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		checkAcceptRegistrations();
 		if (returnType.isAnnotation() || returnType.isArray() || returnType.isPrimitive())
 			throw new IllegalArgumentException("returnType must be a normal type");
-		final ExpressionInfo<E, T> info = new ExpressionInfo<>(patterns, returnType, c);
+		final ExpressionInfo<E, T> info = new ExpressionInfo<E, T>(patterns, returnType, c);
 		for (int i = type.ordinal() + 1; i < ExpressionType.values().length; i++) {
 			expressionTypesStartIndices[i]++;
 		}
@@ -1007,7 +1005,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	}
 	
 	public static Iterator<ExpressionInfo<?, ?>> getExpressions(final Class<?>... returnTypes) {
-		return new CheckedIterator<>(getExpressions(), new NullableChecker<ExpressionInfo<?, ?>>() {
+		return new CheckedIterator<ExpressionInfo<?, ?>>(getExpressions(), new NullableChecker<ExpressionInfo<?, ?>>() {
 			@Override
 			public boolean check(final @Nullable ExpressionInfo<?, ?> i) {
 				if (i == null || i.returnType == Object.class)
@@ -1024,7 +1022,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ EVENTS ================
 	
-	private final static Collection<SkriptEventInfo<?>> events = new ArrayList<>(50);
+	private final static Collection<SkriptEventInfo<?>> events = new ArrayList<SkriptEventInfo<?>>(50);
 	
 	/**
 	 * Registers an event.
@@ -1039,7 +1037,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	@SuppressWarnings({"unchecked"})
 	public static <E extends SkriptEvent> SkriptEventInfo<E> registerEvent(final String name, final Class<E> c, final Class<? extends Event> event, final String... patterns) {
 		checkAcceptRegistrations();
-		final SkriptEventInfo<E> r = new SkriptEventInfo<>(name, patterns, c, CollectionUtils.array(event));
+		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, patterns, c, CollectionUtils.array(event));
 		events.add(r);
 		return r;
 	}
@@ -1055,7 +1053,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	 */
 	public static <E extends SkriptEvent> SkriptEventInfo<E> registerEvent(final String name, final Class<E> c, final Class<? extends Event>[] events, final String... patterns) {
 		checkAcceptRegistrations();
-		final SkriptEventInfo<E> r = new SkriptEventInfo<>(name, patterns, c, events);
+		final SkriptEventInfo<E> r = new SkriptEventInfo<E>(name, patterns, c, events);
 		Skript.events.add(r);
 		return r;
 	}

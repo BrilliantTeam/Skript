@@ -52,7 +52,6 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxElement;
 import ch.njol.skript.lang.SyntaxElementInfo;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Adjective;
 import ch.njol.skript.localization.Language;
@@ -79,7 +78,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 			m_adult = new Adjective(LANGUAGE_NODE + ".age adjectives.adult");
 	
 	// must be here to be initialised before 'new SimpleLiteral' is called in the register block below
-	private final static List<EntityDataInfo<?>> infos = new ArrayList<>();
+	private final static List<EntityDataInfo<?>> infos = new ArrayList<EntityDataInfo<?>>();
 	
 	public static Serializer<EntityData> serializer = new Serializer<EntityData>() {
 		@Override
@@ -150,7 +149,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	};
 	
 	static {
-		Classes.registerClass(new ClassInfo<>(EntityData.class, "entitydata")
+		Classes.registerClass(new ClassInfo<EntityData>(EntityData.class, "entitydata")
 				.user("entity ?types?")
 				.name("Entity Type")
 				.description("The type of an <a href='#entity'>entity</a>, e.g. player, wolf, powered creeper, etc.")
@@ -168,8 +167,8 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 					
 					@Override
 					@Nullable
-					public EntityData parse(final String s, final ParseContext context, final ParserInstance pi) {
-						return EntityData.parse(s, pi);
+					public EntityData parse(final String s, final ParseContext context) {
+						return EntityData.parse(s);
 					}
 					
 					@Override
@@ -244,8 +243,8 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		register(dataClass, codeName, entityClass, 0, codeName);
 	}
 	
-	public static <E extends Entity, T extends EntityData<E>> void register(final Class<? extends T> dataClass, final String name, final Class<E> entityClass, final int defaultName, final String... codeNames) throws IllegalArgumentException {
-		final EntityDataInfo<? extends T> info = new EntityDataInfo<>(dataClass, name, codeNames, defaultName, entityClass);
+	public static <E extends Entity, T extends EntityData<E>> void register(final Class<T> dataClass, final String name, final Class<E> entityClass, final int defaultName, final String... codeNames) throws IllegalArgumentException {
+		final EntityDataInfo<T> info = new EntityDataInfo<T>(dataClass, name, codeNames, defaultName, entityClass);
 		for (int i = 0; i < infos.size(); i++) {
 			if (infos.get(i).entityClass.isAssignableFrom(entityClass)) {
 				infos.add(i, info);
@@ -396,9 +395,9 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 */
 	@SuppressWarnings("null")
 	@Nullable
-	public final static EntityData<?> parse(final String s, final ParserInstance pi) {
+	public final static EntityData<?> parse(final String s) {
 		final Iterator<? extends SyntaxElementInfo<?>> it = infos.iterator();
-		return (EntityData<?>) SkriptParser.parseStatic(pi, Noun.stripIndefiniteArticle(s), it, null);
+		return (EntityData<?>) SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), it, null);
 	}
 	
 	/**
@@ -409,9 +408,9 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 */
 	@SuppressWarnings("null")
 	@Nullable
-	public final static EntityData<?> parseWithoutIndefiniteArticle(final String s, final ParserInstance pi) {
+	public final static EntityData<?> parseWithoutIndefiniteArticle(final String s) {
 		final Iterator<? extends SyntaxElementInfo<?>> it = infos.iterator();
-		return (EntityData<?>) SkriptParser.parseStatic(pi, s, it, null);
+		return (EntityData<?>) SkriptParser.parseStatic(s, it, null);
 	}
 	
 	@Nullable
@@ -448,7 +447,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	@SuppressWarnings({"null", "unchecked"})
 	public E[] getAll(final World... worlds) {
 		assert worlds != null && worlds.length > 0 : Arrays.toString(worlds);
-		final List<E> list = new ArrayList<>();
+		final List<E> list = new ArrayList<E>();
 		for (final World w : worlds) {
 			for (final E e : w.getEntitiesByClass(getType()))
 				if (match(e))
@@ -469,7 +468,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		if (type == Player.class) {
 			if (worlds == null && types.length == 1 && types[0] instanceof PlayerData && ((PlayerData) types[0]).op == 0)
 				return (E[]) PlayerUtils.getOnlinePlayers().toArray(new Player[0]);
-			final List<Player> list = new ArrayList<>();
+			final List<Player> list = new ArrayList<Player>();
 			for (final Player p : PlayerUtils.getOnlinePlayers()) {
 				if (worlds != null && !CollectionUtils.contains(worlds, p.getWorld()))
 					continue;
@@ -482,7 +481,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 			}
 			return (E[]) list.toArray(new Player[list.size()]);
 		}
-		final List<E> list = new ArrayList<>();
+		final List<E> list = new ArrayList<E>();
 		if (worlds == null)
 			worlds = Bukkit.getWorlds().toArray(new World[0]);
 		for (final World w : worlds) {

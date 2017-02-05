@@ -138,12 +138,12 @@ public class SkriptCommand implements CommandExecutor {
 			if (args[0].equalsIgnoreCase("reload")) {
 				if (args[1].equalsIgnoreCase("all")) {
 					reloading(sender, "config and scripts");
-					Skript.reload(sender);
-					reloaded(sender, r, "main config"); // Scripts are reloaded asynchronously...
+					Skript.reload();
+					reloaded(sender, r, "config and scripts");
 				} else if (args[1].equalsIgnoreCase("scripts")) {
 					reloading(sender, "scripts");
-					Skript.reloadScripts(sender);
-					//reloaded(sender, r, "scripts");
+					Skript.reloadScripts();
+					reloaded(sender, r, "scripts");
 				} else if (args[1].equalsIgnoreCase("config")) {
 					reloading(sender, "main config");
 					Skript.reloadMainConfig();
@@ -163,16 +163,18 @@ public class SkriptCommand implements CommandExecutor {
 						}
 						reloading(sender, "script", f.getName());
 						ScriptLoader.unloadScript(f);
-						ScriptLoader.loadScripts(new File[] {f}, sender);
-						//reloaded(sender, r, "script", f.getName());
+						ScriptLoader.loadStructures(new File[] {f});
+						ScriptLoader.loadScripts(new File[] {f});
+						reloaded(sender, r, "script", f.getName());
 					} else {
 						reloading(sender, "scripts in folder", f.getName());
 						final int disabled = ScriptLoader.unloadScripts(f).files;
-						final int enabled = ScriptLoader.loadScripts(f, sender).files;
+						ScriptLoader.loadStructures(f);
+						final int enabled = ScriptLoader.loadScripts(f).files;
 						if (Math.max(disabled, enabled) == 0)
 							info(sender, "reload.empty folder", f.getName());
-						//else
-						//	reloaded(sender, r, "x scripts in folder", f.getName(), Math.max(disabled, enabled));
+						else
+							reloaded(sender, r, "x scripts in folder", f.getName(), Math.max(disabled, enabled));
 					}
 				}
 			} else if (args[0].equalsIgnoreCase("enable")) {
@@ -181,7 +183,8 @@ public class SkriptCommand implements CommandExecutor {
 						info(sender, "enable.all.enabling");
 						final File[] files = toggleScripts(new File(Skript.getInstance().getDataFolder(), Skript.SCRIPTSFOLDER), true).toArray(new File[0]);
 						assert files != null;
-						ScriptLoader.loadScripts(files, sender);
+						ScriptLoader.loadStructures(files);
+						ScriptLoader.loadScripts(files);
 						if (r.numErrors() == 0) {
 							info(sender, "enable.all.enabled");
 						} else {
@@ -208,7 +211,8 @@ public class SkriptCommand implements CommandExecutor {
 						}
 						
 						info(sender, "enable.single.enabling", f.getName());
-						ScriptLoader.loadScripts(new File[] {f}, sender);
+						ScriptLoader.loadStructures(new File[] {f});
+						ScriptLoader.loadScripts(new File[] {f});
 						if (r.numErrors() == 0) {
 							info(sender, "enable.single.enabled", f.getName());
 						} else {
@@ -231,7 +235,8 @@ public class SkriptCommand implements CommandExecutor {
 						final File[] ss = scripts.toArray(new File[scripts.size()]);
 						assert ss != null;
 						
-						final ScriptInfo i = ScriptLoader.loadScripts(ss, sender);
+						ScriptLoader.loadStructures(ss);
+						final ScriptInfo i = ScriptLoader.loadScripts(ss);
 						assert i.files == scripts.size();
 						if (r.numErrors() == 0) {
 							info(sender, "enable.folder.enabled", f.getName(), i.files);

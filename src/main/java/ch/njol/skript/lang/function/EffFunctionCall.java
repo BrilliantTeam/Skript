@@ -29,7 +29,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 
 /**
@@ -44,8 +43,8 @@ public class EffFunctionCall extends Effect {
 	}
 	
 	@Nullable
-	public final static EffFunctionCall parse(final String line, final ParserInstance pi) {
-		final FunctionReference<?> function = new SkriptParser(pi, line, SkriptParser.ALL_FLAGS, ParseContext.DEFAULT).parseFunction((Class<?>[]) null);
+	public final static EffFunctionCall parse(final String line) {
+		final FunctionReference<?> function = new SkriptParser(line, SkriptParser.ALL_FLAGS, ParseContext.DEFAULT).parseFunction((Class<?>[]) null);
 		if (function != null)
 			return new EffFunctionCall(function);
 		return null;

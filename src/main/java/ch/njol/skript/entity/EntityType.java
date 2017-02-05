@@ -28,7 +28,6 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.classes.YggdrasilSerializer;
 import ch.njol.skript.lang.ParseContext;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.registrations.Classes;
@@ -41,18 +40,18 @@ import ch.njol.yggdrasil.YggdrasilSerializable;
 public class EntityType implements Cloneable, YggdrasilSerializable {
 	
 	static {
-		Classes.registerClass(new ClassInfo<>(EntityType.class, "entitytype")
+		Classes.registerClass(new ClassInfo<EntityType>(EntityType.class, "entitytype")
 				.name("Entity Type with Amount")
 				.description("An <a href='#entitydata'>entity type</a> with an amount, e.g. '2 zombies'. I might remove this type in the future and make a more general 'type' type, i.e. a type that has a number and a type.")
 				.usage("&lt;<a href='#number'>number</a>&gt; &lt;entity type&gt;")
 				.examples("spawn 5 creepers behind the player")
 				.since("1.3")
-				.defaultExpression(new SimpleLiteral<>(new EntityType(Entity.class, 1), true))
+				.defaultExpression(new SimpleLiteral<EntityType>(new EntityType(Entity.class, 1), true))
 				.parser(new Parser<EntityType>() {
 					@Override
 					@Nullable
-					public EntityType parse(final String s, final ParseContext context, final ParserInstance pi) {
-						return EntityType.parse(s, pi);
+					public EntityType parse(final String s, final ParseContext context) {
+						return EntityType.parse(s);
 					}
 					
 					@Override
@@ -153,7 +152,7 @@ public class EntityType implements Cloneable, YggdrasilSerializable {
 	
 	@SuppressWarnings("null")
 	@Nullable
-	public static EntityType parse(String s, ParserInstance pi) {
+	public static EntityType parse(String s) {
 		assert s != null && s.length() != 0;
 		int amount = -1;
 		if (s.matches("\\d+ .+")) {
@@ -164,7 +163,7 @@ public class EntityType implements Cloneable, YggdrasilSerializable {
 		}
 //		final Pair<String, Boolean> p = Utils.getPlural(s, amount != 1 && amount != -1);
 //		s = p.first;
-		final EntityData<?> data = EntityData.parseWithoutIndefiniteArticle(s, pi);
+		final EntityData<?> data = EntityData.parseWithoutIndefiniteArticle(s);
 		if (data == null)
 			return null;
 		return new EntityType(data, amount);

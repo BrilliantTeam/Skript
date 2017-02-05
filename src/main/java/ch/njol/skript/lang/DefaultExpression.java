@@ -21,8 +21,6 @@
 
 package ch.njol.skript.lang;
 
-import ch.njol.skript.lang.parser.ParserInstance;
-
 /**
  * Represents an expression that can be used as the default value of a certain type and event.
  * 

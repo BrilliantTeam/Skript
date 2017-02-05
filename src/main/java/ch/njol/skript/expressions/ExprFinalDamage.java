@@ -54,7 +54,7 @@ public class ExprFinalDamage extends SimpleExpression<Double> {
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		if (!pi.isCurrentEvent(EntityDamageEvent.class)) {
+		if (!ScriptLoader.isCurrentEvent(EntityDamageEvent.class)) {
 			Skript.error("The expression 'final damage' can only be used in damage events", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}

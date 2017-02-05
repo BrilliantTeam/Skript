@@ -80,7 +80,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	/**
 	 * Note to self: use {@link #add_(ItemData)} to add item datas, don't add them directly to this list.
 	 */
-	final ArrayList<ItemData> types = new ArrayList<>();
+	final ArrayList<ItemData> types = new ArrayList<ItemData>();
 	
 	private boolean all = false;
 	
@@ -162,7 +162,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		amount = i.getAmount();
 		add_(new ItemData(i));
 		if (!i.getEnchantments().isEmpty())
-			enchantments = new HashMap<>(i.getEnchantments());
+			enchantments = new HashMap<Enchantment, Integer>(i.getEnchantments());
 		if (itemMetaSupported) {
 			meta = i.getItemMeta();
 			unsetItemMetaEnchs((ItemMeta) meta);
@@ -188,7 +188,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			types.add(d.clone());
 		}
 		if (i.enchantments != null)
-			enchantments = new HashMap<>(i.enchantments);
+			enchantments = new HashMap<Enchantment, Integer>(i.enchantments);
 	}
 	
 	/**
@@ -478,14 +478,14 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public void addEnchantment(final Enchantment e, final int level) {
 		Map<Enchantment, Integer> enchs = enchantments;
 		if (enchs == null)
-			enchantments = enchs = new HashMap<>();
+			enchantments = enchs = new HashMap<Enchantment, Integer>();
 		enchs.put(e, level);
 	}
 	
 	@SuppressWarnings("null") // New Eclipse didn't like this, even if it IS very safe
 	public void addEnchantments(final Map<Enchantment, Integer> enchantments) {
 		if (this.enchantments == null)
-			this.enchantments = new HashMap<>(enchantments);
+			this.enchantments = new HashMap<Enchantment, Integer>(enchantments);
 		else
 			this.enchantments.putAll(enchantments);
 	}
@@ -550,7 +550,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			final ItemStack i = getRandom();
 			if (i == null)
 				return EmptyIterable.get();
-			return new SingleItemIterable<>(i);
+			return new SingleItemIterable<ItemStack>(i);
 		}
 		return new Iterable<ItemStack>() {
 			@Override
@@ -1180,7 +1180,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * @return names
 	 */
 	public List<String> getRawNames() {
-		List<String> rawNames = new ArrayList<>();
+		List<String> rawNames = new ArrayList<String>();
 		for (ItemData data : types) {
 			rawNames.add("minecraft:" + Material.getMaterial(data.typeid).toString().toLowerCase()
 					.replace("leash", "lead") // Add hacky code here :)

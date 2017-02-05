@@ -65,7 +65,7 @@ public class ExprAttacker extends SimpleExpression<Entity> {
 	
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		if (!pi.isCurrentEvent(EntityDamageByEntityEvent.class, EntityDeathEvent.class, VehicleDamageEvent.class, VehicleDestroyEvent.class)) {
+		if (!ScriptLoader.isCurrentEvent(EntityDamageByEntityEvent.class, EntityDeathEvent.class, VehicleDamageEvent.class, VehicleDestroyEvent.class)) {
 			Skript.error("Cannot use 'attacker' outside of a damage/death/destroy event", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}

@@ -31,7 +31,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.config.SectionNode;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.ContainerExpression;
 import ch.njol.skript.util.Container;
 import ch.njol.skript.util.Container.ContainerType;
@@ -45,14 +44,14 @@ public class Loop extends TriggerSection {
 	
 	private final Expression<?> expr;
 	
-	private transient Map<Event, Object> current = new WeakHashMap<>();
-	private transient Map<Event, Iterator<?>> currentIter = new WeakHashMap<>();
+	private transient Map<Event, Object> current = new WeakHashMap<Event, Object>();
+	private transient Map<Event, Iterator<?>> currentIter = new WeakHashMap<Event, Iterator<?>>();
 	
 	@Nullable
 	private TriggerItem actualNext;
 	
 	@SuppressWarnings("unchecked")
-	public <T> Loop(final Expression<?> expr, final SectionNode node, final ParserInstance pi) {
+	public <T> Loop(final Expression<?> expr, final SectionNode node) {
 		assert expr != null;
 		assert node != null;
 		if (Container.class.isAssignableFrom(expr.getReturnType())) {
@@ -63,13 +62,13 @@ public class Loop extends TriggerSection {
 		} else {
 			this.expr = expr;
 		}
-		pi.currentSections.add(this);
-		pi.currentLoops.add(this);
+		ScriptLoader.currentSections.add(this);
+		ScriptLoader.currentLoops.add(this);
 		try {
-			setTriggerItems(pi.loadItems(node));
+			setTriggerItems(ScriptLoader.loadItems(node));
 		} finally {
-			pi.currentLoops.remove(pi.currentLoops.size() - 1);
-			pi.currentSections.remove(pi.currentSections.size() - 1);
+			ScriptLoader.currentLoops.remove(ScriptLoader.currentLoops.size() - 1);
+			ScriptLoader.currentSections.remove(ScriptLoader.currentSections.size() - 1);
 		}
 		super.setNext(this);
 	}

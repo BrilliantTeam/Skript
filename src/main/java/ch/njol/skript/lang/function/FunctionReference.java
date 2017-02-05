@@ -179,7 +179,7 @@ public class FunctionReference<T> {
 		
 		final Object[][] params = new Object[singleUberParam ? 1 : parameters.length][];
 		if (singleUberParam && parameters.length > 1) {
-			final ArrayList<Object> l = new ArrayList<>();
+			final ArrayList<Object> l = new ArrayList<Object>();
 			for (int i = 0; i < params.length; i++)
 				l.addAll(Arrays.asList(parameters[i].getArray(e))); // TODO what if an argument is not available? pass null or abort?
 			params[0] = l.toArray();
@@ -198,8 +198,7 @@ public class FunctionReference<T> {
 	@SuppressWarnings("unchecked")
 	public Class<? extends T> getReturnType() {
 		if (signature == null) {
-			//throw new SkriptAPIException("Signature of function is null when return type is asked!");
-			return (Class<? extends T>) Unknown.class;
+			throw new SkriptAPIException("Signature of function is null when return type is asked!");
 		}
 		assert signature != null;
 		@SuppressWarnings("null") // Wait what, Eclipse? Already asserted this...

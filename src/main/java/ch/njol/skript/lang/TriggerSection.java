@@ -28,7 +28,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.config.SectionNode;
-import ch.njol.skript.lang.parser.ParserInstance;
 
 /**
  * Represents a section of a trigger, e.g. a conditional or a loop
@@ -51,12 +50,12 @@ public abstract class TriggerSection extends TriggerItem {
 		setTriggerItems(items);
 	}
 	
-	protected TriggerSection(final SectionNode node, final ParserInstance pi) {
-		pi.currentSections.add(this);
+	protected TriggerSection(final SectionNode node) {
+		ScriptLoader.currentSections.add(this);
 		try {
-			setTriggerItems(pi.loadItems(node));
+			setTriggerItems(ScriptLoader.loadItems(node));
 		} finally {
-			pi.currentSections.remove(pi.currentSections.size() - 1);
+			ScriptLoader.currentSections.remove(ScriptLoader.currentSections.size() - 1);
 		}
 	}
 	
@@ -66,12 +65,12 @@ public abstract class TriggerSection extends TriggerItem {
 	protected TriggerSection() {}
 	
 	/**
-	 * Remember to add this section to {@link LoaderInstance#currentSections} before parsing child elements!
+	 * Remember to add this section to {@link ScriptLoader#currentSections} before parsing child elements!
 	 * 
 	 * <pre>
-	 * LoaderInstance.currentSections.add(this);
-	 * setTriggerItems(LoaderInstance.loadItems(node));
-	 * LoaderInstance.currentSections.remove(LoaderInstance.currentSections.size() - 1);
+	 * ScriptLoader.currentSections.add(this);
+	 * setTriggerItems(ScriptLoader.loadItems(node));
+	 * ScriptLoader.currentSections.remove(ScriptLoader.currentSections.size() - 1);
 	 * </pre>
 	 * 
 	 * @param items

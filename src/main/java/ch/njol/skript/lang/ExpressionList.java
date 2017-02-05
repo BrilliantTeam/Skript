@@ -33,7 +33,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.conditions.CondCompare;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Checker;
@@ -58,7 +57,6 @@ public class ExpressionList<T> implements Expression<T> {
 		this(expressions, returnType, and, null);
 	}
 	
-	@SuppressWarnings("null")
 	protected ExpressionList(final Expression<? extends T>[] expressions, final Class<T> returnType, final boolean and, final @Nullable ExpressionList<?> source) {
 		assert expressions != null && expressions.length > 1;
 		this.expressions = expressions;
@@ -115,7 +113,7 @@ public class ExpressionList<T> implements Expression<T> {
 	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public T[] getAll(final Event e) {
-		final ArrayList<T> r = new ArrayList<>();
+		final ArrayList<T> r = new ArrayList<T>();
 		for (final Expression<? extends T> expr : expressions)
 			r.addAll(Arrays.asList(expr.getAll(e)));
 		return r.toArray((T[]) Array.newInstance(returnType, r.size()));
@@ -194,7 +192,7 @@ public class ExpressionList<T> implements Expression<T> {
 		for (int i = 0; i < exprs.length; i++)
 			if ((exprs[i] = expressions[i].getConvertedExpression(to)) == null)
 				return null;
-		return new ExpressionList<>(exprs, (Class<R>) Utils.getSuperType(to), and, this);
+		return new ExpressionList<R>(exprs, (Class<R>) Utils.getSuperType(to), and, this);
 	}
 	
 	@Override
@@ -231,7 +229,7 @@ public class ExpressionList<T> implements Expression<T> {
 		Class<?>[] l = expressions[0].acceptChange(mode);
 		if (l == null)
 			return null;
-		final ArrayList<Class<?>> r = new ArrayList<>(Arrays.asList(l));
+		final ArrayList<Class<?>> r = new ArrayList<Class<?>>(Arrays.asList(l));
 		for (int i = 1; i < expressions.length; i++) {
 			l = expressions[i].acceptChange(mode);
 			if (l == null)
@@ -331,24 +329,14 @@ public class ExpressionList<T> implements Expression<T> {
 			final T[] values = (T[]) Array.newInstance(returnType, expressions.length);
 			for (int i = 0; i < values.length; i++)
 				values[i] = ((Literal<? extends T>) expressions[i]).getSingle();
-			return new SimpleLiteral<>(values, returnType, and);
+			return new SimpleLiteral<T>(values, returnType, and);
 		}
 		if (isLiteralList) {
 			final Literal<? extends T>[] ls = Arrays.copyOf(expressions, expressions.length, Literal[].class);
 			assert ls != null;
-			return new LiteralList<>(ls, returnType, and);
+			return new LiteralList<T>(ls, returnType, and);
 		}
 		return this;
-	}
-	
-	/**
-	 * Parser instance which is being used or was used to parse this expression.
-	 */
-	protected ParserInstance pi;
-	
-	@Override
-	public void setParserInstance(ParserInstance pi) {
-		this.pi = pi;
 	}
 	
 }

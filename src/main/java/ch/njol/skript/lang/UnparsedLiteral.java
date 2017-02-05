@@ -29,7 +29,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.log.LogEntry;
 import ch.njol.skript.log.ParseLogHandler;
@@ -95,10 +94,10 @@ public class UnparsedLiteral implements Literal<Object> {
 		try {
 			for (final Class<? extends R> t : to) {
 				assert t != null;
-				final R r = Classes.parse(ParserInstance.DUMMY, data, t, context);
+				final R r = Classes.parse(data, t, context);
 				if (r != null) {
 					log.printLog();
-					return new SimpleLiteral<>(r, false);
+					return new SimpleLiteral<R>(r, false);
 				}
 				log.clear();
 			}

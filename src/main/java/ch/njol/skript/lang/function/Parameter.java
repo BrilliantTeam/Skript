@@ -30,7 +30,6 @@ import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.VariableString;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -61,7 +60,7 @@ public final class Parameter<T> {
 	
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public static <T> Parameter<T> newInstance(final ParserInstance pi, final String name, final ClassInfo<T> type, final boolean single, final @Nullable String def) {
+	public static <T> Parameter<T> newInstance(final String name, final ClassInfo<T> type, final boolean single, final @Nullable String def) {
 		if (!Variable.isValidVariableName(name, false, false)) {
 			Skript.error("An argument's name must be a valid variable name, and cannot be a list variable.");
 			return null;
@@ -85,11 +84,11 @@ public final class Parameter<T> {
 			try {
 				if (type.getC() == String.class) {
 					if (def.startsWith("\"") && def.endsWith("\""))
-						d = (Expression<? extends T>) VariableString.newInstance(pi, "" + def.substring(1, def.length() - 1));
+						d = (Expression<? extends T>) VariableString.newInstance("" + def.substring(1, def.length() - 1));
 					else
-						d = (Expression<? extends T>) new SimpleLiteral<>(def, false);
+						d = (Expression<? extends T>) new SimpleLiteral<String>(def, false);
 				} else {
-					d = new SkriptParser(pi, def, SkriptParser.PARSE_LITERALS, ParseContext.DEFAULT).parseExpression(type.getC());
+					d = new SkriptParser(def, SkriptParser.PARSE_LITERALS, ParseContext.DEFAULT).parseExpression(type.getC());
 				}
 				if (d == null) {
 					log.printErrors("'" + def + "' is not " + type.getName().withIndefiniteArticle());
@@ -101,7 +100,7 @@ public final class Parameter<T> {
 			}
 //			}
 		}
-		return new Parameter<>(name, type, single, d);
+		return new Parameter<T>(name, type, single, d);
 	}
 	
 	@Override

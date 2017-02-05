@@ -53,7 +53,6 @@ import ch.njol.skript.classes.Parser;
 import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.lang.DefaultExpression;
 import ch.njol.skript.lang.ParseContext;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.util.StringMode;
@@ -77,10 +76,10 @@ public abstract class Classes {
 	
 	@Nullable
 	private static ClassInfo<?>[] classInfos = null;
-	private final static List<ClassInfo<?>> tempClassInfos = new ArrayList<>();
-	private final static HashMap<Class<?>, ClassInfo<?>> exactClassInfos = new HashMap<>();
-	private final static HashMap<Class<?>, ClassInfo<?>> superClassInfos = new HashMap<>();
-	private final static HashMap<String, ClassInfo<?>> classInfosByCodeName = new HashMap<>();
+	private final static List<ClassInfo<?>> tempClassInfos = new ArrayList<ClassInfo<?>>();
+	private final static HashMap<Class<?>, ClassInfo<?>> exactClassInfos = new HashMap<Class<?>, ClassInfo<?>>();
+	private final static HashMap<Class<?>, ClassInfo<?>> superClassInfos = new HashMap<Class<?>, ClassInfo<?>>();
+	private final static HashMap<String, ClassInfo<?>> classInfosByCodeName = new HashMap<String, ClassInfo<?>>();
 	
 	/**
 	 * @param info info about the class to register
@@ -164,7 +163,7 @@ public abstract class Classes {
 		
 		// remove unresolvable dependencies (and print a warning if testing)
 		for (final ClassInfo<?> ci : tempClassInfos) {
-			final Set<String> s = new HashSet<>();
+			final Set<String> s = new HashSet<String>();
 			final Set<String> before = ci.before();
 			if (before != null) {
 				for (final String b : before) {
@@ -184,7 +183,7 @@ public abstract class Classes {
 				Skript.warning(s.size() + " dependency/ies could not be resolved for " + ci + ": " + StringUtils.join(s, ", "));
 		}
 		
-		final List<ClassInfo<?>> classInfos = new ArrayList<>(tempClassInfos.size());
+		final List<ClassInfo<?>> classInfos = new ArrayList<ClassInfo<?>>(tempClassInfos.size());
 		
 		boolean changed = true;
 		while (changed) {
@@ -411,7 +410,7 @@ public abstract class Classes {
 	 * @return The parsed object
 	 */
 	@Nullable
-	public static <T> T parseSimple(final ParserInstance pi, final String s, final Class<T> c, final ParseContext context) {
+	public static <T> T parseSimple(final String s, final Class<T> c, final ParseContext context) {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			for (final ClassInfo<?> info : getClassInfos()) {
@@ -420,7 +419,7 @@ public abstract class Classes {
 					continue;
 				log.clear();
 				@SuppressWarnings("unchecked")
-				final T t = (T) parser.parse(s, context, pi);
+				final T t = (T) parser.parse(s, context);
 				if (t != null) {
 					log.printLog();
 					return t;
@@ -446,10 +445,10 @@ public abstract class Classes {
 	 */
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Nullable
-	public static <T> T parse(final ParserInstance pi, final String s, final Class<T> c, final ParseContext context) {
+	public static <T> T parse(final String s, final Class<T> c, final ParseContext context) {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
-			T t = parseSimple(pi, s, c, context);
+			T t = parseSimple(s, c, context);
 			if (t != null) {
 				log.printLog();
 				return t;
@@ -459,7 +458,7 @@ public abstract class Classes {
 					continue;
 				if (c.isAssignableFrom(conv.to)) {
 					log.clear();
-					final Object o = parseSimple(pi, s, conv.from, context);
+					final Object o = parseSimple(s, conv.from, context);
 					if (o != null) {
 						t = (T) ((Converter) conv.converter).convert(o);
 						if (t != null) {

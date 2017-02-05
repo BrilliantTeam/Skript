@@ -48,7 +48,6 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxElement;
 import ch.njol.skript.lang.SyntaxElementInfo;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.LanguageChangeListener;
 import ch.njol.skript.localization.Noun;
@@ -240,7 +239,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	
 	@Nullable
 	static SyntaxElementInfo<VisualEffect> info;
-	final static List<Type> types = new ArrayList<>(Type.values().length);
+	final static List<Type> types = new ArrayList<Type>(Type.values().length);
 	final static Noun[] names = new Noun[Type.values().length];
 	static {
 		Language.addListener(new LanguageChangeListener() {
@@ -248,7 +247,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			public void onLanguageChange() {
 				final Type[] ts = Type.values();
 				types.clear();
-				final List<String> patterns = new ArrayList<>(ts.length);
+				final List<String> patterns = new ArrayList<String>(ts.length);
 				for (int i = 0; i < ts.length; i++) {
 					final String node = LANGUAGE_NODE + "." + ts[i].name();
 					final String pattern = Language.get_(node + ".pattern");
@@ -270,7 +269,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				}
 				final String[] ps = patterns.toArray(new String[patterns.size()]);
 				assert ps != null;
-				info = new SyntaxElementInfo<>(ps, VisualEffect.class);
+				info = new SyntaxElementInfo<VisualEffect>(ps, VisualEffect.class);
 			}
 		});
 	}
@@ -339,11 +338,11 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	}
 	
 	@Nullable
-	public final static VisualEffect parse(final String s, final ParserInstance pi) {
+	public final static VisualEffect parse(final String s) {
 		final SyntaxElementInfo<VisualEffect> info = VisualEffect.info;
 		if (info == null)
 			return null;
-		return SkriptParser.parseStatic(pi, Noun.stripIndefiniteArticle(s), new SingleItemIterator<>(info), null);
+		return SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), new SingleItemIterator<SyntaxElementInfo<VisualEffect>>(info), null);
 	}
 	
 	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e) {

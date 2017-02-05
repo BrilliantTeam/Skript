@@ -28,7 +28,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.function.EffFunctionCall;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 
@@ -58,10 +57,10 @@ public abstract class Effect extends Statement {
 	
 	@SuppressWarnings({"rawtypes", "unchecked", "null"})
 	@Nullable
-	public static Effect parse(final String s, final @Nullable String defaultError, final ParserInstance pi) {
+	public static Effect parse(final String s, final @Nullable String defaultError) {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
-			final EffFunctionCall f = EffFunctionCall.parse(s, pi);
+			final EffFunctionCall f = EffFunctionCall.parse(s);
 			if (f != null) {
 				log.printLog();
 				return f;
@@ -74,12 +73,7 @@ public abstract class Effect extends Statement {
 		} finally {
 			log.stop();
 		}
-		return (Effect) SkriptParser.parse(pi, s, (Iterator) Skript.getEffects().iterator(), defaultError);
-	}
-	
-	@Nullable
-	public static Effect parse(final String s, final @Nullable String defaultError) {
-		return parse(s, defaultError, ParserInstance.DUMMY);
+		return (Effect) SkriptParser.parse(s, (Iterator) Skript.getEffects().iterator(), defaultError);
 	}
 	
 }

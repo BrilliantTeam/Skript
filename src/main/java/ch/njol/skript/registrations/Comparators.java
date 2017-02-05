@@ -43,7 +43,7 @@ public class Comparators {
 	
 	private Comparators() {}
 	
-	public final static Collection<ComparatorInfo<?, ?>> comparators = new ArrayList<>();
+	public final static Collection<ComparatorInfo<?, ?>> comparators = new ArrayList<ComparatorInfo<?, ?>>();
 	
 	/**
 	 * Registers a {@link Comparator}.
@@ -57,7 +57,7 @@ public class Comparators {
 		Skript.checkAcceptRegistrations();
 		if (t1 == Object.class && t2 == Object.class)
 			throw new IllegalArgumentException("You must not add a comparator for Objects");
-		comparators.add(new ComparatorInfo<>(t1, t2, c));
+		comparators.add(new ComparatorInfo<T1, T2>(t1, t2, c));
 	}
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -82,12 +82,12 @@ public class Comparators {
 		return javaComparator;
 	}
 	
-	private final static Map<Pair<Class<?>, Class<?>>, Comparator<?, ?>> comparatorsQuickAccess = new HashMap<>();
+	private final static Map<Pair<Class<?>, Class<?>>, Comparator<?, ?>> comparatorsQuickAccess = new HashMap<Pair<Class<?>, Class<?>>, Comparator<?, ?>>();
 	
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final static <F, S> Comparator<? super F, ? super S> getComparator(final Class<F> f, final Class<S> s) {
-		final Pair<Class<?>, Class<?>> p = new Pair<>(f, s);
+		final Pair<Class<?>, Class<?>> p = new Pair<Class<?>, Class<?>>(f, s);
 		if (comparatorsQuickAccess.containsKey(p))
 			return (Comparator<? super F, ? super S>) comparatorsQuickAccess.get(p);
 		final Comparator<?, ?> comp = getComparator_i(f, s);
@@ -123,13 +123,13 @@ public class Comparators {
 				if (info.getType(first).isAssignableFrom(f)) {
 					c2 = Converters.getConverter(s, info.getType(!first));
 					if (c2 != null) {
-						return first ? new ConvertedComparator<F, S>(info.c, c2) : new InverseComparator<>(new ConvertedComparator<S, F>(c2, info.c));
+						return first ? new ConvertedComparator<F, S>(info.c, c2) : new InverseComparator<F, S>(new ConvertedComparator<S, F>(c2, info.c));
 					}
 				}
 				if (info.getType(first).isAssignableFrom(s)) {
 					c1 = Converters.getConverter(f, info.getType(!first));
 					if (c1 != null) {
-						return !first ? new ConvertedComparator<F, S>(c1, info.c) : new InverseComparator<>(new ConvertedComparator<S, F>(info.c, c1));
+						return !first ? new ConvertedComparator<F, S>(c1, info.c) : new InverseComparator<F, S>(new ConvertedComparator<S, F>(info.c, c1));
 					}
 				}
 			}
@@ -141,7 +141,7 @@ public class Comparators {
 				c1 = Converters.getConverter(f, info.getType(first));
 				c2 = Converters.getConverter(s, info.getType(!first));
 				if (c1 != null && c2 != null) {
-					return first ? new ConvertedComparator<F, S>(c1, info.c, c2) : new InverseComparator<>(new ConvertedComparator<S, F>(c2, info.c, c1));
+					return first ? new ConvertedComparator<F, S>(c1, info.c, c2) : new InverseComparator<F, S>(new ConvertedComparator<S, F>(c2, info.c, c1));
 				}
 			}
 		}

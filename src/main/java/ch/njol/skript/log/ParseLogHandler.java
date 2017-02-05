@@ -22,17 +22,12 @@
 package ch.njol.skript.log;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.lang.parser.ParserInstance;
-import ch.njol.skript.util.Utils;
 
 /**
  * @author Peter Güttinger
@@ -42,7 +37,7 @@ public class ParseLogHandler extends LogHandler {
 	@Nullable
 	private LogEntry error = null;
 	
-	private final List<LogEntry> log = new ArrayList<>();
+	private final List<LogEntry> log = new ArrayList<LogEntry>();
 	
 	@Override
 	public LogResult log(final LogEntry entry) {
@@ -91,15 +86,6 @@ public class ParseLogHandler extends LogHandler {
 			error.discarded("not printed");
 	}
 	
-	public void printLog(CommandSender sender) {
-		if (sender instanceof ConsoleCommandSender) {
-			printLog();
-		} else {
-			for (final LogEntry e : log)
-				sender.sendMessage(Utils.replaceEnglishChatStyles(e.getMessage()));
-		}
-	}
-	
 	public void printError() {
 		printError(null);
 	}
@@ -144,35 +130,6 @@ public class ParseLogHandler extends LogHandler {
 	@Nullable
 	public LogEntry getError() {
 		return error;
-	}
-	
-	public Collection<LogEntry> getLog() {
-		return new ArrayList<>(log);
-	}
-	
-	/**
-	 * Submits this to given parser instance. Errors will be displayed
-	 * when enabling scripts, which allows them to be ordered.
-	 * 
-	 * It is not recommended to write anything to log after submitting.
-	 * @param processor Parser instance.
-	 */
-	public void submit(final ParserInstance pi) {
-		pi.submitErrorLog(this);
-	}
-	
-	public void submitError(final ParserInstance pi, final @Nullable String def, final ErrorQuality quality) {
-		if (def != null)
-			error(def, quality);
-		submit(pi);
-	}
-	
-	public void submitError(final ParserInstance pi, final @Nullable String def) {
-		submitError(pi, def, ErrorQuality.SEMANTIC_ERROR);
-	}
-	
-	public void submitLog(final ParserInstance pi) {
-		pi.submitParseLog(this);
 	}
 	
 }

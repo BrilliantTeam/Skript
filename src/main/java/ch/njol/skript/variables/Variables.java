@@ -52,7 +52,6 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.Variable;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.variables.DatabaseStorage.Type;
@@ -106,7 +105,7 @@ public abstract class Variables {
 		});
 	}
 	
-	static List<VariablesStorage> storages = new ArrayList<>();
+	static List<VariablesStorage> storages = new ArrayList<VariablesStorage>();
 	
 	public static boolean load() {
 		assert variables.treeMap.isEmpty();
@@ -188,7 +187,7 @@ public abstract class Variables {
 					if (Skript.logVeryHigh())
 						Skript.info("Loading database '" + node.getKey() + "'...");
 					
-					if (s.load(n, ParserInstance.DUMMY))
+					if (s.load(n))
 						storages.add(s);
 					else
 						successful = false;
@@ -243,7 +242,7 @@ public abstract class Variables {
 	/**
 	 * Not accessed concurrently
 	 */
-	private final static WeakHashMap<Event, VariablesMap> localVariables = new WeakHashMap<>();
+	private final static WeakHashMap<Event, VariablesMap> localVariables = new WeakHashMap<Event, VariablesMap>();
 	
 	/**
 	 * Remember to lock with {@link #getReadLock()} and to not make any changes!
@@ -333,7 +332,7 @@ public abstract class Variables {
 	 * <p>
 	 * Access must be synchronised.
 	 */
-	final static SynchronizedReference<Map<String, NonNullPair<Object, VariablesStorage>>> tempVars = new SynchronizedReference<>(new HashMap<String, NonNullPair<Object, VariablesStorage>>());
+	final static SynchronizedReference<Map<String, NonNullPair<Object, VariablesStorage>>> tempVars = new SynchronizedReference<Map<String, NonNullPair<Object, VariablesStorage>>>(new HashMap<String, NonNullPair<Object, VariablesStorage>>());
 	
 	private static final int MAX_CONFLICT_WARNINGS = 50;
 	private static int loadConflicts = 0;
@@ -367,7 +366,7 @@ public abstract class Variables {
 						Skript.warning("[!] More than " + MAX_CONFLICT_WARNINGS + " variables were loaded more than once from different databases, no more warnings will be printed.");
 					v.getSecond().save(name, null, null);
 				}
-				tvs.put(name, new NonNullPair<>(value, source));
+				tvs.put(name, new NonNullPair<Object, VariablesStorage>(value, source));
 				return false;
 			}
 		}
@@ -444,7 +443,7 @@ public abstract class Variables {
 		queue.add(serialize(name, value));
 	}
 	
-	final static BlockingQueue<SerializedVariable> queue = new LinkedBlockingQueue<>();
+	final static BlockingQueue<SerializedVariable> queue = new LinkedBlockingQueue<SerializedVariable>();
 	
 	static volatile boolean closed = false;
 	

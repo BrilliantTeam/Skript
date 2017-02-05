@@ -131,7 +131,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			boolean hasValue = false;
-			final Class<? extends Event>[] es = pi.getCurrentEvents();
+			final Class<? extends Event>[] es = ScriptLoader.getCurrentEvents();
 			if (es == null) {
 				assert false;
 				return false;
@@ -148,7 +148,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 				}
 			}
 			if (!hasValue) {
-				log.printError("There's no " + Classes.getSuperClassInfo(c).getName() + " in " + Utils.a(pi.getCurrentEventName()) + " event");
+				log.printError("There's no " + Classes.getSuperClassInfo(c).getName() + " in " + Utils.a(ScriptLoader.getCurrentEventName()) + " event");
 				return false;
 			}
 			log.printLog();
@@ -195,7 +195,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	
 	@Override
 	public boolean setTime(final int time) {
-		final Class<? extends Event>[] es = pi.getCurrentEvents();
+		final Class<? extends Event>[] es = ScriptLoader.getCurrentEvents();
 		if (es == null) {
 			assert false;
 			return false;

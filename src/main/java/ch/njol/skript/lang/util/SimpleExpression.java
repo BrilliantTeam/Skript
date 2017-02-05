@@ -54,7 +54,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	
 	private int time = 0;
 	
-	@SuppressWarnings("null") // Parser instance should never be null
+	@SuppressWarnings("null")
 	protected SimpleExpression() {}
 	
 	@Override
@@ -247,7 +247,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	 */
 	@Override
 	public boolean setTime(final int time) {
-		if (pi.hasDelayBefore == Kleenean.TRUE && time != 0) {
+		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
@@ -256,11 +256,11 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	}
 	
 	protected final boolean setTime(final int time, final Class<? extends Event> applicableEvent, final Expression<?>... mustbeDefaultVars) {
-		if (pi.hasDelayBefore == Kleenean.TRUE && time != 0) {
+		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
-		if (!pi.isCurrentEvent(applicableEvent))
+		if (!ScriptLoader.isCurrentEvent(applicableEvent))
 			return false;
 		for (final Expression<?> var : mustbeDefaultVars) {
 			if (!var.isDefault()) {
@@ -272,14 +272,14 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	}
 	
 	protected final boolean setTime(final int time, final Expression<?> mustbeDefaultVar, final Class<? extends Event>... applicableEvents) {
-		if (pi.hasDelayBefore == Kleenean.TRUE && time != 0) {
+		if (ScriptLoader.hasDelayBefore == Kleenean.TRUE && time != 0) {
 			Skript.error("Can't use time states after the event has already passed");
 			return false;
 		}
 		if (!mustbeDefaultVar.isDefault())
 			return false;
 		for (final Class<? extends Event> e : applicableEvents) {
-			if (pi.isCurrentEvent(e)) {
+			if (ScriptLoader.isCurrentEvent(e)) {
 				this.time = time;
 				return true;
 			}
@@ -305,7 +305,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	@Override
 	@Nullable
 	public Iterator<? extends T> iterator(final Event e) {
-		return new ArrayIterator<>(getArray(e));
+		return new ArrayIterator<T>(getArray(e));
 	}
 	
 	@Override
@@ -327,14 +327,10 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	public boolean getAnd() {
 		return true;
 	}
-	
+
 	/**
 	 * Parser instance which is being used or was used to parse this element.
 	 */
 	protected ParserInstance pi;
 	
-	@Override
-	public void setParserInstance(ParserInstance pi) {
-		this.pi = pi;
-	}
 }

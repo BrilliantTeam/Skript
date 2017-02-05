@@ -25,7 +25,6 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.config.SectionNode;
-import ch.njol.skript.lang.parser.ParserInstance;
 
 /**
  * @author Peter Güttinger
@@ -34,8 +33,8 @@ public class While extends TriggerSection {
 	
 	private final Condition c;
 	
-	public While(final Condition c, final SectionNode n, final ParserInstance pi) {
-		super(n, pi);
+	public While(final Condition c, final SectionNode n) {
+		super(n);
 		this.c = c;
 		super.setNext(this);
 	}

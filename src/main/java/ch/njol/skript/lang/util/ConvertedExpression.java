@@ -33,7 +33,6 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.util.Checker;
@@ -56,7 +55,6 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 	protected Class<T> to;
 	final Converter<? super F, ? extends T> conv;
 	
-	@SuppressWarnings("null")
 	public ConvertedExpression(final Expression<? extends F> source, final Class<T> to, final Converter<? super F, ? extends T> conv) {
 		assert source != null;
 		assert to != null;
@@ -78,7 +76,7 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 			final Converter<? super F, ? extends T> conv = (Converter<? super F, ? extends T>) Converters.getConverter(v.getReturnType(), c);
 			if (conv == null)
 				continue;
-			return new ConvertedExpression<>(v, c, conv);
+			return new ConvertedExpression<F, T>(v, c, conv);
 		}
 		return null;
 	}
@@ -259,16 +257,6 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 		if (c != null)
 			return c;
 		return this;
-	}
-	
-	/**
-	 * Parser instance which is being used or was used to parse this expression.
-	 */
-	protected ParserInstance pi;
-	
-	@Override
-	public void setParserInstance(ParserInstance pi) {
-		this.pi = pi;
 	}
 	
 }

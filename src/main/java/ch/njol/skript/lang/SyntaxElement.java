@@ -22,8 +22,8 @@
 package ch.njol.skript.lang;
 
 import ch.njol.skript.ScriptLoader;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.parser.ParserInstance;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
 /**
@@ -44,10 +44,10 @@ public interface SyntaxElement {
 	 * @param isDelayed Whether this expression is used after a delay or not (i.e. if the event has already passed when this expression will be called)
 	 * @param parseResult Additional information about the match.
 	 * @return Whether this expression was initialised successfully. An error should be printed prior to returning false to specify the cause.
-	 * @see LoaderInstance#isCurrentEvent(Class...)
+	 * @see ScriptLoader#isCurrentEvent(Class...)
 	 */
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult);
-	
+
 	/**
 	 * Sets parser instance for this syntax element. Make sure to override this, if it is needed.
 	 * If this method is not overridden, it does <b>nothing</b>, since not everything needs

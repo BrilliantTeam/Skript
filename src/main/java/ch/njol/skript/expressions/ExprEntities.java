@@ -155,7 +155,7 @@ public class ExprEntities extends SimpleExpression<Entity> {
 			return false;
 		final LogHandler h = SkriptLogger.startLogHandler(new BlockingLogHandler());
 		try {
-			final EntityData<?> d = EntityData.parseWithoutIndefiniteArticle(s, pi);
+			final EntityData<?> d = EntityData.parseWithoutIndefiniteArticle(s);
 			if (d != null) {
 				for (final EntityData<?> t : ((Literal<EntityData<?>>) types).getAll()) {
 					assert t != null;

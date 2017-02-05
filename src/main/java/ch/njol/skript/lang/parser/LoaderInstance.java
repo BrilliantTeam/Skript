@@ -39,49 +39,10 @@ import ch.njol.skript.lang.function.Signature;
  * Loads script from disk to memory and registers function signatures.
  */
 public class LoaderInstance implements Runnable {
-	
-	private String name;
-	private File f;
-	private ScriptManager manager;
-	private ExecutorService pool;
-	
-	public LoaderInstance(String name, File f, ScriptManager manager, ExecutorService pool) {
-		this.name = name;
-		this.f = f;
-		this.manager = manager;
-		this.pool = pool;
-	}
-	
-	@SuppressWarnings("null")
+
 	@Override
 	public void run() {
-		if (f.isDirectory()) { // Delegate directory parsing...
-			for (File f2 : f.listFiles())
-				pool.execute(new LoaderInstance(name + "/" + f2.getName(), f2, manager, pool));
-			return;
-		}
-		
-		try {
-			Config config = new Config(f, true, false, ":");
-			for (final Node cnode : config.getMainNode()) {
-				if (!(cnode instanceof SectionNode)) {
-					Skript.error("invalid line - all code has to be put into triggers");
-					continue;
-				}
-				final SectionNode node = ((SectionNode) cnode);
-				String key = node.getKey();
-				if (key == null)
-					continue;
-				
-				if (key.toLowerCase().startsWith("function ")) { // Just go with dummy parser instance for now
-					Functions.loadSignature(config.getFileName(), node, ParserInstance.DUMMY);
-				}
-			}
-			
-			manager.loadReady(f.getName(), config);
-		} catch (IOException e) {
-			// TODO report error
-		}
+
 	}
 	
 }

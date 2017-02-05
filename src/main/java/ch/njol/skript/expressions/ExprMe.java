@@ -52,7 +52,7 @@ public class ExprMe extends SimpleExpression<CommandSender> {
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		if (!pi.isCurrentEvent(EffectCommandEvent.class)) {
+		if (!ScriptLoader.isCurrentEvent(EffectCommandEvent.class)) {
 			return false;
 		}
 		return true;
