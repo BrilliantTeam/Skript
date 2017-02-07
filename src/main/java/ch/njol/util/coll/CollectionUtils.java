@@ -341,6 +341,7 @@ public abstract class CollectionUtils {
 	 * @param array Some objects
 	 * @return The passed array
 	 */
+	@SafeVarargs
 	public static <T> T[] array(final T... array) {
 		return array;
 	}

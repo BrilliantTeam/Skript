@@ -221,20 +221,20 @@ public final class BukkitEventValues {
 				return new BlockStateBlock(e.getNewState());
 			}
 		}, 1);
-		// BlockFormEvent
-		EventValues.registerEventValue(BlockFormEvent.class, Block.class, new Getter<Block, BlockFormEvent>() {
+		// BlockGrowEvent (+ BlockFormEvent)
+		EventValues.registerEventValue(BlockGrowEvent.class, Block.class, new Getter<Block, BlockGrowEvent>() {
 			@Override
 			@Nullable
-			public Block get(final BlockFormEvent e) {
+			public Block get(final BlockGrowEvent e) {
 				if (e instanceof BlockSpreadEvent)
 					return e.getBlock();
 				return new BlockStateBlock(e.getNewState());
 			}
 		}, 0);
-		EventValues.registerEventValue(BlockFormEvent.class, Block.class, new Getter<Block, BlockFormEvent>() {
+		EventValues.registerEventValue(BlockGrowEvent.class, Block.class, new Getter<Block, BlockGrowEvent>() {
 			@Override
 			@Nullable
-			public Block get(final BlockFormEvent e) {
+			public Block get(final BlockGrowEvent e) {
 				return e.getBlock();
 			}
 		}, -1);
@@ -324,15 +324,6 @@ public final class BukkitEventValues {
 			public Player get(final SignChangeEvent e) {
 				return e.getPlayer();
 			}
-		}, 0);
-		// BlockGrowEvent
-		EventValues.registerEventValue(BlockGrowEvent.class, Block.class, new Getter<Block, BlockGrowEvent>() {
-			@Override
-			@Nullable
-			public Block get(BlockGrowEvent e) {
-				return new BlockStateBlock(e.getBlock().getState(), true);
-			}
-			
 		}, 0);
 		
 		// === EntityEvents ===
