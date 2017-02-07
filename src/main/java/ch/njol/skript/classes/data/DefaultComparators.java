@@ -23,6 +23,7 @@ package ch.njol.skript.classes.data;
 
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -282,7 +283,7 @@ public class DefaultComparators {
 		Comparators.registerComparator(OfflinePlayer.class, OfflinePlayer.class, new Comparator<OfflinePlayer, OfflinePlayer>() {
 			@Override
 			public Relation compare(final OfflinePlayer p1, final OfflinePlayer p2) {
-				return Relation.get(p1.getName().equals(p2.getName()));
+				return Relation.get(Objects.equals(p1.getName(), p2.getName()));
 			}
 			
 			@Override
