@@ -53,7 +53,7 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class ExprWorld extends PropertyExpression<Object, World> {
 	static {
-		Skript.registerExpression(ExprWorld.class, World.class, ExpressionType.PROPERTY, "[the] world [of %location/entity%]", "%location/entity%'[s] world");
+		Skript.registerExpression(ExprWorld.class, World.class, ExpressionType.PROPERTY, "[the] world [of %location/entity%]", "%location/entity%['s] world");
 	}
 	
 	@Override
