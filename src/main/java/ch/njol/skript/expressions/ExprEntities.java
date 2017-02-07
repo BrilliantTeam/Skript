@@ -111,7 +111,8 @@ public class ExprEntities extends SimpleExpression<Entity> {
 			center = (Expression<Location>) exprs[exprs.length - 1];
 			final BlockingLogHandler log = SkriptLogger.startLogHandler(new BlockingLogHandler());
 			try {
-				centerEntity = center.getSource().getConvertedExpression(Entity.class);
+				if (!center.getSource().getReturnType().equals(Location.class)) // Ensure that no location -> entity...
+					centerEntity = center.getSource().getConvertedExpression(Entity.class); // ... when no entity exists
 			} finally {
 				log.stop();
 			}
