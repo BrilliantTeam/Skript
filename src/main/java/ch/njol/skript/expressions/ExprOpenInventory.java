@@ -35,7 +35,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 @Description({"Return the open inventory of a player.",
 	"If no inventory is open, it returns the own player's crafting inventory."})
 @Examples({"set slot 1 of open inventory of player to diamond sword"})
-@Since("2.2-dev23b")
+@Since("2.2-dev24")
 public class ExprOpenInventory extends SimplePropertyExpression<Player, Inventory>{
 	static {
 		register(ExprOpenInventory.class, Inventory.class, "(current|open|top) inventory", "player");

@@ -52,7 +52,7 @@ import ch.njol.util.Kleenean;
 	"\tremove 1 stone from slot 0 of player",
 	"\tadd 2 stones to slot 0 of player",
 	"\tclear slot 1 of player"})
-@Since("2.2-dev23b")
+@Since("2.2-dev24")
 public class ExprInventorySlot extends SimpleExpression<Slot>{
 	
 	static {
