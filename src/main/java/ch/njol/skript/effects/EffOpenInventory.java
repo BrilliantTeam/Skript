@@ -99,7 +99,11 @@ public class EffOpenInventory extends Effect {
 			if (i == null)
 				return;
 			for (final Player p : players.getArray(e)) {
-				p.openInventory(i);
+				try {
+					p.openInventory(i);
+				} catch (IllegalArgumentException ex){
+					Skript.error("You can't open a " +i.getType().name().toLowerCase().replaceAll("_", "") + " inventory to a player.");
+				}
 			}
 		} else {
 			for (final Player p : players.getArray(e)) {
