@@ -50,7 +50,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 		"		kick player due to \"Someone with your name has played on this server before\"",
 		"	else:",
 		"		set {uuids.%name of player%} to UUID of player"})
-@Since("2.1.2, 2.2 (offline players' UUIDs), 2.2-dev23a (entitiy's UUIDs)")
+@Since("2.1.2, 2.2 (offline players' UUIDs), 2.2-dev23b (entitiy's UUIDs)")
 public class ExprUUID extends SimplePropertyExpression<Object, String> {
 	private final static boolean offlineUUIDSupported = Skript.methodExists(OfflinePlayer.class, "getUniqueId");
 	static {

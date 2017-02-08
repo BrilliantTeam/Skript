@@ -49,7 +49,7 @@ import ch.njol.util.StringUtils;
  */
 @Name("Replace")
 @Description({"Replaces all occurrences of a given text with another text. Please note that you can only change variables and a few expressions, e.g. a <a href='../expressions/#ExprMessage'>message</a> or a line of a sign.",
-		"Starting with 2.2-dev23a, you can replace items in a inventory too."})
+		"Starting with 2.2-dev23b, you can replace items in a inventory too."})
 @Examples({"replace \"<item>\" in {textvar} with \"%item%\"",
 		"replace every \"&\" with \"§\" in line 1",
 		"# The following acts as a simple chat censor, but it will e.g. censor mass, hassle, assassin, etc. as well:",
@@ -57,7 +57,7 @@ import ch.njol.util.StringUtils;
 		"	replace all \"fuck\", \"bitch\" and \"ass\" with \"****\" in the message",
 		" ",
 		"replace all stone and dirt in player's inventory and player's top inventory with diamond"})
-@Since("2.0, 2.2-dev23a (replace in muliple strings and replace items in inventory)")
+@Since("2.0, 2.2-dev23b (replace in muliple strings and replace items in inventory)")
 public class EffReplace extends Effect {
 	static {
 		Skript.registerEffect(EffReplace.class,
