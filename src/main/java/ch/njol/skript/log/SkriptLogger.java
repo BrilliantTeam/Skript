@@ -101,7 +101,7 @@ public abstract class SkriptLogger {
 	 * @see RedirectingLogHandler
 	 */
 	public final static <T extends LogHandler> T startLogHandler(final T h) {
-		handlers.add(h);
+		//handlers.add(h);
 		return h;
 	}
 	
