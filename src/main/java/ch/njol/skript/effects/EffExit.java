@@ -81,17 +81,17 @@ public class EffExit extends Effect { // TODO [code style] warn user about code 
 			case 2:
 				breakLevels = matchedPattern == 1 ? 1 : Integer.parseInt(parser.regexes.get(0).group());
 				type = parser.mark;
-				if (breakLevels > numLevels(type, pi)) {
-					if (numLevels(type, pi) == 0)
+				if (breakLevels > numLevels(type)) {
+					if (numLevels(type) == 0)
 						Skript.error("can't stop any " + names[type] + " as there are no " + names[type] + " present", ErrorQuality.SEMANTIC_ERROR);
 					else
-						Skript.error("can't stop " + breakLevels + " " + names[type] + " as there are only " + numLevels(type, pi) + " " + names[type] + " present", ErrorQuality.SEMANTIC_ERROR);
+						Skript.error("can't stop " + breakLevels + " " + names[type] + " as there are only " + numLevels(type) + " " + names[type] + " present", ErrorQuality.SEMANTIC_ERROR);
 					return false;
 				}
 				break;
 			case 3:
 				type = parser.mark;
-				breakLevels = numLevels(type, pi);
+				breakLevels = numLevels(type);
 				if (breakLevels == 0) {
 					Skript.error("can't stop any " + names[type] + " as there are no " + names[type] + " present", ErrorQuality.SEMANTIC_ERROR);
 					return false;
@@ -101,7 +101,7 @@ public class EffExit extends Effect { // TODO [code style] warn user about code 
 		return true;
 	}
 	
-	private final static int numLevels(final int type, final ParserInstance pi) {
+	private final static int numLevels(final int type) {
 		if (type == EVERYTHING)
 			return ScriptLoader.currentSections.size();
 		int r = 0;
