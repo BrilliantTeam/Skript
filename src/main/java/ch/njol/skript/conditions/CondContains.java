@@ -21,8 +21,6 @@
 
 package ch.njol.skript.conditions;
 
-import java.util.Arrays;
-
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Inventory;
 import org.eclipse.jdt.annotation.Nullable;
@@ -58,9 +56,9 @@ public class CondContains extends Condition {
 	static {
 		Skript.registerCondition(CondContains.class,
 				"%inventories% ha(s|ve) %itemtypes% [in [(the[ir]|his|her|its)] inventory]",
-				"%inventories/strings/objects% do[es](n't| not) contain %itemtypes/strings/objects%",
 				"%inventories/strings/objects% contain[s] %itemtypes/strings/objects%",
-				"%inventories% do[es](n't| not) have %itemtypes% [in [(the[ir]|his|her|its)] inventory]");
+				"%inventories% do[es](n't| not) have %itemtypes% [in [(the[ir]|his|her|its)] inventory]",
+				"%inventories/strings/objects% do[es](n't| not) contain %itemtypes/strings/objects%");
 	}
 	
 	@SuppressWarnings("null")
