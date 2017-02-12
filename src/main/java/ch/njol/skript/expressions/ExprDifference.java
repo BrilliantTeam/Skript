@@ -22,7 +22,6 @@
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;

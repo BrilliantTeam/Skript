@@ -293,9 +293,9 @@ public class SkriptParser {
 				final Variable<? extends T> var = parseVariable(expr, types);
 				if (var != null) {
 					if ((flags & PARSE_EXPRESSIONS) == 0) {
-//						Skript.error("Variables cannot be used here.");
-//						log.printError();
-//						return null;
+						Skript.error("Variables cannot be used here.");
+						log.printError();
+						return null;
 					}
 					log.printLog();
 					return var;
@@ -699,9 +699,9 @@ public class SkriptParser {
 				return null;
 			}
 			if ((flags & PARSE_EXPRESSIONS) == 0) {
-//				Skript.error("Functions cannot be used here.");
-//				log.printError();
-//				return null;
+				Skript.error("Functions cannot be used here.");
+				log.printError();
+				return null;
 			}
 			final String functionName = "" + m.group(1);
 			final String args = m.group(2);
