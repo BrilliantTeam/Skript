@@ -768,6 +768,21 @@ public final class BukkitEventValues {
 				return null;
 			}
 		}, 0);
+		//InventoryOpenEvent
+		EventValues.registerEventValue(InventoryOpenEvent.class, Player.class, new Getter<Player, InventoryOpenEvent>() {
+			@Override
+			@Nullable
+			public Player get(final InventoryOpenEvent e) {
+				return e.getPlayer();
+			}
+		}, 0);
+		EventValues.registerEventValue(InventoryOpenEvent.class, Inventory.class, new Getter<Inventory, InventoryOpenEvent>() {
+			@Override
+			@Nullable
+			public Inventory get(final InventoryOpenEvent e) {
+				return e.getInventory();
+			}
+		}, 0);
 	}
 	
 }
