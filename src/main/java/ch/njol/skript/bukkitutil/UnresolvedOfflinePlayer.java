@@ -49,30 +49,31 @@ import ch.njol.util.Closeable;
 public class UnresolvedOfflinePlayer implements OfflinePlayer {
 	
 	final static LinkedBlockingQueue<UnresolvedOfflinePlayer> toResolve;
+	final static Thread resolverThread;
 	
-	final static Thread resolverThread = Skript.newThread(new Runnable() {
-		@SuppressWarnings("deprecation")
-		@Override
-		public void run() {
-			if (toResolve == null) {
-				Skript.exception(new NullPointerException("null offline player resolve queue"), "An error happened when trying to enably resolving offline players, so"
-						+ " the feature has been turned off. Please report this at https://github.com/bensku/Skript/issues/237");
-				return;
-			}
-			
-			while (true) {
-				try {
-					final UnresolvedOfflinePlayer p = toResolve.take();
-					p.bukkitOfflinePlayer = Bukkit.getOfflinePlayer(p.name);
-					p.callback.run(p);
-				} catch (final InterruptedException e) {
-					break;
-				}
-			}
-		}
-	}, "Skript offline player resolver thread (fetches UUIDs from the minecraft servers)");
 	static {
 		toResolve = new LinkedBlockingQueue<UnresolvedOfflinePlayer>();
+		resolverThread = Skript.newThread(new Runnable() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void run() {
+				if (toResolve == null) {
+					Skript.exception(new NullPointerException("null offline player resolve queue"), "An error happened when trying to enably resolving offline players, so"
+							+ " the feature has been turned off. Please report this at https://github.com/bensku/Skript/issues/237");
+					return;
+				}
+				
+				while (true) {
+					try {
+						final UnresolvedOfflinePlayer p = toResolve.take();
+						p.bukkitOfflinePlayer = Bukkit.getOfflinePlayer(p.name);
+						p.callback.run(p);
+					} catch (final InterruptedException e) {
+						break;
+					}
+				}
+			}
+		}, "Skript offline player resolver thread (fetches UUIDs from the minecraft servers)");
 		resolverThread.start();
 		Skript.closeOnDisable(new Closeable() {
 			@Override
