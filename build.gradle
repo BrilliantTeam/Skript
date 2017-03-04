@@ -1,5 +1,9 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+plugins {
+    id "com.github.hierynomus.license" version "0.13.1"
+}
+
 apply plugin: 'java'
 apply plugin: 'maven'
 
@@ -60,6 +64,10 @@ processResources {
 
 jar {
 	archiveName System.getenv('SKRIPT_JAR_NAME') == null ? 'Skript.jar' : System.getenv("SKRIPT_JAR_NAME")
+}
+
+license {
+    header file('licenseheader.txt')
 }
 
 configurations {
