@@ -68,6 +68,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -92,6 +94,7 @@ import org.bukkit.event.world.ChunkEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.eclipse.jdt.annotation.Nullable;
@@ -773,7 +776,7 @@ public final class BukkitEventValues {
 			@Override
 			@Nullable
 			public Player get(final InventoryOpenEvent e) {
-				return e.getPlayer();
+				return (Player) e.getPlayer();
 			}
 		}, 0);
 		EventValues.registerEventValue(InventoryOpenEvent.class, Inventory.class, new Getter<Inventory, InventoryOpenEvent>() {
@@ -788,7 +791,7 @@ public final class BukkitEventValues {
 			@Override
 			@Nullable
 			public Player get(final InventoryCloseEvent e) {
-				return e.getPlayer();
+				return (Player) e.getPlayer();
 			}
 		}, 0);
 		EventValues.registerEventValue(InventoryCloseEvent.class, Inventory.class, new Getter<Inventory, InventoryCloseEvent>() {
