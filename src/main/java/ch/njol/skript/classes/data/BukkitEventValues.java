@@ -413,11 +413,11 @@ public final class BukkitEventValues {
 			}
 		}, 0);
 		// EntityTameEvent
-		EventValues.registerEventValue(EntityTameEvent.class, Player.class, new Getter<Player, EntityTameEvent>() {
+		EventValues.registerEventValue(EntityTameEvent.class, Entity.class, new Getter<Entity, EntityTameEvent>() {
 			@Override
 			@Nullable
-			public Player get(final EntityTameEvent e) {
-				return e.getOwner() instanceof Player ? (Player) e.getOwner() : null;
+			public Entity get(final EntityTameEvent e) {
+				return e.getEntity();
 			}
 		}, 0);
 		// EntityChangeBlockEvent
