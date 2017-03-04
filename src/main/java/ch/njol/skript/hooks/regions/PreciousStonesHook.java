@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,9 +31,6 @@ import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.field.Field;
 import net.sacredlabyrinth.Phaed.PreciousStones.field.FieldFlag;
 
-/**
- * @author <a href="mailto:lordboos@gmail.com">Jakub Kolar</a>
- */
 public class PreciousStonesHook extends RegionsPlugin<PreciousStones> {
 
     public PreciousStonesHook() throws IOException {
@@ -54,14 +53,15 @@ public class PreciousStonesHook extends RegionsPlugin<PreciousStones> {
 
     @Override
     public Collection<? extends Region> getRegionsAt_i(final Location l) {
-        return PreciousStones.API().getFieldsProtectingArea(FieldFlag.ALL, l).stream()
+        Set<PreciousStonesRegion> collect = PreciousStones.API().getFieldsProtectingArea(FieldFlag.ALL, l).stream()
                 .map(PreciousStonesRegion::new)
                 .collect(Collectors.toSet());
+        assert collect != null;
+		return collect;
     }
 
-    @SuppressWarnings("null")
     @Override
-    public Region getRegion_i(final World world, final String name) {
+    public @Nullable Region getRegion_i(final World world, final String name) {
         return null;
     }
 
@@ -96,9 +96,12 @@ public class PreciousStonesHook extends RegionsPlugin<PreciousStones> {
 
         @Override
         public Collection<OfflinePlayer> getMembers() {
-            return field.getAllAllowed().stream()
+            @SuppressWarnings("deprecation")
+			Set<OfflinePlayer> collect = field.getAllAllowed().stream()
                     .map(Bukkit::getOfflinePlayer)
                     .collect(Collectors.toSet());
+            assert collect != null;
+			return collect;
         }
 
         @Override
@@ -108,11 +111,15 @@ public class PreciousStonesHook extends RegionsPlugin<PreciousStones> {
 
         @Override
         public Collection<OfflinePlayer> getOwners() {
-            return Stream.of(Bukkit.getOfflinePlayer(field.getOwner()))
+            @SuppressWarnings("deprecation")
+			Set<OfflinePlayer> collect = Stream.of(Bukkit.getOfflinePlayer(field.getOwner()))
                     .collect(Collectors.toSet());
+            assert collect != null;
+			return collect;
         }
 
-        @Override
+        @SuppressWarnings("null")
+		@Override
         public Iterator<Block> getBlocks() {
             final List<Vector> vectors = field.getCorners();
             return new AABB(Bukkit.getWorld(field.getWorld()), vectors.get(0), vectors.get(7)).iterator();
