@@ -66,7 +66,20 @@ public class ExprSortedList extends SimpleExpression<Object> {
 	@Override
 	@Nullable
 	protected Object[] get(Event e) {
-		Object[] sorted = list.getAll(e).clone(); // Not yet sorted
+		Object[] unsorted = list.getAll(e);
+		Object[] sorted = new Object[unsorted.length]; // Not yet sorted...
+		
+		for (int i = 0; i < sorted.length; i++) {
+			Object value = unsorted[i];
+			if (value instanceof Long) {
+				// Hope it fits to the double...
+				sorted[i] = new Double(((Long) value).longValue());
+			} else {
+				// No conversion needed
+				sorted[i] = value;
+			}
+		}
+		
 		try {
 			Arrays.sort(sorted); // Now sorted
 		} catch (IllegalArgumentException ex) { // In case elements are not comparable
