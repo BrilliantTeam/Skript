@@ -62,7 +62,7 @@ public abstract class PassengerUtils {
 			try {
 				return new Entity[]{(Entity)getPassenger.invoke(e)};		
 			} catch (final Exception ex) { //I don't think it can happen, but just in case.
-				Skript.exception(ex, "A error occured while trying to get a passenger in version lower than 1.11.");
+				Skript.exception(ex, "A error occured while trying to get a passenger in version lower than 1.11.2.");
 			} 
 		}
 		return null;
@@ -82,7 +82,7 @@ public abstract class PassengerUtils {
 				vehicle.eject();
 				setPassenger.invoke(vehicle, passenger);
 			} catch (final Exception ex) { 
-				Skript.exception(ex, "A error occured while trying to set a passenger in version lower than 1.11.");
+				Skript.exception(ex, "A error occured while trying to set a passenger in version lower than 1.11.2.");
 			}
 		}
 	}

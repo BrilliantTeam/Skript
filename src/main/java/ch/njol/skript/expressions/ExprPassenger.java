@@ -53,18 +53,18 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Passenger")
 @Description({"The passenger of a vehicle, or the rider of a mob.",
 		"See also: <a href='#ExprVehicle'>vehicle</a>",
-		"For 1.10 and above, it returns a list of passengers and you can use all changers in it."})
-@Examples({"#for 1.9",
+		"For 1.11.2 and above, it returns a list of passengers and you can use all changers in it."})
+@Examples({"#for 1.11 and lower",
 		"passenger of the minecart is a creeper or a cow",
 		"the saddled pig's passenger is a player",
-		"#for 1.10 +",
+		"#for 1.11.2+",
 		"passengers of the minecart contains a creeper or a cow",
 		"the boat's passenger contains a pig",
 		"add a cow and a zombie to passengers of last spawned boat",
 		"set passengers of player's vehicle to a pig and a horse",
 		"remove all pigs from player's vehicle",
 		"clear passengers of boat"})
-@Since("2.0, 2.2-dev26 (Multiple passengers for 1.10+)")
+@Since("2.0, 2.2-dev26 (Multiple passengers for 1.11.2+)")
 public class ExprPassenger extends SimpleExpression<Entity> { // REMIND create 'vehicle' and 'passenger' expressions for vehicle enter/exit events?
 	static { // It was necessary to convert to SimpleExpression due to the method 'isSingle()'.
 		Skript.registerExpression(ExprPassenger.class, Entity.class, ExpressionType.PROPERTY, "[the] passenger[s] of %entities%", "%entities%'[s] passenger[s]");
