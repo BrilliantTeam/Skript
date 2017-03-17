@@ -36,7 +36,6 @@ import ch.njol.skript.effects.EffDrop;
 import ch.njol.skript.effects.EffShoot;
 import ch.njol.skript.effects.EffSpawn;
 import ch.njol.skript.entity.EntityData;
-import ch.njol.skript.entity.XpOrbData;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
