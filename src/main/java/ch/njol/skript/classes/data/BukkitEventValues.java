@@ -209,8 +209,11 @@ public final class BukkitEventValues {
 			@Override
 			@Nullable
 			public Direction get(final BlockPlaceEvent e) {
-				BlockFace bf = e.getBlockPlaced().getFace(e.getBlockAgainst());
-				return new Direction(new double[]{bf.getModX(), bf.getModY(), bf.getModZ()});
+				if (e.getBlock() != null) {
+					BlockFace bf = e.getBlockPlaced().getFace(e.getBlockAgainst());
+					return new Direction(new double[]{bf.getModX(), bf.getModY(), bf.getModZ()});
+				}
+				return Direction.ZERO;
 			}
 		}, 0);
 		// BlockFadeEvent
