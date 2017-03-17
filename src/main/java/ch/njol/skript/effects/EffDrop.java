@@ -21,6 +21,7 @@ package ch.njol.skript.effects;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
@@ -56,6 +57,9 @@ public class EffDrop extends Effect {
 		Skript.registerEffect(EffDrop.class, "drop %itemtypes/experience% [%directions% %locations%]",
 				"drop %itemtypes/experience% [%directions% %locations%] without velocity");
 	}
+	
+	@Nullable
+	public static Entity lastSpawned = null;
 	
 	@SuppressWarnings("null")
 	private Expression<?> drops;
@@ -93,15 +97,17 @@ public class EffDrop extends Effect {
 				if (o instanceof Experience) {
 					final ExperienceOrb orb = l.getWorld().spawn(l, ExperienceOrb.class);
 					orb.setExperience(((Experience) o).getXP());
+					EffSpawn.lastSpawned = orb;
 				} else {
 					for (final ItemStack is : ((ItemType) o).getItem().getAll()) {
 						if (is.getType() != Material.AIR) {
 							if (useVelocity) {
-								l.getWorld().dropItemNaturally(itemDropLoc, is);
+								lastSpawned = l.getWorld().dropItemNaturally(itemDropLoc, is);
 							} else {
 								final Item item = l.getWorld().dropItem(l, is);
 								item.teleport(l);
 								item.setVelocity(new Vector(0, 0, 0));
+								lastSpawned = item;
 							}
 						}
 					}

@@ -51,7 +51,6 @@ public class BoatData extends EntityData<Boat> {
 	}
 	
 	private BoatData(int type){
-		Skript.info("new BoatData(" + type + ");");
 		matchedPattern = type;
 	}
 	
@@ -78,7 +77,6 @@ public class BoatData extends EntityData<Boat> {
 
 	@Override
 	protected boolean match(Boat entity) {
-		Skript.info("Match: " + matchedPattern + " - " + entity.getWoodType().ordinal());
 		return matchedPattern <= 1 || entity.getWoodType().ordinal() == matchedPattern - 2;
 	}
 
@@ -115,7 +113,6 @@ public class BoatData extends EntityData<Boat> {
 	public boolean isOfItemType(ItemType i){
 		if (i.getRandom() == null)
 			return false;
-		Skript.info("isOfItemType: " + i.getRandom() + " - " + matchedPattern);
 		int ordinal = -1;
 		switch (i.getRandom().getType()){
 			case BOAT: ordinal = 0 ; break; //It is to make 'boat' and 'any boat' works as supertype when comparing.

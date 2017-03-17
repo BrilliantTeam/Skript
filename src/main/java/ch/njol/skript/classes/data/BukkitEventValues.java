@@ -58,6 +58,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingEvent;
@@ -435,6 +436,14 @@ public final class BukkitEventValues {
 				}
 			}, 0);
 		}
+		// ItemSpawnEvent
+		EventValues.registerEventValue(ItemSpawnEvent.class, ItemStack.class, new Getter<ItemStack, ItemSpawnEvent>() {
+			@Override
+			@Nullable
+			public ItemStack get(final ItemSpawnEvent e) {
+				return e.getEntity().getItemStack();
+			}
+		}, 0);
 		
 		// --- PlayerEvents ---
 		EventValues.registerEventValue(PlayerEvent.class, Player.class, new Getter<Player, PlayerEvent>() {
