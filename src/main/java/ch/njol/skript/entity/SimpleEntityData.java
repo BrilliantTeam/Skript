@@ -143,7 +143,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 	private final static List<SimpleEntityDataInfo> types = new ArrayList<>();
 	static {
 		types.add(new SimpleEntityDataInfo("arrow", Arrow.class));
-		types.add(new SimpleEntityDataInfo("boat", Boat.class));
+		if (!Skript.methodExists(Boat.class, "getWoodType")) // Only for 1.9 and lower. See BoatData instead
+			types.add(new SimpleEntityDataInfo("boat", Boat.class));
 		types.add(new SimpleEntityDataInfo("blaze", Blaze.class));
 		types.add(new SimpleEntityDataInfo("chicken", Chicken.class));
 		types.add(new SimpleEntityDataInfo("mooshroom", MushroomCow.class));

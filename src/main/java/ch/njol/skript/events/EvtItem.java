@@ -33,6 +33,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.effects.EffSpawn;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -104,6 +105,8 @@ public class EvtItem extends SkriptEvent {
 	@SuppressWarnings("null")
 	@Override
 	public boolean check(final Event e) {
+		if (e instanceof ItemSpawnEvent) // To make 'last dropped item' possible.
+			EffSpawn.lastSpawned = ((ItemSpawnEvent) e).getEntity();
 		if (types == null)
 			return true;
 		final ItemStack is;
