@@ -156,7 +156,7 @@ public abstract class SkriptEventHandler {
 	
 	private static long startEvent;
 	@Nullable
-	private static Timing timing;
+	private static Object timing;
 	
 	@SuppressWarnings("null")
 	public static void logEventStart(final Event e) {
@@ -172,7 +172,7 @@ public abstract class SkriptEventHandler {
 	
 	public static void logEventEnd() {
 		if (timing != null)
-			timing.setEventTime(System.nanoTime() - startEvent);
+			Timings.stop(timing);
 		
 		if (!Skript.logVeryHigh())
 			return;

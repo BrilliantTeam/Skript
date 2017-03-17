@@ -40,6 +40,7 @@ import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.log.Verbosity;
+import ch.njol.skript.timings.Timings;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
@@ -168,6 +169,16 @@ public abstract class SkriptConfig {
 			.optional(true);
 	
 	public final static Option<Boolean> apiSoftExceptions = new Option<Boolean>("soft api exceptions", false);
+	
+	public final static Option<Boolean> enableTimings = new Option<Boolean>("enable timings", true)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					Timings.setEnabled(t);
+				}
+				
+			});
 	
 	/**
 	 * This should only be used in special cases

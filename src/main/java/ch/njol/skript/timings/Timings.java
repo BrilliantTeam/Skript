@@ -31,39 +31,20 @@ import ch.njol.skript.SkriptEventHandler;
  */
 public class Timings {
 	
-	protected static Map<Object,Timing> timings = new HashMap<>();
 	private static volatile boolean enabled;
 	protected static volatile long enableTime;
 	protected static volatile long disableTime;
 	
 	public static Timing of(Object ref) {
-		Timing timing;
-		synchronized (timings) {
-			if (timings.containsKey(ref)) {
-				timing = timings.get(ref);
-			} else {
-				timing = new Timing();
-				timings.put(ref, timing);
-			}
-		}
-		
-		assert timing != null;
-		return timing;
+		return null;
 	}
 	
 	public static boolean enabled() {
 		return enabled;
 	}
 	
-	public static void enable() {
-		enabled = true;
-		enableTime = System.nanoTime();
-	}
-	
-	public static void disable() {
-		enabled = false;
-		disableTime = System.nanoTime();
-		SkriptEventHandler.removeTiming();
+	public static void setEnabled(boolean flag) {
+		enabled = flag;
 	}
 	
 	public static void clear() {
