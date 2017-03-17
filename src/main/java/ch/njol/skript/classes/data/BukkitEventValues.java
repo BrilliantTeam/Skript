@@ -26,6 +26,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -106,6 +107,7 @@ import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.BlockStateBlock;
 import ch.njol.skript.util.BlockUtils;
 import ch.njol.skript.util.DelayedChangeBlock;
+import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.InventorySlot;
 import ch.njol.skript.util.Slot;
@@ -203,6 +205,14 @@ public final class BukkitEventValues {
 				return new BlockStateBlock(e.getBlockReplacedState());
 			}
 		}, -1);
+		EventValues.registerEventValue(BlockPlaceEvent.class, Direction.class, new Getter<Direction, BlockPlaceEvent>() {
+			@Override
+			@Nullable
+			public Direction get(final BlockPlaceEvent e) {
+				BlockFace bf = e.getBlockPlaced().getFace(e.getBlockAgainst());
+				return new Direction(new double[]{bf.getModX(), bf.getModY(), bf.getModZ()});
+			}
+		}, 0);
 		// BlockFadeEvent
 		EventValues.registerEventValue(BlockFadeEvent.class, Block.class, new Getter<Block, BlockFadeEvent>() {
 			@Override
@@ -595,6 +605,15 @@ public final class BukkitEventValues {
 			@Nullable
 			public ItemStack get(final PlayerInteractEvent e) {
 				return e.getItem();
+			}
+		}, 0);
+		EventValues.registerEventValue(PlayerInteractEvent.class, Direction.class, new Getter<Direction, PlayerInteractEvent>() {
+			@Override
+			@Nullable
+			public Direction get(final PlayerInteractEvent e) {
+				if (e.getBlockFace() != null)
+					return new Direction(new double[]{e.getBlockFace().getModX(), e.getBlockFace().getModY(), e.getBlockFace().getModZ()});
+				return Direction.ZERO; // Same as 'BlockFace.SELF' or literal 'at'
 			}
 		}, 0);
 		// PlayerShearEntityEvent
