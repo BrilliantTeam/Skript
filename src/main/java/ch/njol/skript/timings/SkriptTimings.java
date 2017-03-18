@@ -19,24 +19,42 @@
  */
 package ch.njol.skript.timings;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.eclipse.jdt.annotation.Nullable;
+
+import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptEventHandler;
+import ch.njol.skript.lang.Trigger;
+import co.aikar.timings.Timing;
+import co.aikar.timings.Timings;
 
 /**
  * Static utils for Skript timings.
  */
-public class Timings {
+public class SkriptTimings {
 	
 	private static volatile boolean enabled;
-	protected static volatile long enableTime;
-	protected static volatile long disableTime;
+	@SuppressWarnings("null")
+	private static Skript skript; // Initialized on Skript load, before any timings would be used anyway
 	
-	public static Timing of(Object ref) {
-		return null;
+	@Nullable
+	public static Object start(String name) {
+		if (!enabled()) // Timings disabled :(
+			return null;
+		Timing timing = Timings.ofStart(skript, name);
+		assert timing != null;
+		return timing;
+	}
+	
+	public static void stop(@Nullable Object timing) {
+		if (timing == null) // Timings disabled...
+			return;
+		((Timing) timing).stopTiming();
 	}
 	
 	public static boolean enabled() {
@@ -47,8 +65,8 @@ public class Timings {
 		enabled = flag;
 	}
 	
-	public static void clear() {
-		timings.clear();
+	public static void setSkript(Skript plugin) {
+		skript = plugin;
 	}
 	
 }

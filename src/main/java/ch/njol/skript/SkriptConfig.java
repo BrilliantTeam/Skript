@@ -40,7 +40,7 @@ import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.log.Verbosity;
-import ch.njol.skript.timings.Timings;
+import ch.njol.skript.timings.SkriptTimings;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
@@ -170,12 +170,20 @@ public abstract class SkriptConfig {
 	
 	public final static Option<Boolean> apiSoftExceptions = new Option<Boolean>("soft api exceptions", false);
 	
-	public final static Option<Boolean> enableTimings = new Option<Boolean>("enable timings", true)
+	public final static Option<Boolean> enableTimings = new Option<Boolean>("enable timings", false)
 			.setter(new Setter<Boolean>() {
 
 				@Override
 				public void set(Boolean t) {
-					Timings.setEnabled(t);
+					if (Skript.classExists("co.aikar.timings.Timings")) { // Check for Paper server
+						if (t)
+							Skript.info("Timings support enabled!");
+						SkriptTimings.setEnabled(t); // Config option will be used
+					} else { // Not running Paper
+						if (t) // Warn the server admin that timings won't work
+							Skript.warning("Timings cannot be enabled! You are running Bukkit/Spigot, but Paper is required.");
+						SkriptTimings.setEnabled(false); // Just to be sure, deactivate timings support completely
+					}
 				}
 				
 			});
