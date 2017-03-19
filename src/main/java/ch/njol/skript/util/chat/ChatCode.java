@@ -143,8 +143,18 @@ public enum ChatCode {
 	@Nullable
 	public String colorCode;
 	
+	@Nullable
+	public String colorLangName;
+	
+	ChatCode(String colorCode, String langName) {
+		this.colorCode = colorCode;
+		this.colorLangName = langName;
+		this.hasParam = false;
+	}
+	
 	ChatCode(String colorCode) {
 		this.colorCode = colorCode;
+		this.colorLangName = colorCode;
 		this.hasParam = false;
 	}
 	

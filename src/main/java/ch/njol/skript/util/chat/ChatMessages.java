@@ -26,18 +26,43 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.njol.skript.localization.Language;
+import ch.njol.skript.localization.LanguageChangeListener;
+import ch.njol.skript.util.Color;
+
 /**
  * Contains generic utils for generating formatted chat messages.
  */
 public class ChatMessages {
 	
-	private static final Map<String,ChatCode> codes = new HashMap<>();
+	static final Map<String,ChatCode> codes = new HashMap<>();
+	
+	static {
+		Language.addListener(new LanguageChangeListener() {
+			
+			@Override
+			public void onLanguageChange() {
+				codes.clear();
+				
+				for (ChatCode code : ChatCode.values()) {
+					if (code.colorCode != null) {
+						for (String name : Language.getList(Color.LANGUAGE_NODE + "." + code.colorLangName)) {
+							codes.put(name, code);
+						}
+					} else {
+						// TODO work in progress
+					}
+				}
+			}
+		});
+	}
 	
 	public static String parseFormatting(String msg) {
 		char[] chars = msg.toCharArray();
 		
 		List<MessageComponent> components = new ArrayList<>();
 		MessageComponent current = new MessageComponent();
+		components.add(current);
 		StringBuilder curStr = new StringBuilder();
 		
 		char previous = 0;
@@ -66,7 +91,9 @@ public class ChatMessages {
 				
 				ChatCode code = codes.get(name);
 				if (code.nextComponent()) { // Next chat component, someone asked for reset
-					current.text = curStr.toString();
+					String text = curStr.toString();
+					assert text != null;
+					current.text = text;
 					current = new MessageComponent();
 					components.add(current);
 				}
@@ -78,6 +105,10 @@ public class ChatMessages {
 					code.updateComponent(current, param); // Actually update the component...
 			}
 		}
+		String text = curStr.toString();
+		assert text != null;
+		current.text = text;
+		
 		
 		return "";
 	}
