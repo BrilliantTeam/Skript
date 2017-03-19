@@ -38,21 +38,21 @@ public enum ChatCode {
 		}
 	},
 
-	// Colors
+	// Colors (Vanilla color code, Skript color code if different)
 	
 	black("black"),
 	dark_blue("dark_blue"),
 	dark_green("dark_green"),
-	dark_aqua("dark_aqua"),
+	dark_aqua("dark_aqua", "dark_cyan"),
 	dark_red("dark_red"),
 	dark_purple("dark_purple"),
-	gold("gold"),
-	gray("gray"),
-	dark_gray("dark_gray"),
+	gold("gold", "orange"),
+	gray("gray", "light_grey"),
+	dark_gray("dark_gray", "dark_grey"),
 	blue("blue"),
 	green("green"),
-	aqua("aqua"),
-	red("red"),
+	aqua("aqua", "light_cyan"),
+	red("red", "light_red"),
 	light_purple("light_purple"),
 	yellow("yellow"),
 	white("white"),
