@@ -31,6 +31,7 @@ import java.util.Map;
 
 import javax.xml.soap.Text;
 
+import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.reflect.TypeToken;
@@ -39,6 +40,7 @@ import com.google.gson.Gson;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.classes.Serializer;
+import ch.njol.skript.lang.Debuggable;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.LanguageChangeListener;
 import ch.njol.skript.registrations.Classes;
@@ -49,7 +51,7 @@ import ch.njol.yggdrasil.Fields;
 /**
  * Represents a chat message in JSON format.
  */
-public class ChatMessage {
+public class ChatMessage implements Debuggable {
 	
 	/**
 	 * Chat codes, see {@link ChatCode}.
@@ -93,46 +95,6 @@ public class ChatMessage {
 			}
 			
 		});
-		
-		Classes.registerClass(new ClassInfo<>(ChatMessage.class, "chatmessage")
-				.user("chat ?messages?")
-				.name("Chat Message")
-				.description("A chat message represents formatted message that can be sent into chat.")
-				.since("2.2-dev26")
-				.serializer(new Serializer<ChatMessage>() {
-
-					@Override
-					public Fields serialize(ChatMessage o) throws NotSerializableException {
-						Fields f = new Fields();
-						f.putObject("json", o.json);
-						return f;
-					}
-
-					@Override
-					public boolean canBeInstantiated() {
-						return false;
-					}
-					
-					@Override
-					public void deserialize(ChatMessage o, Fields f) throws StreamCorruptedException {
-						assert false;
-					}
-					
-					@Override
-					public ChatMessage deserialize(Fields f) throws StreamCorruptedException {
-						ChatMessage message = new ChatMessage();
-						String json = (String) f.getObject("json");
-						assert json != null;
-						message.json = json;
-						return message;
-					}
-
-					@Override
-					public boolean mustSyncDeserialization() {
-						return false;
-					}
-					
-				}));
 	}
 	
 	/**
@@ -217,6 +179,12 @@ public class ChatMessage {
 		return json;
 	}
 	
+	public static ChatMessage fromJson(String json) {
+		ChatMessage message = new ChatMessage();
+		message.json = json;
+		return message;
+	}
+	
 	String json;
 	
 	@SuppressWarnings("null")
@@ -230,5 +198,15 @@ public class ChatMessage {
 	
 	public String getJson() {
 		return json;
+	}
+
+	@Override
+	public String toString(@Nullable Event e, boolean debug) {
+		return json;
+	}
+	
+	@Override
+	public String toString() {
+		return toString(null, false);
 	}
 }
