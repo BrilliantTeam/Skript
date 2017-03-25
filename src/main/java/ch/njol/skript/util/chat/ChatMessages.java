@@ -26,6 +26,7 @@ import java.io.StreamCorruptedException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +52,7 @@ import ch.njol.yggdrasil.Fields;
 /**
  * Represents a chat message in JSON format.
  */
-public class ChatMessage implements Debuggable {
+public class ChatMessages {
 	
 	/**
 	 * Chat codes, see {@link ChatCode}.
@@ -62,6 +63,23 @@ public class ChatMessage implements Debuggable {
 	 * Instance of GSON we use for serialization.
 	 */
 	static final Gson gson = new Gson();
+	
+	/**
+	 * How many entries should be in message cache.
+	 */
+	static final int msgCacheSize = 100;
+	
+	static final Map<String,String> msgCache = new LinkedHashMap<String,String>() {
+		/**
+		 * Why is this needed... ?
+		 */
+		private static final long serialVersionUID = 8780868977339889766L;
+
+		@Override
+        protected boolean removeEldestEntry(@Nullable Map.Entry<String, String> eldest) {
+			return size() > 100;
+		}
+	};
 	
 	static {
 		// When language changes or server is loaded loop through all chatcodes
@@ -83,17 +101,6 @@ public class ChatMessage implements Debuggable {
 					}
 				}
 			}
-		});
-		
-		// This one converts strings to chat messages if requested
-		Converters.registerConverter(String.class, ChatMessage.class, new Converter<String, ChatMessage>() {
-
-			@Override
-			@Nullable
-			public ChatMessage convert(String f) {
-				return new ChatMessage(f);
-			}
-			
 		});
 	}
 	
@@ -179,34 +186,18 @@ public class ChatMessage implements Debuggable {
 		return json;
 	}
 	
-	public static ChatMessage fromJson(String json) {
-		ChatMessage message = new ChatMessage();
-		message.json = json;
-		return message;
-	}
-	
-	String json;
-	
-	@SuppressWarnings("null")
-	ChatMessage() {
-		// when using this, remember to actually put something to json field
-	}
-	
-	public ChatMessage(String text) {
-		json = parse(text);
-	}
-	
-	public String getJson() {
+	/**
+	 * Gets JSON chat message for given message. Might parse it
+	 * or just take it from cache.
+	 * @param msg Message (not JSON).
+	 * @return
+	 */
+	public static String get(String msg) {
+		String json = msgCache.get(msg);
+		if (json == null) {
+			json = parse(msg);
+			msgCache.put(msg, json);
+		}
 		return json;
-	}
-
-	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return json;
-	}
-	
-	@Override
-	public String toString() {
-		return toString(null, false);
 	}
 }

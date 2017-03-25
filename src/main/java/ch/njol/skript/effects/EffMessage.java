@@ -32,7 +32,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.chat.ChatMessage;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import net.md_5.bungee.api.chat.BaseComponent;
 
@@ -57,8 +57,6 @@ public class EffMessage extends Effect {
 	
 	@Nullable
 	private Expression<String> messages;
-	@Nullable
-	private Expression<ChatMessage> jsonMessages;
 	
 	@SuppressWarnings("null")
 	private Expression<CommandSender> recipients;
@@ -66,10 +64,7 @@ public class EffMessage extends Effect {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		if (hasSendRaw)
-			jsonMessages = (Expression<ChatMessage>) exprs[0];
-		else
-			messages = (Expression<String>) exprs[0];
+		messages = (Expression<String>) exprs[0];
 		recipients = (Expression<CommandSender>) exprs[1];
 		return true;
 	}
@@ -77,11 +72,11 @@ public class EffMessage extends Effect {
 	@Override
 	protected void execute(final Event e) {
 		if (hasSendRaw) {
-			assert jsonMessages != null;
-			for (final ChatMessage message : jsonMessages.getArray(e)) {
+			assert messages != null;
+			for (final String message : messages.getArray(e)) {
 				for (final CommandSender s : recipients.getArray(e)) {
 					if (s instanceof Conversable)
-						((Conversable) s).sendRawMessage(message.getJson());
+						((Conversable) s).sendRawMessage(ChatMessages.get(message));
 					// If command block was supposed to receive this message, just ignore it
 				}
 			}
@@ -97,12 +92,7 @@ public class EffMessage extends Effect {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		if (hasSendRaw) {
-			assert jsonMessages != null;
-			return "send " + jsonMessages.toString(e, debug) + " to " + recipients.toString(e, debug);
-		} else {
-			assert messages != null;
-			return "send " + messages.toString(e, debug) + " to " + recipients.toString(e, debug);
-		}
+		assert messages != null;
+		return "send " + messages.toString(e, debug) + " to " + recipients.toString(e, debug);
 	}
 }

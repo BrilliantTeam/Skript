@@ -63,7 +63,7 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.VisualEffect;
 import ch.njol.skript.util.WeatherType;
-import ch.njol.skript.util.chat.ChatMessage;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.yggdrasil.Fields;
 
 /**
@@ -883,64 +883,6 @@ public class SkriptClasses {
 					}
 				})
 				.serializer(new YggdrasilSerializer<VisualEffect>()));
-		
-		Classes.registerClass(new ClassInfo<>(ChatMessage.class, "chatmessage")
-				.user("chat ?messages?")
-				.name("Chat Message")
-				.description("A chat message represents formatted message that can be sent into chat.")
-				.since("2.2-dev26")
-				.before("string")
-				.serializer(new Serializer<ChatMessage>() {
-
-					@Override
-					public Fields serialize(ChatMessage o) throws NotSerializableException {
-						Fields f = new Fields();
-						f.putObject("json", o.getJson());
-						return f;
-					}
-
-					@Override
-					public boolean canBeInstantiated() {
-						return false;
-					}
-					
-					@Override
-					public void deserialize(ChatMessage o, Fields f) throws StreamCorruptedException {
-						assert false;
-					}
-					
-					@Override
-					public ChatMessage deserialize(Fields f) throws StreamCorruptedException {
-						String json = (String) f.getObject("json");
-						assert json != null;
-						return ChatMessage.fromJson(json);
-					}
-
-					@Override
-					public boolean mustSyncDeserialization() {
-						return false;
-					}
-					
-				})
-				.parser(new Parser<ChatMessage>() {
-
-					@Override
-					public String toString(ChatMessage o, int flags) {
-						return o.toString();
-					}
-
-					@Override
-					public String toVariableNameString(ChatMessage o) {
-						return o.toString();
-					}
-
-					@Override
-					public String getVariableNamePattern() {
-						// TODO Auto-generated method stub
-						return "";
-					}
-					
-				}));
 	}
 	
 }
