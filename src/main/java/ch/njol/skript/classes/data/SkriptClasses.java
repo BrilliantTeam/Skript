@@ -63,7 +63,6 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.VisualEffect;
 import ch.njol.skript.util.WeatherType;
-import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.yggdrasil.Fields;
 
 /**

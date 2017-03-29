@@ -36,6 +36,11 @@ public enum ChatCode {
 		public boolean nextComponent() {
 			return true;
 		}
+		
+		@Override
+		public void updateComponent(MessageComponent component, String param) {
+			component.reset = true;
+		}
 	},
 
 	// Colors (Vanilla color code, Skript color code if different)

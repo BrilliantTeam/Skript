@@ -44,6 +44,7 @@ import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.lang.Debuggable;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.LanguageChangeListener;
+import ch.njol.skript.localization.Message;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Color;
@@ -110,6 +111,10 @@ public class ChatMessages {
 	private static class ComponentList {
 		
 		public ComponentList(List<MessageComponent> components) {
+			this.extra = components.toArray(new MessageComponent[0]);
+		}
+		
+		public ComponentList(MessageComponent[] components) {
 			this.extra = components;
 		}
 
@@ -125,10 +130,10 @@ public class ChatMessages {
 		 */
 		@SuppressWarnings("unused")
 		@Nullable
-		public List<MessageComponent> extra;
+		public MessageComponent[] extra;
 	}
 	
-	private static String parse(String msg) {
+	public static List<MessageComponent> parse(String msg) {
 		char[] chars = msg.toCharArray();
 		
 		List<MessageComponent> components = new ArrayList<>();
@@ -160,7 +165,7 @@ public class ChatMessages {
 					name = tag;
 				}
 				
-				ChatCode code = codes.get(name);
+				ChatCode code = codes.get(name); // TODO fix NPE
 				if (code.nextComponent()) { // Next chat component, someone asked for reset
 					String text = curStr.toString();
 					assert text != null;
@@ -176,10 +181,23 @@ public class ChatMessages {
 					code.updateComponent(current, param); // Actually update the component...
 			}
 		}
-		String text = curStr.toString();
-		assert text != null;
-		current.text = text;
 		
+		return components;
+	}
+	
+	@SuppressWarnings("null")
+	public static MessageComponent[] parseToArray(String msg) {
+		return parse(msg).toArray(new MessageComponent[0]);
+	}
+	
+	public static String toJson(String msg) {
+		ComponentList componentList = new ComponentList(parse(msg));
+		String json = gson.toJson(componentList);
+		assert json != null;
+		return json;
+	}
+	
+	public static String toJson(MessageComponent[] components) {
 		ComponentList componentList = new ComponentList(components);
 		String json = gson.toJson(componentList);
 		assert json != null;
@@ -187,17 +205,26 @@ public class ChatMessages {
 	}
 	
 	/**
-	 * Gets JSON chat message for given message. Might parse it
-	 * or just take it from cache.
-	 * @param msg Message (not JSON).
-	 * @return
+	 * Copies styles from component to another. Note that this only copies
+	 * additional styling, i.e. if text was not bold and is bold, it will remain bold.
+	 * @param from
+	 * @param to
 	 */
-	public static String get(String msg) {
-		String json = msgCache.get(msg);
-		if (json == null) {
-			json = parse(msg);
-			msgCache.put(msg, json);
-		}
-		return json;
+	public static void copyStyles(MessageComponent from, MessageComponent to) {
+		if (to.reset)
+			return;
+		
+		if (!to.bold)
+			to.bold = from.bold;
+		if (!to.italic)
+			to.italic = from.italic;
+		if (!to.underlined)
+			to.underlined = from.underlined;
+		if (!to.strikethrough)
+			to.strikethrough = from.strikethrough;
+		if (!to.obfuscated)
+			to.obfuscated = from.obfuscated;
+		if (to.color.equals("reset"))
+			to.color = from.color;
 	}
 }

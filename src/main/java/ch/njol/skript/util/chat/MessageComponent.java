@@ -32,6 +32,11 @@ public class MessageComponent {
 	public String text = "";
 	
 	/**
+	 * Tells that this component is supposed to reset styling.
+	 */
+	public boolean reset = false;
+	
+	/**
 	 * Makes text <b>bold</b>.
 	 */
 	public boolean bold = false;

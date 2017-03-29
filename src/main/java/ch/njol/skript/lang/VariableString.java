@@ -42,6 +42,7 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.localization.Language;
+import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.log.BlockingLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
@@ -49,6 +50,8 @@ import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.StringMode;
 import ch.njol.skript.util.Utils;
+import ch.njol.skript.util.chat.ChatMessages;
+import ch.njol.skript.util.chat.MessageComponent;
 import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
@@ -76,6 +79,7 @@ public class VariableString implements Expression<String> {
 	
 	@Nullable
 	private final Object[] string;
+	private final MessageComponent[][] components;
 	private final boolean isSimple;
 	@Nullable
 	private final String simple;
@@ -83,16 +87,30 @@ public class VariableString implements Expression<String> {
 	
 	private VariableString(final String s) {
 		isSimple = true;
-		simple = s;
+		simple = Utils.replaceChatStyles("" + s.replace("\"\"", "\""));
 		
-		orig = s;
+		orig = simple;
 		string = null;
+		components = new MessageComponent[][] {ChatMessages.parseToArray(s)};
 		mode = StringMode.MESSAGE;
 	}
 	
 	private VariableString(final String orig, final Object[] string, final StringMode mode) {
 		this.orig = orig;
-		this.string = string;
+		this.string = new Object[string.length];
+		List<MessageComponent[]> components = new ArrayList<>(string.length + 2);
+		for (int i = 0; i < string.length; i++) {
+			Object o = string[i];
+			if (o instanceof String) {
+				string[i] = Utils.replaceChatStyles("" + ((String) o).replace("\"\"", "\""));
+				components.add(ChatMessages.parseToArray((String) o));
+			} else {
+				string[i] = o;
+				components.add(null);
+			}
+		}
+		this.components = components.toArray(new MessageComponent[0][0]);
+		
 		this.mode = mode;
 		
 		isSimple = false;
@@ -161,8 +179,12 @@ public class VariableString implements Expression<String> {
 			Skript.error("The percent sign is used for expressions (e.g. %player%). To insert a '%' type it twice: %%.");
 			return null;
 		}
-		final String s = Utils.replaceChatStyles("" + orig.replace("\"\"", "\""));
-		final ArrayList<Object> string = new ArrayList<>(n / 2 + 2);
+		
+		// We must not parse color codes yet, as JSON support would be broken :(
+		final String s = orig;
+		
+		final List<Object> string = new ArrayList<>(n / 2 + 2); // List of strings and expressions
+		
 		int c = s.indexOf('%');
 		if (c != -1) {
 			if (c != 0)
@@ -183,6 +205,7 @@ public class VariableString implements Expression<String> {
 					return null;
 				}
 				if (c + 1 == c2) {
+					// %% escaped -> one % in result string
 					if (string.size() > 0 && string.get(string.size() - 1) instanceof String) {
 						string.set(string.size() - 1, (String) string.get(string.size() - 1) + "%");
 					} else {
@@ -233,23 +256,27 @@ public class VariableString implements Expression<String> {
 				c = s.indexOf('%', c2 + 1);
 				if (c == -1)
 					c = s.length();
-				final String l = s.substring(c2 + 1, c);
-				if (!l.isEmpty()) {
+				final String l = s.substring(c2 + 1, c); // Try to get string (non-variable) part
+				if (!l.isEmpty()) { // This is string part (no variables)
 					if (string.size() > 0 && string.get(string.size() - 1) instanceof String) {
+						// We can append last string part in the list, so let's do so
 						string.set(string.size() - 1, (String) string.get(string.size() - 1) + l);
-					} else {
+					} else { // Can't append, just add new part
 						string.add(l);
 					}
 				}
 			}
 		} else {
+			// Only one string, no variable parts
 			string.add(s);
 		}
 		
 		checkVariableConflicts(s, mode, string);
 		
+		// Check if this isn't actually variable string, and return
 		if (string.size() == 1 && string.get(0) instanceof String)
-			return new VariableString("" + string.get(0));
+			return new VariableString(s);
+		
 		final Object[] sa = string.toArray();
 		assert sa != null;
 		return new VariableString(orig, sa, mode);
@@ -385,6 +412,52 @@ public class VariableString implements Expression<String> {
 			}
 		}
 		return "" + b.toString();
+	}
+	
+	public MessageComponent[] getMessageComponents(final Event e) {
+		if (isSimple) {
+			MessageComponent[] c = components[0];
+			assert c != null;
+			return c;
+		}
+		
+		final Object[] string = this.string;
+		assert string != null;
+		
+		final List<MessageComponent> componentList = new ArrayList<>();
+		for (int i = 0; i < components.length; i++) {
+			MessageComponent[] c = components[i];
+			if (c == null) { // Need to parse variable part
+				final Object o = string[i];
+				if (o instanceof VariableString) {
+					MessageComponent[] c2 = ((VariableString) o).getMessageComponents(e);
+					ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
+					componentList.addAll(Arrays.asList(c));
+				} else if (o instanceof Expression<?>) {
+					assert mode != StringMode.MESSAGE;
+					componentList.addAll(ChatMessages.parse(Classes.toString(((Expression<?>) o).getArray(e), true, mode)));
+				}
+			} else { // String part, parsed already
+				componentList.addAll(Arrays.asList(c));
+			}
+		}
+		return componentList.toArray(new MessageComponent[0]);
+	}
+	
+	/**
+	 * Parses all expressions in the string and returns it in chat JSON format.
+	 * 
+	 * @param e Event to pass to the expressions.
+	 * @return The input string with all expressions replaced.
+	 */
+	public String toChatString(final Event e) {
+		if (isSimple) {
+			MessageComponent[] c = components[0];
+			assert c != null;
+			return ChatMessages.toJson(c);
+		}
+		
+		return ChatMessages.toJson(getMessageComponents(e));
 	}
 	
 	@Nullable

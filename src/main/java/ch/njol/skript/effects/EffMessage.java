@@ -32,6 +32,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -52,11 +53,12 @@ public class EffMessage extends Effect {
 	private static final boolean hasSendRaw = Skript.classExists("org.bukkit.conversations.Conversable");
 	
 	static {
-		Skript.registerEffect(EffMessage.class, "(message|send [message]) %chatmessages% [to %commandsenders%]");
+		Skript.registerEffect(EffMessage.class, "(message|send [message]) %strings% [to %commandsenders%]");
 	}
 	
 	@Nullable
 	private Expression<String> messages;
+	private boolean canSendRaw;
 	
 	@SuppressWarnings("null")
 	private Expression<CommandSender> recipients;
@@ -65,20 +67,21 @@ public class EffMessage extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		messages = (Expression<String>) exprs[0];
+		canSendRaw = hasSendRaw && messages instanceof VariableString;
 		recipients = (Expression<CommandSender>) exprs[1];
 		return true;
 	}
 	
 	@Override
 	protected void execute(final Event e) {
-		if (hasSendRaw) {
-			assert messages != null;
-			for (final String message : messages.getArray(e)) {
-				for (final CommandSender s : recipients.getArray(e)) {
-					if (s instanceof Conversable)
-						((Conversable) s).sendRawMessage(ChatMessages.get(message));
-					// If command block was supposed to receive this message, just ignore it
-				}
+		assert messages != null;
+		Skript.info("" + messages.getClass());
+		if (canSendRaw) {
+			for (final CommandSender s : recipients.getArray(e)) {
+				assert messages != null;
+				if (s instanceof Conversable)
+					((Conversable) s).sendRawMessage(((VariableString) messages).toChatString(e));
+				// If command block was supposed to receive this message, just ignore it
 			}
 		} else {
 			assert messages != null;
