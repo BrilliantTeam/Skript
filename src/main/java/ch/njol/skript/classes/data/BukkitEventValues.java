@@ -293,6 +293,13 @@ public final class BukkitEventValues {
 				return e.getPlayer();
 			}
 		}, 0);
+		EventValues.registerEventValue(BlockIgniteEvent.class, Block.class, new Getter<Block, BlockIgniteEvent>() {
+			@Override
+			@Nullable
+			public Block get(final BlockIgniteEvent e) {
+				return e.getIgnitingBlock();
+			}
+		}, 0);
 		// BlockDispenseEvent
 		EventValues.registerEventValue(BlockDispenseEvent.class, ItemStack.class, new Getter<ItemStack, BlockDispenseEvent>() {
 			@Override
