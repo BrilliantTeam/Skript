@@ -431,7 +431,7 @@ colors:
 		names: cyan, aqua, dark cyan, dark aqua, dark turquoise, dark turquois
 	light_cyan:
 		adjective: light cyan
-		names: light cyan, light aqua, turquoise, turquois
+		names: light cyan, light aqua, turquoise, turquois, light blue
 	dark_green:
 		adjective: green
 		names: green, dark green
@@ -463,8 +463,13 @@ chat styles:
 	italic: italic, italics, i
 	strikethrough: strikethrough, strike, s
 	underline: underlined, underline, u
-	magic: magic
+	magic: magic, obfuscated
 	reset: reset, r
+	open_url: link, open url, url
+	run_command: run command, command, cmd
+	suggest_command: suggest command
+	change_page: change page
+	show_text: tooltip, show text
 
 # -- Directions --
 directions:

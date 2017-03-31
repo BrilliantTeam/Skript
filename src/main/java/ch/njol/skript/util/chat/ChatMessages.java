@@ -37,7 +37,9 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.classes.Serializer;
@@ -49,6 +51,7 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Color;
 import ch.njol.yggdrasil.Fields;
+import edu.umd.cs.findbugs.ba.bcp.New;
 
 /**
  * Represents a chat message in JSON format.
@@ -63,7 +66,7 @@ public class ChatMessages {
 	/**
 	 * Instance of GSON we use for serialization.
 	 */
-	static final Gson gson = new Gson();
+	static final Gson gson;
 	
 	/**
 	 * How many entries should be in message cache.
@@ -82,7 +85,7 @@ public class ChatMessages {
 		}
 	};
 	
-	static {
+	public static void registerListeners() {
 		// When language changes or server is loaded loop through all chatcodes
 		Language.addListener(new LanguageChangeListener() {
 			
@@ -90,19 +93,26 @@ public class ChatMessages {
 			public void onLanguageChange() {
 				codes.clear();
 				
+				Skript.debug("Parsing message style lang files");
 				for (ChatCode code : ChatCode.values()) {
 					if (code.colorCode != null) { // Color code!
-						for (String name : Language.getList(Color.LANGUAGE_NODE + "." + code.colorLangName)) {
+						for (String name : Language.getList(Color.LANGUAGE_NODE + "." + code.langName + ".names")) {
 							codes.put(name, code);
 						}
 					} else { // Not color code
-						for (String name : Language.getList("chat styles." + code.name())) {
+						for (String name : Language.getList("chat styles." + code.langName)) {
 							codes.put(name, code);
 						}
 					}
 				}
 			}
 		});
+	}
+	
+	static {
+		Gson nullableGson = new GsonBuilder().registerTypeAdapter(boolean.class, new MessageComponent.BooleanSerializer()).create();
+		assert nullableGson != null;
+		gson = nullableGson;
 	}
 	
 	/**
@@ -143,17 +153,24 @@ public class ChatMessages {
 		
 		char previous = 0;
 		int tagStart = 0;
+		boolean tagMode = false; // Tagmode: don't read to StringBuilder, we are at a tag
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
 			if (c == '\\' || previous == '\\') // \ serves as escape character
 				continue;
 			previous = c;
-			curStr.append(c); // Append this char to curStr
 			
-			if (c == '<') {
+			if (c == '<') { // Tag start
 				tagStart = i;
-			} else if (c == '>') {
+				tagMode = true;
+			}
+				
+			if (!tagMode) // Normal handling if not inside a tag
+				curStr.append(c); // Append this char to curStr
+			
+			if (c == '>') { // Tag end
 				String tag = msg.substring(tagStart + 1, i);
+				tagMode = false;
 				
 				String name;
 				String param = "";
@@ -165,9 +182,10 @@ public class ChatMessages {
 					name = tag;
 				}
 				
-				ChatCode code = codes.get(name); // TODO fix NPE
+				ChatCode code = codes.get(name);
 				if (code.nextComponent()) { // Next chat component, someone asked for reset
 					String text = curStr.toString();
+					curStr = new StringBuilder();
 					assert text != null;
 					current.text = text;
 					current = new MessageComponent();
@@ -181,6 +199,9 @@ public class ChatMessages {
 					code.updateComponent(current, param); // Actually update the component...
 			}
 		}
+		String text = curStr.toString();
+		assert text != null;
+		current.text = text;
 		
 		return components;
 	}
@@ -226,5 +247,12 @@ public class ChatMessages {
 			to.obfuscated = from.obfuscated;
 		if (to.color.equals("reset"))
 			to.color = from.color;
+		
+		if (to.clickEvent == null)
+			to.clickEvent = from.clickEvent;
+		if (to.insertion == null)
+			to.insertion = from.insertion;
+		if (to.hoverEvent == null)
+			to.hoverEvent = from.hoverEvent;
 	}
 }

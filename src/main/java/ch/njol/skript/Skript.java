@@ -115,6 +115,7 @@ import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.Version;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Closeable;
 import ch.njol.util.Kleenean;
@@ -200,6 +201,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		//System.setOut(new FilterPrintStream(System.out));
 		
+		ChatMessages.registerListeners();
 		Language.loadDefault(getAddonInstance());
 		
 		Workarounds.init();

@@ -54,8 +54,8 @@ public enum ChatCode {
 	gold("gold", "orange"),
 	gray("gray", "light_grey"),
 	dark_gray("dark_gray", "dark_grey"),
-	blue("blue"),
-	green("green"),
+	blue("blue", "light_cyan"),
+	green("green", "light_green"),
 	aqua("aqua", "light_cyan"),
 	red("red", "light_red"),
 	light_purple("light_purple"),
@@ -78,7 +78,7 @@ public enum ChatCode {
 		}
 	},
 	
-	underlined {
+	underlined(null, "underline") {
 		@Override
 		public void updateComponent(MessageComponent component, String param) {
 			component.underlined = true;
@@ -92,7 +92,7 @@ public enum ChatCode {
 		}
 	},
 	
-	obfuscated {
+	obfuscated(null, "magic") {
 		@Override
 		public void updateComponent(MessageComponent component, String param) {
 			component.obfuscated = true;
@@ -149,26 +149,27 @@ public enum ChatCode {
 	public String colorCode;
 	
 	@Nullable
-	public String colorLangName;
+	public String langName;
 	
-	ChatCode(String colorCode, String langName) {
+	ChatCode(@Nullable String colorCode, String langName) {
 		this.colorCode = colorCode;
-		this.colorLangName = langName;
+		this.langName = langName;
 		this.hasParam = false;
 	}
 	
 	ChatCode(String colorCode) {
 		this.colorCode = colorCode;
-		this.colorLangName = colorCode;
+		this.langName = colorCode;
 		this.hasParam = false;
 	}
 	
 	ChatCode(boolean hasParam) {
 		this.hasParam = hasParam;
+		this.langName = this.name(); // Default to enum name
 	}
 	
 	ChatCode() {
-		this.hasParam = false;
+		this(false);
 	}
 	
 	/**
@@ -181,6 +182,6 @@ public enum ChatCode {
 	}
 	
 	public boolean nextComponent() {
-		return false;
+		return colorCode != null; // Colors reset by default
 	}
 }

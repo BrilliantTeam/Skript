@@ -109,7 +109,9 @@ public class VariableString implements Expression<String> {
 				components.add(null);
 			}
 		}
-		this.components = components.toArray(new MessageComponent[0][0]);
+		MessageComponent[][] componentArray = components.toArray(new MessageComponent[0][0]);
+		assert componentArray != null;
+		this.components = componentArray;
 		
 		this.mode = mode;
 		

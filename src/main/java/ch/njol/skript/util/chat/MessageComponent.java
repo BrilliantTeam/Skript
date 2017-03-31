@@ -21,7 +21,17 @@
 
 package ch.njol.skript.util.chat;
 
+import java.lang.reflect.Type;
+
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 /**
  * Component for chat messages. This can be serialized with GSON and then
@@ -125,4 +135,12 @@ public class MessageComponent {
 	
 	@Nullable
 	public HoverEvent hoverEvent;
+	
+	public static class BooleanSerializer implements JsonSerializer<Boolean> {
+
+		@Override
+		public @Nullable JsonElement serialize(@Nullable Boolean src, @Nullable Type typeOfSrc, @Nullable JsonSerializationContext context) {
+			return src ? new JsonPrimitive(true) : null;
+		}
+	}
 }

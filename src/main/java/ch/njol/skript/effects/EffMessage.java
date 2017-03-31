@@ -19,8 +19,12 @@
  */
 package ch.njol.skript.effects;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.conversations.Conversable;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -36,6 +40,7 @@ import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 /**
  * @author Peter Güttinger
@@ -75,13 +80,13 @@ public class EffMessage extends Effect {
 	@Override
 	protected void execute(final Event e) {
 		assert messages != null;
-		Skript.info("" + messages.getClass());
 		if (canSendRaw) {
 			for (final CommandSender s : recipients.getArray(e)) {
 				assert messages != null;
-				if (s instanceof Conversable)
-					((Conversable) s).sendRawMessage(((VariableString) messages).toChatString(e));
-				// If command block was supposed to receive this message, just ignore it
+				BaseComponent[] components = ComponentSerializer.parse(((VariableString) messages).toChatString(e));
+				s.sendMessage(components);
+				// Sadly this is essentially serializing, then deserializing, then serializing again...
+				// TODO measure performance, potentially improve it
 			}
 		} else {
 			assert messages != null;
