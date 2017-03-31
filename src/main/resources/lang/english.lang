@@ -524,6 +524,27 @@ entities:
 	boat:
 		name: boat¦s
 		pattern: boat(|1¦s)
+	any boat:
+		name: boat¦s
+		pattern: any boat(|1¦s)
+	oak boat:
+		name: oak boat¦s
+		pattern: oak boat(|1¦s)	
+	spruce boat:
+		name: spruce boat¦s
+		pattern: spruce boat(|1¦s)
+	birch boat:
+		name: birch boat¦s
+		pattern: birch boat(|1¦s)
+	jungle boat:
+		name: jungle boat¦s
+		pattern: jungle boat(|1¦s)
+	acacia boat:
+		name: acacia boat¦s
+		pattern: acacia boat(|1¦s)
+	dark oak boat:
+		name: dark oak boat¦s
+		pattern: dark oak boat(|1¦s)
 	blaze:
 		name: blaze¦s
 		pattern: blaze(|1¦s)
@@ -683,6 +704,9 @@ entities:
 		name: TNT
 		pattern: ([primed] TNT(2¦|1¦s)|TNT entit(y|1¦ies))
 	villager:
+		name: villager¦s
+		pattern: <age> villager(|1¦s)|(4¦)[villager] (kid(|1¦s)|child(|1¦ren))
+	normal:
 		name: villager¦s
 		pattern: <age> villager(|1¦s)|(4¦)[villager] (kid(|1¦s)|child(|1¦ren))
 	farmer:
