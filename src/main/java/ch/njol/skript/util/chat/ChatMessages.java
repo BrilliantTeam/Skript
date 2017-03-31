@@ -188,7 +188,13 @@ public class ChatMessages {
 					curStr = new StringBuilder();
 					assert text != null;
 					current.text = text;
+					
+					MessageComponent old = current;
 					current = new MessageComponent();
+					if (code.equals(ChatCode.reset))
+						current.reset = true;
+					copyStyles(old, current);
+					
 					components.add(current);
 				}
 				
