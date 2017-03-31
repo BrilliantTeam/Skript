@@ -28,6 +28,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Chicken;
@@ -59,6 +60,7 @@ import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Comparator;
+import ch.njol.skript.entity.BoatData;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.util.Date;
@@ -235,6 +237,8 @@ public class DefaultComparators {
 				Skript.exception(e, "Cannot initialize material support for minecarts");
 			}
 		}
+		if (Skript.classExists("org.bukkit.entity.ArmorStand"))
+			entityMaterials.put(ArmorStand.class, Material.ARMOR_STAND);
 	}
 	public final static Comparator<EntityData, ItemType> entityItemComparator = new Comparator<EntityData, ItemType>() {
 		@Override
@@ -245,6 +249,8 @@ public class DefaultComparators {
 				return Relation.get(i.isOfType(Material.POTION.getId(), PotionEffectUtils.guessData((ThrownPotion) e)));
 			if (Skript.classExists("org.bukkit.entity.WitherSkull") && e instanceof WitherSkull)
 				return Relation.get(i.isOfType(Material.SKULL_ITEM.getId(), (short) 1));
+			if (e instanceof BoatData)
+				return Relation.get(((BoatData)e).isOfItemType(i));
 			if (entityMaterials.containsKey(e.getType()))
 				return Relation.get(i.isOfType(entityMaterials.get(e.getType()).getId(), (short) 0));
 			for (final Entry<Class<? extends Entity>, Material> m : entityMaterials.entrySet()) {
