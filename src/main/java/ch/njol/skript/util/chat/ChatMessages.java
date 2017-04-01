@@ -44,6 +44,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.lang.Debuggable;
+import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.LanguageChangeListener;
 import ch.njol.skript.localization.Message;
@@ -174,10 +175,16 @@ public class ChatMessages {
 				
 				String name;
 				String param = "";
+				VariableString varParam = null;
 				if (tag.contains(":")) {
-					String[] split = tag.split(":");
+					String[] split = tag.split(":", 2);
 					name = split[0];
 					param = split[1];
+					
+					// Check if we need to do VariableString parsing
+					if (param.contains("%")) {
+						varParam = VariableString.newInstance(param);
+					}
 				} else {
 					name = tag;
 				}
@@ -202,7 +209,7 @@ public class ChatMessages {
 				if (code.colorCode != null) // Just update color code
 					current.color = code.colorCode;
 				else
-					code.updateComponent(current, param); // Actually update the component...
+					code.updateComponent(current, param, varParam); // Call ChatCode update
 			}
 		}
 		String text = curStr.toString();

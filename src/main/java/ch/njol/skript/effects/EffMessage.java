@@ -81,12 +81,14 @@ public class EffMessage extends Effect {
 	protected void execute(final Event e) {
 		assert messages != null;
 		if (canSendRaw) {
+			// Sadly this is essentially serializing, then deserializing, then serializing again...
+			// TODO measure performance, potentially improve it
+			Skript.info(((VariableString) messages).toChatString(e));
+			assert messages != null;
+			BaseComponent[] components = ComponentSerializer.parse(((VariableString) messages).toChatString(e));
 			for (final CommandSender s : recipients.getArray(e)) {
 				assert messages != null;
-				BaseComponent[] components = ComponentSerializer.parse(((VariableString) messages).toChatString(e));
 				s.sendMessage(components);
-				// Sadly this is essentially serializing, then deserializing, then serializing again...
-				// TODO measure performance, potentially improve it
 			}
 		} else {
 			assert messages != null;

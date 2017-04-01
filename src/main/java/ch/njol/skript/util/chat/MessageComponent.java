@@ -23,6 +23,7 @@ package ch.njol.skript.util.chat;
 
 import java.lang.reflect.Type;
 
+import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.JsonDeserializationContext;
@@ -32,6 +33,9 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
+import ch.njol.skript.Skript;
+import ch.njol.skript.lang.VariableString;
 
 /**
  * Component for chat messages. This can be serialized with GSON and then
@@ -89,9 +93,10 @@ public class MessageComponent {
 	
 	public static class ClickEvent {
 		
-		public ClickEvent(ClickEvent.Action action, String value) {
+		public ClickEvent(ClickEvent.Action action, String value, @Nullable VariableString var) {
 			this.action = action;
 			this.value = value;
+			this.var = var;
 		}
 		
 		public static enum Action  {
@@ -108,13 +113,17 @@ public class MessageComponent {
 		public ClickEvent.Action action;
 		
 		public String value;
+		
+		@Nullable
+		public transient VariableString var;
 	}
 	
 	public static class HoverEvent {
 		
-		public HoverEvent(HoverEvent.Action action, String value) {
+		public HoverEvent(HoverEvent.Action action, String value, @Nullable VariableString var) {
 			this.action = action;
 			this.value = value;
+			this.var = var;
 		}
 		
 		public static enum Action {
@@ -131,6 +140,9 @@ public class MessageComponent {
 		public HoverEvent.Action action;
 		
 		public String value;
+		
+		@Nullable
+		public transient VariableString var;
 	}
 	
 	@Nullable
@@ -141,6 +153,16 @@ public class MessageComponent {
 		@Override
 		public @Nullable JsonElement serialize(@Nullable Boolean src, @Nullable Type typeOfSrc, @Nullable JsonSerializationContext context) {
 			return src ? new JsonPrimitive(true) : null;
+		}
+	}
+
+	@SuppressWarnings("null")
+	public void variableUpdate(Event event) {
+		if (clickEvent != null && clickEvent.var != null) {
+			clickEvent.value = clickEvent.var.getSingle(event);
+		}
+		if (hoverEvent != null && hoverEvent.var != null) {
+			hoverEvent.value = hoverEvent.var.getSingle(event);
 		}
 	}
 }

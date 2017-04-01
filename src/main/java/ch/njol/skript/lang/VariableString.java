@@ -193,7 +193,20 @@ public class VariableString implements Expression<String> {
 				string.add(s.substring(0, c));
 			while (c != s.length()) {
 				int c2 = s.indexOf('%', c + 1);
-				int a = c, b;
+				
+				// Check if we are inside <formatting tag>
+				int tagStart = s.indexOf('<', c2);
+				int tagEnd = s.indexOf('>', c2);
+				if (tagEnd != -1 && (tagStart == -1 || tagStart > tagEnd)) {
+					// Go to next %
+					c = s.indexOf('%', c2 + 1);
+					if (c == -1)
+						c = s.length();
+					continue;
+				}
+				
+				int a = c;
+				int b;
 				while (c2 != -1 && (b = s.indexOf('{', a + 1)) != -1 && b < c2) {
 					a = nextVariableBracket(s, b + 1);
 					if (a == -1) {
@@ -419,6 +432,11 @@ public class VariableString implements Expression<String> {
 	public MessageComponent[] getMessageComponents(final Event e) {
 		if (isSimple) {
 			MessageComponent[] c = components[0];
+			// There might be variable URLs etc.
+			for (int j = 0; j < c.length; j++) {
+				MessageComponent component = c[j];
+				component.variableUpdate(e);
+			}
 			assert c != null;
 			return c;
 		}
@@ -440,7 +458,12 @@ public class VariableString implements Expression<String> {
 					componentList.addAll(ChatMessages.parse(Classes.toString(((Expression<?>) o).getArray(e), true, mode)));
 				}
 			} else { // String part, parsed already
-				componentList.addAll(Arrays.asList(c));
+				// However, there might be variable URLs etc.
+				for (int j = 0; j < c.length; j++) {
+					MessageComponent component = c[j];
+					component.variableUpdate(e);
+					componentList.add(component);
+				}
 			}
 		}
 		return componentList.toArray(new MessageComponent[0]);
@@ -453,12 +476,6 @@ public class VariableString implements Expression<String> {
 	 * @return The input string with all expressions replaced.
 	 */
 	public String toChatString(final Event e) {
-		if (isSimple) {
-			MessageComponent[] c = components[0];
-			assert c != null;
-			return ChatMessages.toJson(c);
-		}
-		
 		return ChatMessages.toJson(getMessageComponents(e));
 	}
 	

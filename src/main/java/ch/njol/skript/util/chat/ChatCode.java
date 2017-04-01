@@ -23,6 +23,7 @@ package ch.njol.skript.util.chat;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.util.chat.MessageComponent.*;
 
 /**
@@ -103,32 +104,32 @@ public enum ChatCode {
 	
 	open_url(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.open_url, param);
+		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
+			ClickEvent e = new ClickEvent(ClickEvent.Action.open_url, param, var);
 			component.clickEvent = e;
 		}
 	},
 	
 	run_command(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.run_command, param);
+		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
+			ClickEvent e = new ClickEvent(ClickEvent.Action.run_command, param, var);
 			component.clickEvent = e;
 		}
 	},
 	
 	suggest_command(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.suggest_command, param);
+		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
+			ClickEvent e = new ClickEvent(ClickEvent.Action.suggest_command, param, var);
 			component.clickEvent = e;
 		}
 	},
 	
 	change_page(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.change_page, param);
+		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
+			ClickEvent e = new ClickEvent(ClickEvent.Action.change_page, param, var);
 			component.clickEvent = e;
 		}
 	},
@@ -137,8 +138,8 @@ public enum ChatCode {
 	
 	show_text(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param) {
-			HoverEvent e = new HoverEvent(HoverEvent.Action.show_text, param);
+		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
+			HoverEvent e = new HoverEvent(HoverEvent.Action.show_text, param, var);
 			component.hoverEvent = e;
 		}
 	};
@@ -181,7 +182,11 @@ public enum ChatCode {
 		
 	}
 	
+	public void updateComponent(MessageComponent component, String param, @Nullable VariableString varParam) {
+		updateComponent(component, param);
+	}
+	
 	public boolean nextComponent() {
-		return colorCode != null; // Colors reset by default
+		return true;
 	}
 }
