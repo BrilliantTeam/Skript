@@ -52,7 +52,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 		"send \"Your kill streak is %{kill streak.%player%}%.\" to player",
 		"if the targeted entity exists:",
 		"	message \"You're currently looking at a %type of the targeted entity%!\""})
-@Since("1.0")
+@Since("1.0 (2.2-dev26 for advanced features)")
 public class EffMessage extends Effect {
 	
 	private static final boolean hasSendRaw = Skript.classExists("org.bukkit.conversations.Conversable");
@@ -83,7 +83,6 @@ public class EffMessage extends Effect {
 		if (canSendRaw) {
 			// Sadly this is essentially serializing, then deserializing, then serializing again...
 			// TODO measure performance, potentially improve it
-			Skript.info(((VariableString) messages).toChatString(e));
 			assert messages != null;
 			BaseComponent[] components = ComponentSerializer.parse(((VariableString) messages).toChatString(e));
 			for (final CommandSender s : recipients.getArray(e)) {

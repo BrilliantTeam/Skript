@@ -102,10 +102,12 @@ public class VariableString implements Expression<String> {
 		for (int i = 0; i < string.length; i++) {
 			Object o = string[i];
 			if (o instanceof String) {
-				string[i] = Utils.replaceChatStyles("" + ((String) o).replace("\"\"", "\""));
+				assert this.string != null;
+				this.string[i] = Utils.replaceChatStyles("" + ((String) o).replace("\"\"", "\""));
 				components.add(ChatMessages.parseToArray((String) o));
 			} else {
-				string[i] = o;
+				assert this.string != null;
+				this.string[i] = o;
 				components.add(null);
 			}
 		}
@@ -450,9 +452,27 @@ public class VariableString implements Expression<String> {
 			if (c == null) { // Need to parse variable part
 				final Object o = string[i];
 				if (o instanceof VariableString) {
-					MessageComponent[] c2 = ((VariableString) o).getMessageComponents(e);
+					final MessageComponent[] c2 = ((VariableString) o).getMessageComponents(e);
 					ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
 					componentList.addAll(Arrays.asList(c));
+				} else if (o instanceof ExpressionInfo) {
+					assert mode == StringMode.MESSAGE;
+					final ExpressionInfo info = (ExpressionInfo) o;
+					int flags = info.flags;
+//					if ((flags & Language.F_PLURAL) == 0 && b.length() > 0 && Math.abs(StringUtils.numberBefore(b, b.length() - 1)) != 1)
+//						flags |= Language.F_PLURAL;
+//					if (info.toChatStyle) {
+//						final String s = Classes.toString(info.expr.getArray(e), flags, getLastColor(b));
+//						final String style = Utils.getChatStyle(s);
+//						b.append(style == null ? "<" + s + ">" : style);
+//					} else {
+					if (info.expr instanceof VariableString) {
+						final MessageComponent[] c2 = ((VariableString) o).getMessageComponents(e);
+						ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
+						componentList.addAll(Arrays.asList(c));
+					} else {
+						componentList.addAll(ChatMessages.parse(Classes.toString(info.expr.getArray(e), flags, null)));
+					}
 				} else if (o instanceof Expression<?>) {
 					assert mode != StringMode.MESSAGE;
 					componentList.addAll(ChatMessages.parse(Classes.toString(((Expression<?>) o).getArray(e), true, mode)));
@@ -466,7 +486,9 @@ public class VariableString implements Expression<String> {
 				}
 			}
 		}
-		return componentList.toArray(new MessageComponent[0]);
+		MessageComponent[] componentArray = componentList.toArray(new MessageComponent[0]);
+		assert componentArray != null;
+		return componentArray;
 	}
 	
 	/**
