@@ -153,6 +153,11 @@ public abstract class Functions {
 				return signError("Invalid text/variables/parentheses in the arguments of this function");
 			if (i == args.length() || args.charAt(i) == ',') {
 				final String arg = args.substring(j, i);
+				
+				if (arg.isEmpty()) // Zero-argument function
+					break;
+				
+				// One ore more arguments, indeed
 				final Matcher n = paramPattern.matcher(arg);
 				if (!n.matches())
 					return signError("The " + StringUtils.fancyOrderNumber(params.size() + 1) + " argument's definition is invalid. It should look like 'name: type' or 'name: type = default value'.");
