@@ -1,15 +1,17 @@
 <!doctype html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Skript Documentation - ${skript.version}</title>
-    <link href="css/styles.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Skript Documentation - ${skript.version}</title>
+  <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
   ${include navbar.html}
   <nav>
     <p id="nav-title">Table of Contents</p>
-    ${generate ${pagename} desc_nav.html}
+    <div>
+      ${generate ${pagename} desc_nav.html}
+    </div>
   </nav>
   <div id="content">
     ${content}

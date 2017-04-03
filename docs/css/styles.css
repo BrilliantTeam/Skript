@@ -12,10 +12,10 @@
     overflow-y:auto;
   }
   #nav-title{
-	font-size:15pt;
+    font-size:15pt;
   }
   .item-title{
-	font-size: 15pt;
+	  font-size: 15pt;
   }
 }
 
@@ -77,6 +77,11 @@ nav p {
 
 nav p a{
   color: black;
+  display: block;
+  border-radius: 3px;
+}
+nav p a:hover{
+  background-color:#5BC7F9;
 }
 
 #content{
