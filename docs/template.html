@@ -6,10 +6,14 @@
     <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
-    ${include navbar.html}
-    <div id="content">
-      ${content}
-    </div>
-    <!-- other things are inserted here -->
+  ${include navbar.html}
+  <nav>
+    <p id="nav-title">Table of Contents</p>
+    ${generate $pagename desc_nav.html}
+  </nav>
+  <div id="content">
+    ${content}
+  </div>
+  <!-- other things are inserted here -->
 </body>
 </html>

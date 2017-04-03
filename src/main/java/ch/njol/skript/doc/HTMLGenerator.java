@@ -86,6 +86,7 @@ public class HTMLGenerator {
 			String page = skeleton.replace("${content}", content); // Content to inside skeleton
 			
 			page = page.replace("${skript.version}", Skript.getVersion().toString()); // Skript version
+			page = page.replace("${pagename}", f.getName().replace(".html", ""));
 			
 			List<String> replace = Lists.newArrayList();
 			int include = page.indexOf("${include"); // Single file includes
