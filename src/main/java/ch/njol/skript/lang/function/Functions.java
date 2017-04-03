@@ -116,6 +116,8 @@ public abstract class Functions {
 			return error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
 		final String name = "" + m.group(1);
 		Signature<?> sign = signatures.get(name);
+		if (sign == null) // Signature parsing failed, probably: null signature
+			return null; // This has been reported before...
 		final List<Parameter<?>> params = sign.parameters;
 		final ClassInfo<?> c = sign.returnType;
 		final NonNullPair<String, Boolean> p = sign.info;
