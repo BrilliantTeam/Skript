@@ -159,7 +159,7 @@ public abstract class Functions {
 				if (arg.isEmpty()) // Zero-argument function
 					break;
 				
-				// One ore more arguments, indeed
+				// One ore more arguments for this function
 				final Matcher n = paramPattern.matcher(arg);
 				if (!n.matches())
 					return signError("The " + StringUtils.fancyOrderNumber(params.size() + 1) + " argument's definition is invalid. It should look like 'name: type' or 'name: type = default value'.");
