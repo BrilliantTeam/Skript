@@ -292,6 +292,8 @@ public class EvtClick extends SkriptEvent {
 			case ENDER_PEARL:
 			case EYE_OF_ENDER:
 			case MONSTER_EGG:
+			case BOOK_AND_QUILL:
+			case WRITTEN_BOOK:
 				mainUsable = true;
 				break;
 				//$CASES-OMITTED$
