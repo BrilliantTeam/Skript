@@ -42,9 +42,6 @@ import ch.njol.skript.util.Slot;
 import ch.njol.util.Kleenean;
 import ch.njol.util.Math2;
 
-/**
- * @author joeuguce99
- */
 @Name("Colour Items")
 @Description("Colours items in a given <a href='classes.html#color'>colour</a>. " +
 		"You can also use RGB codes if you feel limited with the 16 default colours. " +
