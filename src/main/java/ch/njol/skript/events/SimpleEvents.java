@@ -46,6 +46,7 @@ import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepRegrowWoolEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -70,6 +71,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
@@ -394,5 +396,10 @@ public class SimpleEvents {
 				.description("Called when player's currently viewed inventory is closed.")
 				.examples("")
 				.since("2.2-dev21");
+		Skript.registerEvent("Slime Split", SimpleEvent.class, SlimeSplitEvent.class, "slime split")
+				.description("Called when slime splits.")
+				.examples("")
+				.since("2.2-dev26");
+		
 	}
 }
