@@ -23,6 +23,8 @@ import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -43,14 +45,18 @@ import ch.njol.util.Math2;
 /**
  * @author joeuguce99
  */
-@Name("Colour Armour")
-@Description("Colours leather armour in a given <a href='../classes/#color'>colour</a>. " +
+@Name("Colour Items")
+@Description("Colours items in a given <a href='classes.html#color'>colour</a>. " +
 		"You can also use RGB codes if you feel limited with the 16 default colours. " +
-		"RGB codes are three numbers from 0 to 255 in the order <code>(red, green, blue)</code>, where <code>(0,0,0)</code> is black and <code>(255,255,255)</code> is white.")
+		"RGB codes are three numbers from 0 to 255 in the order <code>(red, green, blue)</code>, where <code>(0,0,0)</code> is black and <code>(255,255,255)</code> is white. " +
+		"Armor is colourable for all Minecraft versions. With Minecraft 1.11 or newer you can also colour potions and maps.")
 @Examples({"dye player's helmet blue",
 		"colour the player's tool red"})
-@Since("2.0")
+@Since("2.0 (2.2-dev26 for maps and potions)")
 public class EffColorArmor extends Effect {
+	
+	private static final boolean potionColors = Skript.isRunningMinecraft(1, 11);
+	
 	static {
 		Skript.registerEffect(EffColorArmor.class,
 				"(dye|colo[u]r|paint) %slots/itemstack% %color%",
@@ -117,6 +123,16 @@ public class EffColorArmor extends Effect {
 				final LeatherArmorMeta m = (LeatherArmorMeta) i.getItemMeta();
 				m.setColor(c);
 				i.setItemMeta(m);
+			} else if (potionColors) {
+				if (i.getType() == Material.MAP || i.getType() == Material.EMPTY_MAP) {
+					final MapMeta m = (MapMeta) i.getItemMeta();
+					m.setColor(c);
+					i.setItemMeta(m);
+				} else if (i.getType() == Material.POTION || i.getType() == Material.SPLASH_POTION || i.getType() == Material.LINGERING_POTION) {
+					final PotionMeta m = (PotionMeta) i.getItemMeta();
+					m.setColor(c);
+					i.setItemMeta(m);
+				}
 			}
 			if (o instanceof Slot) {
 				((Slot) o).setItem(i);
