@@ -35,7 +35,7 @@ import ch.njol.skript.lang.ExpressionType;
  * @author Peter Güttinger
  */
 @Name("Region")
-@Description({"The <a href='../classes/#region'>region</a> involved in an event.",
+@Description({"The <a href='classes.html#region'>region</a> involved in an event.",
 		"This expression requires a supported regions plugin to be installed."})
 @Examples({"on region enter:",
 		"	region is {forbidden region}",
