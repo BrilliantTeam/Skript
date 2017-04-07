@@ -52,10 +52,8 @@ import net.md_5.bungee.chat.ComponentSerializer;
 		"send \"Your kill streak is %{kill streak.%player%}%.\" to player",
 		"if the targeted entity exists:",
 		"	message \"You're currently looking at a %type of the targeted entity%!\""})
-@Since("1.0 (2.2-dev26 for advanced features)")
+@Since("1.0, 2.2-dev26 (advanced features)")
 public class EffMessage extends Effect {
-	
-	private static final boolean hasSendRaw = Skript.classExists("org.bukkit.conversations.Conversable");
 	
 	static {
 		Skript.registerEffect(EffMessage.class, "(message|send [message]) %strings% [to %commandsenders%]");
@@ -72,7 +70,7 @@ public class EffMessage extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		messages = (Expression<String>) exprs[0];
-		canSendRaw = hasSendRaw && messages instanceof VariableString;
+		canSendRaw = messages instanceof VariableString;
 		recipients = (Expression<CommandSender>) exprs[1];
 		return true;
 	}
@@ -86,8 +84,12 @@ public class EffMessage extends Effect {
 			assert messages != null;
 			BaseComponent[] components = ComponentSerializer.parse(((VariableString) messages).toChatString(e));
 			for (final CommandSender s : recipients.getArray(e)) {
-				assert messages != null;
-				s.sendMessage(components);
+				if (s instanceof Player) { // Use JSON chat
+					((Player) s).spigot().sendMessage(components);
+				} else { // Fall back to non-JSON chat
+					assert messages != null;
+					s.sendMessage(messages.getSingle(e));
+				}
 			}
 		} else {
 			assert messages != null;

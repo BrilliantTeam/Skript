@@ -188,6 +188,10 @@ public class ChatMessages {
 				} else {
 					name = tag;
 				}
+				if (name.equals("none")) {
+					curStr.append("<none>");
+					continue; // FIXME an ugly hack!
+				}
 				
 				ChatCode code = codes.get(name);
 				if (code.nextComponent()) { // Next chat component, someone asked for reset
