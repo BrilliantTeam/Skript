@@ -46,22 +46,22 @@ public enum ChatCode {
 
 	// Colors (Vanilla color code, Skript color code if different)
 	
-	black("black"),
-	dark_blue("dark_blue"),
-	dark_green("dark_green"),
-	dark_aqua("dark_aqua", "dark_cyan"),
-	dark_red("dark_red"),
-	dark_purple("dark_purple"),
-	gold("gold", "orange"),
-	gray("gray", "light_grey"),
-	dark_gray("dark_gray", "dark_grey"),
-	blue("blue", "light_cyan"),
-	green("green", "light_green"),
-	aqua("aqua", "light_cyan"),
-	red("red", "light_red"),
-	light_purple("light_purple"),
-	yellow("yellow"),
-	white("white"),
+	black("black", '0'),
+	dark_blue("dark_blue", '1'),
+	dark_green("dark_green", '2'),
+	dark_aqua("dark_aqua", "dark_cyan", '3'),
+	dark_red("dark_red", '4'),
+	dark_purple("dark_purple", '5'),
+	gold("gold", "orange", '6'),
+	gray("gray", "light_grey", '7'),
+	dark_gray("dark_gray", "dark_grey", '8'),
+	blue("blue", "light_cyan", '9'),
+	green("green", "light_green", 'a'),
+	aqua("aqua", "light_cyan", 'b'),
+	red("red", "light_red", 'c'),
+	light_purple("light_purple", 'd'),
+	yellow("yellow", 'e'),
+	white("white", 'f'),
 	
 	// Formatting
 	
@@ -152,16 +152,26 @@ public enum ChatCode {
 	@Nullable
 	public String langName;
 	
+	public char colorChar;
+	
+	ChatCode(@Nullable String colorCode, String langName, char colorChar) {
+		this.colorCode = colorCode;
+		this.langName = langName;
+		this.hasParam = false;
+		this.colorChar = colorChar;
+	}
+	
 	ChatCode(@Nullable String colorCode, String langName) {
 		this.colorCode = colorCode;
 		this.langName = langName;
 		this.hasParam = false;
 	}
 	
-	ChatCode(String colorCode) {
+	ChatCode(String colorCode, char colorChar) {
 		this.colorCode = colorCode;
 		this.langName = colorCode;
 		this.hasParam = false;
+		this.colorChar = colorChar;
 	}
 	
 	ChatCode(boolean hasParam) {

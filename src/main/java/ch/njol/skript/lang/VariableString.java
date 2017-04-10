@@ -454,7 +454,7 @@ public class VariableString implements Expression<String> {
 				if (o instanceof VariableString) {
 					final MessageComponent[] c2 = ((VariableString) o).getMessageComponents(e);
 					ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
-					componentList.addAll(Arrays.asList(c));
+					componentList.addAll(Arrays.asList(c2));
 				} else if (o instanceof ExpressionInfo) {
 					assert mode == StringMode.MESSAGE;
 					final ExpressionInfo info = (ExpressionInfo) o;
@@ -469,13 +469,17 @@ public class VariableString implements Expression<String> {
 					if (info.expr instanceof VariableString) {
 						final MessageComponent[] c2 = ((VariableString) o).getMessageComponents(e);
 						ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
-						componentList.addAll(Arrays.asList(c));
+						componentList.addAll(Arrays.asList(c2));
 					} else {
-						componentList.addAll(ChatMessages.parse(Classes.toString(info.expr.getArray(e), flags, null)));
+						final MessageComponent[] c2 = ChatMessages.parseToArray(Classes.toString(info.expr.getArray(e), flags, null));
+						ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
+						componentList.addAll(Arrays.asList(c2));
 					}
 				} else if (o instanceof Expression<?>) {
 					assert mode != StringMode.MESSAGE;
-					componentList.addAll(ChatMessages.parse(Classes.toString(((Expression<?>) o).getArray(e), true, mode)));
+					final MessageComponent[] c2 = ChatMessages.parseToArray(Classes.toString(((Expression<?>) o).getArray(e), true, mode));
+					ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
+					componentList.addAll(Arrays.asList(c2));
 				}
 			} else { // String part, parsed already
 				// However, there might be variable URLs etc.

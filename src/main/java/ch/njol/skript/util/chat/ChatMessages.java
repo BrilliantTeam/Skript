@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.xml.soap.Text;
 
 import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.reflect.TypeToken;
@@ -63,6 +64,8 @@ public class ChatMessages {
 	 * Chat codes, see {@link ChatCode}.
 	 */
 	static final Map<String,ChatCode> codes = new HashMap<>();
+	
+	static final ChatCode[] colorChars = new ChatCode[256];
 	
 	/**
 	 * Instance of GSON we use for serialization.
@@ -104,6 +107,16 @@ public class ChatMessages {
 						for (String name : Language.getList("chat styles." + code.langName)) {
 							codes.put(name, code);
 						}
+					}
+					
+					colorChars['k'] = ChatCode.obfuscated;
+					colorChars['l'] = ChatCode.bold;
+					colorChars['m'] = ChatCode.strikethrough;
+					colorChars['n'] = ChatCode.underlined;
+					colorChars['o'] = ChatCode.italic;
+					colorChars['r'] = ChatCode.reset;
+					if (code.colorChar != 0) {
+						colorChars[code.colorChar] = code;
 					}
 				}
 			}
@@ -155,6 +168,7 @@ public class ChatMessages {
 		char previous = 0;
 		int tagStart = 0;
 		boolean tagMode = false; // Tagmode: don't read to StringBuilder, we are at a tag
+		boolean nextColorChar = false; // If next char is color code (§ or & something)
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
 			if (c == '\\' || previous == '\\') // \ serves as escape character
@@ -166,8 +180,16 @@ public class ChatMessages {
 				tagMode = true;
 			}
 				
-			if (!tagMode) // Normal handling if not inside a tag
-				curStr.append(c); // Append this char to curStr
+			if (!tagMode && !nextColorChar) {// Normal handling if not inside a tag
+				if (c == '&' || c == '§') {
+					nextColorChar = true;
+					continue;
+				} else {
+					curStr.append(c); // Append this char to curStr
+				}
+			}
+			
+			ChatCode code = null;
 			
 			if (c == '>') { // Tag end
 				String tag = msg.substring(tagStart + 1, i);
@@ -188,25 +210,11 @@ public class ChatMessages {
 				} else {
 					name = tag;
 				}
-				if (name.equals("none")) {
-					curStr.append("<none>");
-					continue; // FIXME an ugly hack!
-				}
 				
-				ChatCode code = codes.get(name);
-				if (code.nextComponent()) { // Next chat component, someone asked for reset
-					String text = curStr.toString();
-					curStr = new StringBuilder();
-					assert text != null;
-					current.text = text;
-					
-					MessageComponent old = current;
-					current = new MessageComponent();
-					if (code.equals(ChatCode.reset))
-						current.reset = true;
-					copyStyles(old, current);
-					
-					components.add(current);
+				code = codes.get(name);
+				if (code == null) { // Invalid chat code will be appended as is; like <none>
+					curStr.append('<').append(name).append('>');
+					continue;
 				}
 				
 				assert param != null;
@@ -214,6 +222,35 @@ public class ChatMessages {
 					current.color = code.colorCode;
 				else
 					code.updateComponent(current, param, varParam); // Call ChatCode update
+			} else if (nextColorChar && c < 256) { // Legacy color code
+				nextColorChar = false;
+				code = colorChars[c];
+				if (code != null) {
+					@SuppressWarnings("null")
+					@NonNull String param = null;
+					if (code.colorCode != null) // Just update color code
+						current.color = code.colorCode;
+					else
+						code.updateComponent(current, param, null); // Call ChatCode update
+				} else {
+					curStr.append(previous).append(c);
+					continue;
+				}
+			}
+			
+			if (code != null && code.nextComponent()) { // Next chat component
+				String text = curStr.toString();
+				curStr = new StringBuilder();
+				assert text != null;
+				current.text = text;
+				
+				MessageComponent old = current;
+				current = new MessageComponent();
+				if (code.equals(ChatCode.reset))
+					current.reset = true;
+				copyStyles(old, current);
+				
+				components.add(current);
 			}
 		}
 		String text = curStr.toString();
@@ -271,5 +308,17 @@ public class ChatMessages {
 			to.insertion = from.insertion;
 		if (to.hoverEvent == null)
 			to.hoverEvent = from.hoverEvent;
+	}
+
+
+	public static void shareStyles(MessageComponent[] components) {
+		MessageComponent previous = null;
+		for (MessageComponent c : components) {
+			if (previous != null) {
+				assert c != null;
+				copyStyles(previous, c);
+			}
+			previous = c;
+		}
 	}
 }
