@@ -91,7 +91,8 @@ public class VariableString implements Expression<String> {
 		
 		orig = simple;
 		string = null;
-		components = new MessageComponent[][] {ChatMessages.parseToArray(s)};
+		assert simple != null;
+		components = new MessageComponent[][] {ChatMessages.parseToArray(simple)};
 		mode = StringMode.MESSAGE;
 	}
 	
@@ -102,9 +103,10 @@ public class VariableString implements Expression<String> {
 		for (int i = 0; i < string.length; i++) {
 			Object o = string[i];
 			if (o instanceof String) {
+				String quotesFixed = ((String) o).replace("\"\"", "\"");
 				assert this.string != null;
-				this.string[i] = Utils.replaceChatStyles("" + ((String) o).replace("\"\"", "\""));
-				components.add(ChatMessages.parseToArray((String) o));
+				this.string[i] = Utils.replaceChatStyles("" + quotesFixed);
+				components.add(ChatMessages.parseToArray("" + quotesFixed));
 			} else {
 				assert this.string != null;
 				this.string[i] = o;
@@ -185,7 +187,7 @@ public class VariableString implements Expression<String> {
 		}
 		
 		// We must not parse color codes yet, as JSON support would be broken :(
-		final String s = orig;
+		final String s = orig.replace("\"\"", "\"");
 		
 		final List<Object> string = new ArrayList<>(n / 2 + 2); // List of strings and expressions
 		
