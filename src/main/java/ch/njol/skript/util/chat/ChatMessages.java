@@ -190,14 +190,14 @@ public class ChatMessages {
 			}
 			
 			ChatCode code = null;
+			String param = "";
+			VariableString varParam = null;
 			
 			if (c == '>') { // Tag end
 				String tag = msg.substring(tagStart + 1, i);
 				tagMode = false;
 				
 				String name;
-				String param = "";
-				VariableString varParam = null;
 				if (tag.contains(":")) {
 					String[] split = tag.split(":", 2);
 					name = split[0];
@@ -217,40 +217,35 @@ public class ChatMessages {
 					continue;
 				}
 				
-				assert param != null;
-				if (code.colorCode != null) // Just update color code
-					current.color = code.colorCode;
-				else
-					code.updateComponent(current, param, varParam); // Call ChatCode update
 			} else if (nextColorChar && c < 256) { // Legacy color code
 				nextColorChar = false;
 				code = colorChars[c];
-				if (code != null) {
-					@SuppressWarnings("null")
-					@NonNull String param = null;
-					if (code.colorCode != null) // Just update color code
-						current.color = code.colorCode;
-					else
-						code.updateComponent(current, param, null); // Call ChatCode update
-				} else {
+				if (code == null) {
 					curStr.append(previous).append(c);
 					continue;
 				}
 			}
 			
-			if (code != null && code.nextComponent()) { // Next chat component
-				String text = curStr.toString();
-				curStr = new StringBuilder();
-				assert text != null;
-				current.text = text;
+			if (code != null) {
+				if (code.nextComponent()) { // Next chat component
+					String text = curStr.toString();
+					curStr = new StringBuilder();
+					assert text != null;
+					current.text = text;
+					
+					MessageComponent old = current;
+					current = new MessageComponent();
+					if (code.equals(ChatCode.reset))
+						current.reset = true;
+					copyStyles(old, current);
+					
+					components.add(current);
+				}
 				
-				MessageComponent old = current;
-				current = new MessageComponent();
-				if (code.equals(ChatCode.reset))
-					current.reset = true;
-				copyStyles(old, current);
-				
-				components.add(current);
+				if (code.colorCode != null) // Just update color code
+					current.color = code.colorCode;
+				else
+					code.updateComponent(current, param, varParam); // Call ChatCode update
 			}
 		}
 		String text = curStr.toString();
@@ -320,5 +315,15 @@ public class ChatMessages {
 			}
 			previous = c;
 		}
+	}
+
+	/**
+	 * Constructs plain text only message component.
+	 * @param str
+	 */
+	public static MessageComponent plainText(String str) {
+		MessageComponent component = new MessageComponent();
+		component.text = str;
+		return component;
 	}
 }

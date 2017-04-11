@@ -471,15 +471,21 @@ public class VariableString implements Expression<String> {
 						ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
 						componentList.addAll(Arrays.asList(c2));
 					} else {
-						final MessageComponent[] c2 = ChatMessages.parseToArray(Classes.toString(info.expr.getArray(e), flags, null));
-						ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
-						componentList.addAll(Arrays.asList(c2));
+						final String str = Classes.toString(info.expr.getArray(e), flags, null);
+						MessageComponent last = componentList.get(componentList.size() - 1);
+						if (last != null)
+							last.text += str;
+						else
+							componentList.add(ChatMessages.plainText(str));
 					}
 				} else if (o instanceof Expression<?>) {
 					assert mode != StringMode.MESSAGE;
-					final MessageComponent[] c2 = ChatMessages.parseToArray(Classes.toString(((Expression<?>) o).getArray(e), true, mode));
-					ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
-					componentList.addAll(Arrays.asList(c2));
+					final String str = Classes.toString(((Expression<?>) o).getArray(e), true, mode);
+					MessageComponent last = componentList.get(componentList.size() - 1);
+					if (last != null)
+						last.text += str;
+					else
+						componentList.add(ChatMessages.plainText(str));
 				}
 			} else { // String part, parsed already
 				// However, there might be variable URLs etc.
