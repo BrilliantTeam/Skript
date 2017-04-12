@@ -36,7 +36,7 @@ public abstract class AsyncEffect extends Effect{
     @Nullable
     protected TriggerItem walk(Event e) {
         Delay.addDelayedEvent(e);
-        Executors.newSingleThreadExecutor().submit(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 execute(e);
@@ -44,7 +44,7 @@ public abstract class AsyncEffect extends Effect{
                     lock.notify();
                 }
             }
-        });
+        }).start();
         synchronized (lock){
             try {
                 lock.wait();
