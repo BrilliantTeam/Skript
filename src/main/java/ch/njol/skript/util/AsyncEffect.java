@@ -37,7 +37,7 @@ public abstract class AsyncEffect extends Effect{
     @Nullable
     protected TriggerItem walk(Event e) {
         Delay.addDelayedEvent(e);
-        getExecutorService().submit(new Runnable() {
+        getExecutorService().execute(new Runnable() {
             @Override
             public void run() {
                 execute(e);
