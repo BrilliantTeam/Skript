@@ -25,6 +25,7 @@ import ch.njol.skript.lang.TriggerItem;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -36,7 +37,7 @@ public abstract class AsyncEffect extends Effect{
     @Nullable
     protected TriggerItem walk(Event e) {
         Delay.addDelayedEvent(e);
-        new Thread(new Runnable() {
+        getExecutorService().submit(new Runnable() {
             @Override
             public void run() {
                 execute(e);
@@ -44,7 +45,7 @@ public abstract class AsyncEffect extends Effect{
                     lock.notify();
                 }
             }
-        }).start();
+        });
         synchronized (lock){
             try {
                 lock.wait();
@@ -58,4 +59,6 @@ public abstract class AsyncEffect extends Effect{
         }
         return null;
     }
+
+    public abstract ExecutorService getExecutorService();
 }
