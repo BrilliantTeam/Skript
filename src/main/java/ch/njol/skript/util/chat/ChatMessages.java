@@ -165,89 +165,89 @@ public class ChatMessages {
 		components.add(current);
 		StringBuilder curStr = new StringBuilder();
 		
-		char previous = 0;
-		int tagStart = 0;
-		boolean tagMode = false; // Tagmode: don't read to StringBuilder, we are at a tag
-		boolean nextColorChar = false; // If next char is color code (§ or & something)
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
-			if (c == '\\' || previous == '\\') // \ serves as escape character
-				continue;
-			previous = c;
-			
-			if (c == '<') { // Tag start
-				tagStart = i;
-				tagMode = true;
-			}
-				
-			if (!tagMode && !nextColorChar) {// Normal handling if not inside a tag
-				if (c == '&' || c == '§') {
-					nextColorChar = true;
-					continue;
-				} else {
-					curStr.append(c); // Append this char to curStr
-				}
-			}
-			
 			ChatCode code = null;
 			String param = "";
 			VariableString varParam = null;
 			
-			if (c == '>') { // Tag end
-				String tag = msg.substring(tagStart + 1, i);
-				tagMode = false;
-				
-				String name;
-				if (tag.contains(":")) {
-					String[] split = tag.split(":", 2);
-					name = split[0];
-					param = split[1];
-					
-					// Check if we need to do VariableString parsing
-					if (param.contains("%")) {
-						varParam = VariableString.newInstance(param);
+			if (c == '<') { // Tag parsing
+				int end = msg.indexOf('>', i);
+				if (end != -1) { // If this COULD be valid tag...
+					String tag = msg.substring(i + 1, end);
+					String name;
+					if (tag.contains(":")) {
+						String[] split = tag.split(":", 2);
+						name = split[0];
+						param = split[1];
+						
+						// Check if we need to do VariableString parsing
+						if (param.contains("%")) {
+							varParam = VariableString.newInstance(param);
+						}
+					} else {
+						name = tag;
 					}
-				} else {
-					name = tag;
+					
+					code = codes.get(name);
+					if (code != null) { // ... and if the tag IS really valid
+						if (code.nextComponent()) { // Next chat component
+							String text = curStr.toString();
+							curStr = new StringBuilder();
+							assert text != null;
+							current.text = text;
+							
+							MessageComponent old = current;
+							current = new MessageComponent();
+							if (code.equals(ChatCode.reset))
+								current.reset = true;
+							copyStyles(old, current);
+							
+							components.add(current);
+						}
+						
+						if (code.colorCode != null) // Just update color code
+							current.color = code.colorCode;
+						else
+							code.updateComponent(current, param, varParam); // Call ChatCode update
+						
+						// Increment i to tag end + 1
+						i = end;
+					}
 				}
-				
-				code = codes.get(name);
-				if (code == null) { // Invalid chat code will be appended as is; like <none>
-					curStr.append('<').append(name).append('>');
-					continue;
-				}
-				
-			} else if (nextColorChar && c < 256) { // Legacy color code
-				nextColorChar = false;
-				code = colorChars[c];
+			} else if (c == '&' || c == '§') {
+				char color = chars[i + 1];
+				code = colorChars[color];
 				if (code == null) {
-					curStr.append(previous).append(c);
-					continue;
-				}
-			}
-			
-			if (code != null) {
-				if (code.nextComponent()) { // Next chat component
-					String text = curStr.toString();
-					curStr = new StringBuilder();
-					assert text != null;
-					current.text = text;
+					curStr.append(c).append(color); // Invalid formatting char, plain append
+				} else {
+					if (code.nextComponent()) { // Next chat component
+						String text = curStr.toString();
+						curStr = new StringBuilder();
+						assert text != null;
+						current.text = text;
+						
+						MessageComponent old = current;
+						current = new MessageComponent();
+						if (code.equals(ChatCode.reset))
+							current.reset = true;
+						copyStyles(old, current);
+						
+						components.add(current);
+					}
 					
-					MessageComponent old = current;
-					current = new MessageComponent();
-					if (code.equals(ChatCode.reset))
-						current.reset = true;
-					copyStyles(old, current);
-					
-					components.add(current);
+					if (code.colorCode != null) // Just update color code
+						current.color = code.colorCode;
+					else
+						code.updateComponent(current, param, varParam); // Call ChatCode update
 				}
 				
-				if (code.colorCode != null) // Just update color code
-					current.color = code.colorCode;
-				else
-					code.updateComponent(current, param, varParam); // Call ChatCode update
+				i += 2; // Skip this and color char
 			}
+				
+			curStr.append(c); // Append this char to curStr
 		}
+		
 		String text = curStr.toString();
 		assert text != null;
 		current.text = text;
