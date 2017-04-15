@@ -367,6 +367,15 @@ tree types:
 	big_redwood:
 		name: tall redwood¦s
 		pattern: (big|tall) (fir|pine|spruce|redwood)s?
+	mega_redwood:
+		name: mega redwood¦s
+		pattern: (mega|giant) (fir|pine|spruce|redwood)s?
+	birch:
+		name: birch¦es
+		pattern: birch(es)?
+	tall_birch:
+		name: tall birch¦es
+		pattern: (tall|big) birch(es)?
 	jungle:
 		name: jungle tree¦s
 		pattern: (any )?jungle trees?
@@ -376,6 +385,15 @@ tree types:
 	big_jungle:
 		name: big jungle tree¦s
 		pattern: (big|tall|huge|giant|large) jungle trees?
+	cocoa_tree:
+		name: cocoa tree¦s
+		pattern: cocoa trees?
+	acacia:
+		name: acacia¦s
+		pattern: acacias?
+	dark_oak:
+		name: dark oak¦s
+		pattern: dark oaks?
 	jungle_bush:
 		name: bush¦es
 		pattern: (jungle )?bush(es)?
