@@ -480,29 +480,19 @@ public class VariableString implements Expression<String> {
 					} else {
 						final String str = Classes.toString(info.expr.getArray(e), flags, null);
 						
-						if (!componentList.isEmpty()) {
-							MessageComponent last = componentList.get(componentList.size() - 1);
-							if (last != null)
-								last.text += str;
-							else
-								componentList.add(ChatMessages.plainText(str));
-						} else {
-							componentList.add(ChatMessages.plainText(str));
-						}
+						MessageComponent component = ChatMessages.plainText(str);
+						if (!componentList.isEmpty())
+							ChatMessages.copyStyles(componentList.get(componentList.size() - 1), component); // Copy styles
+						componentList.add(component);
 					}
 				} else if (o instanceof Expression<?>) {
 					assert mode != StringMode.MESSAGE;
 					final String str = Classes.toString(((Expression<?>) o).getArray(e), true, mode);
 					
-					if (!componentList.isEmpty()) {
-						MessageComponent last = componentList.get(componentList.size() - 1);
-						if (last != null)
-							last.text += str;
-						else
-							componentList.add(ChatMessages.plainText(str));
-					} else {
-						componentList.add(ChatMessages.plainText(str));
-					}
+					MessageComponent component = ChatMessages.plainText(str);
+					if (!componentList.isEmpty())
+						ChatMessages.copyStyles(componentList.get(componentList.size() - 1), component); // Copy styles
+					componentList.add(component);
 				}
 			} else { // String part, parsed already
 				// However, there might be variable URLs etc.
