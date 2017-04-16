@@ -318,20 +318,48 @@ public class SkriptParser {
 				} else {
 					e = (Expression<?>) parse(expr, (Iterator) Skript.getExpressions(types), null);
 				}
-				if (e != null) {
+				if (e != null) { // Expression/VariableString parsing success
 					for (final Class<? extends T> t : types) {
+						// Check return type against everything that expression accepts
 						if (t.isAssignableFrom(e.getReturnType())) {
 							log.printLog();
 							return (Expression<? extends T>) e;
 						}
 					}
-					for (final Class<? extends T> t : types) {
-						final Expression<? extends T> r = e.getConvertedExpression(t);
-						if (r != null) {
-							log.printLog();
-							return r;
+					// No directly same type found
+					if (e instanceof Variable) {
+						// This block fixes long-standing parser bug with variables
+						// that made vector support very hard to adds
+						
+						/*
+						 * Variables need special handling. We do not yet know
+						 * type of them, so creating converted expression
+						 * always succeeds. The problem? Getting stuff from
+						 * that expression may result null, if variable was of
+						 * different type.
+						 * 
+						 * This would work... except the expressions may accept
+						 * multiple types (%type1/type2/type3%). Which one we
+						 * choose to create converter for? No of them.
+						 * 
+						 * Instead, we just ask variable to give converted
+						 * expression with all types. 
+						 */
+						
+						// Java generics... Lots of FUN!
+						Class<T>[] objTypes = (Class<T>[]) types;
+						return e.getConvertedExpression(objTypes);
+					} else {
+						// Non-variables are easy, as we know their types
+						for (final Class<? extends T> t : types) {
+							final Expression<? extends T> r = e.getConvertedExpression(t);
+							if (r != null) {
+								log.printLog();
+								return r;
+							}
 						}
 					}
+					// Print errors, if we couldn't get the correct type
 					log.printError(e.toString(null, false) + " " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
 					return null;
 				}
@@ -1105,7 +1133,7 @@ public class SkriptParser {
 					end = pattern.indexOf('%', j + 1);
 					if (end == -1)
 						throw new MalformedPatternException(pattern, "Odd number of '%'");
-					final String name = "" + pattern.substring(j + 1, end);
+					final String name = "" + pattern.substring(j + 1, end); // %type/anothertype%
 					final ExprInfo vi = getExprInfo(name);
 					if (end == pattern.length() - 1) {
 						i2 = expr.length();
@@ -1121,7 +1149,7 @@ public class SkriptParser {
 							res = parse_i(pattern, i2, end + 1);
 							if (res != null) {
 								final ParseLogHandler log2 = SkriptLogger.startParseLogHandler();
-								try {
+								try { // Loop over all types that could go here
 									for (int k = 0; k < vi.classes.length; k++) {
 										if ((flags & vi.flagMask) == 0)
 											continue;
@@ -1129,7 +1157,7 @@ public class SkriptParser {
 										@SuppressWarnings("unchecked")
 										final Expression<?> e = new SkriptParser("" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
 										if (e != null) {
-											if (!vi.isPlural[k] && !e.isSingle()) {
+											if (!vi.isPlural[k] && !e.isSingle()) { // Wrong number of arguments
 												if (context == ParseContext.COMMAND) {
 													Skript.error(Commands.m_too_many_arguments.toString(vi.classes[k].getName().getIndefiniteArticle(), vi.classes[k].getName().toString()), ErrorQuality.SEMANTIC_ERROR);
 													return null;
