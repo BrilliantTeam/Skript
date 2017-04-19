@@ -82,6 +82,8 @@ public class EffMessage extends Effect {
 			// Sadly this is essentially serializing, then deserializing, then serializing again...
 			// TODO measure performance, potentially improve it
 			assert messages != null;
+			Skript.info(((VariableString) messages).toChatString(e));
+			assert messages != null;
 			BaseComponent[] components = ComponentSerializer.parse(((VariableString) messages).toChatString(e));
 			for (final CommandSender s : recipients.getArray(e)) {
 				if (s instanceof Player) { // Use JSON chat

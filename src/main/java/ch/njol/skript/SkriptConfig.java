@@ -44,6 +44,7 @@ import ch.njol.skript.timings.SkriptTimings;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Setter;
 
 /**
@@ -98,6 +99,7 @@ public abstract class SkriptConfig {
 	public final static Option<Boolean> usePlayerUUIDsInVariableNames = new Option<Boolean>("use player UUIDs in variable names", false); // TODO change to true later (as well as in the default config)
 	public final static Option<Boolean> enablePlayerVariableFix = new Option<Boolean>("player variable fix", true);
 	
+	@SuppressWarnings("null")
 	private final static DateFormat shortDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 	private final static Option<DateFormat> dateFormat = new Option<DateFormat>("date format", shortDateFormat, new Converter<String, DateFormat>() {
 		@Override
@@ -184,6 +186,16 @@ public abstract class SkriptConfig {
 							Skript.warning("Timings cannot be enabled! You are running Bukkit/Spigot, but Paper is required.");
 						SkriptTimings.setEnabled(false); // Just to be sure, deactivate timings support completely
 					}
+				}
+				
+			});
+	
+	public final static Option<Boolean> parseLinks = new Option<Boolean>("parse links in chat messages", false)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					ChatMessages.parseLinks = t;
 				}
 				
 			});

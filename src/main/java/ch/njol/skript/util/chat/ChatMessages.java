@@ -61,6 +61,12 @@ import edu.umd.cs.findbugs.ba.bcp.New;
 public class ChatMessages {
 	
 	/**
+	 * If anything that starts with http(s):// should be interpreted
+	 * as a link (for old script compatibility).
+	 */
+	public static boolean parseLinks = false;
+	
+	/**
 	 * Chat codes, see {@link ChatCode}.
 	 */
 	static final Map<String,ChatCode> codes = new HashMap<>();
@@ -109,16 +115,19 @@ public class ChatMessages {
 						}
 					}
 					
-					colorChars['k'] = ChatCode.obfuscated;
-					colorChars['l'] = ChatCode.bold;
-					colorChars['m'] = ChatCode.strikethrough;
-					colorChars['n'] = ChatCode.underlined;
-					colorChars['o'] = ChatCode.italic;
-					colorChars['r'] = ChatCode.reset;
+					// Register color char
 					if (code.colorChar != 0) {
 						colorChars[code.colorChar] = code;
 					}
 				}
+				
+				// Add formatting chars
+				colorChars['k'] = ChatCode.obfuscated;
+				colorChars['l'] = ChatCode.bold;
+				colorChars['m'] = ChatCode.strikethrough;
+				colorChars['n'] = ChatCode.underlined;
+				colorChars['o'] = ChatCode.italic;
+				colorChars['r'] = ChatCode.reset;
 			}
 		});
 	}
@@ -170,6 +179,42 @@ public class ChatMessages {
 			ChatCode code = null;
 			String param = "";
 			VariableString varParam = null;
+			
+			// Attempt link parsing
+			if (parseLinks && c == 'h') {
+				String rest = msg.substring(i); // Get rest of string
+				
+				String link = null;
+				if (rest.startsWith("http://") || rest.startsWith("https://")) {
+					link = rest.split(" ", 2)[0];
+				}
+				
+				// Link found
+				if (link != null && !link.isEmpty()) {
+					// Take previous component, create new
+					String text = curStr.toString();
+					curStr = new StringBuilder();
+					assert text != null;
+					current.text = text;
+					
+					MessageComponent old = current;
+					current = new MessageComponent();
+					copyStyles(old, current);
+					
+					components.add(current);
+					
+					// Make new component a link
+					ChatCode.open_url.updateComponent(current, link, null); // URL for client...
+					current.text = link; // ... and for player
+					
+					i += link.length() - 1; // Skip link for all other parsing
+					
+					// Add one MORE component (this comes after the link)
+					current = new MessageComponent();
+					components.add(current);
+					continue;
+				}
+			}
 			
 			if (c == '<') { // Tag parsing
 				int end = msg.indexOf('>', i);
