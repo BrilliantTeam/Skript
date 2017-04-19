@@ -72,6 +72,7 @@ jar {
 
 license {
     header file('licenseheader.txt')
+    exclude('*.sk')
 }
 
 configurations {
