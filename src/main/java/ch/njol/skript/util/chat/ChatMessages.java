@@ -56,7 +56,7 @@ import ch.njol.yggdrasil.Fields;
 import edu.umd.cs.findbugs.ba.bcp.New;
 
 /**
- * Represents a chat message in JSON format.
+ * Handles parsing chat messages.
  */
 public class ChatMessages {
 	
@@ -211,11 +211,18 @@ public class ChatMessages {
 						else
 							code.updateComponent(current, param, varParam); // Call ChatCode update
 						
-						// Increment i to tag end + 1
+						// Increment i to tag end
 						i = end;
+						continue;
 					}
 				}
 			} else if (c == '&' || c == '§') {
+				// Corner case: this is last character, so we cannot get next
+				if (i == chars.length - 1) {
+					curStr.append(c);
+					continue;
+				}
+				
 				char color = chars[i + 1];
 				code = colorChars[color];
 				if (code == null) {
@@ -242,7 +249,8 @@ public class ChatMessages {
 						code.updateComponent(current, param, varParam); // Call ChatCode update
 				}
 				
-				i += 2; // Skip this and color char
+				i++; // Skip this and color char
+				continue;
 			}
 				
 			curStr.append(c); // Append this char to curStr
