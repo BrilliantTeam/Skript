@@ -45,7 +45,10 @@ public abstract class AsyncEffect extends Effect{
                 Bukkit.getScheduler().runTask(Skript.getInstance(), new Runnable() {
                     @Override
                     public void run() {
-                        TriggerItem.walk(getNext(), e);
+                        TriggerItem next = getNext();
+                        if (next != null){
+                            TriggerItem.walk(next, e);
+                        }
                     }
                 });
             }
