@@ -19,9 +19,11 @@
  */
 package ch.njol.skript.util;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.effects.Delay;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.TriggerItem;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -32,33 +34,22 @@ import java.util.concurrent.Executors;
  * @author Andrew Tran
  */
 public abstract class AsyncEffect extends Effect{
-    private final Object lock = new Object();
     @Override
     @Nullable
     protected TriggerItem walk(Event e) {
         Delay.addDelayedEvent(e);
-        getExecutorService().execute(new Runnable() {
+        Bukkit.getScheduler().runTaskAsynchronously(Skript.getInstance(), new Runnable() {
             @Override
             public void run() {
                 execute(e);
-                synchronized (lock){
-                    lock.notify();
-                }
+                Bukkit.getScheduler().runTask(Skript.getInstance(), new Runnable() {
+                    @Override
+                    public void run() {
+                        TriggerItem.walk(getNext(), e);
+                    }
+                });
             }
         });
-        synchronized (lock){
-            try {
-                lock.wait();
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-            TriggerItem next = getNext();
-            if (next != null){
-                TriggerItem.walk(next, e);
-            }
-        }
         return null;
     }
-
-    public abstract ExecutorService getExecutorService();
 }
