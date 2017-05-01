@@ -158,13 +158,8 @@ public abstract class SkriptEventHandler {
 	}
 	
 	private static long startEvent;
-	@Nullable
-	private static Object timing;
 	
-	@SuppressWarnings("null")
 	public static void logEventStart(final Event e) {
-		timing = SkriptTimings.start(e.getEventName());
-		
 		startEvent = System.nanoTime();
 		if (!Skript.logVeryHigh())
 			return;
@@ -173,8 +168,6 @@ public abstract class SkriptEventHandler {
 	}
 	
 	public static void logEventEnd() {
-		SkriptTimings.stop(timing);
-		
 		if (!Skript.logVeryHigh())
 			return;
 		Skript.info("== took " + 1. * (System.nanoTime() - startEvent) / 1000000. + " milliseconds ==");
@@ -194,11 +187,7 @@ public abstract class SkriptEventHandler {
 			return;
 		Skript.info("# " + t.getName() + " took " + 1. * (System.nanoTime() - startTrigger) / 1000000. + " milliseconds");
 	}
-	
-	public static void removeTiming() {
-		timing = null;
-	}
-	
+
 	public static void addTrigger(final Class<? extends Event>[] events, final Trigger trigger) {
 		for (final Class<? extends Event> e : events) {
 			List<Trigger> ts = triggers.get(e);

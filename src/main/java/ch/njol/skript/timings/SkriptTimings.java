@@ -59,7 +59,9 @@ public class SkriptTimings {
 	}
 	
 	public static boolean enabled() {
-		return enabled;
+		// First check if we can run timings (enabled in settings + running Paper)
+		// After that (we know that class exists), check if server has timings running
+		return enabled && Timings.isTimingsEnabled();
 	}
 	
 	public static void setEnabled(boolean flag) {
