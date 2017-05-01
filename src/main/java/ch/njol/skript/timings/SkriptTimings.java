@@ -46,7 +46,8 @@ public class SkriptTimings {
 	public static Object start(String name) {
 		if (!enabled()) // Timings disabled :(
 			return null;
-		Timing timing = Timings.ofStart(skript, name);
+		Timing timing = Timings.of(skript, name);
+		timing.startTimingIfSync(); // No warning spam in async code
 		assert timing != null;
 		return timing;
 	}

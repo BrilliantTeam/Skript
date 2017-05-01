@@ -266,7 +266,7 @@ public abstract class Functions {
 		final Iterator<FunctionData> iter = functions.values().iterator();
 		while (iter.hasNext()) {
 			final FunctionData d = iter.next();
-			if (d.function instanceof ScriptFunction && script.equals(((ScriptFunction<?>) d.function).trigger.getScript())) {
+			if (d != null && d.function instanceof ScriptFunction && script.equals(((ScriptFunction<?>) d.function).trigger.getScript())) {
 				iter.remove();
 				signatures.remove(d.function.name);
 				r++;
