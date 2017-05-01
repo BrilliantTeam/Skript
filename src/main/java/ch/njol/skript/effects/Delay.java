@@ -107,6 +107,10 @@ public class Delay extends Effect {
 		return delayed.contains(e);
 	}
 
+	public static void addDelayedEvent(Event event){
+		delayed.add(event);
+	}
+
 	@Override
 	protected void execute(final Event e) {
 		throw new UnsupportedOperationException();
