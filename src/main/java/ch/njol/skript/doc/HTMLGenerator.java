@@ -78,12 +78,16 @@ public class HTMLGenerator {
 				continue;
 			} else if (f.isDirectory()) // Ignore other directories
 				continue;
-			if (f.getName().endsWith("template.html") || !f.getName().endsWith(".html"))
+			if (f.getName().endsWith("template.html") || f.getName().endsWith(".md"))
 				continue; // Ignore skeleton and README
 			Skript.info("Creating documentation for " + f.getName());
 			
 			String content = readFile(f);
-			String page = skeleton.replace("${content}", content); // Content to inside skeleton
+			String page;
+			if (f.getName().endsWith(".html"))
+				page = skeleton.replace("${content}", content); // Content to inside skeleton
+			else // Not HTML, so don't even try to use template.html
+				page = content;
 			
 			page = page.replace("${skript.version}", Skript.getVersion().toString()); // Skript version
 			page = page.replace("${pagename}", f.getName().replace(".html", ""));
