@@ -61,9 +61,14 @@ import edu.umd.cs.findbugs.ba.bcp.New;
 public class ChatMessages {
 	
 	/**
-	 * Link parse mode.
+	 * Link parse mode for potential links which are not marked with tags.
 	 */
 	public static LinkParseMode linkParseMode = LinkParseMode.DISABLED;
+	
+	/**
+	 * If color codes should also function as reset code.
+	 */
+	public static boolean colorResetCodes = false;
 	
 	/**
 	 * Chat codes, see {@link ChatCode}.
@@ -285,7 +290,7 @@ public class ChatMessages {
 							
 							MessageComponent old = current;
 							current = new MessageComponent();
-							if (code.equals(ChatCode.reset))
+							if (isResetCode(code))
 								current.reset = true;
 							copyStyles(old, current);
 							
@@ -322,7 +327,7 @@ public class ChatMessages {
 						
 						MessageComponent old = current;
 						current = new MessageComponent();
-						if (code.equals(ChatCode.reset))
+						if (isResetCode(code))
 							current.reset = true;
 						copyStyles(old, current);
 						
@@ -419,5 +424,9 @@ public class ChatMessages {
 		MessageComponent component = new MessageComponent();
 		component.text = str;
 		return component;
+	}
+	
+	public static boolean isResetCode(ChatCode code) {
+		return code == ChatCode.reset || (colorResetCodes && code.colorChar != 0);
 	}
 }

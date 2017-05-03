@@ -216,6 +216,16 @@ public abstract class SkriptConfig {
 				
 			});
 	
+	public final static Option<Boolean> colorResetCodes = new Option<Boolean>("color codes reset formatting", false)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					ChatMessages.colorResetCodes = t;
+				}
+				
+			});
+	
 	/**
 	 * This should only be used in special cases
 	 */
