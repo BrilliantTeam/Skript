@@ -61,10 +61,9 @@ import edu.umd.cs.findbugs.ba.bcp.New;
 public class ChatMessages {
 	
 	/**
-	 * If anything that starts with http(s):// should be interpreted
-	 * as a link (for old script compatibility).
+	 * Link parse mode.
 	 */
-	public static boolean parseLinks = false;
+	public static LinkParseMode linkParseMode = LinkParseMode.DISABLED;
 	
 	/**
 	 * Chat codes, see {@link ChatCode}.
@@ -181,7 +180,7 @@ public class ChatMessages {
 			VariableString varParam = null;
 			
 			// Attempt link parsing
-			if (parseLinks && c == 'h') {
+			if (linkParseMode == LinkParseMode.STRICT && c == 'h') {
 				String rest = msg.substring(i); // Get rest of string
 				
 				String link = null;
@@ -205,6 +204,48 @@ public class ChatMessages {
 					
 					// Make new component a link
 					ChatCode.open_url.updateComponent(current, link, null); // URL for client...
+					current.text = link; // ... and for player
+					
+					i += link.length() - 1; // Skip link for all other parsing
+					
+					// Add one MORE component (this comes after the link)
+					current = new MessageComponent();
+					components.add(current);
+					continue;
+				}
+			} else if (linkParseMode == LinkParseMode.LENIENT && (i == 0 || chars[i - 1] == ' ')) {
+				// Lenient link parsing
+				String rest = msg.substring(i); // Get rest of string
+				
+				String link = null;
+				if (rest.contains(".")) {
+					link = rest.split(" ", 2)[0];
+				}
+				
+				// Link found
+				if (link != null && !link.isEmpty()) {
+					// Insert protocol (aka guess it) if it isn't there
+					String url;
+					if (!link.startsWith("http://") && !link.startsWith("https://")) {
+						url = "http://" + link; // Hope that http -> https redirect works on target site...
+					} else {
+						url = link;
+					}
+					
+					// Take previous component, create new
+					String text = curStr.toString();
+					curStr = new StringBuilder();
+					assert text != null;
+					current.text = text;
+					
+					MessageComponent old = current;
+					current = new MessageComponent();
+					copyStyles(old, current);
+					
+					components.add(current);
+					
+					// Make new component a link
+					ChatCode.open_url.updateComponent(current, url, null); // URL for client...
 					current.text = link; // ... and for player
 					
 					i += link.length() - 1; // Skip link for all other parsing

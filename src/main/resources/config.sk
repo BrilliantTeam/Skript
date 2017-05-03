@@ -168,9 +168,11 @@ enable timings: false
 # Note that this requires Paper (https://paper.readthedocs.io/en/paper-1.11/) to work; on Bukkit/Spigot this option has no effect.
 # When false, timings are not enabled for scripts even if you're running Paper.
 
-parse links in chat messages: false
-# If Skript should attempt to parse anything that begins with "http://" or "https://" as links
-# when parsing chat messages. Turning this on might make parsing texts slightly slower.
+parse links in chat messages: disabled
+# Controls how Skript will try to parse links in chat messages.
+# If 'disabled' or 'false', no links will be automatically parsed
+# When 'strict', everything starting with http(s):// will be parsed as link
+# When 'lenient', everything that contains a dot will be interpreted as a link
 
 # ==== Variables ====
 

@@ -45,6 +45,7 @@ import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.chat.ChatMessages;
+import ch.njol.skript.util.chat.LinkParseMode;
 import ch.njol.util.Setter;
 
 /**
@@ -190,12 +191,27 @@ public abstract class SkriptConfig {
 				
 			});
 	
-	public final static Option<Boolean> parseLinks = new Option<Boolean>("parse links in chat messages", false)
-			.setter(new Setter<Boolean>() {
+	public final static Option<String> parseLinks = new Option<String>("parse links in chat messages", "disabled")
+			.setter(new Setter<String>() {
 
 				@Override
-				public void set(Boolean t) {
-					ChatMessages.parseLinks = t;
+				public void set(String t) {
+					switch (t) {
+						case "false":
+						case "disabled":
+							ChatMessages.linkParseMode = LinkParseMode.DISABLED;
+							break;
+						case "true":
+						case "lenient":
+							ChatMessages.linkParseMode = LinkParseMode.LENIENT;
+							break;
+						case "strict":
+							ChatMessages.linkParseMode = LinkParseMode.STRICT;
+							break;
+						default:
+							ChatMessages.linkParseMode = LinkParseMode.DISABLED;
+							Skript.warning("Unknown link parse mode: " + t + ", please use disabled, strict or lenient");
+					}
 				}
 				
 			});
