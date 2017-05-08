@@ -132,7 +132,8 @@ public class Metrics {
     private void startSubmitting() {
         final Timer timer = new Timer(true); // We use a timer cause the Bukkit scheduler is affected by server lags
         timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
+            @SuppressWarnings("synthetic-access")
+			@Override
             public void run() {
                 if (!plugin.isEnabled()) { // Plugin was disabled
                     timer.cancel();
@@ -141,8 +142,7 @@ public class Metrics {
                 // Nevertheless we want our code to run in the Bukkit main thread, so we have to use the Bukkit scheduler
                 // Don't be afraid! The connection to the bStats server is still async, only the stats collection is sync ;)
                 Bukkit.getScheduler().runTask(plugin, new Runnable() {
-                    @SuppressWarnings("synthetic-access")
-					@Override
+                    @Override
                     public void run() {
                         submitData();
                     }
