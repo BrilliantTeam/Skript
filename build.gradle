@@ -72,7 +72,7 @@ jar {
 
 license {
     header file('licenseheader.txt')
-    exclude('src/main/java/ch/njol/skript/Metrics.java')
+    exclude('**/Metrics.java')
 }
 
 configurations {

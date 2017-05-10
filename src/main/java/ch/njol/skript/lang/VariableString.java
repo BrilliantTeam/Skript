@@ -198,17 +198,6 @@ public class VariableString implements Expression<String> {
 			while (c != s.length()) {
 				int c2 = s.indexOf('%', c + 1);
 				
-				// Check if we are inside <formatting tag>
-				int tagStart = s.indexOf('<', c2);
-				int tagEnd = s.indexOf('>', c2);
-				if (tagEnd != -1 && (tagStart == -1 || tagStart > tagEnd)) {
-					// Go to next %
-					c = s.indexOf('%', c2 + 1);
-					if (c == -1)
-						c = s.length();
-					continue;
-				}
-				
 				int a = c;
 				int b;
 				while (c2 != -1 && (b = s.indexOf('{', a + 1)) != -1 && b < c2) {
