@@ -187,8 +187,10 @@ public class HTMLGenerator {
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since.value());
 		Description description = c.getAnnotation(Description.class);
 		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description.value()));
+		desc = desc.replace("${element.desc-safe}", Joiner.on(" ").join(description == null ? new String[0] : description.value()).replace("\"", "\\\""));
 		Examples examples = c.getAnnotation(Examples.class);
 		desc = desc.replace("${element.examples}", Joiner.on("\n<br>").join(examples == null ? new String[0] : examples.value()));
+		desc = desc.replace("${element.examples-safe}", Joiner.on(" ").join(examples == null ? new String[0] : examples.value()).replace("\"", "\\\""));
 		desc = desc.replace("${element.id}", info.c.getSimpleName());
 		
 		List<String> toGen = Lists.newArrayList();
@@ -235,8 +237,10 @@ public class HTMLGenerator {
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since);
 		String[] description = info.getDescription();
 		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description));
+		desc = desc.replace("${element.desc-safe}", Joiner.on(" ").join(description == null ? new String[0] : description).replace("\"", "\\\""));
 		String[] examples = info.getExamples();
 		desc = desc.replace("${element.examples}", Joiner.on("\n<br>").join(examples == null ? new String[0] : examples));
+		desc = desc.replace("${element.examples-safe}", Joiner.on(" ").join(examples == null ? new String[0] : examples).replace("\"", "\\\""));
 		desc = desc.replace("${element.id}", info.getId());
 		
 		List<String> toGen = Lists.newArrayList();
@@ -277,8 +281,10 @@ public class HTMLGenerator {
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since);
 		String[] description = info.getDescription();
 		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description));
+		desc = desc.replace("${element.desc-safe}", Joiner.on(" ").join(description == null ? new String[0] : description).replace("\"", "\\\""));
 		String[] examples = info.getExamples();
 		desc = desc.replace("${element.examples}", Joiner.on("\n<br>").join(examples == null ? new String[0] : examples));
+		desc = desc.replace("${element.examples-safe}", Joiner.on(" ").join(examples == null ? new String[0] : examples).replace("\"", "\\\""));
 		desc = desc.replace("${element.id}", info.getCodeName());
 		
 		List<String> toGen = Lists.newArrayList();
@@ -322,8 +328,10 @@ public class HTMLGenerator {
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since);
 		String[] description = info.getDescription();
 		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description));
+		desc = desc.replace("${element.desc-safe}", Joiner.on(" ").join(description == null ? new String[0] : description).replace("\"", "\\\""));
 		String[] examples = info.getExamples();
 		desc = desc.replace("${element.examples}", Joiner.on("\n<br>").join(examples == null ? new String[0] : examples));
+		desc = desc.replace("${element.examples-safe}", Joiner.on(" ").join(examples == null ? new String[0] : examples).replace("\"", "\\\""));
 		desc = desc.replace("${element.id}", info.getName());
 		
 		List<String> toGen = Lists.newArrayList();

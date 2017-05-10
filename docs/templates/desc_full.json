@@ -1,0 +1,11 @@
+"${element.id}" : {
+  "id" : "${element.id}",
+  "name" : "${element.name}",
+  "patterns" : [
+    ${generate element.patterns pattern_element.json}
+    "pattern_end"
+  ],
+  "since" : "${element.version}",
+  "description" : "${element.desc-safe}",
+  "examples" : "${element.examples-safe}"
+},
