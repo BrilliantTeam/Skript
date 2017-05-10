@@ -216,7 +216,7 @@ public abstract class SkriptConfig {
 				
 			});
 	
-	public final static Option<Boolean> colorResetCodes = new Option<Boolean>("color codes reset formatting", false)
+	public final static Option<Boolean> colorResetCodes = new Option<Boolean>("color codes reset formatting", true)
 			.setter(new Setter<Boolean>() {
 
 				@Override
