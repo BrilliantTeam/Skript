@@ -5,7 +5,7 @@
     ${generate element.patterns-safe pattern_element.json}
     "pattern_end"
   ],
-  "since" : "${element.version}",
+  "since" : "${element.since}",
   "description" : "${element.desc-safe}",
   "examples" : "${element.examples-safe}"
 },
