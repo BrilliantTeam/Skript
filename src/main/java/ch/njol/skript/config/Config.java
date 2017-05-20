@@ -40,7 +40,7 @@ import ch.njol.skript.config.validate.SectionValidator;
  * 
  * @author Peter Güttinger
  */
-public class Config {
+public class Config implements Comparable<Config> {
 	
 	boolean simple = false;
 	
@@ -283,6 +283,13 @@ public class Config {
 	 */
 	public void load(final Class<?> c) {
 		load(c, null, "");
+	}
+
+	@Override
+	public int compareTo(@Nullable Config other) {
+		if (other == null)
+			return 0;
+		return fileName.compareTo(other.fileName);
 	}
 	
 }

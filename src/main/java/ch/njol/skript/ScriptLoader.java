@@ -24,6 +24,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -259,14 +260,14 @@ final public class ScriptLoader {
 	 * @param files
 	 * @return Info on the loaded scripts
 	 */
-	public final static ScriptInfo loadScripts(final File[] files) {
-		Arrays.sort(files);
+	public final static ScriptInfo loadScripts(final List<Config> configs) {
+		Collections.sort(configs);
 		final ScriptInfo i = new ScriptInfo();
 		final boolean wasLocal = Language.setUseLocal(false);
 		try {
-			for (final File f : files) {
-				assert f != null : Arrays.toString(files);
-				i.add(loadScript(f));
+			for (final Config cfg : configs) {
+				assert cfg != null : configs.toString();
+				i.add(loadScript(cfg));
 			}
 		} finally {
 			if (wasLocal)
@@ -283,7 +284,7 @@ final public class ScriptLoader {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private final static ScriptInfo loadScript(final File f) {
+	private final static ScriptInfo loadScript(final Config config) {
 //		File cache = null;
 //		if (SkriptConfig.enableScriptCaching.value()) {
 //			cache = new File(f.getParentFile(), "cache" + File.separator + f.getName() + "c");
@@ -340,7 +341,6 @@ final public class ScriptLoader {
 //			}
 //		}
 		try {
-			final Config config = new Config(f, true, false, ":");
 			if (SkriptConfig.keepConfigsLoaded.value())
 				SkriptConfig.configs.add(config);
 			int numTriggers = 0;
@@ -560,10 +560,8 @@ final public class ScriptLoader {
 //			}
 			
 			return new ScriptInfo(1, numTriggers, numCommands, numFunctions);
-		} catch (final IOException e) {
-			Skript.error("Could not load " + f.getName() + ": " + ExceptionUtils.toString(e));
 		} catch (final Exception e) {
-			Skript.exception(e, "Could not load " + f.getName());
+			Skript.exception(e, "Could not load " + config.getFileName());
 		} finally {
 			SkriptLogger.setNode(null);
 		}
@@ -575,15 +573,17 @@ final public class ScriptLoader {
 	 * 
 	 * @param files
 	 */
-	public final static void loadStructures(final File[] files) {
+	public final static List<Config> loadStructures(final File[] files) {
 		Arrays.sort(files);
+		
+		List<Config> loadedFiles = new ArrayList<>(files.length);
 		for (final File f : files) {
 			assert f != null : Arrays.toString(files);
-			loadStructure(f);
+			loadedFiles.add(loadStructure(f));
 		}
-	
 		
 		SkriptEventHandler.registerBukkitEvents();
+		return loadedFiles;
 	}
 	
 	/**
@@ -591,16 +591,19 @@ final public class ScriptLoader {
 	 * 
 	 * @param directory
 	 */
-	public final static void loadStructures(final File directory) {
+	public final static List<Config> loadStructures(final File directory) {
 		final File[] files = directory.listFiles(scriptFilter);
 		Arrays.sort(files);
+		
+		List<Config> loadedFiles = new ArrayList<>(files.length);
 		for (final File f : files) {
 			if (f.isDirectory()) {
-				loadStructures(f);
+				loadedFiles.addAll(loadStructures(f));
 			} else {
-				loadStructure(f);
+				loadedFiles.add(loadStructure(f));
 			}
 		}
+		return loadedFiles;
 	}
 	
 	/**
@@ -609,7 +612,7 @@ final public class ScriptLoader {
 	 * @param f Script
 	 */
 	@SuppressWarnings("unchecked")
-	private final static void loadStructure(final File f) {
+	private final static @Nullable Config loadStructure(final File f) {
 		try {
 			final Config config = new Config(f, true, false, ":");
 			if (SkriptConfig.keepConfigsLoaded.value())
@@ -661,6 +664,8 @@ final public class ScriptLoader {
 			} finally {
 				numErrors.stop();
 			}
+			SkriptLogger.setNode(null);
+			return config;
 		} catch (final IOException e) {
 			Skript.error("Could not load " + f.getName() + ": " + ExceptionUtils.toString(e));
 		} catch (final Exception e) {
@@ -668,6 +673,7 @@ final public class ScriptLoader {
 		} finally {
 			SkriptLogger.setNode(null);
 		}
+		return null; // Oops something went wrong
 	}
 	
 	/**
