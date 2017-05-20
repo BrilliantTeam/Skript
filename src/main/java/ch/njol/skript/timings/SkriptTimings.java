@@ -55,7 +55,7 @@ public class SkriptTimings {
 	public static void stop(@Nullable Object timing) {
 		if (timing == null) // Timings disabled...
 			return;
-		((Timing) timing).stopTiming();
+		((Timing) timing).stopTimingIfSync();
 	}
 	
 	public static boolean enabled() {
