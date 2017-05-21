@@ -131,10 +131,10 @@ final public class ScriptLoader {
 		hasDelayBefore = Kleenean.FALSE;
 	}
 	
-	public static List<TriggerSection> currentSections = new ArrayList<TriggerSection>();
-	public static List<Loop> currentLoops = new ArrayList<Loop>();
-	private final static Map<String, ItemType> currentAliases = new HashMap<String, ItemType>();
-	final static HashMap<String, String> currentOptions = new HashMap<String, String>();
+	public static List<TriggerSection> currentSections = new ArrayList<>();
+	public static List<Loop> currentLoops = new ArrayList<>();
+	private final static Map<String, ItemType> currentAliases = new HashMap<>();
+	final static HashMap<String, String> currentOptions = new HashMap<>();
 	
 	public static Map<String, ItemType> getScriptAliases() {
 		return currentAliases;
@@ -196,8 +196,8 @@ final public class ScriptLoader {
 		try {
 			Language.setUseLocal(false);
 			
-			loadStructures(scriptsFolder);
-			i = loadScripts(scriptsFolder);
+			List<Config> configs = loadStructures(scriptsFolder);
+			i = loadScripts(configs);
 			
 			synchronized (loadedScripts) {
 				loadedScripts.add(i);
@@ -228,36 +228,9 @@ final public class ScriptLoader {
 	};
 	
 	/**
-	 * Loads enabled scripts from the specified directory and it's subdirectories.
-	 * 
-	 * @param directory
-	 * @return Info on the loaded scripts
-	 */
-	public final static ScriptInfo loadScripts(final File directory) {
-		final ScriptInfo i = new ScriptInfo();
-		final boolean wasLocal = Language.setUseLocal(false);
-		try {
-			final File[] files = directory.listFiles(scriptFilter);
-			Arrays.sort(files);
-			for (final File f : files) {
-				if (f.isDirectory()) {
-					i.add(loadScripts(f));
-				} else {
-					i.add(loadScript(f));
-				}
-			}
-		} finally {
-			if (wasLocal)
-				Language.setUseLocal(true);
-		}
-		
-		return i;
-	}
-	
-	/**
 	 * Loads the specified scripts.
 	 * 
-	 * @param files
+	 * @param configs
 	 * @return Info on the loaded scripts
 	 */
 	public final static ScriptInfo loadScripts(final List<Config> configs) {
@@ -284,62 +257,12 @@ final public class ScriptLoader {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private final static ScriptInfo loadScript(final Config config) {
-//		File cache = null;
-//		if (SkriptConfig.enableScriptCaching.value()) {
-//			cache = new File(f.getParentFile(), "cache" + File.separator + f.getName() + "c");
-//			if (cache.exists()) {
-//				final RetainingLogHandler log = SkriptLogger.startRetainingLog();
-//				ObjectInputStream in = null;
-//				try {
-//					in = new ObjectInputStream(new FileInputStream(cache));
-//					final long lastModified = in.readLong();
-//					if (lastModified == f.lastModified()) {
-//						final SerializedScript script = (SerializedScript) in.readObject();
-//						triggersLoop: for (final Trigger t : script.triggers) {
-//							if (t.getEvent() instanceof SelfRegisteringSkriptEvent) {
-//								((SelfRegisteringSkriptEvent) t.getEvent()).register(t);
-//								SkriptEventHandler.addSelfRegisteringTrigger(t);
-//							} else {
-//								for (final SkriptEventInfo<?> e : Skript.getEvents()) {
-//									if (e.c == t.getEvent().getClass()) {
-//										SkriptEventHandler.addTrigger(e.events, t);
-//										continue triggersLoop;
-//									}
-//								}
-//								throw new EmptyStackException();
-//							}
-//						}
-//						for (final ScriptCommand c : script.commands) {
-//							Commands.registerCommand(c);
-//						}
-//						log.printLog();
-//						return new ScriptInfo(1, script.triggers.size(), script.commands.size());
-//					} else {
-//						cache.delete();
-//					}
-//				} catch (final Exception e) {
-//					if (Skript.testing()) {
-//						System.err.println("[debug] Error loading cached script '" + f.getName() + "':");
-//						e.printStackTrace();
-//					}
-//					unloadScript(f);
-//					if (in != null) {
-//						try {
-//							in.close();
-//						} catch (final IOException e1) {}
-//					}
-//					cache.delete();
-//				} finally {
-//					log.stop();
-//					if (in != null) {
-//						try {
-//							in.close();
-//						} catch (final IOException e) {}
-//					}
-//				}
-//			}
-//		}
+	final static ScriptInfo loadScript(final @Nullable Config config) {
+		if (config == null) { // Something bad happened, hopefully got logged to console
+			return new ScriptInfo();
+		}
+		
+		
 		try {
 			if (SkriptConfig.keepConfigsLoaded.value())
 				SkriptConfig.configs.add(config);
@@ -612,7 +535,7 @@ final public class ScriptLoader {
 	 * @param f Script
 	 */
 	@SuppressWarnings("unchecked")
-	private final static @Nullable Config loadStructure(final File f) {
+	public final static @Nullable Config loadStructure(final File f) {
 		try {
 			final Config config = new Config(f, true, false, ":");
 			if (SkriptConfig.keepConfigsLoaded.value())
@@ -745,7 +668,7 @@ final public class ScriptLoader {
 		if (Skript.debug())
 			indentation += "    ";
 		
-		final ArrayList<TriggerItem> items = new ArrayList<TriggerItem>();
+		final ArrayList<TriggerItem> items = new ArrayList<>();
 		
 		Kleenean hadDelayBeforeLastIf = Kleenean.FALSE;
 		

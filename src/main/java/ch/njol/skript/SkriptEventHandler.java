@@ -256,6 +256,10 @@ public abstract class SkriptEventHandler {
 	private final static Set<Class<? extends Event>> registeredEvents = new HashSet<>();
 	private final static Listener listener = new Listener() {};
 	
+	/**
+	 * Registers event handlers for all events which currently loaded
+	 * triggers are using.
+	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	final static void registerBukkitEvents() {
 		for (final Class<? extends Event> e : triggers.keySet()) {

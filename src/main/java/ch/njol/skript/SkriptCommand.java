@@ -22,6 +22,7 @@ package ch.njol.skript;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -34,6 +35,7 @@ import ch.njol.skript.ScriptLoader.ScriptInfo;
 import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.command.CommandHelp;
+import ch.njol.skript.config.Config;
 import ch.njol.skript.doc.HTMLGenerator;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
@@ -181,14 +183,14 @@ public class SkriptCommand implements CommandExecutor {
 						}
 						reloading(sender, "script", f.getName());
 						ScriptLoader.unloadScript(f);
-						ScriptLoader.loadStructures(new File[] {f});
-						ScriptLoader.loadScripts(new File[] {f});
+						Config config = ScriptLoader.loadStructure(f);
+						ScriptLoader.loadScript(config);
 						reloaded(sender, r, "script", f.getName());
 					} else {
 						reloading(sender, "scripts in folder", f.getName());
 						final int disabled = ScriptLoader.unloadScripts(f).files;
-						ScriptLoader.loadStructures(f);
-						final int enabled = ScriptLoader.loadScripts(f).files;
+						List<Config> configs = ScriptLoader.loadStructures(f);
+						final int enabled = ScriptLoader.loadScripts(configs).files;
 						if (Math.max(disabled, enabled) == 0)
 							info(sender, "reload.empty folder", f.getName());
 						else
@@ -201,8 +203,8 @@ public class SkriptCommand implements CommandExecutor {
 						info(sender, "enable.all.enabling");
 						final File[] files = toggleScripts(new File(Skript.getInstance().getDataFolder(), Skript.SCRIPTSFOLDER), true).toArray(new File[0]);
 						assert files != null;
-						ScriptLoader.loadStructures(files);
-						ScriptLoader.loadScripts(files);
+						List<Config> configs = ScriptLoader.loadStructures(files);
+						ScriptLoader.loadScripts(configs);
 						if (r.numErrors() == 0) {
 							info(sender, "enable.all.enabled");
 						} else {
@@ -229,8 +231,8 @@ public class SkriptCommand implements CommandExecutor {
 						}
 						
 						info(sender, "enable.single.enabling", f.getName());
-						ScriptLoader.loadStructures(new File[] {f});
-						ScriptLoader.loadScripts(new File[] {f});
+						Config config = ScriptLoader.loadStructure(f);
+						ScriptLoader.loadScript(config);
 						if (r.numErrors() == 0) {
 							info(sender, "enable.single.enabled", f.getName());
 						} else {
@@ -253,8 +255,8 @@ public class SkriptCommand implements CommandExecutor {
 						final File[] ss = scripts.toArray(new File[scripts.size()]);
 						assert ss != null;
 						
-						ScriptLoader.loadStructures(ss);
-						final ScriptInfo i = ScriptLoader.loadScripts(ss);
+						List<Config> configs = ScriptLoader.loadStructures(ss);
+						final ScriptInfo i = ScriptLoader.loadScripts(configs);
 						assert i.files == scripts.size();
 						if (r.numErrors() == 0) {
 							info(sender, "enable.folder.enabled", f.getName(), i.files);
