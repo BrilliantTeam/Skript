@@ -837,6 +837,28 @@ public final class BukkitEventValues {
 				return e.getInventory();
 			}
 		}, 0);
+		//InventoryCloseEvent
+		EventValues.registerEventValue(InventoryCloseEvent.class, Player.class, new Getter<Player, InventoryCloseEvent>() {
+			@Override
+			@Nullable
+			public Player get(final InventoryCloseEvent e) {
+				return (Player) e.getPlayer();
+			}
+		}, 0);
+		EventValues.registerEventValue(InventoryCloseEvent.class, Inventory.class, new Getter<Inventory, InventoryCloseEvent>() {
+			@Override
+			@Nullable
+			public Inventory get(final InventoryCloseEvent e) {
+				return e.getInventory();
+			}
+		}, 0);
+		//PortalCreateEvent
+		EventValues.registerEventValue(PortalCreateEvent.class, World.class, new Getter<World, PortalCreateEvent>() {
+			@Override
+			@Nullable
+			public World get(final PortalCreateEvent e) {
+				return e.getWorld();
+			}
+		}, 0);
 	}
-	
 }
