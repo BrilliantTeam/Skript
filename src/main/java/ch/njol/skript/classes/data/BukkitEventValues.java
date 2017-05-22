@@ -837,6 +837,13 @@ public final class BukkitEventValues {
 				return e.getInventory();
 			}
 		}, 0);
+		//PortalCreateEvent
+		EventValues.registerEventValue(PortalCreateEvent.class, World.class, new Getter<World, PortalCreateEvent>() {
+			@Override
+			@Nullable
+			public World get(final PortalCreateEvent e) {
+				return e.getWorld();
+			}
+		}, 0);
 	}
-	
 }
