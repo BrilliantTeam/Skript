@@ -44,6 +44,7 @@ import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.bekvon.bukkit.residence.protection.ResidencePermissions;
+import com.google.common.base.Objects;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -173,13 +174,13 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 
 		@Override
 		public boolean isOwner(OfflinePlayer p) {
-			return res.getPermissions().playerHas(p.getName(), Flags.build, false);
+			return Objects.equal(res.getPermissions().getOwnerUUID(), p.getUniqueId());
 		}
 
 		@SuppressWarnings("null")
 		@Override
 		public Collection<OfflinePlayer> getOwners() {
-			return Collections.emptyList();
+			return Collections.singleton(Residence.getInstance().getOfflinePlayer(res.getPermissions().getOwner()));
 		}
 
 		@SuppressWarnings("null")
