@@ -34,11 +34,6 @@ public enum ChatCode {
 	
 	reset {
 		@Override
-		public boolean nextComponent() {
-			return true;
-		}
-		
-		@Override
 		public void updateComponent(MessageComponent component, String param) {
 			component.reset = true;
 		}
@@ -194,9 +189,5 @@ public enum ChatCode {
 	
 	public void updateComponent(MessageComponent component, String param, @Nullable VariableString varParam) {
 		updateComponent(component, param);
-	}
-	
-	public boolean nextComponent() {
-		return true;
 	}
 }

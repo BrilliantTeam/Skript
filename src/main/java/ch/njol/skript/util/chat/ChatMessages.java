@@ -204,25 +204,23 @@ public class ChatMessages {
 					
 					code = codes.get(name);
 					if (code != null) { // ... and if the tag IS really valid
-						if (code.nextComponent()) { // Next chat component
-							String text = curStr.toString();
-							curStr = new StringBuilder();
-							assert text != null;
-							current.text = text;
-							
-							MessageComponent old = current;
-							current = new MessageComponent();
-							if (isResetCode(code))
-								current.reset = true;
-							copyStyles(old, current);
-							
-							components.add(current);
-						}
+						String text = curStr.toString();
+						curStr = new StringBuilder();
+						assert text != null;
+						current.text = text;
+						
+						MessageComponent old = current;
+						current = new MessageComponent();
+						
+						components.add(current);
 						
 						if (code.colorCode != null) // Just update color code
 							current.color = code.colorCode;
 						else
 							code.updateComponent(current, param, varParam); // Call ChatCode update
+						
+						// Copy styles from old to current if needed
+						copyStyles(old, current);
 						
 						// Increment i to tag end
 						i = end;
@@ -243,25 +241,23 @@ public class ChatMessages {
 				if (code == null) {
 					curStr.append(c).append(color); // Invalid formatting char, plain append
 				} else {
-					if (code.nextComponent()) { // Next chat component
-						String text = curStr.toString();
-						curStr = new StringBuilder();
-						assert text != null;
-						current.text = text;
-						
-						MessageComponent old = current;
-						current = new MessageComponent();
-						if (isResetCode(code))
-							current.reset = true;
-						copyStyles(old, current);
-						
-						components.add(current);
-					}
+					String text = curStr.toString();
+					curStr = new StringBuilder();
+					assert text != null;
+					current.text = text;
+					
+					MessageComponent old = current;
+					current = new MessageComponent();
+					
+					components.add(current);
 					
 					if (code.colorCode != null) // Just update color code
 						current.color = code.colorCode;
 					else
 						code.updateComponent(current, param, varParam); // Call ChatCode update
+					
+					// Copy styles from old to current if needed
+					copyStyles(old, current);
 				}
 				
 				i++; // Skip this and color char
@@ -385,19 +381,23 @@ public class ChatMessages {
 		if (to.reset)
 			return;
 		
-		if (!to.bold)
-			to.bold = from.bold;
-		if (!to.italic)
-			to.italic = from.italic;
-		if (!to.underlined)
-			to.underlined = from.underlined;
-		if (!to.strikethrough)
-			to.strikethrough = from.strikethrough;
-		if (!to.obfuscated)
-			to.obfuscated = from.obfuscated;
-		if (to.color.equals("reset"))
-			to.color = from.color;
+		// If we don't have color or colors don't reset formatting, copy formatting
+		if (to.color == null || !colorResetCodes) {
+			if (!to.bold)
+				to.bold = from.bold;
+			if (!to.italic)
+				to.italic = from.italic;
+			if (!to.underlined)
+				to.underlined = from.underlined;
+			if (!to.strikethrough)
+				to.strikethrough = from.strikethrough;
+			if (!to.obfuscated)
+				to.obfuscated = from.obfuscated;
+			if (to.color == null)
+				to.color = from.color;
+		}
 		
+		// Links and such are never reset by color codes - weird, but it'd break too much stuff
 		if (to.clickEvent == null)
 			to.clickEvent = from.clickEvent;
 		if (to.insertion == null)
@@ -426,9 +426,5 @@ public class ChatMessages {
 		MessageComponent component = new MessageComponent();
 		component.text = str;
 		return component;
-	}
-	
-	public static boolean isResetCode(ChatCode code) {
-		return code == ChatCode.reset || (colorResetCodes && code.colorChar != 0);
 	}
 }

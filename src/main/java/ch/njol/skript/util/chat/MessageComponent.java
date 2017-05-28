@@ -79,7 +79,7 @@ public class MessageComponent {
 	/**
 	 * Color of this text. Defaults to reseting it.
 	 */
-	public String color = "reset";
+	public @Nullable String color;
 	
 	/**
 	 * Value of this, if present, will appended on what player is currently
