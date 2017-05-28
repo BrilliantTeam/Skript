@@ -184,7 +184,91 @@ public class ChatMessages {
 			String param = "";
 			VariableString varParam = null;
 			
-			// Attempt link parsing
+			if (c == '<') { // Tag parsing
+				int end = msg.indexOf('>', i);
+				if (end != -1) { // If this COULD be valid tag...
+					String tag = msg.substring(i + 1, end);
+					String name;
+					if (tag.contains(":")) {
+						String[] split = tag.split(":", 2);
+						name = split[0];
+						param = split[1];
+						
+						// Check if we need to do VariableString parsing
+						if (param.contains("%")) {
+							varParam = VariableString.newInstance(param);
+						}
+					} else {
+						name = tag;
+					}
+					
+					code = codes.get(name);
+					if (code != null) { // ... and if the tag IS really valid
+						if (code.nextComponent()) { // Next chat component
+							String text = curStr.toString();
+							curStr = new StringBuilder();
+							assert text != null;
+							current.text = text;
+							
+							MessageComponent old = current;
+							current = new MessageComponent();
+							if (isResetCode(code))
+								current.reset = true;
+							copyStyles(old, current);
+							
+							components.add(current);
+						}
+						
+						if (code.colorCode != null) // Just update color code
+							current.color = code.colorCode;
+						else
+							code.updateComponent(current, param, varParam); // Call ChatCode update
+						
+						// Increment i to tag end
+						i = end;
+						continue;
+					}
+					
+					// If this is invalid tag, just ignore it. Maybe scripter was trying to be clever with formatting
+				}
+			} else if (c == '&' || c == '§') {
+				// Corner case: this is last character, so we cannot get next
+				if (i == chars.length - 1) {
+					curStr.append(c);
+					continue;
+				}
+				
+				char color = chars[i + 1];
+				code = colorChars[color];
+				if (code == null) {
+					curStr.append(c).append(color); // Invalid formatting char, plain append
+				} else {
+					if (code.nextComponent()) { // Next chat component
+						String text = curStr.toString();
+						curStr = new StringBuilder();
+						assert text != null;
+						current.text = text;
+						
+						MessageComponent old = current;
+						current = new MessageComponent();
+						if (isResetCode(code))
+							current.reset = true;
+						copyStyles(old, current);
+						
+						components.add(current);
+					}
+					
+					if (code.colorCode != null) // Just update color code
+						current.color = code.colorCode;
+					else
+						code.updateComponent(current, param, varParam); // Call ChatCode update
+				}
+				
+				i++; // Skip this and color char
+				continue;
+			}
+			
+			// Attempt link parsing, if a tag was not found
 			if (linkParseMode == LinkParseMode.STRICT && c == 'h') {
 				String rest = msg.substring(i); // Get rest of string
 				
@@ -260,88 +344,6 @@ public class ChatMessages {
 					components.add(current);
 					continue;
 				}
-			}
-			
-			if (c == '<') { // Tag parsing
-				int end = msg.indexOf('>', i);
-				if (end != -1) { // If this COULD be valid tag...
-					String tag = msg.substring(i + 1, end);
-					String name;
-					if (tag.contains(":")) {
-						String[] split = tag.split(":", 2);
-						name = split[0];
-						param = split[1];
-						
-						// Check if we need to do VariableString parsing
-						if (param.contains("%")) {
-							varParam = VariableString.newInstance(param);
-						}
-					} else {
-						name = tag;
-					}
-					
-					code = codes.get(name);
-					if (code != null) { // ... and if the tag IS really valid
-						if (code.nextComponent()) { // Next chat component
-							String text = curStr.toString();
-							curStr = new StringBuilder();
-							assert text != null;
-							current.text = text;
-							
-							MessageComponent old = current;
-							current = new MessageComponent();
-							if (isResetCode(code))
-								current.reset = true;
-							copyStyles(old, current);
-							
-							components.add(current);
-						}
-						
-						if (code.colorCode != null) // Just update color code
-							current.color = code.colorCode;
-						else
-							code.updateComponent(current, param, varParam); // Call ChatCode update
-						
-						// Increment i to tag end
-						i = end;
-						continue;
-					}
-				}
-			} else if (c == '&' || c == '§') {
-				// Corner case: this is last character, so we cannot get next
-				if (i == chars.length - 1) {
-					curStr.append(c);
-					continue;
-				}
-				
-				char color = chars[i + 1];
-				code = colorChars[color];
-				if (code == null) {
-					curStr.append(c).append(color); // Invalid formatting char, plain append
-				} else {
-					if (code.nextComponent()) { // Next chat component
-						String text = curStr.toString();
-						curStr = new StringBuilder();
-						assert text != null;
-						current.text = text;
-						
-						MessageComponent old = current;
-						current = new MessageComponent();
-						if (isResetCode(code))
-							current.reset = true;
-						copyStyles(old, current);
-						
-						components.add(current);
-					}
-					
-					if (code.colorCode != null) // Just update color code
-						current.color = code.colorCode;
-					else
-						code.updateComponent(current, param, varParam); // Call ChatCode update
-				}
-				
-				i++; // Skip this and color char
-				continue;
 			}
 				
 			curStr.append(c); // Append this char to curStr
