@@ -25,6 +25,7 @@ import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -148,11 +149,11 @@ public class ChatMessages {
 	private static class ComponentList {
 		
 		public ComponentList(List<MessageComponent> components) {
-			this.extra = components.toArray(new MessageComponent[0]);
+			this.extra = components;
 		}
 		
 		public ComponentList(MessageComponent[] components) {
-			this.extra = components;
+			this.extra = Arrays.asList(components);
 		}
 
 		/**
@@ -167,7 +168,7 @@ public class ChatMessages {
 		 */
 		@SuppressWarnings("unused")
 		@Nullable
-		public MessageComponent[] extra;
+		public List<MessageComponent> extra;
 	}
 	
 	public static List<MessageComponent> parse(String msg) {
@@ -364,7 +365,7 @@ public class ChatMessages {
 		return json;
 	}
 	
-	public static String toJson(MessageComponent[] components) {
+	public static String toJson(List<MessageComponent> components) {
 		ComponentList componentList = new ComponentList(components);
 		String json = gson.toJson(componentList);
 		assert json != null;
