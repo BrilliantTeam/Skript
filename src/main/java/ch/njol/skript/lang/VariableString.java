@@ -79,6 +79,8 @@ public class VariableString implements Expression<String> {
 	
 	@Nullable
 	private final Object[] string;
+	@Nullable
+	private Object[] stringUnformatted;
 	private final boolean isSimple;
 	@Nullable
 	private final String simple;
@@ -100,6 +102,7 @@ public class VariableString implements Expression<String> {
 	private VariableString(final String orig, final Object[] string, final StringMode mode) {
 		this.orig = orig;
 		this.string = new Object[string.length];
+		this.stringUnformatted = new Object[string.length];
 		for (int i = 0; i < string.length; i++) {
 			Object o = string[i];
 			if (o instanceof String) {
@@ -109,6 +112,10 @@ public class VariableString implements Expression<String> {
 				assert this.string != null;
 				this.string[i] = o;
 			}
+			
+			// For unformatted string, don't format stuff
+			assert this.stringUnformatted != null;
+			this.stringUnformatted[i] = o;
 		}
 		
 		this.mode = mode;
@@ -437,10 +444,10 @@ public class VariableString implements Expression<String> {
 	 */
 	public String toUnformattedString(final Event e) {
 		if (isSimple) {
-			assert simple != null;
-			return simple;
+			assert simpleUnformatted != null;
+			return simpleUnformatted;
 		}
-		final Object[] string = this.string;
+		final Object[] string = this.stringUnformatted;
 		assert string != null;
 		final StringBuilder b = new StringBuilder();
 		for (int i = 0; i < string.length; i++) {

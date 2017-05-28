@@ -183,7 +183,6 @@ public class ChatMessages {
 			char c = chars[i];
 			ChatCode code = null;
 			String param = "";
-			VariableString varParam = null;
 			
 			if (c == '<') { // Tag parsing
 				int end = msg.indexOf('>', i);
@@ -194,11 +193,6 @@ public class ChatMessages {
 						String[] split = tag.split(":", 2);
 						name = split[0];
 						param = split[1];
-						
-						// Check if we need to do VariableString parsing
-						if (param.contains("%")) {
-							varParam = VariableString.newInstance(param);
-						}
 					} else {
 						name = tag;
 					}
@@ -218,7 +212,7 @@ public class ChatMessages {
 						if (code.colorCode != null) // Just update color code
 							current.color = code.colorCode;
 						else
-							code.updateComponent(current, param, varParam); // Call ChatCode update
+							code.updateComponent(current, param); // Call ChatCode update
 						
 						// Copy styles from old to current if needed
 						copyStyles(old, current);
@@ -255,7 +249,7 @@ public class ChatMessages {
 					if (code.colorCode != null) // Just update color code
 						current.color = code.colorCode;
 					else
-						code.updateComponent(current, param, varParam); // Call ChatCode update
+						code.updateComponent(current, param); // Call ChatCode update
 					
 					// Copy styles from old to current if needed
 					copyStyles(old, current);
@@ -289,7 +283,7 @@ public class ChatMessages {
 					components.add(current);
 					
 					// Make new component a link
-					ChatCode.open_url.updateComponent(current, link, null); // URL for client...
+					ChatCode.open_url.updateComponent(current, link); // URL for client...
 					current.text = link; // ... and for player
 					
 					i += link.length() - 1; // Skip link for all other parsing
@@ -331,7 +325,7 @@ public class ChatMessages {
 					components.add(current);
 					
 					// Make new component a link
-					ChatCode.open_url.updateComponent(current, url, null); // URL for client...
+					ChatCode.open_url.updateComponent(current, url); // URL for client...
 					current.text = link; // ... and for player
 					
 					i += link.length() - 1; // Skip link for all other parsing

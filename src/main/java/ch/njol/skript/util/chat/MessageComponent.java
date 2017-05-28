@@ -93,7 +93,7 @@ public class MessageComponent {
 	
 	public static class ClickEvent {
 		
-		public ClickEvent(ClickEvent.Action action, String value, @Nullable VariableString var) {
+		public ClickEvent(ClickEvent.Action action, String value) {
 			this.action = action;
 			this.value = value;
 			this.var = var;
@@ -120,7 +120,7 @@ public class MessageComponent {
 	
 	public static class HoverEvent {
 		
-		public HoverEvent(HoverEvent.Action action, String value, @Nullable VariableString var) {
+		public HoverEvent(HoverEvent.Action action, String value) {
 			this.action = action;
 			this.value = value;
 			this.var = var;
