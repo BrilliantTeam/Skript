@@ -184,7 +184,7 @@ public class SkriptCommand implements CommandExecutor {
 						reloading(sender, "script", f.getName());
 						ScriptLoader.unloadScript(f);
 						Config config = ScriptLoader.loadStructure(f);
-						ScriptLoader.loadScript(config);
+						ScriptLoader.loadScripts(config);
 						reloaded(sender, r, "script", f.getName());
 					} else {
 						reloading(sender, "scripts in folder", f.getName());
@@ -232,7 +232,7 @@ public class SkriptCommand implements CommandExecutor {
 						
 						info(sender, "enable.single.enabling", f.getName());
 						Config config = ScriptLoader.loadStructure(f);
-						ScriptLoader.loadScript(config);
+						ScriptLoader.loadScripts(config);
 						if (r.numErrors() == 0) {
 							info(sender, "enable.single.enabled", f.getName());
 						} else {

@@ -230,8 +230,8 @@ final public class ScriptLoader {
 	/**
 	 * Loads the specified scripts.
 	 * 
-	 * @param configs
-	 * @return Info on the loaded scripts
+	 * @param configs Configs for scripts, loaded by {@link #loadStructures(File[])}
+	 * @return Info on the loaded scripts.
 	 */
 	public final static ScriptInfo loadScripts(final List<Config> configs) {
 		Collections.sort(configs);
@@ -256,8 +256,25 @@ final public class ScriptLoader {
 		return i;
 	}
 	
+	/**
+	 * Loads the specified scripts.
+	 * 
+	 * @param configs Configs for scripts, loaded by {@link #loadStructure(File)}
+	 * @return Info on the loaded scripts
+	 */
+	@SuppressWarnings("null")
+	public final static ScriptInfo loadScripts(final Config... configs) {
+		return loadScripts(Arrays.asList(configs));
+	}
+	
+	/**
+	 * Loads one script. Only for internal use, as this doesn't register/update
+	 * event handlers.
+	 * @param config Config for script to be loaded.
+	 * @return Info about script that is loaded
+	 */
 	@SuppressWarnings("unchecked")
-	final static ScriptInfo loadScript(final @Nullable Config config) {
+	private final static ScriptInfo loadScript(final @Nullable Config config) {
 		if (config == null) { // Something bad happened, hopefully got logged to console
 			return new ScriptInfo();
 		}
@@ -457,31 +474,6 @@ final public class ScriptLoader {
 				numErrors.stop();
 			}
 			
-//			if (SkriptConfig.enableScriptCaching.value() && cache != null) {
-//				if (numErrors.getCount() > 0) {
-//					ObjectOutputStream out = null;
-//					try {
-//						cache.getParentFile().mkdirs();
-//						out = new ObjectOutputStream(new FileOutputStream(cache));
-//						out.writeLong(f.lastModified());
-//						out.writeObject(script);
-//					} catch (final NotSerializableException e) {
-//						Skript.exception(e, "Cannot cache " + f.getName());
-//						if (out != null)
-//							out.close();
-//						cache.delete();
-//					} catch (final IOException e) {
-//						Skript.warning("Cannot cache " + f.getName() + ": " + e.getLocalizedMessage());
-//						if (out != null)
-//							out.close();
-//						cache.delete();
-//					} finally {
-//						if (out != null)
-//							out.close();
-//					}
-//				}
-//			}
-			
 			return new ScriptInfo(1, numTriggers, numCommands, numFunctions);
 		} catch (final Exception e) {
 			Skript.exception(e, "Could not load " + config.getFileName());
@@ -492,7 +484,7 @@ final public class ScriptLoader {
 	}
 	
 	/**
-	 * Loads the specified scripts.
+	 * Loads structures of specified scripts.
 	 * 
 	 * @param files
 	 */
@@ -505,7 +497,6 @@ final public class ScriptLoader {
 			loadedFiles.add(loadStructure(f));
 		}
 		
-		SkriptEventHandler.registerBukkitEvents();
 		return loadedFiles;
 	}
 	
@@ -538,24 +529,13 @@ final public class ScriptLoader {
 	public final static @Nullable Config loadStructure(final File f) {
 		try {
 			final Config config = new Config(f, true, false, ":");
-			if (SkriptConfig.keepConfigsLoaded.value())
-				SkriptConfig.configs.add(config);
-			int numTriggers = 0;
-			int numCommands = 0;
-			int numFunctions = 0;
-			
-			currentAliases.clear();
-			currentOptions.clear();
-			currentScript = config;
-			
-//			final SerializedScript script = new SerializedScript();
 			
 			final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
 			
 			try {
 				for (final Node cnode : config.getMainNode()) {
 					if (!(cnode instanceof SectionNode)) {
-						Skript.error("invalid line - all code has to be put into triggers");
+						// Don't spit error yet, we are only pre-parsing...
 						continue;
 					}
 					
@@ -573,9 +553,6 @@ final public class ScriptLoader {
 						setCurrentEvent("function", FunctionEvent.class);
 						
 						final Signature<?> func = Functions.loadSignature(config.getFileName(), node);
-						if (func != null) {
-							numFunctions++;
-						}
 						
 						deleteCurrentEvent();
 						
