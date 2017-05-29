@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2016 Peter Güttinger and contributors
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util.chat;
 
 import net.md_5.bungee.api.ChatColor;
@@ -47,9 +45,9 @@ public class BungeeConverter {
 		base.setInsertion(origin.insertion);
 		
 		if (origin.clickEvent != null)
-			base.setClickEvent(new ClickEvent(ClickEvent.Action.valueOf(origin.clickEvent.action.name()), origin.clickEvent.value));
+			base.setClickEvent(new ClickEvent(ClickEvent.Action.valueOf(origin.clickEvent.action.name().toUpperCase()), origin.clickEvent.value));
 		if (origin.hoverEvent != null)
-			base.setHoverEvent(new HoverEvent(HoverEvent.Action.valueOf(origin.hoverEvent.action.name()),
+			base.setHoverEvent(new HoverEvent(HoverEvent.Action.valueOf(origin.hoverEvent.action.name().toUpperCase()),
 					new BaseComponent[] {new TextComponent(origin.clickEvent.value)})); // WAIT WHAT?!?
 		
 		return base;
