@@ -1095,6 +1095,12 @@ visual effects:
 	block_dust:
 		name: block dust @-
 		pattern: [sprinting] dust of [%itemtype%]
+	totem:
+		name: totem @-
+		pattern: totem
+	spit:
+		name: spit @-
+		pattern: spit
 	area_expression: [with [offset of %number%, %number%(,| and) %number%][[and ]speed %number%]]
 
 # -- Inventory Actions --
