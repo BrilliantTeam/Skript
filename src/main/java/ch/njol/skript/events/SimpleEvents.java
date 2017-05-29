@@ -38,6 +38,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -397,9 +398,17 @@ public class SimpleEvents {
 				.examples("")
 				.since("2.2-dev21");
 		Skript.registerEvent("Slime Split", SimpleEvent.class, SlimeSplitEvent.class, "slime split")
-				.description("Called when slime splits.")
+				.description("Called when a slime splits. Usually this happens when a big slime dies.")
 				.examples("")
 				.since("2.2-dev26");
-		
+		if (Skript.classExists("org.bukkit.event.entity.EntityResurrectEvent")) {
+			Skript.registerEvent("Resurrect Attempt", SimpleEvent.class, EntityResurrectEvent.class, "[entity] resurrect attempt")
+					.description("Called when an entity dies, always. If they are not holding a totem, this is calcelled - you can, however, uncancel it.")
+					.examples("on resurrect attempt:",
+							"	entity is player",
+							"	entity has permission \"admin.undying\"",
+							"	uncancel the event")
+					.since("2.2-dev28");
+		}
 	}
 }
