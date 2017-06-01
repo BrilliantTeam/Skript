@@ -39,7 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Vectors - Random")
 @Description("Creates a random vector")
 @Examples({"set {_v} to random vector"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorRandom extends SimpleExpression<Vector> {
 	static {
 		Skript.registerExpression(ExprVectorRandom.class, Vector.class, ExpressionType.SIMPLE, "random vector");

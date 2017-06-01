@@ -49,7 +49,7 @@ import org.eclipse.jdt.annotation.Nullable;
 		"set vector yaw of {_v} to -45",
 		"set vector pitch of {_v} to 45",
 		"send \"%vector yaw of {_v}%, %vector pitch of {_v}%\"",})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorYawPitch extends SimplePropertyExpression<Vector, Number> {
 	static {
 		Skript.registerExpression(ExprVectorYawPitch.class, Number.class, ExpressionType.PROPERTY,"vector (0¦yaw|1¦pitch) of %vector%");

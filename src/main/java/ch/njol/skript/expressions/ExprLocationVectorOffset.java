@@ -41,7 +41,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Vectors - Location vector offset")
 @Description("Offset a location by a vector")
 @Examples({"set {_loc} to {_loc} ~ {_v}"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprLocationVectorOffset extends SimpleExpression<Location> {
 	static {
 		Skript.registerExpression(ExprLocationVectorOffset.class, Location.class, ExpressionType.SIMPLE, "%location%[ ]~[~][ ]%vectors%");

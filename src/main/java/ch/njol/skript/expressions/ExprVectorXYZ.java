@@ -49,7 +49,7 @@ import org.eclipse.jdt.annotation.Nullable;
 		"set y of {_v} to 2",
 		"set z of {_v} to 3",
 		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	static {
 		Skript.registerExpression(ExprVectorXYZ.class, Number.class, ExpressionType.PROPERTY, "(0¦x|1¦y|2¦z) of %vector%");
