@@ -186,8 +186,13 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 					return raw;
 				}
 			}
-		};
+		},
 		
+		// 1.11 particles
+		TOTEM("TOTEM"),
+		SPIT("SPIT");
+		
+		@Nullable
 		final Object effect;
 		@Nullable
 		final String name;
@@ -205,6 +210,17 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		
 		private Type(final Particle effect) {
 			this.effect = effect;
+			this.name = null;
+		}
+		
+		private Type(final String name) {
+			Particle real = null;
+			try {
+				real = Particle.valueOf(name);
+			} catch (IllegalArgumentException e) {
+				// This MC version does not support this particle...
+			}
+			this.effect = real;
 			this.name = null;
 		}
 		
@@ -295,6 +311,11 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		type = types.get(matchedPattern);
 		
+		if (type.effect == null) {
+			Skript.error("Minecraft " + Skript.getMinecraftVersion() + " version does not support particle " + type);
+			return false;
+		}
+		
 		if (type.isColorable()) {
 			for (Expression<?> expr : exprs) {
 				if (expr == null) continue;
@@ -373,6 +394,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				// Particle effect...
 				Object pData = type.getData(data, l);
 				
+				assert type.effect != null;
 				// Check that data has correct type (otherwise bad things will happen)
 				if (pData != null && !((Particle) type.effect).getDataType().isAssignableFrom(pData.getClass())) {
 					pData = null;

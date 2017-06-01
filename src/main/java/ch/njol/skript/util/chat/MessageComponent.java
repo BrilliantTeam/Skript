@@ -79,7 +79,7 @@ public class MessageComponent {
 	/**
 	 * Color of this text. Defaults to reseting it.
 	 */
-	public String color = "reset";
+	public @Nullable String color;
 	
 	/**
 	 * Value of this, if present, will appended on what player is currently
@@ -93,7 +93,7 @@ public class MessageComponent {
 	
 	public static class ClickEvent {
 		
-		public ClickEvent(ClickEvent.Action action, String value, @Nullable VariableString var) {
+		public ClickEvent(ClickEvent.Action action, String value) {
 			this.action = action;
 			this.value = value;
 			this.var = var;
@@ -120,7 +120,7 @@ public class MessageComponent {
 	
 	public static class HoverEvent {
 		
-		public HoverEvent(HoverEvent.Action action, String value, @Nullable VariableString var) {
+		public HoverEvent(HoverEvent.Action action, String value) {
 			this.action = action;
 			this.value = value;
 			this.var = var;

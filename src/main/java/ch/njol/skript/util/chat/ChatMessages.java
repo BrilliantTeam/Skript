@@ -25,6 +25,7 @@ import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -148,11 +149,11 @@ public class ChatMessages {
 	private static class ComponentList {
 		
 		public ComponentList(List<MessageComponent> components) {
-			this.extra = components.toArray(new MessageComponent[0]);
+			this.extra = components;
 		}
 		
 		public ComponentList(MessageComponent[] components) {
-			this.extra = components;
+			this.extra = Arrays.asList(components);
 		}
 
 		/**
@@ -167,7 +168,7 @@ public class ChatMessages {
 		 */
 		@SuppressWarnings("unused")
 		@Nullable
-		public MessageComponent[] extra;
+		public List<MessageComponent> extra;
 	}
 	
 	public static List<MessageComponent> parse(String msg) {
@@ -182,9 +183,83 @@ public class ChatMessages {
 			char c = chars[i];
 			ChatCode code = null;
 			String param = "";
-			VariableString varParam = null;
 			
-			// Attempt link parsing
+			if (c == '<') { // Tag parsing
+				int end = msg.indexOf('>', i);
+				if (end != -1) { // If this COULD be valid tag...
+					String tag = msg.substring(i + 1, end);
+					String name;
+					if (tag.contains(":")) {
+						String[] split = tag.split(":", 2);
+						name = split[0];
+						param = split[1];
+					} else {
+						name = tag;
+					}
+					
+					code = codes.get(name);
+					if (code != null) { // ... and if the tag IS really valid
+						String text = curStr.toString();
+						curStr = new StringBuilder();
+						assert text != null;
+						current.text = text;
+						
+						MessageComponent old = current;
+						current = new MessageComponent();
+						
+						components.add(current);
+						
+						if (code.colorCode != null) // Just update color code
+							current.color = code.colorCode;
+						else
+							code.updateComponent(current, param); // Call ChatCode update
+						
+						// Copy styles from old to current if needed
+						copyStyles(old, current);
+						
+						// Increment i to tag end
+						i = end;
+						continue;
+					}
+					
+					// If this is invalid tag, just ignore it. Maybe scripter was trying to be clever with formatting
+				}
+			} else if (c == '&' || c == '§') {
+				// Corner case: this is last character, so we cannot get next
+				if (i == chars.length - 1) {
+					curStr.append(c);
+					continue;
+				}
+				
+				char color = chars[i + 1];
+				code = colorChars[color];
+				if (code == null) {
+					curStr.append(c).append(color); // Invalid formatting char, plain append
+				} else {
+					String text = curStr.toString();
+					curStr = new StringBuilder();
+					assert text != null;
+					current.text = text;
+					
+					MessageComponent old = current;
+					current = new MessageComponent();
+					
+					components.add(current);
+					
+					if (code.colorCode != null) // Just update color code
+						current.color = code.colorCode;
+					else
+						code.updateComponent(current, param); // Call ChatCode update
+					
+					// Copy styles from old to current if needed
+					copyStyles(old, current);
+				}
+				
+				i++; // Skip this and color char
+				continue;
+			}
+			
+			// Attempt link parsing, if a tag was not found
 			if (linkParseMode == LinkParseMode.STRICT && c == 'h') {
 				String rest = msg.substring(i); // Get rest of string
 				
@@ -208,7 +283,7 @@ public class ChatMessages {
 					components.add(current);
 					
 					// Make new component a link
-					ChatCode.open_url.updateComponent(current, link, null); // URL for client...
+					ChatCode.open_url.updateComponent(current, link); // URL for client...
 					current.text = link; // ... and for player
 					
 					i += link.length() - 1; // Skip link for all other parsing
@@ -250,7 +325,7 @@ public class ChatMessages {
 					components.add(current);
 					
 					// Make new component a link
-					ChatCode.open_url.updateComponent(current, url, null); // URL for client...
+					ChatCode.open_url.updateComponent(current, url); // URL for client...
 					current.text = link; // ... and for player
 					
 					i += link.length() - 1; // Skip link for all other parsing
@@ -260,88 +335,6 @@ public class ChatMessages {
 					components.add(current);
 					continue;
 				}
-			}
-			
-			if (c == '<') { // Tag parsing
-				int end = msg.indexOf('>', i);
-				if (end != -1) { // If this COULD be valid tag...
-					String tag = msg.substring(i + 1, end);
-					String name;
-					if (tag.contains(":")) {
-						String[] split = tag.split(":", 2);
-						name = split[0];
-						param = split[1];
-						
-						// Check if we need to do VariableString parsing
-						if (param.contains("%")) {
-							varParam = VariableString.newInstance(param);
-						}
-					} else {
-						name = tag;
-					}
-					
-					code = codes.get(name);
-					if (code != null) { // ... and if the tag IS really valid
-						if (code.nextComponent()) { // Next chat component
-							String text = curStr.toString();
-							curStr = new StringBuilder();
-							assert text != null;
-							current.text = text;
-							
-							MessageComponent old = current;
-							current = new MessageComponent();
-							if (isResetCode(code))
-								current.reset = true;
-							copyStyles(old, current);
-							
-							components.add(current);
-						}
-						
-						if (code.colorCode != null) // Just update color code
-							current.color = code.colorCode;
-						else
-							code.updateComponent(current, param, varParam); // Call ChatCode update
-						
-						// Increment i to tag end
-						i = end;
-						continue;
-					}
-				}
-			} else if (c == '&' || c == '§') {
-				// Corner case: this is last character, so we cannot get next
-				if (i == chars.length - 1) {
-					curStr.append(c);
-					continue;
-				}
-				
-				char color = chars[i + 1];
-				code = colorChars[color];
-				if (code == null) {
-					curStr.append(c).append(color); // Invalid formatting char, plain append
-				} else {
-					if (code.nextComponent()) { // Next chat component
-						String text = curStr.toString();
-						curStr = new StringBuilder();
-						assert text != null;
-						current.text = text;
-						
-						MessageComponent old = current;
-						current = new MessageComponent();
-						if (isResetCode(code))
-							current.reset = true;
-						copyStyles(old, current);
-						
-						components.add(current);
-					}
-					
-					if (code.colorCode != null) // Just update color code
-						current.color = code.colorCode;
-					else
-						code.updateComponent(current, param, varParam); // Call ChatCode update
-				}
-				
-				i++; // Skip this and color char
-				continue;
 			}
 				
 			curStr.append(c); // Append this char to curStr
@@ -366,7 +359,7 @@ public class ChatMessages {
 		return json;
 	}
 	
-	public static String toJson(MessageComponent[] components) {
+	public static String toJson(List<MessageComponent> components) {
 		ComponentList componentList = new ComponentList(components);
 		String json = gson.toJson(componentList);
 		assert json != null;
@@ -383,19 +376,23 @@ public class ChatMessages {
 		if (to.reset)
 			return;
 		
-		if (!to.bold)
-			to.bold = from.bold;
-		if (!to.italic)
-			to.italic = from.italic;
-		if (!to.underlined)
-			to.underlined = from.underlined;
-		if (!to.strikethrough)
-			to.strikethrough = from.strikethrough;
-		if (!to.obfuscated)
-			to.obfuscated = from.obfuscated;
-		if (to.color.equals("reset"))
-			to.color = from.color;
+		// If we don't have color or colors don't reset formatting, copy formatting
+		if (to.color == null || !colorResetCodes) {
+			if (!to.bold)
+				to.bold = from.bold;
+			if (!to.italic)
+				to.italic = from.italic;
+			if (!to.underlined)
+				to.underlined = from.underlined;
+			if (!to.strikethrough)
+				to.strikethrough = from.strikethrough;
+			if (!to.obfuscated)
+				to.obfuscated = from.obfuscated;
+			if (to.color == null)
+				to.color = from.color;
+		}
 		
+		// Links and such are never reset by color codes - weird, but it'd break too much stuff
 		if (to.clickEvent == null)
 			to.clickEvent = from.clickEvent;
 		if (to.insertion == null)
@@ -424,9 +421,5 @@ public class ChatMessages {
 		MessageComponent component = new MessageComponent();
 		component.text = str;
 		return component;
-	}
-	
-	public static boolean isResetCode(ChatCode code) {
-		return code == ChatCode.reset || (colorResetCodes && code.colorChar != 0);
 	}
 }
