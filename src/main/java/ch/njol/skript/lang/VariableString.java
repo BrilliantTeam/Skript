@@ -88,10 +88,15 @@ public class VariableString implements Expression<String> {
 	private final String simpleUnformatted;
 	private final StringMode mode;
 	
+	/**
+	 * Creates a new VariableString which does not contain variables.
+	 * @param s Content for string.
+	 */
 	private VariableString(final String s) {
 		isSimple = true;
-		simpleUnformatted = s;
-		simple = Utils.replaceChatStyles(s);
+		simpleUnformatted = s.replace("%%", "%"); // This doesn't contain variables, so this wasn't done in newInstance!
+		assert simpleUnformatted != null;
+		simple = Utils.replaceChatStyles(simpleUnformatted);
 		
 		orig = simple;
 		string = null;
@@ -99,6 +104,12 @@ public class VariableString implements Expression<String> {
 		mode = StringMode.MESSAGE;
 	}
 	
+	/**
+	 * Creates a new VariableString which contains variables.
+	 * @param orig Original string (unparsed).
+	 * @param string Objects, some of them are variables.
+	 * @param mode String mode.
+	 */
 	private VariableString(final String orig, final Object[] string, final StringMode mode) {
 		this.orig = orig;
 		this.string = new Object[string.length];
@@ -172,11 +183,12 @@ public class VariableString implements Expression<String> {
 	}
 	
 	/**
-	 * Prints errors
+	 * Creates an instance of VariableString by parsing given string.
+	 * Prints errors and returns null if it is somehow invalid.
 	 * 
-	 * @param orig unquoted string
+	 * @param orig Unquoted string to parse.
 	 * @param mode
-	 * @return A new VariableString instance
+	 * @return A new VariableString instance.
 	 */
 	@Nullable
 	public static VariableString newInstance(final String orig, final StringMode mode) {
