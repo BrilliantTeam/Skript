@@ -189,18 +189,7 @@ public class VariableString implements Expression<String> {
 		}
 		
 		// We must not parse color codes yet, as JSON support would be broken :(
-		StringBuilder sb = new StringBuilder(orig.length());
-		char previous = 0;
-		for (char ch : orig.toCharArray()) { // Double quotes -> one quotes
-			if (previous == '"') {
-				sb.append(previous);
-				previous = 0; // Set previous to NUL so we won't generate infinite double quotes
-			}
-			if (ch != '"')
-				sb.append(ch);
-			previous = ch;
-		}
-		final String s = sb.toString();
+		final String s = orig.replace("\"\"", "\"");
 		
 		final List<Object> string = new ArrayList<>(n / 2 + 2); // List of strings and expressions
 		
