@@ -45,9 +45,9 @@ public class BungeeConverter {
 		base.setInsertion(origin.insertion);
 		
 		if (origin.clickEvent != null)
-			base.setClickEvent(new ClickEvent(ClickEvent.Action.valueOf(origin.clickEvent.action.name().toUpperCase()), origin.clickEvent.value));
+			base.setClickEvent(new ClickEvent(ClickEvent.Action.valueOf(origin.clickEvent.action.spigotName), origin.clickEvent.value));
 		if (origin.hoverEvent != null)
-			base.setHoverEvent(new HoverEvent(HoverEvent.Action.valueOf(origin.hoverEvent.action.name().toUpperCase()),
+			base.setHoverEvent(new HoverEvent(HoverEvent.Action.valueOf(origin.hoverEvent.action.spigotName),
 					new BaseComponent[] {new TextComponent(origin.clickEvent.value)})); // WAIT WHAT?!?
 		
 		return base;

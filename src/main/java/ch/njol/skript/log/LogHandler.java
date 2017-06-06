@@ -48,9 +48,10 @@ public abstract class LogHandler {
 		return SkriptLogger.isStopped(this);
 	}
 	
-//	/**
-//	 * Will be useful should Skript ever be written in Java 7
-//	 */
+	/**
+	 * Mayby some day, we can use this - needs some parser rewrites to avoid
+	 * warnings though.
+	 */
 //	@Override
 //	public final void close() throws Exception {
 //		stop();

@@ -96,7 +96,6 @@ public class MessageComponent {
 		public ClickEvent(ClickEvent.Action action, String value) {
 			this.action = action;
 			this.value = value;
-			this.var = var;
 		}
 		
 		public static enum Action  {
@@ -107,15 +106,19 @@ public class MessageComponent {
 			
 			suggest_command,
 			
-			change_page
+			change_page;
+			
+			public final String spigotName;
+			
+			@SuppressWarnings("null")
+			Action() {
+				spigotName = this.name().toUpperCase();
+			}
 		}
 		
 		public ClickEvent.Action action;
 		
 		public String value;
-		
-		@Nullable
-		public transient VariableString var;
 	}
 	
 	public static class HoverEvent {
@@ -123,7 +126,6 @@ public class MessageComponent {
 		public HoverEvent(HoverEvent.Action action, String value) {
 			this.action = action;
 			this.value = value;
-			this.var = var;
 		}
 		
 		public static enum Action {
@@ -134,15 +136,19 @@ public class MessageComponent {
 			
 			show_entity,
 			
-			show_achievement
+			show_achievement;
+			
+			public final String spigotName;
+			
+			@SuppressWarnings("null")
+			Action() {
+				spigotName = this.name().toUpperCase();
+			}
 		}
 		
 		public HoverEvent.Action action;
 		
 		public String value;
-		
-		@Nullable
-		public transient VariableString var;
 	}
 	
 	@Nullable
@@ -153,16 +159,6 @@ public class MessageComponent {
 		@Override
 		public @Nullable JsonElement serialize(@Nullable Boolean src, @Nullable Type typeOfSrc, @Nullable JsonSerializationContext context) {
 			return src ? new JsonPrimitive(true) : null;
-		}
-	}
-
-	@SuppressWarnings("null")
-	public void variableUpdate(Event event) {
-		if (clickEvent != null && clickEvent.var != null) {
-			clickEvent.value = clickEvent.var.getSingle(event);
-		}
-		if (hoverEvent != null && hoverEvent.var != null) {
-			hoverEvent.value = hoverEvent.var.getSingle(event);
 		}
 	}
 }
