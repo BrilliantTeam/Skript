@@ -132,7 +132,7 @@ public abstract class SkriptEventHandler {
 			logEventStart(e);
 		}
 		
-		if (e instanceof Cancellable && ((Cancellable) e).isCancelled() &&
+		if (e instanceof Cancellable && ((Cancellable) e).isCancelled() && !listenCancelled.contains(e.getClass()) &&
 				!(e instanceof PlayerInteractEvent && (((PlayerInteractEvent) e).getAction() == Action.LEFT_CLICK_AIR || ((PlayerInteractEvent) e).getAction() == Action.RIGHT_CLICK_AIR) && ((PlayerInteractEvent) e).useItemInHand() != Result.DENY)
 				|| e instanceof ServerCommandEvent && (((ServerCommandEvent) e).getCommand() == null || ((ServerCommandEvent) e).getCommand().isEmpty())) {
 			if (Skript.logVeryHigh())
@@ -319,5 +319,10 @@ public abstract class SkriptEventHandler {
 //		}
 //		return false;
 //	}
+	
+	/**
+	 * Events which are listened even if they are cancelled.
+	 */
+	public final static Set<Class<? extends Event>> listenCancelled = new HashSet<>();
 	
 }

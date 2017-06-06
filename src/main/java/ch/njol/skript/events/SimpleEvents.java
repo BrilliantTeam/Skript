@@ -93,6 +93,8 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 import org.spigotmc.event.entity.EntityMountEvent;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptEventHandler;
+import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.util.coll.CollectionUtils;
 
@@ -410,6 +412,7 @@ public class SimpleEvents {
 							"	entity has permission \"admin.undying\"",
 							"	uncancel the event")
 					.since("2.2-dev28");
+			SkriptEventHandler.listenCancelled.add(EntityResurrectEvent.class); // Listen this even when cancelled
 		}
 		Skript.registerEvent("Player World Change", SimpleEvent.class, PlayerChangedWorldEvent.class, "player world change[d]")
 				.description("Called when a player enters a world. Does not work with other entities!")
