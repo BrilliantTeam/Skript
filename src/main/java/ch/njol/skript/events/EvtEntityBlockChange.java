@@ -22,6 +22,7 @@ package ch.njol.skript.events;
 import org.bukkit.Material;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Silverfish;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.eclipse.jdt.annotation.Nullable;
@@ -37,8 +38,8 @@ import ch.njol.util.Checker;
  */
 public class EvtEntityBlockChange extends SkriptEvent {
 	static {
-		Skript.registerEvent("Enderman/Sheep", EvtEntityBlockChange.class, EntityChangeBlockEvent.class, ChangeEvent.patterns)
-				.description("Called when an enderman places or picks up a block, or a sheep eats grass respectively.")
+		Skript.registerEvent("Enderman/Sheep/Silverfish", EvtEntityBlockChange.class, EntityChangeBlockEvent.class, ChangeEvent.patterns)
+				.description("Called when an enderman places or picks up a block, a sheep eats grass or a silverfish boops into/out of a block respectively.")
 				.examples("")
 				.since("");
 	}
@@ -61,8 +62,14 @@ public class EvtEntityBlockChange extends SkriptEvent {
 			public boolean check(final EntityChangeBlockEvent e) {
 				return e.getEntity() instanceof Sheep;
 			}
+		}),
+		//TODO add both entering and leaving a block not just both xD
+		SILVERFISH_BOOP("silverfish boop", new Checker<EntityChangeBlockEvent>() {
+			@Override
+			public boolean check(final EntityChangeBlockEvent e) {
+				return e.getEntity() instanceof Silverfish && e.getTo() != Material.AIR;
+			}
 		});
-		// TODO silverfishes
 		
 		private final String pattern;
 		final Checker<EntityChangeBlockEvent> checker;
