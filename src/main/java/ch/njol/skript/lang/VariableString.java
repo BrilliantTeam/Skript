@@ -79,48 +79,61 @@ public class VariableString implements Expression<String> {
 	
 	@Nullable
 	private final Object[] string;
-	private final MessageComponent[][] components;
+	@Nullable
+	private Object[] stringUnformatted;
 	private final boolean isSimple;
 	@Nullable
 	private final String simple;
+	@Nullable
+	private final String simpleUnformatted;
 	private final StringMode mode;
 	
+	/**
+	 * Creates a new VariableString which does not contain variables.
+	 * @param s Content for string.
+	 */
 	private VariableString(final String s) {
 		isSimple = true;
-		simple = Utils.replaceChatStyles("" + s.replace("\"\"", "\""));
+		simpleUnformatted = s.replace("%%", "%"); // This doesn't contain variables, so this wasn't done in newInstance!
+		assert simpleUnformatted != null;
+		simple = Utils.replaceChatStyles(simpleUnformatted);
 		
 		orig = simple;
 		string = null;
 		assert simple != null;
-		components = new MessageComponent[][] {ChatMessages.parseToArray(simple)};
 		mode = StringMode.MESSAGE;
 	}
 	
+	/**
+	 * Creates a new VariableString which contains variables.
+	 * @param orig Original string (unparsed).
+	 * @param string Objects, some of them are variables.
+	 * @param mode String mode.
+	 */
 	private VariableString(final String orig, final Object[] string, final StringMode mode) {
 		this.orig = orig;
 		this.string = new Object[string.length];
-		List<MessageComponent[]> components = new ArrayList<>(string.length + 2);
+		this.stringUnformatted = new Object[string.length];
 		for (int i = 0; i < string.length; i++) {
 			Object o = string[i];
 			if (o instanceof String) {
-				String quotesFixed = ((String) o).replace("\"\"", "\"");
 				assert this.string != null;
-				this.string[i] = Utils.replaceChatStyles("" + quotesFixed);
-				components.add(ChatMessages.parseToArray("" + quotesFixed));
+				this.string[i] = Utils.replaceChatStyles((String) o);
 			} else {
 				assert this.string != null;
 				this.string[i] = o;
-				components.add(null);
 			}
+			
+			// For unformatted string, don't format stuff
+			assert this.stringUnformatted != null;
+			this.stringUnformatted[i] = o;
 		}
-		MessageComponent[][] componentArray = components.toArray(new MessageComponent[0][0]);
-		assert componentArray != null;
-		this.components = componentArray;
 		
 		this.mode = mode;
 		
 		isSimple = false;
 		simple = null;
+		simpleUnformatted = null;
 	}
 	
 	/**
@@ -170,11 +183,12 @@ public class VariableString implements Expression<String> {
 	}
 	
 	/**
-	 * Prints errors
+	 * Creates an instance of VariableString by parsing given string.
+	 * Prints errors and returns null if it is somehow invalid.
 	 * 
-	 * @param orig unquoted string
+	 * @param orig Unquoted string to parse.
 	 * @param mode
-	 * @return A new VariableString instance
+	 * @return A new VariableString instance.
 	 */
 	@Nullable
 	public static VariableString newInstance(final String orig, final StringMode mode) {
@@ -197,17 +211,6 @@ public class VariableString implements Expression<String> {
 				string.add(s.substring(0, c));
 			while (c != s.length()) {
 				int c2 = s.indexOf('%', c + 1);
-				
-				// Check if we are inside <formatting tag>
-				int tagStart = s.indexOf('<', c2);
-				int tagEnd = s.indexOf('>', c2);
-				if (tagEnd != -1 && (tagStart == -1 || tagStart > tagEnd)) {
-					// Go to next %
-					c = s.indexOf('%', c2 + 1);
-					if (c == -1)
-						c = s.length();
-					continue;
-				}
 				
 				int a = c;
 				int b;
@@ -433,79 +436,53 @@ public class VariableString implements Expression<String> {
 		return "" + b.toString();
 	}
 	
-	public MessageComponent[] getMessageComponents(final Event e) {
+	/**
+	 * Parses all expressions in the string and returns it.
+	 * Does not parse formatting codes!
+	 * 
+	 * @param e Event to pass to the expressions.
+	 * @return The input string with all expressions replaced.
+	 */
+	public String toUnformattedString(final Event e) {
 		if (isSimple) {
-			MessageComponent[] c = components[0];
-			// There might be variable URLs etc.
-			for (int j = 0; j < c.length; j++) {
-				MessageComponent component = c[j];
-				component.variableUpdate(e);
-			}
-			assert c != null;
-			return c;
+			assert simpleUnformatted != null;
+			return simpleUnformatted;
 		}
-		
-		final Object[] string = this.string;
+		final Object[] string = this.stringUnformatted;
 		assert string != null;
-		
-		final List<MessageComponent> componentList = new ArrayList<>();
-		for (int i = 0; i < components.length; i++) {
-			MessageComponent[] c = components[i];
-			if (c == null) { // Need to parse variable part
-				final Object o = string[i];
-				if (o instanceof VariableString) {
-					final MessageComponent[] c2 = ((VariableString) o).getMessageComponents(e);
-					
-					if (!componentList.isEmpty())
-						ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
-					componentList.addAll(Arrays.asList(c2));
-				} else if (o instanceof ExpressionInfo) {
-					assert mode == StringMode.MESSAGE;
-					final ExpressionInfo info = (ExpressionInfo) o;
-					int flags = info.flags;
-//					if ((flags & Language.F_PLURAL) == 0 && b.length() > 0 && Math.abs(StringUtils.numberBefore(b, b.length() - 1)) != 1)
-//						flags |= Language.F_PLURAL;
-//					if (info.toChatStyle) {
-//						final String s = Classes.toString(info.expr.getArray(e), flags, getLastColor(b));
-//						final String style = Utils.getChatStyle(s);
-//						b.append(style == null ? "<" + s + ">" : style);
-//					} else {
-					if (info.expr instanceof VariableString) {
-						final MessageComponent[] c2 = ((VariableString) o).getMessageComponents(e);
-						
-						if (!componentList.isEmpty())
-							ChatMessages.copyStyles(componentList.get(componentList.size() - 1), c2[0]); // Copy styles
-						
-						componentList.addAll(Arrays.asList(c2));
-					} else {
-						final String str = Classes.toString(info.expr.getArray(e), flags, null);
-						
-						MessageComponent component = ChatMessages.plainText(str);
-						if (!componentList.isEmpty())
-							ChatMessages.copyStyles(componentList.get(componentList.size() - 1), component); // Copy styles
-						componentList.add(component);
-					}
-				} else if (o instanceof Expression<?>) {
-					assert mode != StringMode.MESSAGE;
-					final String str = Classes.toString(((Expression<?>) o).getArray(e), true, mode);
-					
-					MessageComponent component = ChatMessages.plainText(str);
-					if (!componentList.isEmpty())
-						ChatMessages.copyStyles(componentList.get(componentList.size() - 1), component); // Copy styles
-					componentList.add(component);
+		final StringBuilder b = new StringBuilder();
+		for (int i = 0; i < string.length; i++) {
+			final Object o = string[i];
+			if (o instanceof Expression<?>) {
+				assert mode != StringMode.MESSAGE;
+				b.append(Classes.toString(((Expression<?>) o).getArray(e), true, mode));
+			} else if (o instanceof ExpressionInfo) {
+				assert mode == StringMode.MESSAGE;
+				final ExpressionInfo info = (ExpressionInfo) o;
+				int flags = info.flags;
+				if ((flags & Language.F_PLURAL) == 0 && b.length() > 0 && Math.abs(StringUtils.numberBefore(b, b.length() - 1)) != 1)
+					flags |= Language.F_PLURAL;
+				if (info.toChatStyle) {
+					final String s = Classes.toString(info.expr.getArray(e), flags, null);
+					final String style = Utils.getChatStyle(s);
+					b.append(style == null ? "<" + s + ">" : style);
+				} else {
+					b.append(Classes.toString(info.expr.getArray(e), flags, null));
 				}
-			} else { // String part, parsed already
-				// However, there might be variable URLs etc.
-				for (int j = 0; j < c.length; j++) {
-					MessageComponent component = c[j];
-					component.variableUpdate(e);
-					componentList.add(component);
-				}
+			} else {
+				b.append(o);
 			}
 		}
-		MessageComponent[] componentArray = componentList.toArray(new MessageComponent[0]);
-		assert componentArray != null;
-		return componentArray;
+		return "" + b.toString();
+	}
+	
+	public List<MessageComponent> getMessageComponents(final Event e) {
+		if (isSimple) {
+			assert simpleUnformatted != null;
+			return ChatMessages.parse(simpleUnformatted);
+		}
+		
+		return ChatMessages.parse(toUnformattedString(e));
 	}
 	
 	/**

@@ -46,8 +46,13 @@ public class CondIsEmpty extends PropertyCondition<Object> {
 	public boolean check(final Object o) {
 		if (o instanceof String)
 			return ((String) o).isEmpty();
-		if (o instanceof Inventory)
-			return !((Inventory) o).iterator().hasNext();
+		if (o instanceof Inventory) {
+			for (ItemStack s : ((Inventory) o).getContents()) {
+				if (s != null && s.getType() != Material.AIR)
+					return false; // There is an item here!
+			}
+			return true;
+		}
 		if (o instanceof Slot) {
 			final Slot s = (Slot) o;
 			final ItemStack i = s.getItem();

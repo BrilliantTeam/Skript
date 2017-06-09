@@ -174,10 +174,10 @@ parse links in chat messages: disabled
 # When 'strict', everything starting with http(s):// will be parsed as link.
 # When 'lenient', everything that contains a dot will be interpreted as a link.
 
-color codes reset formatting: false
+color codes reset formatting: true
 # With old Minecraft chat protocol, color codes used to reset formatting of text.
 # With JSON-based new chat protocol, this is not necessary, but can be done
-# manually for compatibility. Toggle this on to enable the old behavior.
+# manually for compatibility. This is done by default for compatibility.
 
 # ==== Variables ====
 

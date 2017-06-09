@@ -41,7 +41,7 @@ import org.eclipse.jdt.annotation.Nullable;
 		"set {_v} to vector 1, 2, 3",
 		"set standard length of {_v} to 2",
 		"send \"%standard length of {_v}%\""})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorLength extends SimplePropertyExpression<Vector, Double> {
 	static {
 		Skript.registerExpression(ExprVectorLength.class, Double.class, ExpressionType.PROPERTY, "(vector|standard|normal) length of %vector%", "%vector%['s] (vector|standard|normal) length");

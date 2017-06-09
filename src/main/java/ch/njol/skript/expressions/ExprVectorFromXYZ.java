@@ -39,7 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Vectors - Create from XYZ")
 @Description("Creates a vector from an x, y and z value")
 @Examples({"set {_v} to vector 0, 1, 0"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorFromXYZ extends SimpleExpression<Vector> {
 	static {
 		Skript.registerExpression(ExprVectorFromXYZ.class, Vector.class, ExpressionType.SIMPLE, "[new] vector [(from|at|to)] %number%,[ ]%number%(,[ ]| and )%number%");

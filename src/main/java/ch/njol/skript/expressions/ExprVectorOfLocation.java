@@ -40,7 +40,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Vectors - Create from location")
 @Description("Creates a vector from a location")
 @Examples({"set {_v} to vector of {_loc}"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorOfLocation extends SimpleExpression<Vector> {
 	static {
 		Skript.registerExpression(ExprVectorOfLocation.class, Vector.class, ExpressionType.SIMPLE, "vector (of|from|to) %location%", "%location%['s] vector");

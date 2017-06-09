@@ -105,7 +105,7 @@ public class ExprIP extends SimpleExpression<String> {
 
 	@Override
 	public boolean isSingle() {
-		return false;
+		return true;
 	}
 
 

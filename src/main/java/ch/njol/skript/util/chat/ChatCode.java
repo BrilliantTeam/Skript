@@ -34,11 +34,6 @@ public enum ChatCode {
 	
 	reset {
 		@Override
-		public boolean nextComponent() {
-			return true;
-		}
-		
-		@Override
 		public void updateComponent(MessageComponent component, String param) {
 			component.reset = true;
 		}
@@ -104,32 +99,32 @@ public enum ChatCode {
 	
 	open_url(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.open_url, param, var);
+		public void updateComponent(MessageComponent component, String param) {
+			ClickEvent e = new ClickEvent(ClickEvent.Action.open_url, param);
 			component.clickEvent = e;
 		}
 	},
 	
 	run_command(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.run_command, param, var);
+		public void updateComponent(MessageComponent component, String param) {
+			ClickEvent e = new ClickEvent(ClickEvent.Action.run_command, param);
 			component.clickEvent = e;
 		}
 	},
 	
 	suggest_command(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.suggest_command, param, var);
+		public void updateComponent(MessageComponent component, String param) {
+			ClickEvent e = new ClickEvent(ClickEvent.Action.suggest_command, param);
 			component.clickEvent = e;
 		}
 	},
 	
 	change_page(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.change_page, param, var);
+		public void updateComponent(MessageComponent component, String param) {
+			ClickEvent e = new ClickEvent(ClickEvent.Action.change_page, param);
 			component.clickEvent = e;
 		}
 	},
@@ -138,8 +133,8 @@ public enum ChatCode {
 	
 	show_text(true) {
 		@Override
-		public void updateComponent(MessageComponent component, String param, @Nullable VariableString var) {
-			HoverEvent e = new HoverEvent(HoverEvent.Action.show_text, param, var);
+		public void updateComponent(MessageComponent component, String param) {
+			HoverEvent e = new HoverEvent(HoverEvent.Action.show_text, param);
 			component.hoverEvent = e;
 		}
 	};
@@ -190,13 +185,5 @@ public enum ChatCode {
 	 */
 	public void updateComponent(MessageComponent component, String param) {
 		
-	}
-	
-	public void updateComponent(MessageComponent component, String param, @Nullable VariableString varParam) {
-		updateComponent(component, param);
-	}
-	
-	public boolean nextComponent() {
-		return true;
 	}
 }

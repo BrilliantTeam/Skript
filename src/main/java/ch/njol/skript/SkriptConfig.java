@@ -124,7 +124,7 @@ public abstract class SkriptConfig {
 		}
 	}
 	
-	private final static Option<Verbosity> verbosity = new Option<Verbosity>("verbosity", Verbosity.NORMAL, new EnumParser<Verbosity>(Verbosity.class, "verbosity"))
+	final static Option<Verbosity> verbosity = new Option<Verbosity>("verbosity", Verbosity.NORMAL, new EnumParser<Verbosity>(Verbosity.class, "verbosity"))
 			.setter(new Setter<Verbosity>() {
 				@Override
 				public void set(final Verbosity v) {
@@ -216,7 +216,7 @@ public abstract class SkriptConfig {
 				
 			});
 	
-	public final static Option<Boolean> colorResetCodes = new Option<Boolean>("color codes reset formatting", false)
+	public final static Option<Boolean> colorResetCodes = new Option<Boolean>("color codes reset formatting", true)
 			.setter(new Setter<Boolean>() {
 
 				@Override

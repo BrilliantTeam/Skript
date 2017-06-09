@@ -91,6 +91,7 @@ import org.bukkit.event.vehicle.VehicleEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.weather.WeatherEvent;
 import org.bukkit.event.world.ChunkEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -837,6 +838,13 @@ public final class BukkitEventValues {
 				return e.getInventory();
 			}
 		}, 0);
+		//PortalCreateEvent
+		EventValues.registerEventValue(PortalCreateEvent.class, World.class, new Getter<World, PortalCreateEvent>() {
+			@Override
+			@Nullable
+			public World get(final PortalCreateEvent e) {
+				return e.getWorld();
+			}
+		}, 0);
 	}
-	
 }

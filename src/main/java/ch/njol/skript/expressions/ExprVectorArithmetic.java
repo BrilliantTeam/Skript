@@ -50,7 +50,7 @@ import java.lang.reflect.Array;
 		"set {_v} to {_v} ** 5",
 		"set {_v} to {_v} // {_v}",
 		"set {_v} to {_v} // 5"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 
 	private static enum Operator {

@@ -42,7 +42,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Examples({"rotate {_v} around x-axis by 90",
 		"rotate {_v} around y-axis by 90",
 		"rotate {_v} around z-axis by 90"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class EffVectorRotateXYZ extends Effect{
 	static {
 		Skript.registerEffect(EffVectorRotateXYZ.class, "rotate %vectors% around (1¦x|2¦y|3¦z)(-| )axis by %number% [degrees]");

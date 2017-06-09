@@ -29,7 +29,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public class HandlerList implements Iterable<LogHandler> {
 	
-	private final LinkedList<LogHandler> list = new LinkedList<LogHandler>();
+	private final LinkedList<LogHandler> list = new LinkedList<>();
 	
 	public void add(final LogHandler h) {
 		list.addFirst(h);

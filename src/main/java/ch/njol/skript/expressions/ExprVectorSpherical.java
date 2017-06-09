@@ -43,7 +43,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Examples({"loop 360 times:",
 		"	set {_v} to spherical vector radius 1, yaw loop-value, pitch loop-value",
 		"set {_v} to spherical vector radius 1, yaw 45, pitch 90"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorSpherical extends SimpleExpression<Vector> {
 	static {
 		Skript.registerExpression(ExprVectorSpherical.class, Vector.class, ExpressionType.SIMPLE, "[new] spherical vector [(from|with)] [radius] %number%, [yaw] %number%(,| and) [pitch] %number%");

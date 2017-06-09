@@ -41,7 +41,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Vectors - Create from pitch and yaw")
 @Description("Creates a vector from a yaw and pitch value")
 @Examples({"set {_v} to vector from yaw 45 and pitch 45"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorFromYawAndPitch extends SimpleExpression<Vector> {
 	static {
 		Skript.registerExpression(ExprVectorFromYawAndPitch.class, Vector.class, ExpressionType.SIMPLE, "[new] vector from yaw %number% and pitch %number%");

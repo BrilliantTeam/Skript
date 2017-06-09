@@ -43,7 +43,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Examples({"set {_loc} to {_v} to location in world \"world\"",
 		"set {_loc} to {_v} to location in world \"world\" with yaw 45 and pitch 90",
 		"set {_loc} to location of {_v} in \"world\" with yaw 45 and pitch 90"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprLocationFromVector extends SimpleExpression<Location> {
 	static {
 		Skript.registerExpression(ExprLocationFromVector.class, Location.class, ExpressionType.SIMPLE,

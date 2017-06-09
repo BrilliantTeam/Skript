@@ -40,7 +40,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Vectors - Between locations")
 @Description("Creates a vector between two locations")
 @Examples({"set {_v} to vector between {_loc1} and {_loc2}"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class ExprVectorBetweenLocations extends SimpleExpression<Vector> {
 	static {
 		Skript.registerExpression(ExprVectorBetweenLocations.class, Vector.class, ExpressionType.SIMPLE, "vector (from|between) %location% (to|and) %location%");

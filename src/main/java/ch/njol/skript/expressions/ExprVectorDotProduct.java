@@ -39,7 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Vectors - Dot product")
 @Description("Gets the dot product between two vectors")
 @Examples({"set {_v} to {_v2} dot {_v3}"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 /**
  * NOTE vector 1, 2, 3 dot vector 1, 2, 3 does NOT work!
  * it returns a new vector: 1, 2, 18. This should not happen

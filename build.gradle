@@ -5,7 +5,7 @@ plugins {
 }
 
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 repositories {
 	jcenter()
@@ -72,7 +72,7 @@ jar {
 
 license {
     header file('licenseheader.txt')
-    exclude('src/main/java/ch/njol/skript/Metrics.java')
+    exclude('**/Metrics.java')
 }
 
 configurations {
@@ -93,9 +93,28 @@ compileJava {
 	}
 }
 
-uploadArchives {
-    repositories.mavenDeployer {
-        pom.groupId = "ch.njol"
-        repository(url: "file:///itemapi_repo/")
-    }
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			groupId "ch.njol"
+			artifactId "skript"
+			version project.property("version")
+
+			from components.java
+
+			artifact sourceJar {
+    			classifier "sources"
+			}
+		}
+	}
+	
+	repositories {
+		maven {
+			url "file:///itemapi_repo/"
+		}
+	}
 }

@@ -21,13 +21,13 @@
 
 @media (max-device-width:700px){
   body{
-	font-size: 30pt;
+	font-size: 15pt;
   }
   #nav-title{
-	font-size:45pt;
+	font-size: 15pt;
   }
   .item-title{
-	font-size: 45pt;
+	font-size: 15pt;
   }
 }
 
@@ -35,6 +35,7 @@ body {
   font-family:sans-serif;
   padding: 0px;
   margin: 0px;
+  background-color: #e6f7ff;
 }
 
 #global-navigation{
@@ -42,12 +43,15 @@ body {
   padding: 10px;
   font-size: 12pt;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: auto;
 }
 
 #global-navigation a{
   color: #000000;
   padding: 10px;
   display: inline-block;
+  text-align: center;
 }
 
 #global-navigation a:hover,

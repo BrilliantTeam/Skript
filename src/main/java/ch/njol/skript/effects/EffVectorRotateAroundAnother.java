@@ -40,7 +40,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Vectors - Rotate around vector")
 @Description("Rotates a vector around another vector")
 @Examples({"rotate {_v} around vector 1, 0, 0 by 90"})
-@Since("INSERT VERSION")
+@Since("2.2-dev28")
 public class EffVectorRotateAroundAnother extends Effect{
 	static {
 		Skript.registerEffect(EffVectorRotateAroundAnother.class, "rotate %vectors% around %vector% by %number% [degrees]");

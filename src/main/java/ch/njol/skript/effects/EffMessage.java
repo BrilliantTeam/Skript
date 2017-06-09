@@ -21,6 +21,7 @@ package ch.njol.skript.effects;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.conversations.Conversable;
@@ -37,7 +38,9 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.util.chat.BungeeConverter;
 import ch.njol.skript.util.chat.ChatMessages;
+import ch.njol.skript.util.chat.MessageComponent;
 import ch.njol.util.Kleenean;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -79,10 +82,10 @@ public class EffMessage extends Effect {
 	protected void execute(final Event e) {
 		assert messages != null;
 		if (canSendRaw) {
-			// Sadly this is essentially serializing, then deserializing, then serializing again...
-			// TODO measure performance, potentially improve it
 			assert messages != null;
-			BaseComponent[] components = ComponentSerializer.parse(((VariableString) messages).toChatString(e));
+			List<MessageComponent> componentList = ((VariableString) messages).getMessageComponents(e);
+			@SuppressWarnings("null") // Most certainly safe, but I guess not...
+			BaseComponent[] components = BungeeConverter.convert(componentList.toArray(new MessageComponent[componentList.size()]));
 			for (final CommandSender s : recipients.getArray(e)) {
 				if (s instanceof Player) { // Use JSON chat
 					((Player) s).spigot().sendMessage(components);

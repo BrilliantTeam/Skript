@@ -409,6 +409,95 @@ public final class Skript extends JavaPlugin implements Listener {
 				EvtSkript.onSkriptStart();
 				
 				final Metrics metrics = new Metrics(Skript.this);
+				
+				metrics.addCustomChart(new Metrics.SimplePie("pluginLanguage") {
+					
+					@Override
+					public String getValue() {
+						return Language.getName();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("effectCommands") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.enableEffectCommands.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("uuidsWithPlayers") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.usePlayerUUIDsInVariableNames.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("playerVariableFix") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.enablePlayerVariableFix.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("logVerbosity") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.verbosity.value().name().toLowerCase().replace('_', ' ');
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("pluginPriority") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.defaultEventPriority.value().name().toLowerCase().replace('_', ' ');
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("logPlayerCommands") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.logPlayerCommands.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("maxTargetDistance") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.maxTargetBlockDistance.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("softApiExceptions") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.apiSoftExceptions.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("timingsStatus") {
+					
+					@Override
+					public String getValue() {
+						if (!Skript.classExists("co.aikar.timings.Timings"))
+							return "unsupported";
+						else
+							return "" + SkriptConfig.enableTimings.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("parseLinks") {
+					
+					@Override
+					public String getValue() {
+						return "" + ChatMessages.linkParseMode.name().toLowerCase();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("colorResetCodes") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.colorResetCodes.value();
+					}
+				});
+				
 				Skript.metrics = metrics;
 				
 				// suppresses the "can't keep up" warning after loading all scripts
