@@ -912,6 +912,9 @@ entities:
 	evoker fangs:
 		name: evoker fangs
 		pattern: evoker fangs
+	illusioner:
+		name: illusioner
+		pattern: illusioner(|1¦s)
 	vex:
 		name: vex¦es
 		pattern: vex(|1¦es)
