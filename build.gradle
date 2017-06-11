@@ -40,7 +40,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.destroystokyo.paper:paper-api:1.11.2-R0.1-SNAPSHOT'
+	compile 'com.destroystokyo.paper:paper-api:1.12-R0.1-SNAPSHOT'
 	compile 'org.eclipse.jdt:org.eclipse.jdt.annotation:1.1.0'
 	compile 'com.google.code.findbugs:findbugs:2.0.3'
 	compile 'de.slikey:EffectLib:5.0'

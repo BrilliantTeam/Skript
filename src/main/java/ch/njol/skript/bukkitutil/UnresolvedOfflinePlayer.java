@@ -50,9 +50,9 @@ public class UnresolvedOfflinePlayer implements OfflinePlayer {
 	final static Thread resolverThread;
 	
 	static {
-		toResolve = new LinkedBlockingQueue<UnresolvedOfflinePlayer>();
+		toResolve = new LinkedBlockingQueue<>();
 		resolverThread = Skript.newThread(new Runnable() {
-			@SuppressWarnings("deprecation")
+			@SuppressWarnings({"deprecation", "unused"})
 			@Override
 			public void run() {
 				if (toResolve == null) {
@@ -137,12 +137,6 @@ public class UnresolvedOfflinePlayer implements OfflinePlayer {
 	@Override
 	public boolean isBanned() {
 		return bukkitOfflinePlayer.isBanned();
-	}
-	
-	@Override
-	@Deprecated
-	public void setBanned(final boolean banned) {
-		bukkitOfflinePlayer.setBanned(banned);
 	}
 	
 	@Override
