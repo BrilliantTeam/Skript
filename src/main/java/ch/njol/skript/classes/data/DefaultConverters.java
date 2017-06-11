@@ -309,16 +309,16 @@ public class DefaultConverters {
 //			
 //		});
 		
-		// Vectors - Number to vector
-		Converters.registerConverter(Number.class, Vector.class, new Converter<Number, Vector>() {
-			@Override
-			@Nullable
-			public Vector convert(Number number) {
-				return new Vector(number.doubleValue(), number.doubleValue(), number.doubleValue());
-			}
-		});
+		// Number - Vector; DISABLED due to performance problems
+//		Converters.registerConverter(Number.class, Vector.class, new Converter<Number, Vector>() {
+//			@Override
+//			@Nullable
+//			public Vector convert(Number number) {
+//				return new Vector(number.doubleValue(), number.doubleValue(), number.doubleValue());
+//			}
+//		});
 
-		// Vectors - Vector to direction
+		// Vector - Direction
 		Converters.registerConverter(Vector.class, Direction.class, new Converter<Vector, Direction>() {
 			@Override
 			@Nullable
