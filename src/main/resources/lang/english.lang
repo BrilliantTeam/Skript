@@ -913,7 +913,7 @@ entities:
 		name: evoker fangs
 		pattern: evoker fangs
 	illusioner:
-		name: illusioner
+		name: illusioner¦s
 		pattern: illusioner(|1¦s)
 	vex:
 		name: vex¦es
@@ -921,6 +921,24 @@ entities:
 	vindicator:
 		name: vindicator¦s
 		pattern: vindicator(|1¦s)
+	parrot:
+		name: parrot¦s
+		pattern: parrot(|1¦s)
+	red parrot:
+		name: red parrot¦s
+		pattern: red parrot(|1¦s)
+	blue parrot:
+		name: blue parrot¦s
+		pattern: blue parrot(|1¦s)
+	green parrot:
+		name: green parrot¦s
+		pattern: green parrot(|1¦s)
+	cyan parrot:
+		name: cyan parrot¦s
+		pattern: cyan parrot(|1¦s)
+	gray parrot:
+		name: gray parrot¦s
+		pattern:  gray parrot(|1¦s)
 	monster:
 		name: monster¦s
 		pattern: monster(|1¦s)
