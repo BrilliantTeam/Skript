@@ -44,7 +44,7 @@ public class GuardianData extends EntityData<Guardian> {
 		return true;
 	}
 
-	@SuppressWarnings("null")
+	@SuppressWarnings({"null", "deprecation"})
 	@Override
 	protected boolean init(Class<? extends Guardian> c, Guardian e) {
 		if(e != null)
@@ -52,6 +52,7 @@ public class GuardianData extends EntityData<Guardian> {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void set(Guardian entity) {
 		if(isElder)
@@ -59,6 +60,7 @@ public class GuardianData extends EntityData<Guardian> {
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected boolean match(Guardian entity) {
 		return entity.isElder() == isElder;
