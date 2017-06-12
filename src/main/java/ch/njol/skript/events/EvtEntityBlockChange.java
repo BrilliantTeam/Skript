@@ -63,11 +63,16 @@ public class EvtEntityBlockChange extends SkriptEvent {
 				return e.getEntity() instanceof Sheep;
 			}
 		}),
-		//TODO add both entering and leaving a block not just both xD
-		SILVERFISH_BOOP("silverfish boop", new Checker<EntityChangeBlockEvent>() {
+		SILVERFISH_ENTER("silverfish enter", new Checker<EntityChangeBlockEvent>() {
 			@Override
 			public boolean check(final EntityChangeBlockEvent e) {
-				return e.getEntity() instanceof Silverfish && e.getTo() != Material.AIR;
+				return e.getEntity() instanceof Silverfish && e.getTo() == Material.MONSTER_EGGS;
+			}
+		}),
+		SILVERFISH_EXIT("silverfish exit", new Checker<EntityChangeBlockEvent>() {
+			@Override
+			public boolean check(final EntityChangeBlockEvent e) {
+				return e.getEntity() instanceof Silverfish && e.getTo() != Material.MONSTER_EGGS;
 			}
 		});
 		
