@@ -46,41 +46,40 @@ import ch.njol.util.Kleenean;
 @Since("INSERT VERSION")
 public class ExprVelocity extends SimplePropertyExpression<Entity, Vector> {
 	static {
-		Skript.registerExpression(ExprVelocity.class, Vector.class, ExpressionType.PROPERTY, "(velocity|acceleration) of %entity%", "%entity%'s (velocity|acceleration)");
+		Skript.registerExpression(ExprVelocity.class, Vector.class, ExpressionType.PROPERTY, "(velocity|acceleration)");
 	}
-
-	@Override
-	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final SkriptParser.ParseResult parseResult) {
-		super.init(exprs, matchedPattern, isDelayed, parseResult);
-		
-		return true;
-	}
-
+	
 	@Override
 	protected String getPropertyName() {
 		return "velocity";
 	}
-
+	
 	@Override
 	public Class<Vector> getReturnType() {
 		return Vector.class;
 	}
-
+	
 	@Override
 	@SuppressWarnings("null")
 	public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
 		if ((mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.ADD || mode == Changer.ChangeMode.REMOVE || mode == Changer.ChangeMode.DELETE) && getExpr().isSingle() && Changer.ChangerUtils.acceptsChange(getExpr(), Changer.ChangeMode.SET, Vector.class))
-			return new Class[] { Number.class };
+			return new Class[] {Number.class};
 		return null;
 	}
-
+	
+	@Override
+	@Nullable
+	public Vector convert(Entity e) {
+		return e.getVelocity();
+	}
+	
 	@Override
 	@SuppressWarnings("null")
 	public void change(final Event e, final @Nullable Object[] delta, final Changer.ChangeMode mode) throws UnsupportedOperationException {
 		Entity ent = getExpr().getSingle(e);
 		if (ent == null)
 			return;
-		switch(mode){
+		switch (mode) {
 			case ADD:
 				ent.setVelocity(ent.getVelocity().add((Vector) delta[0]));
 				break;
@@ -99,11 +98,4 @@ public class ExprVelocity extends SimplePropertyExpression<Entity, Vector> {
 				break;
 		}
 	}
-
-	@Override
-	@Nullable
-	public Vector convert(Entity e) {
-		return e.getVelocity();
-	}
-
 }
