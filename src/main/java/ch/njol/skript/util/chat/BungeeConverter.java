@@ -48,11 +48,12 @@ public class BungeeConverter {
 			base.setClickEvent(new ClickEvent(ClickEvent.Action.valueOf(origin.clickEvent.action.spigotName), origin.clickEvent.value));
 		if (origin.hoverEvent != null)
 			base.setHoverEvent(new HoverEvent(HoverEvent.Action.valueOf(origin.hoverEvent.action.spigotName),
-					new BaseComponent[] {new TextComponent(origin.clickEvent.value)})); // WAIT WHAT?!?
+					new BaseComponent[] {new TextComponent(origin.hoverEvent.value)})); // WAIT WHAT?!?
 		
 		return base;
 	}
 	
+	@SuppressWarnings("null") // For origins[i] access
 	public static BaseComponent[] convert(MessageComponent[] origins) {
 		BaseComponent[] bases = new BaseComponent[origins.length];
 		for (int i = 0; i < origins.length; i++) {

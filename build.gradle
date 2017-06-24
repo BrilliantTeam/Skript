@@ -37,6 +37,10 @@ repositories {
 	maven {
 		url 'https://repo.destroystokyo.com/repository/maven-public/'
 	}
+	
+	maven {
+		url 'http://ci.emc.gs/nexus/content/groups/aikar/'
+	}
 }
 
 dependencies {
