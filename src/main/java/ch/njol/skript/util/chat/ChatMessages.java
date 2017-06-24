@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.xml.soap.Text;
 
@@ -78,27 +79,13 @@ public class ChatMessages {
 	
 	static final ChatCode[] colorChars = new ChatCode[256];
 	
+	@SuppressWarnings("null")
+	static final Pattern linkPattern = Pattern.compile("[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
+	
 	/**
 	 * Instance of GSON we use for serialization.
 	 */
 	static final Gson gson;
-	
-	/**
-	 * How many entries should be in message cache.
-	 */
-	static final int msgCacheSize = 100;
-	
-	static final Map<String,String> msgCache = new LinkedHashMap<String,String>() {
-		/**
-		 * Why is this needed... ?
-		 */
-		private static final long serialVersionUID = 8780868977339889766L;
-
-		@Override
-        protected boolean removeEldestEntry(@Nullable Map.Entry<String, String> eldest) {
-			return size() > 100;
-		}
-	};
 	
 	public static void registerListeners() {
 		// When language changes or server is loaded loop through all chatcodes
@@ -152,6 +139,7 @@ public class ChatMessages {
 			this.extra = components;
 		}
 		
+		@SuppressWarnings("unused")
 		public ComponentList(MessageComponent[] components) {
 			this.extra = Arrays.asList(components);
 		}
@@ -298,8 +286,9 @@ public class ChatMessages {
 				String rest = msg.substring(i); // Get rest of string
 				
 				String link = null;
-				if (rest.contains(".")) {
-					link = rest.split(" ", 2)[0];
+				String potentialLink = rest.split(" ", 2)[0]; // Split stuff
+				if (linkPattern.matcher(potentialLink).matches()) { // Check if it is at least somewhat valid URL
+					link = potentialLink;
 				}
 				
 				// Link found
