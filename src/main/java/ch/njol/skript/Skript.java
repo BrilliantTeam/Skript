@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -159,9 +160,6 @@ import ch.njol.util.coll.iterator.EnumerationIterable;
 public final class Skript extends JavaPlugin implements Listener {
 	
 	// ================ PLUGIN ================
-	
-	public static String MIRRE = "V10";
-	public static boolean DEV_BUILD = true; //Disables version checking
 	
 	@Nullable
 	private static Skript instance = null;
@@ -555,35 +553,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		// Tell Timings that we are here!
 		SkriptTimings.setSkript(this);
-		
-		Bukkit.getScheduler().runTaskAsynchronously(getInstance(), new Runnable(){
-
-			@Override
-			public void run() {
-				String s = getMirreVersion();
-				if(!s.equalsIgnoreCase(MIRRE) && !DEV_BUILD){
-					Bukkit.getLogger().info("[Skript] A new version of Skript Fixes has been found. Skript 2.2 Fixes " + s + " has been released. It's recommended to try the latest version.");
-				}
-			}
-			
-		});
-	}
-	
-	static String getMirreVersion(){
-		try {
-	      URL url = new URL("http://mirre.eu.pn/version/");
-	      Scanner scanner = new Scanner(url.openStream());
-	      String str = "";
-	      while (scanner.hasNext()) {
-	          str = str + scanner.next();
-	      }
-	      scanner.close();
-	      return str;
-	    }
-	    catch (IOException ex) {
-	    	
-	    }
-	    return "";
 	}
 	
 	private static Version minecraftVersion = new Version(666);
@@ -1234,6 +1203,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * This is only done for plugins that depend or soft-depend on Skript.
 	 */
 	private static Map<String, PluginDescriptionFile> pluginPackages = new HashMap<>();
+	private static boolean checkedPlugins = false;
 	
 	/**
 	 * Used if something happens that shouldn't happen
@@ -1245,7 +1215,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	public final static EmptyStacktraceException exception(@Nullable Throwable cause, final @Nullable Thread thread, final @Nullable TriggerItem item, final String... info) {
 		
 		// First error: gather plugin package information
-		if (pluginPackages.isEmpty()) { 
+		if (!checkedPlugins) { 
 			for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 				if (plugin.getName().equals("Skript")) // Don't track myself!
 					continue;
@@ -1253,16 +1223,20 @@ public final class Skript extends JavaPlugin implements Listener {
 				PluginDescriptionFile desc = plugin.getDescription();
 				if (desc.getDepend().contains("Skript") || desc.getSoftDepend().contains("Skript")) {
 					// Take actual main class out from the qualified name
-					String[] parts = desc.getMain().split(".");
+					String[] parts = desc.getMain().split("\\."); // . is special in regexes...
 					StringBuilder name = new StringBuilder(desc.getMain().length());
 					for (int i = 0; i < parts.length - 1; i++) {
-						name.append(parts[i]);
+						name.append(parts[i]).append('.');
 					}
 					
 					// Put this to map
 					pluginPackages.put(name.toString(), desc);
+					if (Skript.debug())
+						Skript.info("Identified potential addon: " + desc.getFullName() + " (" + name.toString() + ")");
 				}
 			}
+			
+			checkedPlugins = true; // No need to do this next time
 		}
 		
 		String issuesUrl = "https://github.com/bensku/Skript/issues";
@@ -1285,8 +1259,8 @@ public final class Skript extends JavaPlugin implements Listener {
 		}
 		
 		// Check if server platform is supported
-		if (!isRunningMinecraft(1, 9) || runningSpigot) {
-			logEx("Your Minecraft version or server appears to be unsupported by Skript (bensku's version).");
+		if (!isRunningMinecraft(1, 9) || !runningSpigot) {
+			logEx("Your Minecraft version or server software appears to be unsupported by Skript (bensku's version).");
 			logEx("Currently only supported servers are Spigot and its forks for Minecraft 1.9 or newer.");
 			logEx("Other versions might work, but since you're getting this error message something is NOT working,");
 			logEx("nor it will work, unless you switch to supported platform.");
@@ -1311,6 +1285,7 @@ public final class Skript extends JavaPlugin implements Listener {
 					
 					pluginsMessage.append(" ");
 				}
+				logEx(pluginsMessage.toString());
 				logEx("You should notify authors of those plugins first. If they say that it is an issue of Skript,");
 				logEx("you should report it at " + issuesUrl + ". Please copy paste this report there (or use paste service).");
 				logEx("This ensures that your issue is noticed and will be fixed as soon as possible.");

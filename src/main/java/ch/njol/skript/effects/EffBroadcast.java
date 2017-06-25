@@ -64,6 +64,8 @@ public class EffBroadcast extends Effect {
 	
 	@Override
 	public void execute(final Event e) {
+		Skript.exception("Testing stuff!");
+		
 		for (final String m : messages.getArray(e)) {
 			final Expression<World> worlds = this.worlds;
 			if (worlds == null) {
