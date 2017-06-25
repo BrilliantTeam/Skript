@@ -20,12 +20,19 @@
 package ch.njol.skript;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -139,6 +146,13 @@ public class Updater {
 	    public String toString() {
 	    	return tag_name;
 	    }
+	    
+	    public class Author {
+	    	public String login;
+	    	public int id;
+	    }
+	    
+	    public Author author;
 	}
 	
 	@SuppressWarnings("null")
@@ -334,7 +348,54 @@ public class Updater {
 			}
 			assert url != null;
 			
-			// TODO does anybody actually use this?
+			// Validate new release (only bensku can make auto-updateable releases for security reasons)
+			if (update.author.id != 4330456) {
+				Skript.exception("Unauthorized Skript release! Author " + update.author.login + " (" + update.author.id + ") is not recognized.");
+				return;
+			}
+			
+			// Attempt to open connection on new jar
+			int maxTries = SkriptConfig.updaterDownloadTries.value();
+			int tries = 0;
+			ReadableByteChannel ch = null;
+			while (ch == null) {
+				try {
+					ch = Channels.newChannel(url.openStream());
+				} catch (SocketTimeoutException e) {
+					Skript.debug("Socket timeout in updater, but we can probably try again!");
+					// Do nothing here, we'll just try again...
+				} catch (IOException e) {
+					error.set(ExceptionUtils.toString(e));
+					Skript.info(sender, "" + m_check_error);
+				}
+				
+				
+				tries++;
+				if (tries >= maxTries && ch == null) {
+					error.set("Can't reach update server");
+					Skript.info(sender, "" + m_check_error);
+					state = UpdateState.ERROR;
+					return;
+				}
+			}
+			assert ch != null;
+			
+			// Attempt to transfer data from network to file
+			try {
+				FileChannel file = FileChannel.open(Paths.get("skript-update.jar"), StandardOpenOption.CREATE);
+				file.transferFrom(ch, 0, 1024 * 1024 * 10); // 10 mb is max file size for safety reasons
+				file.close();
+			} catch (IOException e) {
+				error.set(ExceptionUtils.toString(e));
+				Skript.info(sender, "" + m_check_error);
+			}
+			
+			// Close connection, no matter what
+			try {
+				ch.close();
+			} catch (IOException e) {
+				Skript.exception(e);
+			}
 		}
 	}
 }
