@@ -28,7 +28,6 @@ import ch.njol.skript.hooks.Hook;
 import ch.njol.skript.hooks.biomes.BiomeMapUtil.To19Mapping;
 import ch.njol.skript.util.EnumUtils;
 import ch.njol.skript.util.VisualEffect;
-import de.slikey.effectlib.util.ParticleEffect;
 
 /**
  * Hook for multi version biomes.

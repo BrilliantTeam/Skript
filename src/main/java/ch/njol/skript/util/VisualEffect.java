@@ -20,9 +20,7 @@
 package ch.njol.skript.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
@@ -53,10 +51,6 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.iterator.SingleItemIterator;
 import ch.njol.yggdrasil.YggdrasilSerializable;
-import de.slikey.effectlib.util.ParticleEffect;
-import de.slikey.effectlib.util.ParticleEffect.ParticleData;
-import de.slikey.effectlib.util.ParticleEffect.BlockData;
-import de.slikey.effectlib.util.ParticleEffect.ItemData;
 
 /**
  * @author Peter Güttinger

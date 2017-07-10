@@ -19,10 +19,6 @@ repositories {
 	}
 
 	maven {
-		url 'http://maven.elmakers.com/repository/'
-	}
-
-	maven {
 		url 'http://maven.sk89q.com/repo'
 	}
 
@@ -41,15 +37,22 @@ repositories {
 	maven {
 		url 'http://ci.emc.gs/nexus/content/groups/aikar/'
 	}
+	
+	maven {
+		url 'http://nexus.hc.to/content/repositories/pub_releases'
+	}
+	
+	maven {
+		url 'http://maven.elmakers.com/repository/'
+	}
 }
 
 dependencies {
 	compile 'com.destroystokyo.paper:paper-api:1.12-R0.1-SNAPSHOT'
 	compile 'org.eclipse.jdt:org.eclipse.jdt.annotation:1.1.0'
 	compile 'com.google.code.findbugs:findbugs:2.0.3'
-	compile 'de.slikey:EffectLib:5.0'
 	compile 'com.sk89q:worldguard:6.1.1-SNAPSHOT'
-	compile 'net.milkbowl.vault:Vault:1.5.3'
+	compile 'net.milkbowl.vault:Vault:1.6.6'
 	compile 'net.sacredlabyrinth.Phaed:PreciousStones:10.0.5'
 
 	testCompile 'junit:junit:4.12'

@@ -68,6 +68,15 @@ public class Updater {
 	
 	@Nullable
 	private static Gson gson;
+	private static boolean gsonUnavailable;
+	
+	static {
+		// Only initialize GSON if available
+		if (Skript.classExists("com.google.gson.Gson"))
+			gson = new Gson();
+		else
+			gsonUnavailable = true;
+	}
 	
 	final static AtomicReference<String> error = new AtomicReference<>();
 	public static volatile UpdateState state = UpdateState.NOT_STARTED;
@@ -159,6 +168,9 @@ public class Updater {
 	public static void start() {
 		Skript.debug("Initializing updater");
 		
+		if (gsonUnavailable) // Something wrong with GSON...
+			return;
+		
 		long period;
 		if (SkriptConfig.checkForNewVersion.value())
 			period = SkriptConfig.updateCheckInterval.value().getTicks_i();
@@ -174,8 +186,6 @@ public class Updater {
 		assert str != null : "Cannot deserialize null string";
 		@SuppressWarnings("serial")
 		Type listType = new TypeToken<List<ResponseEntry>>() {}.getType();
-		if (gson == null) // Initialize GSON if it wasn't initialized before
-			gson = new Gson();
 		assert gson != null;
 		List<ResponseEntry> responses = gson.fromJson(str, listType);
 		assert responses != null;
