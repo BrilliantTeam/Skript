@@ -46,7 +46,7 @@ public class EffExceptionDebug extends Effect {
 
 	@Override
 	protected void execute(Event e) {
-		Skript.exception("Created by a script (debugging...");
+		Skript.exception("Created by a script (debugging)...");
 	}
 
 	@Override

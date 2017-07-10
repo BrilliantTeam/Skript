@@ -34,6 +34,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.timings.SkriptTimings;
@@ -63,6 +64,12 @@ public class Delay extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		duration = (Expression<Timespan>) exprs[0];
+		if (duration instanceof Literal) { // If we can, do sanity check for delays
+			long millis = ((Literal<Timespan>) duration).getSingle().getMilliSeconds();
+			if (millis < 50) {
+				Skript.warning("Delays less than one tick are not possible, defaulting to one tick.");
+			}
+		}
 		return true;
 	}
 
@@ -95,7 +102,7 @@ public class Delay extends Effect {
 					
 					SkriptTimings.stop(timing); // Stop timing if it was even started
 				}
-			}, d.getTicks_i());
+			}, d.getTicks_i() < 1 ? 1 : d.getTicks_i()); // Minimum delay is one tick, less than it is useless!
 		}
 		return null;
 	}
