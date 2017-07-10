@@ -1271,24 +1271,42 @@ public final class Skript extends JavaPlugin implements Listener {
 			logEx("You will be given instructions how to report this error if it persists with latest Skript.");
 			logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
 		} else {
-			if (stackPlugins.isEmpty()) {
+			if (pluginPackages.isEmpty()) {
 				logEx("You should report it at " + issuesUrl + ". Please copy paste this report there (or use paste service).");
 				logEx("This ensures that your issue is noticed and will be fixed as soon as possible.");
 			} else {
 				logEx("It looks like you are using some plugin(s) that alter how Skript works (addons).");
-				logEx("Following plugins are probably related to this error in some way:");
-				StringBuilder pluginsMessage = new StringBuilder();
-				for (PluginDescriptionFile desc : stackPlugins) {
-					pluginsMessage.append(desc.getName());
-					if (desc.getWebsite() != null && !desc.getWebsite().isEmpty()) // Add website if found
-						pluginsMessage.append(" (").append(desc.getWebsite()).append(")");
-					
-					pluginsMessage.append(" ");
+				if (stackPlugins.isEmpty()) {
+					logEx("Here is full list of them:");
+					StringBuilder pluginsMessage = new StringBuilder();
+					for (PluginDescriptionFile desc : pluginPackages.values()) {
+						pluginsMessage.append(desc.getName());
+						if (desc.getWebsite() != null && !desc.getWebsite().isEmpty()) // Add website if found
+							pluginsMessage.append(" (").append(desc.getWebsite()).append(")");
+						
+						pluginsMessage.append(" ");
+					}
+					logEx(pluginsMessage.toString());
+					logEx("We could not identify which of those are specially related, so this might also be Skript issue.");
+				} else {
+					logEx("Following plugins are probably related to this error in some way:");
+					StringBuilder pluginsMessage = new StringBuilder();
+					for (PluginDescriptionFile desc : stackPlugins) {
+						pluginsMessage.append(desc.getName());
+						if (desc.getWebsite() != null && !desc.getWebsite().isEmpty()) // Add website if found
+							pluginsMessage.append(" (").append(desc.getWebsite()).append(")");
+						
+						pluginsMessage.append(" ");
+					}
+					logEx(pluginsMessage.toString());
 				}
-				logEx(pluginsMessage.toString());
-				logEx("You should notify authors of those plugins first. If they say that it is an issue of Skript,");
-				logEx("you should report it at " + issuesUrl + ". Please copy paste this report there (or use paste service).");
-				logEx("This ensures that your issue is noticed and will be fixed as soon as possible.");
+				
+				logEx("You should try disabling those plugins one by one, trying to find which one causes it.");
+				logEx("If the error doesn't disappear even after disabling all listed plugins, it is probably Skript issue.");
+				logEx("In that case, you will be given instruction on how should you report it.");
+				logEx("On the other hand, if the error disappears when disabling some plugin, report it to author of that plugin.");
+				logEx("Only if the author tells you to do so, report it as Skript issue (url below)");
+				logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
 			}
 		}
 		
