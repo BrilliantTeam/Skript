@@ -71,6 +71,7 @@ public abstract class Functions {
 	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<>();
 	
 	/**
+	 * Register a function written in Java.
 	 * @param function
 	 * @return The passed function
 	 */

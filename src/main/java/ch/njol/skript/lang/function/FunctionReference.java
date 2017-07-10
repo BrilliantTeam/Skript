@@ -82,6 +82,8 @@ public class FunctionReference<T> {
 						+ " These will continue to use the old version of the function until Skript restarts.");
 			return false;
 		}
+		
+		// Intentional ==, as they must be same instances!
 		if (newFunc == function)
 			return true;
 		
@@ -141,6 +143,7 @@ public class FunctionReference<T> {
 						+ " These will continue to use the old version of the function until Skript restarts.");
 			return false;
 		}
+		
 		for (int i = 0; i < parameters.length; i++) {
 			final Parameter<?> p = sign.parameters.get(singleUberParam ? 0 : i);
 			final RetainingLogHandler log = SkriptLogger.startRetainingLog();
@@ -182,7 +185,7 @@ public class FunctionReference<T> {
 		final Object[][] params = new Object[singleUberParam ? 1 : parameters.length][];
 		if (singleUberParam && parameters.length > 1) {
 			final ArrayList<Object> l = new ArrayList<>();
-			for (int i = 0; i < params.length; i++)
+			for (int i = 0; i < parameters.length; i++)
 				l.addAll(Arrays.asList(parameters[i].getArray(e))); // TODO what if an argument is not available? pass null or abort?
 			params[0] = l.toArray();
 		} else {
