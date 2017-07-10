@@ -174,6 +174,10 @@ public class FunctionReference<T> {
 	protected T[] execute(final Event e) {
 		if (function == null)
 			function = (Function<? extends T>) Functions.getFunction(functionName);
+		if (function == null) { // It might be impossible to resolve functions in some cases!
+			Skript.error("Invalid function call to function that does not exist yet. Be careful when using functions in 'script load' events!");
+			return null; // Return nothing and hope it works
+		}
 		
 		final Object[][] params = new Object[singleUberParam ? 1 : parameters.length][];
 		if (singleUberParam && parameters.length > 1) {
