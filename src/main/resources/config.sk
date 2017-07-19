@@ -179,6 +179,11 @@ color codes reset formatting: true
 # With JSON-based new chat protocol, this is not necessary, but can be done
 # manually for compatibility. This is done by default for compatibility.
 
+asynchronous script loading: false
+# Enables asynchronous script loading, which will cause less lag spikes.
+# Asynchronous loading might, however, make loading generally slower.
+# It can also cause issues with (old) addons and possibly some scripts.
+
 # ==== Variables ====
 
 databases:

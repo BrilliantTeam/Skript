@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,9 +65,9 @@ public abstract class Functions {
 	public static ScriptFunction<?> currentFunction = null;
 	
 	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<>();
-	final static Map<String, FunctionData> functions = new HashMap<>();
+	final static Map<String, FunctionData> functions = new ConcurrentHashMap<>();
 	final static Map<String, Signature<?>> javaSignatures = new HashMap<>();
-	final static Map<String, Signature<?>> signatures = new HashMap<>();
+	final static Map<String, Signature<?>> signatures = new ConcurrentHashMap<>();
 	
 	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<>();
 	
@@ -311,6 +312,14 @@ public abstract class Functions {
 	@SuppressWarnings("null")
 	public static Iterable<JavaFunction<?>> getJavaFunctions() {
 		return javaFunctions.values();
+	}
+
+	/**
+	 * Puts a function directly to map. Usually no need to do so.
+	 * @param func
+	 */
+	public static void putFunction(Function<?> func) {
+		functions.put(func.name, new FunctionData(func));
 	}
 	
 }

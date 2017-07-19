@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 
 import org.bukkit.event.Event;
@@ -76,6 +79,7 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.ExceptionUtils;
+import ch.njol.skript.util.Task;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Callback;
 import ch.njol.util.Kleenean;
@@ -183,6 +187,33 @@ final public class ScriptLoader {
 	
 	private static String indentation = "";
 	
+	// Load scripts in separate (one) thread
+	static BlockingQueue<Runnable> loadQueue = new ArrayBlockingQueue<>(20, true);
+	static Thread loaderThread;
+	static boolean loadAsync;
+	
+	// Initialize and start load thread
+	static {
+		loaderThread = new AsyncLoaderThread();
+		loaderThread.start();
+	}
+	
+	private static class AsyncLoaderThread extends Thread {
+		
+		public AsyncLoaderThread() { }
+
+		@Override
+		public void run() {
+			while (true) {
+				try {
+					loadQueue.take().run();
+				} catch (InterruptedException e) {
+					Skript.exception(e); // Bubble it up with instructions on how to report it
+				}
+			}
+		}
+	}
+	
 	static ScriptInfo loadScripts() {
 		final File scriptsFolder = new File(Skript.getInstance().getDataFolder(), Skript.SCRIPTSFOLDER + File.separator);
 		if (!scriptsFolder.isDirectory())
@@ -240,7 +271,7 @@ final public class ScriptLoader {
 		try {
 			for (final Config cfg : configs) {
 				assert cfg != null : configs.toString();
-				i.add(loadScript(cfg));
+				loadScript(cfg);
 			}
 		} finally {
 			if (wasLocal)
@@ -268,219 +299,276 @@ final public class ScriptLoader {
 	}
 	
 	/**
+	 * Represents data for event which is waiting to be loaded.
+	 */
+	private static class ParsedEventData {
+		
+		public ParsedEventData(NonNullPair<SkriptEventInfo<?>, SkriptEvent> info, String event, SectionNode node, List<TriggerItem> items) {
+			this.info = info;
+			this.event = event;
+			this.node = node;
+			this.items = items;
+		}
+		
+		public final NonNullPair<SkriptEventInfo<?>, SkriptEvent> info;
+		public final String event;
+		public final SectionNode node;
+		public final List<TriggerItem> items;
+	}
+	
+	/**
 	 * Loads one script. Only for internal use, as this doesn't register/update
 	 * event handlers.
 	 * @param config Config for script to be loaded.
 	 * @return Info about script that is loaded
 	 */
 	@SuppressWarnings("unchecked")
-	private final static ScriptInfo loadScript(final @Nullable Config config) {
+	private final static void loadScript(final @Nullable Config config) {
 		if (config == null) { // Something bad happened, hopefully got logged to console
-			return new ScriptInfo();
+			return;
 		}
 		
-		
-		try {
-			if (SkriptConfig.keepConfigsLoaded.value())
-				SkriptConfig.configs.add(config);
-			int numTriggers = 0;
-			int numCommands = 0;
-			int numFunctions = 0;
-			
-			currentAliases.clear();
-			currentOptions.clear();
-			currentScript = config;
-			
-//			final SerializedScript script = new SerializedScript();
-			
-			final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
+		Runnable task = () -> {
+			List<ScriptCommand> commands = new ArrayList<>();
+			List<Function<?>> functions = new ArrayList<>();
+			List<ParsedEventData> events = new ArrayList<>();
 			
 			try {
-				for (final Node cnode : config.getMainNode()) {
-					if (!(cnode instanceof SectionNode)) {
-						Skript.error("invalid line - all code has to be put into triggers");
-						continue;
-					}
-					
-					final SectionNode node = ((SectionNode) cnode);
-					String event = node.getKey();
-					if (event == null)
-						continue;
-					
-					if (event.equalsIgnoreCase("aliases")) {
-						node.convertToEntries(0, "=");
-						for (final Node n : node) {
-							if (!(n instanceof EntryNode)) {
-								Skript.error("invalid line in aliases section");
-								continue;
-							}
-							final ItemType t = Aliases.parseAlias(((EntryNode) n).getValue());
-							if (t == null)
-								continue;
-							currentAliases.put(((EntryNode) n).getKey().toLowerCase(), t);
+				if (SkriptConfig.keepConfigsLoaded.value())
+					SkriptConfig.configs.add(config);
+				int numTriggers = 0;
+				int numCommands = 0;
+				int numFunctions = 0;
+				
+				currentAliases.clear();
+				currentOptions.clear();
+				currentScript = config;
+				
+	//			final SerializedScript script = new SerializedScript();
+				
+				final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
+				
+				try {
+					for (final Node cnode : config.getMainNode()) {
+						if (!(cnode instanceof SectionNode)) {
+							Skript.error("invalid line - all code has to be put into triggers");
+							continue;
 						}
-						continue;
-					} else if (event.equalsIgnoreCase("options")) {
-						node.convertToEntries(0);
-						for (final Node n : node) {
-							if (!(n instanceof EntryNode)) {
-								Skript.error("invalid line in options");
-								continue;
-							}
-							currentOptions.put(((EntryNode) n).getKey(), ((EntryNode) n).getValue());
-						}
-						continue;
-					} else if (event.equalsIgnoreCase("variables")) {
-						// TODO allow to make these override existing variables
-						node.convertToEntries(0, "=");
-						for (final Node n : node) {
-							if (!(n instanceof EntryNode)) {
-								Skript.error("Invalid line in variables section");
-								continue;
-							}
-							String name = ((EntryNode) n).getKey().toLowerCase(Locale.ENGLISH);
-							if (name.startsWith("{") && name.endsWith("}"))
-								name = "" + name.substring(1, name.length() - 1);
-							final String var = name;
-							name = StringUtils.replaceAll(name, "%(.+)?%", new Callback<String, Matcher>() {
-								@Override
-								@Nullable
-								public String run(final Matcher m) {
-									if (m.group(1).contains("{") || m.group(1).contains("}") || m.group(1).contains("%")) {
-										Skript.error("'" + var + "' is not a valid name for a default variable");
-										return null;
-									}
-									final ClassInfo<?> ci = Classes.getClassInfoFromUserInput("" + m.group(1));
-									if (ci == null) {
-										Skript.error("Can't understand the type '" + m.group(1) + "'");
-										return null;
-									}
-									return "<" + ci.getCodeName() + ">";
-								}
-							});
-							if (name == null) {
-								continue;
-							} else if (name.contains("%")) {
-								Skript.error("Invalid use of percent signs in variable name");
-								continue;
-							}
-							if (Variables.getVariable(name, null, false) != null)
-								continue;
-							Object o;
-							final ParseLogHandler log = SkriptLogger.startParseLogHandler();
-							try {
-								o = Classes.parseSimple(((EntryNode) n).getValue(), Object.class, ParseContext.SCRIPT);
-								if (o == null) {
-									log.printError("Can't understand the value '" + ((EntryNode) n).getValue() + "'");
+						
+						final SectionNode node = ((SectionNode) cnode);
+						String event = node.getKey();
+						if (event == null)
+							continue;
+						
+						if (event.equalsIgnoreCase("aliases")) {
+							node.convertToEntries(0, "=");
+							for (final Node n : node) {
+								if (!(n instanceof EntryNode)) {
+									Skript.error("invalid line in aliases section");
 									continue;
 								}
-								log.printLog();
-							} finally {
-								log.stop();
+								final ItemType t = Aliases.parseAlias(((EntryNode) n).getValue());
+								if (t == null)
+									continue;
+								currentAliases.put(((EntryNode) n).getKey().toLowerCase(), t);
 							}
-							final ClassInfo<?> ci = Classes.getSuperClassInfo(o.getClass());
-							if (ci.getSerializer() == null) {
-								Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
-								continue;
-							} else if (ci.getSerializeAs() != null) {
-								final ClassInfo<?> as = Classes.getExactClassInfo(ci.getSerializeAs());
-								if (as == null) {
-									assert false : ci;
+							continue;
+						} else if (event.equalsIgnoreCase("options")) {
+							node.convertToEntries(0);
+							for (final Node n : node) {
+								if (!(n instanceof EntryNode)) {
+									Skript.error("invalid line in options");
 									continue;
 								}
-								o = Converters.convert(o, as.getC());
-								if (o == null) {
+								currentOptions.put(((EntryNode) n).getKey(), ((EntryNode) n).getValue());
+							}
+							continue;
+						} else if (event.equalsIgnoreCase("variables")) {
+							// TODO allow to make these override existing variables
+							node.convertToEntries(0, "=");
+							for (final Node n : node) {
+								if (!(n instanceof EntryNode)) {
+									Skript.error("Invalid line in variables section");
+									continue;
+								}
+								String name = ((EntryNode) n).getKey().toLowerCase(Locale.ENGLISH);
+								if (name.startsWith("{") && name.endsWith("}"))
+									name = "" + name.substring(1, name.length() - 1);
+								final String var = name;
+								name = StringUtils.replaceAll(name, "%(.+)?%", new Callback<String, Matcher>() {
+									@Override
+									@Nullable
+									public String run(final Matcher m) {
+										if (m.group(1).contains("{") || m.group(1).contains("}") || m.group(1).contains("%")) {
+											Skript.error("'" + var + "' is not a valid name for a default variable");
+											return null;
+										}
+										final ClassInfo<?> ci = Classes.getClassInfoFromUserInput("" + m.group(1));
+										if (ci == null) {
+											Skript.error("Can't understand the type '" + m.group(1) + "'");
+											return null;
+										}
+										return "<" + ci.getCodeName() + ">";
+									}
+								});
+								if (name == null) {
+									continue;
+								} else if (name.contains("%")) {
+									Skript.error("Invalid use of percent signs in variable name");
+									continue;
+								}
+								if (Variables.getVariable(name, null, false) != null)
+									continue;
+								Object o;
+								final ParseLogHandler log = SkriptLogger.startParseLogHandler();
+								try {
+									o = Classes.parseSimple(((EntryNode) n).getValue(), Object.class, ParseContext.SCRIPT);
+									if (o == null) {
+										log.printError("Can't understand the value '" + ((EntryNode) n).getValue() + "'");
+										continue;
+									}
+									log.printLog();
+								} finally {
+									log.stop();
+								}
+								final ClassInfo<?> ci = Classes.getSuperClassInfo(o.getClass());
+								if (ci.getSerializer() == null) {
 									Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
 									continue;
+								} else if (ci.getSerializeAs() != null) {
+									final ClassInfo<?> as = Classes.getExactClassInfo(ci.getSerializeAs());
+									if (as == null) {
+										assert false : ci;
+										continue;
+									}
+									o = Converters.convert(o, as.getC());
+									if (o == null) {
+										Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
+										continue;
+									}
 								}
+								Variables.setVariable(name, o, null, false);
 							}
-							Variables.setVariable(name, o, null, false);
-						}
-						continue;
-					}
-					
-					if (!SkriptParser.validateLine(event))
-						continue;
-					
-					if (event.toLowerCase().startsWith("command ")) {
-						
-						setCurrentEvent("command", CommandEvent.class);
-						
-						final ScriptCommand c = Commands.loadCommand(node);
-						if (c != null) {
-							numCommands++;
-//							script.commands.add(c);
+							continue;
 						}
 						
-						deleteCurrentEvent();
+						if (!SkriptParser.validateLine(event))
+							continue;
 						
-						continue;
-					} else if (event.toLowerCase().startsWith("function ")) {
-						
-						setCurrentEvent("function", FunctionEvent.class);
-						
-						final Function<?> func = Functions.loadFunction(node);
-						if (func != null) {
-							numFunctions++;
+						if (event.toLowerCase().startsWith("command ")) {
+							
+							setCurrentEvent("command", CommandEvent.class);
+							
+							final ScriptCommand c = Commands.loadCommand(node, false);
+							if (c != null) {
+								numCommands++;
+								commands.add(c);
+							}
+							
+							deleteCurrentEvent();
+							
+							continue;
+						} else if (event.toLowerCase().startsWith("function ")) {
+							
+							setCurrentEvent("function", FunctionEvent.class);
+							
+							final Function<?> func = Functions.loadFunction(node);
+							if (func != null) {
+								numFunctions++;
+								functions.add(func);
+							}
+							
+							deleteCurrentEvent();
+							
+							continue;
 						}
 						
-						deleteCurrentEvent();
+						if (Skript.logVeryHigh() && !Skript.debug())
+							Skript.info("loading trigger '" + event + "'");
 						
-						continue;
+						if (StringUtils.startsWithIgnoreCase(event, "on "))
+							event = "" + event.substring("on ".length());
+						
+						event = replaceOptions(event);
+						
+						final NonNullPair<SkriptEventInfo<?>, SkriptEvent> parsedEvent = SkriptParser.parseEvent(event, "can't understand this event: '" + node.getKey() + "'");
+						if (parsedEvent == null)
+							continue;
+						
+						if (Skript.debug() || node.debug())
+							Skript.debug(event + " (" + parsedEvent.getSecond().toString(null, true) + "):");
+						
+						setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
+						events.add(new ParsedEventData(parsedEvent, event, node, loadItems(node)));
+						
+						numTriggers++;
 					}
 					
-					if (Skript.logVeryHigh() && !Skript.debug())
-						Skript.info("loading trigger '" + event + "'");
+					if (Skript.logHigh())
+						Skript.info("loaded " + numTriggers + " trigger" + (numTriggers == 1 ? "" : "s") + " and " + numCommands + " command" + (numCommands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
 					
-					if (StringUtils.startsWithIgnoreCase(event, "on "))
-						event = "" + event.substring("on ".length());
-					
-					event = replaceOptions(event);
-					
-					final NonNullPair<SkriptEventInfo<?>, SkriptEvent> parsedEvent = SkriptParser.parseEvent(event, "can't understand this event: '" + node.getKey() + "'");
-					if (parsedEvent == null)
-						continue;
-					
-					if (Skript.debug() || node.debug())
-						Skript.debug(event + " (" + parsedEvent.getSecond().toString(null, true) + "):");
-					
-					setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
-					final Trigger trigger;
-					try {
-						trigger = new Trigger(config.getFile(), event, parsedEvent.getSecond(), loadItems(node));
-						trigger.setLineNumber(node.getLine()); // Set line number for debugging
-						trigger.setDebugLabel(config.getFileName() + ": line " + node.getLine());
-					} finally {
-						deleteCurrentEvent();
-					}
-					
-					if (parsedEvent.getSecond() instanceof SelfRegisteringSkriptEvent) {
-						((SelfRegisteringSkriptEvent) parsedEvent.getSecond()).register(trigger);
-						SkriptEventHandler.addSelfRegisteringTrigger(trigger);
-					} else {
-						SkriptEventHandler.addTrigger(parsedEvent.getFirst().events, trigger);
-					}
-					
-//					script.triggers.add(trigger);
-					
-					numTriggers++;
+					currentScript = null;
+				} finally {
+					numErrors.stop();
 				}
-				
-				if (Skript.logHigh())
-					Skript.info("loaded " + numTriggers + " trigger" + (numTriggers == 1 ? "" : "s") + " and " + numCommands + " command" + (numCommands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
-				
-				currentScript = null;
+				synchronized (loadedScripts) {
+					loadedScripts.add(new ScriptInfo(1, numTriggers, numCommands, numFunctions));
+				}
+			} catch (final Exception e) {
+				Skript.exception(e, "Could not load " + config.getFileName());
 			} finally {
-				numErrors.stop();
+				SkriptLogger.setNode(null);
 			}
 			
-			return new ScriptInfo(1, numTriggers, numCommands, numFunctions);
-		} catch (final Exception e) {
-			Skript.exception(e, "Could not load " + config.getFileName());
-		} finally {
-			SkriptLogger.setNode(null);
-		}
-		return new ScriptInfo();
+			// In always sync task, enable stuff
+			Task.callSync(new Callable<Void>() {
+
+				@Override
+				public @Nullable Void call() throws Exception {
+					// Unload script
+					File file = config.getFile();
+					if (file != null)
+						unloadScript(file);
+					
+					// Now, enable everything!
+					for (ScriptCommand command : commands) {
+						assert command != null;
+						Commands.registerCommand(command);
+					}
+					
+					for (Function<?> func : functions) {
+						assert func != null;
+						Functions.putFunction(func);
+					}
+					
+					for (ParsedEventData event : events) {
+						final Trigger trigger;
+						try {
+							trigger = new Trigger(config.getFile(), event.event, event.info.getSecond(), event.items);
+							trigger.setLineNumber(event.node.getLine()); // Set line number for debugging
+							trigger.setDebugLabel(config.getFileName() + ": line " + event.node.getLine());
+						} finally {
+							deleteCurrentEvent();
+						}
+						
+						if (event.info.getSecond() instanceof SelfRegisteringSkriptEvent) {
+							((SelfRegisteringSkriptEvent) event.info.getSecond()).register(trigger);
+							SkriptEventHandler.addSelfRegisteringTrigger(trigger);
+						} else {
+							SkriptEventHandler.addTrigger(event.info.getFirst().events, trigger);
+						}
+					}
+					
+					return null;
+				}
+				
+			});
+		};
+		
+		if (loadAsync)
+			loadQueue.add(task);
+		else
+			task.run();
 	}
 	
 	/**

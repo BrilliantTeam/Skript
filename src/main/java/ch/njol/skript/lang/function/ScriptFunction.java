@@ -44,7 +44,8 @@ public class ScriptFunction<T> extends Function<T> {
 		super(name, parameters, returnType, single);
 		
 		// here to allow recursion
-		Functions.functions.put(name, new FunctionData(this));
+		// no longer here, see ScriptLoader
+		//Functions.functions.put(name, new FunctionData(this));
 		
 		Functions.currentFunction = this;
 		try {

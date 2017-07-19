@@ -26,6 +26,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.locks.LockSupport;
 
 import org.bukkit.event.EventPriority;
 import org.eclipse.jdt.annotation.NonNull;
@@ -222,6 +223,16 @@ public abstract class SkriptConfig {
 				@Override
 				public void set(Boolean t) {
 					ChatMessages.colorResetCodes = t;
+				}
+				
+			});
+	
+	public final static Option<Boolean> asyncLoaderEnabled = new Option<Boolean>("asynchronous script loading", false)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					ScriptLoader.loadAsync = t;
 				}
 				
 			});

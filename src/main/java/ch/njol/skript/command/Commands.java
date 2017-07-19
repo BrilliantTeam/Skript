@@ -74,6 +74,7 @@ import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.mirre.FilterPrintStream;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Callback;
 import ch.njol.util.NonNullPair;
@@ -318,6 +319,11 @@ public abstract class Commands {
 	
 	@Nullable
 	public final static ScriptCommand loadCommand(final SectionNode node) {
+		return loadCommand(node, true);
+	}
+	
+	@Nullable
+	public final static ScriptCommand loadCommand(final SectionNode node, final boolean alsoRegister) {
 		final String key = node.getKey();
 		if (key == null)
 			return null;
@@ -465,8 +471,10 @@ public abstract class Commands {
 			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage, aliases, permission, permissionMessage, executableBy, ScriptLoader.loadItems(trigger));
 		} finally {
 			Commands.currentArguments = null;
-		}	
-		registerCommand(c);
+		}
+		
+		if (alsoRegister)
+			registerCommand(c);
 		
 		if (Skript.logVeryHigh() && !Skript.debug())
 			Skript.info("registered command " + desc);
