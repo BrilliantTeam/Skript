@@ -234,7 +234,7 @@ final public class ScriptLoader {
 	 * @return Info on the loaded scripts.
 	 */
 	public final static ScriptInfo loadScripts(final List<Config> configs) {
-		Collections.sort(configs);
+		// Do NOT sort here, list must be loaded in order it came in (see issue #667)
 		final ScriptInfo i = new ScriptInfo();
 		final boolean wasLocal = Language.setUseLocal(false);
 		try {
