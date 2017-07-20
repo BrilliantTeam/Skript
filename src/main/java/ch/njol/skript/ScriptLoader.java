@@ -34,6 +34,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -163,6 +164,17 @@ final public class ScriptLoader {
 			functions = numFunctions;
 		}
 		
+		/**
+		 * Copy constructor.
+		 * @param loadedscripts
+		 */
+		public ScriptInfo(ScriptInfo o) {
+			files = o.files;
+			triggers = o.triggers;
+			commands = o.commands;
+			functions = o.functions;
+		}
+
 		public void add(final ScriptInfo other) {
 			files += other.files;
 			triggers += other.triggers;
@@ -175,6 +187,11 @@ final public class ScriptLoader {
 			triggers -= other.triggers;
 			commands -= other.commands;
 			functions -= other.functions;
+		}
+		
+		@Override
+		public String toString() {
+			return "ScriptInfo{files=" + files + ",triggers=" + triggers + ",commands=" + commands + ",functions:" + functions + "}";
 		}
 	}
 	
@@ -214,38 +231,38 @@ final public class ScriptLoader {
 		}
 	}
 	
-	static ScriptInfo loadScripts() {
+	static void loadScripts() {
 		final File scriptsFolder = new File(Skript.getInstance().getDataFolder(), Skript.SCRIPTSFOLDER + File.separator);
 		if (!scriptsFolder.isDirectory())
 			scriptsFolder.mkdirs();
 		
 		final Date start = new Date();
 		
-		final ScriptInfo i;
-		
-		final ErrorDescLogHandler h = SkriptLogger.startLogHandler(new ErrorDescLogHandler(null, null, m_no_errors.toString()));
-		try {
-			Language.setUseLocal(false);
+		Runnable task = () -> {
+			final ScriptInfo i;
 			
-			List<Config> configs = loadStructures(scriptsFolder);
-			i = loadScripts(configs);
-			
-			synchronized (loadedScripts) {
-				loadedScripts.add(i);
+			final ErrorDescLogHandler h = SkriptLogger.startLogHandler(new ErrorDescLogHandler(null, null, m_no_errors.toString()));
+			try {
+				Language.setUseLocal(false);
+				
+				List<Config> configs = loadStructures(scriptsFolder);
+				i = loadScripts(configs);
+			} finally {
+				Language.setUseLocal(true);
+				h.stop();
 			}
-		} finally {
-			Language.setUseLocal(true);
-			h.stop();
-		}
-		
-		if (i.files == 0)
-			Skript.warning(m_no_scripts.toString());
-		if (Skript.logNormal() && i.files > 0)
-			Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
-		
-		SkriptEventHandler.registerBukkitEvents();
-		
-		return i;
+			
+			if (i.files == 0)
+				Skript.warning(m_no_scripts.toString());
+			if (Skript.logNormal() && i.files > 0)
+				Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
+			
+			SkriptEventHandler.registerBukkitEvents();
+		};
+		if (loadAsync)
+			loadQueue.add(task);
+		else
+			task.run();
 	}
 	
 	/**
@@ -265,25 +282,40 @@ final public class ScriptLoader {
 	 * @return Info on the loaded scripts.
 	 */
 	public final static ScriptInfo loadScripts(final List<Config> configs) {
-		// Do NOT sort here, list must be loaded in order it came in (see issue #667)
-		final ScriptInfo i = new ScriptInfo();
-		final boolean wasLocal = Language.setUseLocal(false);
-		try {
-			for (final Config cfg : configs) {
-				assert cfg != null : configs.toString();
-				loadScript(cfg);
-			}
-		} finally {
-			if (wasLocal)
-				Language.setUseLocal(true);
-		}
-		
+		ScriptInfo before;
 		synchronized (loadedScripts) {
-			loadedScripts.add(i);
+			before = new ScriptInfo(loadedScripts);
 		}
 		
-		SkriptEventHandler.registerBukkitEvents();
+		Runnable task = () -> {
+			// Do NOT sort here, list must be loaded in order it came in (see issue #667)
+			final boolean wasLocal = Language.setUseLocal(false);
+			try {
+				for (final Config cfg : configs) {
+					assert cfg != null : configs.toString();
+					loadScript(cfg);
+				}
+			} finally {
+				if (wasLocal)
+					Language.setUseLocal(true);
+			}
+			
+			SkriptEventHandler.registerBukkitEvents();
+		};
+		if (loadAsync && Bukkit.isPrimaryThread())
+			loadQueue.add(task);
+		else
+			task.run();
 		
+		ScriptInfo i;
+		// Calculate how much new stuff we loaded
+		synchronized (loadedScripts) {
+			i = new ScriptInfo(loadedScripts);
+		}
+		i.subtract(before);
+		
+		// If task was ran asynchronously, returned stats may be wrong
+		// This is probably ok, since loadScripts() will go async if needed
 		return i;
 	}
 	
@@ -328,247 +360,243 @@ final public class ScriptLoader {
 			return;
 		}
 		
-		Runnable task = () -> {
-			List<ScriptCommand> commands = new ArrayList<>();
-			List<Function<?>> functions = new ArrayList<>();
-			List<ParsedEventData> events = new ArrayList<>();
+		List<ScriptCommand> commands = new ArrayList<>();
+		List<Function<?>> functions = new ArrayList<>();
+		List<ParsedEventData> events = new ArrayList<>();
+		
+		try {
+			if (SkriptConfig.keepConfigsLoaded.value())
+				SkriptConfig.configs.add(config);
+			
+			currentAliases.clear();
+			currentOptions.clear();
+			currentScript = config;
+			
+//			final SerializedScript script = new SerializedScript();
+			
+			final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
 			
 			try {
-				if (SkriptConfig.keepConfigsLoaded.value())
-					SkriptConfig.configs.add(config);
+				for (final Node cnode : config.getMainNode()) {
+					if (!(cnode instanceof SectionNode)) {
+						Skript.error("invalid line - all code has to be put into triggers");
+						continue;
+					}
+					
+					final SectionNode node = ((SectionNode) cnode);
+					String event = node.getKey();
+					if (event == null)
+						continue;
+					
+					if (event.equalsIgnoreCase("aliases")) {
+						node.convertToEntries(0, "=");
+						for (final Node n : node) {
+							if (!(n instanceof EntryNode)) {
+								Skript.error("invalid line in aliases section");
+								continue;
+							}
+							final ItemType t = Aliases.parseAlias(((EntryNode) n).getValue());
+							if (t == null)
+								continue;
+							currentAliases.put(((EntryNode) n).getKey().toLowerCase(), t);
+						}
+						continue;
+					} else if (event.equalsIgnoreCase("options")) {
+						node.convertToEntries(0);
+						for (final Node n : node) {
+							if (!(n instanceof EntryNode)) {
+								Skript.error("invalid line in options");
+								continue;
+							}
+							currentOptions.put(((EntryNode) n).getKey(), ((EntryNode) n).getValue());
+						}
+						continue;
+					} else if (event.equalsIgnoreCase("variables")) {
+						// TODO allow to make these override existing variables
+						node.convertToEntries(0, "=");
+						for (final Node n : node) {
+							if (!(n instanceof EntryNode)) {
+								Skript.error("Invalid line in variables section");
+								continue;
+							}
+							String name = ((EntryNode) n).getKey().toLowerCase(Locale.ENGLISH);
+							if (name.startsWith("{") && name.endsWith("}"))
+								name = "" + name.substring(1, name.length() - 1);
+							final String var = name;
+							name = StringUtils.replaceAll(name, "%(.+)?%", new Callback<String, Matcher>() {
+								@Override
+								@Nullable
+								public String run(final Matcher m) {
+									if (m.group(1).contains("{") || m.group(1).contains("}") || m.group(1).contains("%")) {
+										Skript.error("'" + var + "' is not a valid name for a default variable");
+										return null;
+									}
+									final ClassInfo<?> ci = Classes.getClassInfoFromUserInput("" + m.group(1));
+									if (ci == null) {
+										Skript.error("Can't understand the type '" + m.group(1) + "'");
+										return null;
+									}
+									return "<" + ci.getCodeName() + ">";
+								}
+							});
+							if (name == null) {
+								continue;
+							} else if (name.contains("%")) {
+								Skript.error("Invalid use of percent signs in variable name");
+								continue;
+							}
+							if (Variables.getVariable(name, null, false) != null)
+								continue;
+							Object o;
+							final ParseLogHandler log = SkriptLogger.startParseLogHandler();
+							try {
+								o = Classes.parseSimple(((EntryNode) n).getValue(), Object.class, ParseContext.SCRIPT);
+								if (o == null) {
+									log.printError("Can't understand the value '" + ((EntryNode) n).getValue() + "'");
+									continue;
+								}
+								log.printLog();
+							} finally {
+								log.stop();
+							}
+							final ClassInfo<?> ci = Classes.getSuperClassInfo(o.getClass());
+							if (ci.getSerializer() == null) {
+								Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
+								continue;
+							} else if (ci.getSerializeAs() != null) {
+								final ClassInfo<?> as = Classes.getExactClassInfo(ci.getSerializeAs());
+								if (as == null) {
+									assert false : ci;
+									continue;
+								}
+								o = Converters.convert(o, as.getC());
+								if (o == null) {
+									Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
+									continue;
+								}
+							}
+							Variables.setVariable(name, o, null, false);
+						}
+						continue;
+					}
+					
+					if (!SkriptParser.validateLine(event))
+						continue;
+					
+					if (event.toLowerCase().startsWith("command ")) {
+						
+						setCurrentEvent("command", CommandEvent.class);
+						
+						final ScriptCommand c = Commands.loadCommand(node, false);
+						if (c != null) {
+							commands.add(c);
+						}
+						
+						deleteCurrentEvent();
+						
+						continue;
+					} else if (event.toLowerCase().startsWith("function ")) {
+						
+						setCurrentEvent("function", FunctionEvent.class);
+						
+						final Function<?> func = Functions.loadFunction(node);
+						if (func != null) {
+							functions.add(func);
+						}
+						
+						deleteCurrentEvent();
+						
+						continue;
+					}
+					
+					if (Skript.logVeryHigh() && !Skript.debug())
+						Skript.info("loading trigger '" + event + "'");
+					
+					if (StringUtils.startsWithIgnoreCase(event, "on "))
+						event = "" + event.substring("on ".length());
+					
+					event = replaceOptions(event);
+					
+					final NonNullPair<SkriptEventInfo<?>, SkriptEvent> parsedEvent = SkriptParser.parseEvent(event, "can't understand this event: '" + node.getKey() + "'");
+					if (parsedEvent == null)
+						continue;
+					
+					if (Skript.debug() || node.debug())
+						Skript.debug(event + " (" + parsedEvent.getSecond().toString(null, true) + "):");
+					
+					setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
+					events.add(new ParsedEventData(parsedEvent, event, node, loadItems(node)));
+				}
+				
+				currentScript = null;
+			} finally {
+				numErrors.stop();
+			}
+		} catch (final Exception e) {
+			Skript.exception(e, "Could not load " + config.getFileName());
+		} finally {
+			SkriptLogger.setNode(null);
+		}
+		
+		// In always sync task, enable stuff
+		Task.callSync(new Callable<Void>() {
+
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public @Nullable Void call() throws Exception {
+				// Track what is loaded
 				int numTriggers = 0;
 				int numCommands = 0;
 				int numFunctions = 0;
 				
-				currentAliases.clear();
-				currentOptions.clear();
-				currentScript = config;
+				// Unload script
+				File file = config.getFile();
+				if (file != null)
+					unloadScript_(file);
 				
-	//			final SerializedScript script = new SerializedScript();
+				// Now, enable everything!
+				for (ScriptCommand command : commands) {
+					assert command != null;
+					Commands.registerCommand(command);
+					numCommands++;
+				}
 				
-				final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
+				for (Function<?> func : functions) {
+					assert func != null;
+					Functions.putFunction(func);
+					numFunctions++;
+				}
 				
-				try {
-					for (final Node cnode : config.getMainNode()) {
-						if (!(cnode instanceof SectionNode)) {
-							Skript.error("invalid line - all code has to be put into triggers");
-							continue;
-						}
-						
-						final SectionNode node = ((SectionNode) cnode);
-						String event = node.getKey();
-						if (event == null)
-							continue;
-						
-						if (event.equalsIgnoreCase("aliases")) {
-							node.convertToEntries(0, "=");
-							for (final Node n : node) {
-								if (!(n instanceof EntryNode)) {
-									Skript.error("invalid line in aliases section");
-									continue;
-								}
-								final ItemType t = Aliases.parseAlias(((EntryNode) n).getValue());
-								if (t == null)
-									continue;
-								currentAliases.put(((EntryNode) n).getKey().toLowerCase(), t);
-							}
-							continue;
-						} else if (event.equalsIgnoreCase("options")) {
-							node.convertToEntries(0);
-							for (final Node n : node) {
-								if (!(n instanceof EntryNode)) {
-									Skript.error("invalid line in options");
-									continue;
-								}
-								currentOptions.put(((EntryNode) n).getKey(), ((EntryNode) n).getValue());
-							}
-							continue;
-						} else if (event.equalsIgnoreCase("variables")) {
-							// TODO allow to make these override existing variables
-							node.convertToEntries(0, "=");
-							for (final Node n : node) {
-								if (!(n instanceof EntryNode)) {
-									Skript.error("Invalid line in variables section");
-									continue;
-								}
-								String name = ((EntryNode) n).getKey().toLowerCase(Locale.ENGLISH);
-								if (name.startsWith("{") && name.endsWith("}"))
-									name = "" + name.substring(1, name.length() - 1);
-								final String var = name;
-								name = StringUtils.replaceAll(name, "%(.+)?%", new Callback<String, Matcher>() {
-									@Override
-									@Nullable
-									public String run(final Matcher m) {
-										if (m.group(1).contains("{") || m.group(1).contains("}") || m.group(1).contains("%")) {
-											Skript.error("'" + var + "' is not a valid name for a default variable");
-											return null;
-										}
-										final ClassInfo<?> ci = Classes.getClassInfoFromUserInput("" + m.group(1));
-										if (ci == null) {
-											Skript.error("Can't understand the type '" + m.group(1) + "'");
-											return null;
-										}
-										return "<" + ci.getCodeName() + ">";
-									}
-								});
-								if (name == null) {
-									continue;
-								} else if (name.contains("%")) {
-									Skript.error("Invalid use of percent signs in variable name");
-									continue;
-								}
-								if (Variables.getVariable(name, null, false) != null)
-									continue;
-								Object o;
-								final ParseLogHandler log = SkriptLogger.startParseLogHandler();
-								try {
-									o = Classes.parseSimple(((EntryNode) n).getValue(), Object.class, ParseContext.SCRIPT);
-									if (o == null) {
-										log.printError("Can't understand the value '" + ((EntryNode) n).getValue() + "'");
-										continue;
-									}
-									log.printLog();
-								} finally {
-									log.stop();
-								}
-								final ClassInfo<?> ci = Classes.getSuperClassInfo(o.getClass());
-								if (ci.getSerializer() == null) {
-									Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
-									continue;
-								} else if (ci.getSerializeAs() != null) {
-									final ClassInfo<?> as = Classes.getExactClassInfo(ci.getSerializeAs());
-									if (as == null) {
-										assert false : ci;
-										continue;
-									}
-									o = Converters.convert(o, as.getC());
-									if (o == null) {
-										Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
-										continue;
-									}
-								}
-								Variables.setVariable(name, o, null, false);
-							}
-							continue;
-						}
-						
-						if (!SkriptParser.validateLine(event))
-							continue;
-						
-						if (event.toLowerCase().startsWith("command ")) {
-							
-							setCurrentEvent("command", CommandEvent.class);
-							
-							final ScriptCommand c = Commands.loadCommand(node, false);
-							if (c != null) {
-								numCommands++;
-								commands.add(c);
-							}
-							
-							deleteCurrentEvent();
-							
-							continue;
-						} else if (event.toLowerCase().startsWith("function ")) {
-							
-							setCurrentEvent("function", FunctionEvent.class);
-							
-							final Function<?> func = Functions.loadFunction(node);
-							if (func != null) {
-								numFunctions++;
-								functions.add(func);
-							}
-							
-							deleteCurrentEvent();
-							
-							continue;
-						}
-						
-						if (Skript.logVeryHigh() && !Skript.debug())
-							Skript.info("loading trigger '" + event + "'");
-						
-						if (StringUtils.startsWithIgnoreCase(event, "on "))
-							event = "" + event.substring("on ".length());
-						
-						event = replaceOptions(event);
-						
-						final NonNullPair<SkriptEventInfo<?>, SkriptEvent> parsedEvent = SkriptParser.parseEvent(event, "can't understand this event: '" + node.getKey() + "'");
-						if (parsedEvent == null)
-							continue;
-						
-						if (Skript.debug() || node.debug())
-							Skript.debug(event + " (" + parsedEvent.getSecond().toString(null, true) + "):");
-						
-						setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
-						events.add(new ParsedEventData(parsedEvent, event, node, loadItems(node)));
-						
-						numTriggers++;
+				for (ParsedEventData event : events) {
+					final Trigger trigger;
+					try {
+						trigger = new Trigger(config.getFile(), event.event, event.info.getSecond(), event.items);
+						trigger.setLineNumber(event.node.getLine()); // Set line number for debugging
+						trigger.setDebugLabel(config.getFileName() + ": line " + event.node.getLine());
+					} finally {
+						deleteCurrentEvent();
 					}
 					
-					if (Skript.logHigh())
-						Skript.info("loaded " + numTriggers + " trigger" + (numTriggers == 1 ? "" : "s") + " and " + numCommands + " command" + (numCommands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
-					
-					currentScript = null;
-				} finally {
-					numErrors.stop();
+					if (event.info.getSecond() instanceof SelfRegisteringSkriptEvent) {
+						((SelfRegisteringSkriptEvent) event.info.getSecond()).register(trigger);
+						SkriptEventHandler.addSelfRegisteringTrigger(trigger);
+					} else {
+						SkriptEventHandler.addTrigger(event.info.getFirst().events, trigger);
+					}
+					numTriggers++;
 				}
+				
 				synchronized (loadedScripts) {
-					loadedScripts.add(new ScriptInfo(1, numTriggers, numCommands, numFunctions));
-				}
-			} catch (final Exception e) {
-				Skript.exception(e, "Could not load " + config.getFileName());
-			} finally {
-				SkriptLogger.setNode(null);
-			}
-			
-			// In always sync task, enable stuff
-			Task.callSync(new Callable<Void>() {
-
-				@Override
-				public @Nullable Void call() throws Exception {
-					// Unload script
-					File file = config.getFile();
-					if (file != null)
-						unloadScript(file);
-					
-					// Now, enable everything!
-					for (ScriptCommand command : commands) {
-						assert command != null;
-						Commands.registerCommand(command);
-					}
-					
-					for (Function<?> func : functions) {
-						assert func != null;
-						Functions.putFunction(func);
-					}
-					
-					for (ParsedEventData event : events) {
-						final Trigger trigger;
-						try {
-							trigger = new Trigger(config.getFile(), event.event, event.info.getSecond(), event.items);
-							trigger.setLineNumber(event.node.getLine()); // Set line number for debugging
-							trigger.setDebugLabel(config.getFileName() + ": line " + event.node.getLine());
-						} finally {
-							deleteCurrentEvent();
-						}
-						
-						if (event.info.getSecond() instanceof SelfRegisteringSkriptEvent) {
-							((SelfRegisteringSkriptEvent) event.info.getSecond()).register(trigger);
-							SkriptEventHandler.addSelfRegisteringTrigger(trigger);
-						} else {
-							SkriptEventHandler.addTrigger(event.info.getFirst().events, trigger);
-						}
-					}
-					
-					return null;
+					// Add 2 "files", since unloadScript reduces file count by 1 for some reason
+					loadedScripts.add(new ScriptInfo(2, numTriggers, numCommands, numFunctions));
 				}
 				
-			});
-		};
-		
-		if (loadAsync)
-			loadQueue.add(task);
-		else
-			task.run();
+				if (Skript.logHigh())
+					Skript.info("loaded " + numTriggers + " trigger" + (numTriggers == 1 ? "" : "s") + " and " + numCommands + " command" + (numCommands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
+				
+				return null;
+			}
+		});
 	}
 	
 	/**
@@ -615,10 +643,15 @@ final public class ScriptLoader {
 	 */
 	@SuppressWarnings("unchecked")
 	public final static @Nullable Config loadStructure(final File f) {
+		if (!f.exists()) { // If file does not exist...
+			unloadScript(f); // ... it might be good idea to unload it now
+			return null;
+		}
+		
 		try {
 			final Config config = new Config(f, true, false, ":");
 			
-			final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
+			//final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
 			
 			try {
 				for (final Node cnode : config.getMainNode()) {
@@ -650,7 +683,7 @@ final public class ScriptLoader {
 				
 				currentScript = null;
 			} finally {
-				numErrors.stop();
+				//numErrors.stop();
 			}
 			SkriptLogger.setNode(null);
 			return config;
@@ -698,7 +731,7 @@ final public class ScriptLoader {
 	final static ScriptInfo unloadScript(final File script) {
 		final ScriptInfo r = unloadScript_(script);
 		Functions.clearFunctions(script);
-		//Functions.validateFunctions();
+		Functions.validateFunctions();
 		return r;
 	}
 	

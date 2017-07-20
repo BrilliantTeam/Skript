@@ -205,6 +205,7 @@ public abstract class Functions {
 		@SuppressWarnings("unchecked")
 		Signature<?> sign = new Signature<>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
 		Functions.signatures.put(name, sign);
+		Skript.debug("Registered function signature: " + name);
 		return sign;
 	}
 	
@@ -263,14 +264,15 @@ public abstract class Functions {
 	 * @param script
 	 * @return How many functions were removed
 	 */
-	public final static int clearFunctions(final File script) {
+	public final static int clearFunctions(final File script, final boolean keepSigns) {
 		int r = 0;
 		final Iterator<FunctionData> iter = functions.values().iterator();
 		while (iter.hasNext()) {
 			final FunctionData d = iter.next();
 			if (d != null && d.function instanceof ScriptFunction && script.equals(((ScriptFunction<?>) d.function).trigger.getScript())) {
 				iter.remove();
-				signatures.remove(d.function.name);
+				if (!keepSigns)
+					signatures.remove(d.function.name);
 				r++;
 				final Iterator<FunctionReference<?>> it = d.calls.iterator();
 				while (it.hasNext()) {
@@ -283,6 +285,16 @@ public abstract class Functions {
 			}
 		}
 		return r;
+	}
+	
+	/**
+	 * Remember to call {@link #validateFunctions()} after calling this
+	 * 
+	 * @param script
+	 * @return How many functions were removed
+	 */
+	public final static int clearFunctions(final File script) {
+		return clearFunctions(script, false);
 	}
 	
 	public final static void validateFunctions() {

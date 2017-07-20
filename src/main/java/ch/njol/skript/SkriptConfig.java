@@ -235,7 +235,8 @@ public abstract class SkriptConfig {
 					ScriptLoader.loadAsync = t;
 				}
 				
-			});
+			})
+			.optional(true);
 	
 	/**
 	 * This should only be used in special cases

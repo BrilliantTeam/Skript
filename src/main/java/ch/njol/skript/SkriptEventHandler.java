@@ -237,7 +237,7 @@ public abstract class SkriptEventHandler {
 		
 		info.commands = Commands.unregisterCommands(script);
 		
-		info.functions = Functions.clearFunctions(script);
+		info.functions = Functions.clearFunctions(script, true);
 		
 		return info;
 	}
