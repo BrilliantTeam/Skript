@@ -217,7 +217,7 @@ public class Updater {
 		private CommandSender sender;
 		
 		public String tryLoadReleases(URL url) throws IOException, SocketTimeoutException {
-			Skript.debug("Trying to load releases from " + url + "...");
+			//Skript.debug("Trying to load releases from " + url + "...");
 			Scanner scan = null;
 			try {
 				scan = new Scanner(url.openStream(), "UTF-8");
@@ -226,7 +226,7 @@ public class Updater {
 					throw new IOException("Null output from scanner!");
 				return out;
 			} finally {
-				Skript.debug("Closing scanner NOW!");
+				//Skript.debug("Closing scanner NOW!");
 				if (scan != null)
 					scan.close();
 			}
@@ -263,7 +263,7 @@ public class Updater {
 		
 		@Override
 		public void run() {
-			Skript.debug("Beginning update checking");
+			//Skript.debug("Beginning update checking");
 			state = UpdateState.CHECKING;
 			
 			URL url = null;
@@ -283,7 +283,7 @@ public class Updater {
 				try {
 					response = tryLoadReleases(url);
 				} catch (SocketTimeoutException e) {
-					Skript.debug("Socket timeout in updater, but we can probably try again!");
+					//Skript.debug("Socket timeout in updater, but we can probably try again!");
 					// Do nothing here, we'll just try again...
 				} catch (IOException e) {
 					error.set(ExceptionUtils.toString(e));
