@@ -182,13 +182,15 @@ public class SkriptCommand implements CommandExecutor {
 							return true;
 						}
 						reloading(sender, "script", f.getName());
-						//ScriptLoader.unloadScript(f);
+						if (!ScriptLoader.loadAsync)
+							ScriptLoader.unloadScript(f);
 						Config config = ScriptLoader.loadStructure(f);
 						ScriptLoader.loadScripts(config);
 						reloaded(sender, r, "script", f.getName());
 					} else {
 						reloading(sender, "scripts in folder", f.getName());
-						//final int disabled = ScriptLoader.unloadScripts(f).files;
+						if (!ScriptLoader.loadAsync)
+							ScriptLoader.unloadScripts(f);
 						List<Config> configs = ScriptLoader.loadStructures(f);
 						final int enabled = ScriptLoader.loadScripts(configs).files;
 						if (enabled == 0)

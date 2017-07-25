@@ -26,9 +26,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -205,9 +207,31 @@ final public class ScriptLoader {
 	private static String indentation = "";
 	
 	// Load scripts in separate (one) thread
-	static BlockingQueue<Runnable> loadQueue = new ArrayBlockingQueue<>(20, true);
-	static Thread loaderThread;
-	static boolean loadAsync;
+	static final BlockingQueue<Runnable> loadQueue = new ArrayBlockingQueue<>(20, true);
+	static final Thread loaderThread;
+	static boolean loadAsync; // See below
+	
+	/**
+	 * Checks if scripts are loaded in separate thread. If true,
+	 * following behavior should be expected:
+	 * <ul>
+	 * <li>Scripts are still unloaded and enabled in server thread
+	 * <li>When reloading a script, old version is unloaded <i>after</i> it has
+	 * been parsed, immediately before it has been loaded
+	 * <li>When reloading all scripts, scripts that were removed are disabled
+	 * after everything has been reloaded
+	 * <li>Script infos returned by most methods are inaccurate
+	 * @return If main thread is not blocked when loading.
+	 */
+	public static boolean isAsync() {
+		return loadAsync;
+	}
+	
+	/**
+	 * All loaded script files.
+	 */
+	@SuppressWarnings("null")
+	static final Set<File> loadedFiles = Collections.synchronizedSet(new HashSet<>());
 	
 	// Initialize and start load thread
 	static {
@@ -239,6 +263,8 @@ final public class ScriptLoader {
 		final Date start = new Date();
 		
 		Runnable task = () -> {
+			final Set<File> oldLoadedFiles = new HashSet<>(loadedFiles);
+			
 			final ScriptInfo i;
 			
 			final ErrorDescLogHandler h = SkriptLogger.startLogHandler(new ErrorDescLogHandler(null, null, m_no_errors.toString()));
@@ -250,6 +276,20 @@ final public class ScriptLoader {
 			} finally {
 				Language.setUseLocal(true);
 				h.stop();
+			}
+			
+			// Now, make sure that old files that are no longer there are unloaded
+			// Only if this is done using async loading, though!
+			if (loadAsync) {
+				oldLoadedFiles.removeAll(loadedFiles);
+				for (File script : oldLoadedFiles) {
+					assert script != null;
+					
+					// Use internal unload method which does not call validateFunctions()
+					unloadScript_(script);
+					Functions.clearFunctions(script);
+				}
+				Functions.validateFunctions(); // Manually validate functions
 			}
 			
 			if (i.files == 0)
@@ -282,10 +322,7 @@ final public class ScriptLoader {
 	 * @return Info on the loaded scripts.
 	 */
 	public final static ScriptInfo loadScripts(final List<Config> configs) {
-		ScriptInfo before;
-		synchronized (loadedScripts) {
-			before = new ScriptInfo(loadedScripts);
-		}
+		ScriptInfo i = new ScriptInfo();
 		
 		Runnable task = () -> {
 			// Do NOT sort here, list must be loaded in order it came in (see issue #667)
@@ -293,7 +330,7 @@ final public class ScriptLoader {
 			try {
 				for (final Config cfg : configs) {
 					assert cfg != null : configs.toString();
-					loadScript(cfg);
+					i.add(loadScript(cfg));
 				}
 			} finally {
 				if (wasLocal)
@@ -306,13 +343,6 @@ final public class ScriptLoader {
 			loadQueue.add(task);
 		else
 			task.run();
-		
-		ScriptInfo i;
-		// Calculate how much new stuff we loaded
-		synchronized (loadedScripts) {
-			i = new ScriptInfo(loadedScripts);
-		}
-		i.subtract(before);
 		
 		// If task was ran asynchronously, returned stats may be wrong
 		// This is probably ok, since loadScripts() will go async if needed
@@ -355,14 +385,20 @@ final public class ScriptLoader {
 	 * @return Info about script that is loaded
 	 */
 	@SuppressWarnings("unchecked")
-	private final static void loadScript(final @Nullable Config config) {
+	private final static ScriptInfo loadScript(final @Nullable Config config) {
 		if (config == null) { // Something bad happened, hopefully got logged to console
-			return;
+			return new ScriptInfo();
 		}
 		
+		// When something is parsed, it goes there to be loaded later
 		List<ScriptCommand> commands = new ArrayList<>();
 		List<Function<?>> functions = new ArrayList<>();
 		List<ParsedEventData> events = new ArrayList<>();
+		
+		// Track what is loaded
+		int numTriggers = 0;
+		int numCommands = 0;
+		int numFunctions = 0;
 		
 		try {
 			if (SkriptConfig.keepConfigsLoaded.value())
@@ -491,6 +527,7 @@ final public class ScriptLoader {
 						if (c != null) {
 							commands.add(c);
 						}
+						numCommands++;
 						
 						deleteCurrentEvent();
 						
@@ -503,6 +540,7 @@ final public class ScriptLoader {
 						if (func != null) {
 							functions.add(func);
 						}
+						numFunctions++;
 						
 						deleteCurrentEvent();
 						
@@ -526,7 +564,12 @@ final public class ScriptLoader {
 					
 					setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
 					events.add(new ParsedEventData(parsedEvent, event, node, loadItems(node)));
+					
+					numTriggers++;
 				}
+				
+				if (Skript.logHigh())
+					Skript.info("loaded " + numTriggers + " trigger" + (numTriggers == 1 ? "" : "s") + " and " + numCommands + " command" + (numCommands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
 				
 				currentScript = null;
 			} finally {
@@ -543,28 +586,24 @@ final public class ScriptLoader {
 
 			@SuppressWarnings("synthetic-access")
 			@Override
-			public @Nullable Void call() throws Exception {
-				// Track what is loaded
-				int numTriggers = 0;
-				int numCommands = 0;
-				int numFunctions = 0;
-				
-				// Unload script
+			public @Nullable Void call() throws Exception {				
+				// Unload script IF we're doing async stuff
+				// (else it happened already)
 				File file = config.getFile();
-				if (file != null)
-					unloadScript_(file);
+				if (loadAsync) {
+					if (file != null)
+						unloadScript_(file);
+				}
 				
 				// Now, enable everything!
 				for (ScriptCommand command : commands) {
 					assert command != null;
 					Commands.registerCommand(command);
-					numCommands++;
 				}
 				
 				for (Function<?> func : functions) {
 					assert func != null;
 					Functions.putFunction(func);
-					numFunctions++;
 				}
 				
 				for (ParsedEventData event : events) {
@@ -583,20 +622,16 @@ final public class ScriptLoader {
 					} else {
 						SkriptEventHandler.addTrigger(event.info.getFirst().events, trigger);
 					}
-					numTriggers++;
 				}
 				
-				synchronized (loadedScripts) {
-					// Add 2 "files", since unloadScript reduces file count by 1 for some reason
-					loadedScripts.add(new ScriptInfo(2, numTriggers, numCommands, numFunctions));
-				}
-				
-				if (Skript.logHigh())
-					Skript.info("loaded " + numTriggers + " trigger" + (numTriggers == 1 ? "" : "s") + " and " + numCommands + " command" + (numCommands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
+				// Add to loaded files to use for future reloads
+				loadedFiles.add(file);
 				
 				return null;
 			}
 		});
+		
+		return new ScriptInfo(1, numTriggers, numCommands, numFunctions);
 	}
 	
 	/**
@@ -736,11 +771,17 @@ final public class ScriptLoader {
 	}
 	
 	private final static ScriptInfo unloadScript_(final File script) {
-		final ScriptInfo info = SkriptEventHandler.removeTriggers(script);
-		synchronized (loadedScripts) {
-			loadedScripts.subtract(info);
+		if (loadedFiles.contains(script)) {
+			final ScriptInfo info = SkriptEventHandler.removeTriggers(script); // Remove triggers
+			synchronized (loadedScripts) { // Update script info
+				loadedScripts.subtract(info);
+			}
+			
+			loadedFiles.remove(script); // We just unloaded it, so...
+			return info; // Return how much we unloaded
 		}
-		return info;
+		
+		return new ScriptInfo(); // Return that we unloaded literally nothing
 	}
 	
 	public final static String replaceOptions(final String s) {
