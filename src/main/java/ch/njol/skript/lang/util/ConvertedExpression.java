@@ -25,6 +25,7 @@ import java.util.NoSuchElementException;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.ClassInfo;
@@ -173,8 +174,9 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 			@Override
 			public boolean check(final F f) {
 				final T t = conv.convert(f);
-				if (t == null)
-					return false;
+				if (t == null) {
+					return c.check((T) f);
+				}
 				return c.check(t);
 			}
 		});
