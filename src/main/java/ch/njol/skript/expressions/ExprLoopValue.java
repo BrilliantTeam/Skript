@@ -20,6 +20,7 @@
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -141,6 +142,7 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 				@Override
 				@Nullable
 				public R convert(final Object o) {
+					Skript.info("Attempt to convert " + o.getClass() + " to " + Arrays.toString(to));
 					return Converters.convert(o, to);
 				}
 			});

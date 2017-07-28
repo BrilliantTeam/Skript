@@ -326,38 +326,17 @@ public class SkriptParser {
 							return (Expression<? extends T>) e;
 						}
 					}
+					
 					// No directly same type found
-					if (e instanceof Variable) {
-						// This block fixes long-standing parser bug with variables
-						// that made vector support very hard to adds
-						
-						/*
-						 * Variables need special handling. We do not yet know
-						 * type of them, so creating converted expression
-						 * always succeeds. The problem? Getting stuff from
-						 * that expression may result null, if variable was of
-						 * different type.
-						 * 
-						 * This would work... except the expressions may accept
-						 * multiple types (%type1/type2/type3%). Which one we
-						 * choose to create converter for? No of them.
-						 * 
-						 * Instead, we just ask variable to give converted
-						 * expression with all types. 
-						 */
-						
-						// Java generics... Lots of FUN!
-						Class<T>[] objTypes = (Class<T>[]) types;
-						return e.getConvertedExpression(objTypes);
-					} else {
-						// Non-variables are easy, as we know their types
-						for (final Class<? extends T> t : types) {
-							final Expression<? extends T> r = e.getConvertedExpression(t);
-							if (r != null) {
-								log.printLog();
-								return r;
-							}
-						}
+					Class<T>[] objTypes = (Class<T>[]) types; // Java generics... ?
+					Skript.info("e is: " + e.getReturnType());
+					Skript.info("trying with: " + Arrays.toString(objTypes));
+					Thread.dumpStack();
+					final Expression<? extends T> r = e.getConvertedExpression(objTypes);
+					if (r != null) {
+						Skript.info("e after: " + r.getReturnType());
+						log.printLog();
+						return r;
 					}
 					// Print errors, if we couldn't get the correct type
 					log.printError(e.toString(null, false) + " " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);

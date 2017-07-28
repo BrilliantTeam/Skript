@@ -20,6 +20,7 @@
 package ch.njol.skript.lang.util;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.bukkit.event.Event;
@@ -203,6 +204,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public final <R> Expression<? extends R> getConvertedExpression(final Class<R>... to) {
+		Skript.info("to is" + Arrays.toString(to));
 		if (CollectionUtils.containsSuperclass(to, getReturnType()))
 			return (Expression<? extends R>) this;
 		return this.getConvertedExpr(to);
