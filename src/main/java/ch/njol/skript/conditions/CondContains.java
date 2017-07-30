@@ -99,11 +99,9 @@ public class CondContains extends Condition {
 	public boolean check(final Event e) {
 		boolean caseSensitive = SkriptConfig.caseSensitive.value();
 		
-		Skript.info("Checking..." + containers + "; " + containers.getClass());
 		return containers.check(e, new Checker<Object>() {
 			@Override
 			public boolean check(final Object container) {
-				Skript.info("container: " + container.getClass());
 				if (containers instanceof Variable && !containers.isSingle()) {
 					return items.check(e, new Checker<Object>() {
 						@Override
@@ -125,8 +123,6 @@ public class CondContains extends Condition {
 						return items.check(e, new Checker<Object>() {
 							@Override
 							public boolean check(final Object type) {
-								Skript.info("s: " + s);
-								Skript.info("type: " + type + "; " + type.getClass());
 								if (type instanceof Variable) {
 									@SuppressWarnings("unchecked")
 									String toFind = ((Variable<String>) type).getSingle(e);
