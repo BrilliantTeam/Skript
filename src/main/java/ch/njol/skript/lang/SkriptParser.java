@@ -33,6 +33,8 @@ import java.util.regex.PatternSyntaxException;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.bekvon.bukkit.residence.commands.info;
+
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
@@ -371,31 +373,108 @@ public class SkriptParser {
 	}
 	
 	@Nullable
-	private final <T> Expression<?> parseSingleExpr(final boolean allowUnparsedLiteral, @Nullable final LogEntry error, final ExprInfo vi) {
-		if (expr.isEmpty())
+	private final Expression<?> parseSingleExpr(final boolean allowUnparsedLiteral, @Nullable final LogEntry error, final ExprInfo vi) {
+		if (expr.isEmpty()) // Empty expressions return nothing, obviously
 			return null;
+		
+		// Command special parsing
 		if (context != ParseContext.COMMAND && expr.startsWith("(") && expr.endsWith(")") && next(expr, 0, context) == expr.length())
 			return new SkriptParser(this, "" + expr.substring(1, expr.length() - 1)).parseSingleExpr(allowUnparsedLiteral, error, vi);
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
+			// Construct types array which contains all potential classes
+			final Class<?>[] types = new Class[vi.classes.length]; // This may contain nulls!
+			boolean hasSingular = false;
+			boolean hasPlural = false;
+			
+			// Another array for all potential types, but this time without any nulls
+			// (indexes do not align with other data in ExprInfo)
+			final Class<?>[] nonNullTypes = new Class[vi.classes.length];
+			
+			int nonNullIndex = 0;
+			for (int i = 0; i < types.length; i++) {
+				if ((flags & vi.flagMask) == 0) { // Flag mask invalidates this, skip it
+					continue;
+				}
+				
+				// Plural/singular checks
+				// TODO move them elsewhere, this method needs to be as fast as possible
+				if (vi.isPlural[i])
+					hasPlural = true;
+				else
+					hasSingular = true;
+				
+				// Actually put class to types[i]
+				types[i] = vi.classes[i].getC();
+				
+				// Handle nonNullTypes data fill
+				nonNullTypes[nonNullIndex] = types[i];
+				nonNullIndex++;
+			}
+			
+			boolean onlyPlural = false;
+			boolean onlySingular = false;
+			if (hasSingular && !hasPlural)
+				onlySingular = true;
+			else if (!hasSingular && hasPlural)
+				onlyPlural = true;
+			
 			if (context == ParseContext.DEFAULT || context == ParseContext.EVENT) {
-				final Variable<? extends T> var = parseVariable(expr, types);
-				if (var != null) {
-					if ((flags & PARSE_EXPRESSIONS) == 0) {
-						Skript.error("Variables cannot be used here.");
+				// Attempt to parse variable first
+				if (onlySingular || onlyPlural) { // No mixed plurals/singulars possible
+					final Variable<?> var = parseVariable(expr, nonNullTypes);
+					if (var != null) { // Parsing succeeded, we have a variable
+						// If variables cannot be used here, it is now allowed
+						if ((flags & PARSE_EXPRESSIONS) == 0) {
+							Skript.error("Variables cannot be used here.");
+							log.printError();
+							return null;
+						}
+						
+						// Plural/singular sanity check
+						if (hasSingular && !var.isSingle()) {
+							Skript.error("'" + expr + "' can only accept a single value of any type, not more", ErrorQuality.SEMANTIC_ERROR);
+						}
+						
+						log.printLog();
+						return var;
+					} else if (log.hasError()) {
 						log.printError();
 						return null;
 					}
-					log.printLog();
-					return var;
-				} else if (log.hasError()) {
-					log.printError();
-					return null;
+				} else { // Mixed plurals/singulars
+					for (int i = 0; i < types.length; i++) {
+						if (types[i] == null)
+							continue;
+						@SuppressWarnings("unchecked")
+						final Variable<?> var = parseVariable(expr, new Class[] {types[i]});
+						if (var != null) { // Parsing succeeded, we have a variable
+							// If variables cannot be used here, it is now allowed
+							if ((flags & PARSE_EXPRESSIONS) == 0) {
+								Skript.error("Variables cannot be used here.");
+								log.printError();
+								return null;
+							}
+							
+							// Plural/singular sanity check
+							if (!vi.isPlural[i] && !var.isSingle()) {
+								Skript.error("'" + expr + "' can only accept a single " + vi.classes[i].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
+							}
+							
+							log.printLog();
+							return var;
+						} else if (log.hasError()) {
+							log.printError();
+							return null;
+						}
+					}
 				}
-				final FunctionReference<T> fr = parseFunction(types);
+				
+				// If it wasn't variable, do same for function call
+				final FunctionReference<?> fr = parseFunction(types);
 				if (fr != null) {
 					log.printLog();
-					return new ExprFunctionCall(fr);
+					return new ExprFunctionCall<>(fr);
 				} else if (log.hasError()) {
 					log.printError();
 					return null;
@@ -410,21 +489,46 @@ public class SkriptParser {
 					e = (Expression<?>) parse(expr, (Iterator) Skript.getExpressions(types), null);
 				}
 				if (e != null) { // Expression/VariableString parsing success
-					for (final Class<? extends T> t : types) {
+					Class<?> returnType = e.getReturnType(); // Sometimes getReturnType does non-trivial costly operations
+					assert returnType != null;
+					for (int i = 0; i < types.length; i++) {
+						final Class<?> t = types[i];
+						if (t == null) // Ignore invalid (null) types
+							continue;
+						
 						// Check return type against everything that expression accepts
-						if (t.isAssignableFrom(e.getReturnType())) {
+						if (t.isAssignableFrom(returnType)) {
+							if (!vi.isPlural[i] && !e.isSingle()) { // Wrong number of arguments
+								if (context == ParseContext.COMMAND) {
+									Skript.error(Commands.m_too_many_arguments.toString(vi.classes[i].getName().getIndefiniteArticle(), vi.classes[i].getName().toString()), ErrorQuality.SEMANTIC_ERROR);
+									return null;
+								} else {
+									Skript.error("'" + expr + "' can only accept a single " + vi.classes[i].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
+									return null;
+								}
+							}
+							
 							log.printLog();
-							return (Expression<? extends T>) e;
+							return e;
 						}
 					}
 					
 					// No directly same type found
-					Class<T>[] objTypes = (Class<T>[]) types; // Java generics... ?
-					final Expression<? extends T> r = e.getConvertedExpression(objTypes);
-					if (r != null) {
-						log.printLog();
-						return r;
+					if (types.length == 1) { // Only one type is accepted here
+						// So, we'll just create converted expression
+						@SuppressWarnings("unchecked") // This is safe... probably
+						Expression<?> r = e.getConvertedExpression((Class<Object>[]) types);
+						if (r != null) {
+							log.printLog();
+							return r;
+						}
+					} else { // Multiple types accepted
+						if (returnType == Object.class) { // No specific return type, so probably variable etc.
+							log.printLog();
+							return e; // Expression will have to deal with it runtime
+						}
 					}
+
 					// Print errors, if we couldn't get the correct type
 					log.printError(e.toString(null, false) + " " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
 					return null;
@@ -668,7 +772,7 @@ public class SkriptParser {
 	}
 	
 	@Nullable
-	public final <T> Expression<?> parseExpression(final ExprInfo vi) {
+	public final Expression<?> parseExpression(final ExprInfo vi) {
 		if (expr.length() == 0)
 			return null;
 		
@@ -682,17 +786,18 @@ public class SkriptParser {
 					final SkriptParser p = new SkriptParser(expr, PARSE_LITERALS, context);
 					p.suppressMissingAndOrWarnings = suppressMissingAndOrWarnings; // If we suppress warnings here, we suppress them in parser what we created too
 					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
+						@SuppressWarnings("unchecked")
 						final Expression<?> e = p.parseExpression(c);
 						if (e != null) {
 							log.printLog();
-							return (Expression<? extends T>) e;
+							return e;
 						}
 						log.clear();
 					}
 				}
 			}
 			//Mirre
-			final Expression<? extends T> r = parseSingleExpr(false, null, vi);
+			final Expression<?> r = parseSingleExpr(false, null, vi);
 			if (r != null) {
 				log.printLog();
 				return r;
@@ -731,7 +836,7 @@ public class SkriptParser {
 				if (isObject && (flags & PARSE_LITERALS) != 0) { // single expression - can return an UnparsedLiteral now
 					log.clear();
 					log.printLog();
-					return (Expression<? extends T>) new UnparsedLiteral(expr, log.getError());
+					return new UnparsedLiteral(expr, log.getError());
 				}
 				// results in useless errors most of the time
 //				log.printError("'" + expr + "' " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
@@ -838,13 +943,13 @@ public class SkriptParser {
 				exprRetTypes[i] = ts.get(i).getReturnType();
 			
 			if (isLiteralList) {
-				final Literal<T>[] ls = ts.toArray(new Literal[ts.size()]);
+				final Literal<?>[] ls = ts.toArray(new Literal[ts.size()]);
 				assert ls != null;
-				return new LiteralList<>(ls, (Class<T>) Utils.getSuperType(exprRetTypes), !and.isFalse());
+				return new LiteralList(ls, Utils.getSuperType(exprRetTypes), !and.isFalse());
 			} else {
-				final Expression<T>[] es = ts.toArray(new Expression[ts.size()]);
+				final Expression<?>[] es = ts.toArray(new Expression[ts.size()]);
 				assert es != null;
-				return new ExpressionList<>(es, (Class<T>) Utils.getSuperType(exprRetTypes), !and.isFalse());
+				return new ExpressionList(es, Utils.getSuperType(exprRetTypes), !and.isFalse());
 			}
 		} finally {
 			log.stop();
@@ -1401,39 +1506,33 @@ public class SkriptParser {
 							if (res != null) {
 								final ParseLogHandler log2 = SkriptLogger.startParseLogHandler();
 								try { // Loop over all types that could go here
-									for (int k = 0; k < vi.classes.length; k++) {
-										if ((flags & vi.flagMask) == 0)
-											continue;
-										log2.clear();
-										@SuppressWarnings("unchecked")
-										final Expression<?> e = new SkriptParser("" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi.classes[k].getC());
-										if (e != null) {
-											if (!vi.isPlural[k] && !e.isSingle()) { // Wrong number of arguments
-												if (context == ParseContext.COMMAND) {
-													Skript.error(Commands.m_too_many_arguments.toString(vi.classes[k].getName().getIndefiniteArticle(), vi.classes[k].getName().toString()), ErrorQuality.SEMANTIC_ERROR);
-													return null;
-												} else {
-													Skript.error("'" + expr.substring(0, i) + "<...>" + expr.substring(i2) + "' can only accept a single " + vi.classes[k].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
-													return null;
-												}
+									final Expression<?> e = new SkriptParser("" + expr.substring(i, i2), flags & vi.flagMask, context).parseExpression(vi);
+									if (e != null) {
+//										if (!vi.isPlural[k] && !e.isSingle()) { // Wrong number of arguments
+//											if (context == ParseContext.COMMAND) {
+//												Skript.error(Commands.m_too_many_arguments.toString(vi.classes[k].getName().getIndefiniteArticle(), vi.classes[k].getName().toString()), ErrorQuality.SEMANTIC_ERROR);
+//												return null;
+//											} else {
+//												Skript.error("'" + expr.substring(0, i) + "<...>" + expr.substring(i2) + "' can only accept a single " + vi.classes[k].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
+//												return null;
+//											}
+//										}
+										if (vi.time != 0) {
+											if (e instanceof Literal<?>)
+												return null;
+											if (ScriptLoader.hasDelayBefore == Kleenean.TRUE) {
+												Skript.error("Cannot use time states after the event has already passed", ErrorQuality.SEMANTIC_ERROR);
+												return null;
 											}
-											if (vi.time != 0) {
-												if (e instanceof Literal<?>)
-													return null;
-												if (ScriptLoader.hasDelayBefore == Kleenean.TRUE) {
-													Skript.error("Cannot use time states after the event has already passed", ErrorQuality.SEMANTIC_ERROR);
-													return null;
-												}
-												if (!e.setTime(vi.time)) {
-													Skript.error(e + " does not have a " + (vi.time == -1 ? "past" : "future") + " state", ErrorQuality.SEMANTIC_ERROR);
-													return null;
-												}
+											if (!e.setTime(vi.time)) {
+												Skript.error(e + " does not have a " + (vi.time == -1 ? "past" : "future") + " state", ErrorQuality.SEMANTIC_ERROR);
+												return null;
 											}
-											log2.printLog();
-											log.printLog();
-											res.exprs[countUnescaped(pattern, '%', 0, j) / 2] = e;
-											return res;
 										}
+										log2.printLog();
+										log.printLog();
+										res.exprs[countUnescaped(pattern, '%', 0, j) / 2] = e;
+										return res;
 									}
 									// results in useless errors most of the time
 //									Skript.error("'" + expr.substring(i, i2) + "' is " + notOfType(vi.classes), ErrorQuality.NOT_AN_EXPRESSION);
