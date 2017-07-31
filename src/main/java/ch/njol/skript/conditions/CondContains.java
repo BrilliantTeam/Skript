@@ -67,7 +67,6 @@ public class CondContains extends Condition {
 	@SuppressWarnings({"unchecked", "null", "unused"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		Skript.info("containers first: " + exprs[0].getReturnType());
 		containers = exprs[0].getConvertedExpression(Object.class);
 		if (containers == null)
 			return false;

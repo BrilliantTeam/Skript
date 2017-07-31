@@ -71,6 +71,7 @@ public class FunctionReference<T> {
 	
 	@SuppressWarnings("unchecked")
 	public boolean validateFunction(final boolean first) {
+		Skript.debug("Validating function " + functionName);
 		final Signature<?> sign = Functions.getSignature(functionName);
 		final Function<?> newFunc = Functions.getFunction(functionName);
 		SkriptLogger.setNode(node);
@@ -82,10 +83,6 @@ public class FunctionReference<T> {
 						+ " These will continue to use the old version of the function until Skript restarts.");
 			return false;
 		}
-		
-		// Intentional ==, as they must be same instances!
-		if (newFunc == function)
-			return true;
 		
 		final Class<? extends T>[] returnTypes = this.returnTypes;
 		if (returnTypes != null) {

@@ -142,7 +142,6 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 				@Override
 				@Nullable
 				public R convert(final Object o) {
-					Skript.info("Attempt to convert " + o.getClass() + " to " + Arrays.toString(to));
 					return Converters.convert(o, to);
 				}
 			});
