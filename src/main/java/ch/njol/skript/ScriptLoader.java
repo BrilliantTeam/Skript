@@ -582,7 +582,7 @@ final public class ScriptLoader {
 		}
 		
 		// In always sync task, enable stuff
-		Task.callSync(new Callable<Void>() {
+		Callable<Void> callable = new Callable<Void>() {
 
 			@SuppressWarnings("synthetic-access")
 			@Override
@@ -629,7 +629,16 @@ final public class ScriptLoader {
 				
 				return null;
 			}
-		});
+		};
+		if (loadAsync) { // Need to delegate to main thread
+			Task.callSync(callable);
+		} else { // We are in main thread, execute immediately
+			try {
+				callable.call();
+			} catch (Exception e) {
+				Skript.exception(e);
+			}
+		}
 		
 		return new ScriptInfo(1, numTriggers, numCommands, numFunctions);
 	}
