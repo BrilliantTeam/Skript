@@ -562,8 +562,11 @@ final public class ScriptLoader {
 					if (Skript.debug() || node.debug())
 						Skript.debug(event + " (" + parsedEvent.getSecond().toString(null, true) + "):");
 					
-					setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
 					events.add(new ParsedEventData(parsedEvent, event, node, loadItems(node)));
+					
+					if (parsedEvent.getSecond() instanceof SelfRegisteringSkriptEvent) {
+						((SelfRegisteringSkriptEvent) parsedEvent.getSecond()).afterParse(config);
+					}
 					
 					numTriggers++;
 				}
@@ -607,6 +610,8 @@ final public class ScriptLoader {
 				}
 				
 				for (ParsedEventData event : events) {
+					setCurrentEvent("" + event.info.getFirst().getName().toLowerCase(Locale.ENGLISH), event.info.getFirst().events);
+					
 					final Trigger trigger;
 					try {
 						trigger = new Trigger(config.getFile(), event.event, event.info.getSecond(), event.items);
@@ -622,6 +627,8 @@ final public class ScriptLoader {
 					} else {
 						SkriptEventHandler.addTrigger(event.info.getFirst().events, trigger);
 					}
+					
+					deleteCurrentEvent();
 				}
 				
 				// Add to loaded files to use for future reloads
