@@ -45,6 +45,9 @@ body {
   font-weight: bold;
   white-space: nowrap;
   overflow: auto;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
 }
 
 #global-navigation a{
@@ -64,7 +67,7 @@ nav{
   list-style: none;
   background-color: #e6f7ff;
   padding:10px;
-  margin-top: 0px;
+  margin-top: 50px;
 
 }
 
@@ -72,6 +75,11 @@ nav{
   font-weight: bold;
   border-bottom: solid 2px #00aeff;
   margin-bottom: 10px;
+  position: fixed;
+}
+
+#nav-contents{
+  padding-top: 30px;
 }
 
 nav p {
@@ -91,6 +99,7 @@ nav p a:hover{
 #content{
   background-color:#e6f7ff;
   padding:20px;
+  padding-top:50px;
 }
 
 .item-title{
