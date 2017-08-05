@@ -562,7 +562,12 @@ final public class ScriptLoader {
 					if (Skript.debug() || node.debug())
 						Skript.debug(event + " (" + parsedEvent.getSecond().toString(null, true) + "):");
 					
-					events.add(new ParsedEventData(parsedEvent, event, node, loadItems(node)));
+					try {
+						setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
+						events.add(new ParsedEventData(parsedEvent, event, node, loadItems(node)));
+					} finally {
+						deleteCurrentEvent();
+					}
 					
 					if (parsedEvent.getSecond() instanceof SelfRegisteringSkriptEvent) {
 						((SelfRegisteringSkriptEvent) parsedEvent.getSecond()).afterParse(config);
