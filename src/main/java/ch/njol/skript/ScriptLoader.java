@@ -761,7 +761,7 @@ final public class ScriptLoader {
 	 */
 	final static ScriptInfo unloadScripts(final File folder) {
 		final ScriptInfo r = unloadScripts_(folder);
-		Functions.validateFunctions();
+		//Functions.validateFunctions();
 		return r;
 	}
 	
