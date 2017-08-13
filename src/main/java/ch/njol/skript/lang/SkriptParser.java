@@ -528,6 +528,12 @@ public class SkriptParser {
 						if (returnType == Object.class) { // No specific return type, so probably variable etc.
 							log.printLog();
 							return e; // Expression will have to deal with it runtime
+						} else {
+							Expression<?> r = e.getConvertedExpression((Class<Object>[]) types);
+							if (r != null) {
+								log.printLog();
+								return r;
+							}
 						}
 					}
 
