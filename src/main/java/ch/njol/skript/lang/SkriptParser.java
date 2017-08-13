@@ -22,9 +22,11 @@ package ch.njol.skript.lang;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1737,7 +1739,19 @@ public class SkriptParser {
 		int time = 0;
 	}
 	
+	private static final Map<String,ExprInfo> exprInfoCache = new HashMap<>();
+	
 	private static ExprInfo getExprInfo(String s) throws MalformedPatternException, IllegalArgumentException, SkriptAPIException {
+		ExprInfo r = exprInfoCache.get(s);
+		if (r == null) {
+			r = createExprInfo(s);
+			exprInfoCache.put(s, r);
+		}
+		
+		return r;
+	}
+	
+	private static ExprInfo createExprInfo(String s) throws MalformedPatternException, IllegalArgumentException, SkriptAPIException {
 		final ExprInfo r = new ExprInfo(StringUtils.count(s, '/') + 1);
 		r.isOptional = s.startsWith("-");
 		if (r.isOptional)
