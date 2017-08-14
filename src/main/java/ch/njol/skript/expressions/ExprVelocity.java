@@ -46,7 +46,7 @@ import ch.njol.util.Kleenean;
 @Since("INSERT VERSION")
 public class ExprVelocity extends SimplePropertyExpression<Entity, Vector> {
 	static {
-		Skript.registerExpression(ExprVelocity.class, Vector.class, ExpressionType.PROPERTY, "(velocity|acceleration)");
+		register(ExprVelocity.class, Vector.class, "velocity", "entity");
 	}
 	
 	@Override
@@ -62,7 +62,7 @@ public class ExprVelocity extends SimplePropertyExpression<Entity, Vector> {
 	@Override
 	@SuppressWarnings("null")
 	public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
-		if ((mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.ADD || mode == Changer.ChangeMode.REMOVE || mode == Changer.ChangeMode.DELETE) && getExpr().isSingle() && Changer.ChangerUtils.acceptsChange(getExpr(), Changer.ChangeMode.SET, Vector.class))
+		if ((mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.ADD || mode == Changer.ChangeMode.REMOVE || mode == Changer.ChangeMode.DELETE))
 			return new Class[] {Number.class};
 		return null;
 	}
