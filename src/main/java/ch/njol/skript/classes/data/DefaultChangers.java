@@ -201,7 +201,7 @@ public class DefaultChangers {
 				switch (mode) {
 					case DELETE:
 						invi.clear();
-						if (invi instanceof PlayerInventory) {
+						if (ItemType.oldInvSize && invi instanceof PlayerInventory) {
 							((PlayerInventory) invi).setArmorContents(new ItemStack[4]);
 							if (((PlayerInventory) invi).getHolder() instanceof Player) {
 								final Player p = (Player) ((PlayerInventory) invi).getHolder();
