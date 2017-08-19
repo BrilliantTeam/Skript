@@ -54,7 +54,6 @@ public abstract class Functions {
 	
 	final static class FunctionData {
 		final Function<?> function;
-		final Collection<FunctionReference<?>> calls = new ArrayList<>();
 		
 		public FunctionData(final Function<?> function) {
 			this.function = function;
@@ -91,9 +90,9 @@ public abstract class Functions {
 	}
 	
 	final static void registerCaller(final FunctionReference<?> r) {
-		final FunctionData d = functions.get(r.functionName);
-		assert d != null;
-		d.calls.add(r);
+		final Signature<?> sign = signatures.get(r.functionName);
+		assert sign != null;
+		sign.calls.add(r);
 	}
 	
 	public final static String functionNamePattern = "[\\p{IsAlphabetic}][\\p{IsAlphabetic}\\p{IsDigit}_]*";
@@ -264,17 +263,18 @@ public abstract class Functions {
 	 * @param script
 	 * @return How many functions were removed
 	 */
-	public final static int clearFunctions(final File script, final boolean keepSigns) {
+	public final static int clearFunctions(final File script) {
 		int r = 0;
 		final Iterator<FunctionData> iter = functions.values().iterator();
 		while (iter.hasNext()) {
 			final FunctionData d = iter.next();
 			if (d != null && d.function instanceof ScriptFunction && script.equals(((ScriptFunction<?>) d.function).trigger.getScript())) {
 				iter.remove();
-				if (!keepSigns)
-					signatures.remove(d.function.name);
 				r++;
-				final Iterator<FunctionReference<?>> it = d.calls.iterator();
+				final Signature<?> sign = signatures.get(d.function.name);
+				assert sign != null; // Function must have signature
+				
+				final Iterator<FunctionReference<?>> it = sign.calls.iterator();
 				while (it.hasNext()) {
 					final FunctionReference<?> c = it.next();
 					if (script.equals(c.script))
@@ -285,16 +285,6 @@ public abstract class Functions {
 			}
 		}
 		return r;
-	}
-	
-	/**
-	 * Remember to call {@link #validateFunctions()} after calling this
-	 * 
-	 * @param script
-	 * @return How many functions were removed
-	 */
-	public final static int clearFunctions(final File script) {
-		return clearFunctions(script, false);
 	}
 	
 	public final static void validateFunctions() {
@@ -310,10 +300,13 @@ public abstract class Functions {
 		final Iterator<FunctionData> iter = functions.values().iterator();
 		while (iter.hasNext()) {
 			final FunctionData d = iter.next();
-			if (d.function instanceof ScriptFunction)
+			if (d.function instanceof ScriptFunction) {
 				iter.remove();
-			else
-				d.calls.clear();
+			} else {
+				final Signature<?> sign = signatures.get(d.function.name);
+				assert sign != null; // Function must have signature
+				sign.calls.clear();
+			}
 		}
 		signatures.clear();
 		signatures.putAll(javaSignatures);
