@@ -35,14 +35,14 @@ Now, what would you fill to the issue report?
 Do not use offensive language or insult *anyone*. Distruptive behaviour in issue
 tracker will be dealt with harshly and in the end, will leave your issue unresolved.
 
-### Pull Requests
+## Pull Requests
 Pull requests are a great way to contribute code, but there are still a few
 guidelines on how to use them.
 
 Note that these guidelines do not apply to pull requesting changes to
 documentation. For that kind of pull requests, just use common sense.
 
-## What to Contribute?
+### What to Contribute?
 You can find issues tagged with "help wanted" on tracker to see if there is
 something for you. If you want to take over one of these, just leave a comment
 so other contributors don't accidentally pick same issue to work on. You can also
