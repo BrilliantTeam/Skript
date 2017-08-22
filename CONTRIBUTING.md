@@ -83,6 +83,23 @@ in next Skript release.
 
 Good luck!
 
+### Insight: Pull Request Review
+Pull requests will be reviewed by one of following persons before they will be
+merged. This includes testing the code, but *no* debugging if it doesn't work.
+So please test your code beforehand, the review is last safeguard.
+
+Reviewers:
+
+* @bensku - Skript developer, repo owner
+* @xXAndrew28Xx - addon developer
+* @Syst3ms - addon developer
+
+Review also includes checking code style. That is usually something that @bensku
+does, since it requires relatively little time.
+
+Note that reviewers may naturally not review their own pull requests, but must
+get someone else do it. If no one else can, @bensku will do it.
+
 ## Code Bounties
 Just to let you know, [Bountysource](https://www.bountysource.com/) is a thing.
 While putting a bounty on issue *probably* won't make me do it any faster,
