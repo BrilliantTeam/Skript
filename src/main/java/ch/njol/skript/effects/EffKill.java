@@ -69,7 +69,7 @@ public class EffKill extends Effect {
 			if (entity instanceof EnderDragonPart){
 				entity = ((EnderDragonPart) entity).getParent();
 			}
-			//Ender Dragons won't die via noraml damage
+			//Ender Dragons won't die via normal damage
 			if ((entity instanceof ArmorStand || entity instanceof Vehicle || entity instanceof EnderDragon) && !(entity instanceof Damageable)) {
 				entity.remove(); // Got complaints in issue tracker, so this is possible... Not sure if good idea, though!
 			} else {
