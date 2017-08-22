@@ -217,9 +217,10 @@ public class DatabaseStorage extends VariablesStorage {
 				if (!prepareQueries()) {
 					return false;
 				}
-
+				
 				// old
-				if (hasOldTable) {
+				// Table name support was added after the verison that used the legacy database format
+				if (hasOldTable && !tableName.equals("variables")) {
 					final ResultSet r1 = db.query("SELECT " + SELECT_ORDER + " FROM " + OLD_TABLE_NAME);
 					assert r1 != null;
 					try {
