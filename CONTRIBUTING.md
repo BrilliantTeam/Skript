@@ -60,7 +60,7 @@ useful in sane amount of time. Skript is not a good programming/Java learning
 project!
 
 Still here? Good luck. If you did not learn how to use Git, now might be a good
-time to [https://help.github.com/categories/bootcamp/](learn).
+time to [learn](https://help.github.com/categories/bootcamp/).
 
 ### When Programming
 Use a sane development environment. README has some instructions about working
@@ -84,7 +84,7 @@ in next Skript release.
 Good luck!
 
 ## Code Bounties
-Just to let you know, [https://www.bountysource.com/](Bountysource) is a thing.
+Just to let you know, [Bountysource](https://www.bountysource.com/) is a thing.
 While putting a bounty on issue *probably* won't make me do it any faster,
 someone else might get interested.
 
