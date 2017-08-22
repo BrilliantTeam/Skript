@@ -35,7 +35,6 @@ import lib.PatPeter.SQLibrary.SQLite;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
