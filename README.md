@@ -76,32 +76,20 @@ with applicable nullness rules. Note that this really means *exceptional*;
 adding some expressions and stuff like that do not count.
 
 ## Contributing
-So, you want to contribute to Skript? You need to:
-* Have some skills in Java (unless said otherwise)
+Code guidelines can be found below. You should also see CONTRIBUTING.md for
+a lot of useful information.
+
+## Code Guidelines
+So, you want to work with Skript's codebase? There are a few guidelines for you:
+* Understand Java as a language (Skript is not good learning project)
 * Use Eclipse as your IDE for Skript *or* get your own IDE to support Eclipse's nullness annotations
 * Not alter Eclipse nullness annotation settings; they affect even the compiler
-* Use tabs as indentation; Eclipse does this for you
-* Write code that follows conventions in other files of Skript's source
+* Use tabs as indentation (Eclipse settings provided will do this)
+* Try to write code that looks similar to
 * **DO NOT** use NMS code
 
-Tl;dr; follow these directions unless you have good reason not to.
-
-### What to Contribute?
-You can find issues tagged with "help wanted" on tracker to see if there is
-something for you. If you want to take over one of these, just leave a comment
-so other contributors don't accidentally pick same issue to work on. You can also
-offer your help to any other issue, but for "help wanted" tasks, help is really
-*needed*.
-
-You don't have to pick an issue to work on. If you have good idea, you can first
-create an issue to ask what other people think about it. After that, you can
-write code for it, test it, and finally submit a pull request.
-
-### I'm not Java expert, can I still help?
-You do need to know something of Java programming to be much help, but you do
-not need to be an expert. If you can write code that works and doesn't contain
-too much [spaghetti](https://en.wikipedia.org/wiki/Spaghetti_code), you're
-good to go!
+Of course, these are just recommendations. However, not following them may get
+your pull requests rejected.
 
 ### Maven repository
 If you use Skript as (soft) dependency for your plugin, and use maven or Gradle,
