@@ -21,6 +21,7 @@ package ch.njol.skript.lang.function;
 
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.classes.ClassInfo;
@@ -90,7 +91,8 @@ public abstract class Function<T> {
 	@SuppressWarnings("null")
 	@Nullable
 	public final T[] execute(final Object[][] params) {
-		final FunctionEvent e = new FunctionEvent();
+		final FunctionEvent e = new FunctionEvent(this);
+		Bukkit.getPluginManager().callEvent(e);
 		if (params.length > parameters.length) {
 			assert false : params.length;
 			return null;
