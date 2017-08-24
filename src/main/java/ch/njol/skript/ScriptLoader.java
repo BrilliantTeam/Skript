@@ -24,6 +24,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -233,8 +234,9 @@ final public class ScriptLoader {
 	@SuppressWarnings("null")
 	static final Set<File> loadedFiles = Collections.synchronizedSet(new HashSet<>());
 	
-	public static Set<File> getLoadedFiles() {
-		return loadedFiles;
+	@SuppressWarnings("null") // Collections methods don't return nulls, ever
+	public static Collection<File> getLoadedFiles() {
+		return Collections.unmodifiableCollection(loadedFiles);
 	}
 	
 	// Initialize and start load thread
