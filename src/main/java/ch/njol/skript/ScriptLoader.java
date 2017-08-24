@@ -233,6 +233,10 @@ final public class ScriptLoader {
 	@SuppressWarnings("null")
 	static final Set<File> loadedFiles = Collections.synchronizedSet(new HashSet<>());
 	
+	public static Set<File> getLoadedFiles() {
+		return loadedFiles;
+	}
+	
 	// Initialize and start load thread
 	static {
 		loaderThread = new AsyncLoaderThread();
