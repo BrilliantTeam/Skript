@@ -71,7 +71,7 @@ public class EffKill extends Effect {
 			}
 			
 			// Some entities cannot take damage but should be killable
-			if (entity instanceof ArmorStand || entity instanceof Vehicle || entity instanceof EnderDragon) {
+			if ((entity instanceof ArmorStand || entity instanceof Vehicle || entity instanceof EnderDragon || entity instanceof Pig) && !(entity instanceof Damageable)) {
 				entity.remove(); // Got complaints in issue tracker, so this is possible... Not sure if good idea, though!
 			} else if (entity instanceof Damageable) {
 				final boolean creative = entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE;
