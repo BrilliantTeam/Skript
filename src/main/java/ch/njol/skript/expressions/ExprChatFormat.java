@@ -103,13 +103,13 @@ public class ExprChatFormat extends SimpleExpression<String>{
 		((AsyncPlayerChatEvent) e).setFormat(format);
 	}
 	
-	public String convertToNormal(String format){
+	private String convertToNormal(String format){
 		return format.replaceAll("%", "%%")
-				.replaceAll("(?i)\\[(player|sender)]", "%1$s")
-				.replaceAll("(?i)\\[(message|msg)]", "%2$s");
+				.replaceAll("(?i)\\[(player|sender)]", "%1\\$s")
+				.replaceAll("(?i)\\[(message|msg)]", "%2\\$s");
 	}
 	
-	public String convertToFriendly(String format){
+	private String convertToFriendly(String format){
 		format = format.replaceAll("%%", "%")
 			.replaceAll("%1\\$s", "[player]")
 			.replaceAll("%2\\$s", "[message]");
