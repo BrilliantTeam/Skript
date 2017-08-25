@@ -39,6 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 			"	message \"Book Title: %title of event-item%\""})
 @Since("INSERT VERSION")
 public class ExprBookTitle extends SimplePropertyExpression<ItemStack,String> {
+	
 	static {
 		register(ExprBookTitle.class, String.class, "(book name|title)", "itemstack");
 	}
@@ -86,6 +87,9 @@ public class ExprBookTitle extends SimplePropertyExpression<ItemStack,String> {
 			case DELETE:
 				bookMeta.setTitle("");
 				break;
+				//$CASES-OMITTED$
+			default:
+				assert false;
 		}
 		itemStack.setItemMeta(bookMeta);
 	}

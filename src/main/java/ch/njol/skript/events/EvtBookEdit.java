@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerEditBookEvent;
 import org.eclipse.jdt.annotation.Nullable;
 
 public class EvtBookEdit extends SkriptEvent{
+	
 	static {
 		Skript.registerEvent("Book Edit", EvtBookEdit.class, PlayerEditBookEvent.class, "book (edit|change|write)")
 			.description("Called when a player edits a book")

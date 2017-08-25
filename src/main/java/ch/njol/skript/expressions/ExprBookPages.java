@@ -47,6 +47,7 @@ import java.util.List;
 			"   message \"Book Page 1: %page 1 of event-item%\""})
 @Since("INSERT VERSION")
 public class ExprBookPages extends SimpleExpression<String> {
+	
 	static {
 		Skript.registerExpression(ExprBookPages.class, String.class, ExpressionType.PROPERTY, "[all] [the] [book] (pages|content) of %itemstack%", "%itemstack%'s [book] (pages|content)", "[book] page %number% of %itemstack%", "%itemstack%'s [book] page %number%");
 	}
