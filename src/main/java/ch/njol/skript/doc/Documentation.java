@@ -155,8 +155,8 @@ public class Documentation {
 		if (StringUtils.containsAny(regex, ".[]\\*+"))
 			Skript.error("Regex '" + regex + "' contains unconverted Regex syntax");
 		return escapeHTML("" + regex
-				.replaceAll("\\((.+?)\\)\\?", "[2.2-dev31]")
-				.replaceAll("(.)\\?", "[2.2-dev31]"));
+				.replaceAll("\\((.+?)\\)\\?", "[$1]")
+				.replaceAll("(.)\\?", "[$1]"));
 	}
 	
 	private final static String cleanPatterns(final String patterns) {
@@ -164,10 +164,10 @@ public class Documentation {
 				escapeHTML(patterns) // escape HTML
 				.replaceAll("(?<=[\\(\\|])[-0-9]+?¦", "") // remove marks
 				.replace("()", "") // remove empty mark setting groups (mark¦)
-				.replaceAll("\\(([^|]+?)\\|\\)", "[2.2-dev31]") // replace (mark¦x|) groups with [x]
-				.replaceAll("\\(\\|([^|]+?)\\)", "[2.2-dev31]") // dito
-				.replaceAll("\\((.+?)\\|\\)", "[(2.2-dev31)]") // replace (a|b|) with [(a|b)]
-				.replaceAll("\\(\\|(.+?)\\)", "[(2.2-dev31)]") // dito
+				.replaceAll("\\(([^|]+?)\\|\\)", "[$1]") // replace (mark¦x|) groups with [x]
+				.replaceAll("\\(\\|([^|]+?)\\)", "[$1]") // dito
+				.replaceAll("\\((.+?)\\|\\)", "[($1)]") // replace (a|b|) with [(a|b)]
+				.replaceAll("\\(\\|(.+?)\\)", "[($1)]") // dito
 		, "(?<!\\\\)%(.+?)(?<!\\\\)%", new Callback<String, Matcher>() { // link & fancy types
 			@Override
 			public String run(final Matcher m) {
