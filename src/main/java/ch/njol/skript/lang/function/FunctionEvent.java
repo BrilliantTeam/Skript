@@ -22,18 +22,18 @@ package ch.njol.skript.lang.function;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public final class FunctionEvent extends Event {
+public final class FunctionEvent<T> extends Event {
 	
 	// Bukkit stuff
 	private final static HandlerList handlers = new HandlerList();
 	
-	private Function<?> function;
+	private Function<? extends T> function;
 	
-	public <T> FunctionEvent(Function<T> function) {
+	public FunctionEvent(Function<? extends T> function) {
 		this.function = function;
 	}
 	
-	public Function<?> getFunction() {
+	public Function<? extends T> getFunction() {
 		return function;
 	}
 	
