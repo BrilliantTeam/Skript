@@ -86,6 +86,7 @@ public class ExprChatFormat extends SimpleExpression<String>{
 		return new String[]{convertToFriendly(((AsyncPlayerChatEvent) e).getFormat())};
 	}
 	
+	//delta[0] has to be a String unless Skript has horribly gone wrong
 	@Override
 	public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
 		if (delta == null){
@@ -93,7 +94,11 @@ public class ExprChatFormat extends SimpleExpression<String>{
 		}
 		String format = null;
 		if (mode == Changer.ChangeMode.SET){
-			format = convertToNormal((String) delta[0]);
+			String newFormat = (String) delta[0];
+			if (newFormat == null){
+				return;
+			}
+			format = convertToNormal(newFormat);
 		}else if (mode == Changer.ChangeMode.RESET){
 			format = "<%s> %s";
 		}
@@ -103,13 +108,15 @@ public class ExprChatFormat extends SimpleExpression<String>{
 		((AsyncPlayerChatEvent) e).setFormat(format);
 	}
 	
-	private String convertToNormal(String format){
+	@SuppressWarnings({"null"}) //First parameter is marked as @NonNull and String#replaceAll won't return null
+	private static String convertToNormal(String format){
 		return format.replaceAll("%", "%%")
 				.replaceAll("(?i)\\[(player|sender)]", "%1\\$s")
 				.replaceAll("(?i)\\[(message|msg)]", "%2\\$s");
 	}
 	
-	private String convertToFriendly(String format){
+	@SuppressWarnings({"null"}) //First parameter is marked as @NonNull and String#replaceAll won't return null
+	private static String convertToFriendly(String format){
 		format = format.replaceAll("%%", "%")
 			.replaceAll("%1\\$s", "[player]")
 			.replaceAll("%2\\$s", "[message]");
