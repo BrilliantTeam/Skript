@@ -91,7 +91,7 @@ public abstract class Function<T> {
 	@SuppressWarnings("null")
 	@Nullable
 	public final T[] execute(final Object[][] params) {
-		final FunctionEvent e = new FunctionEvent(this);
+		final FunctionEvent<? extends T> e = new FunctionEvent<>(this);
 		Bukkit.getPluginManager().callEvent(e);
 		if (params.length > parameters.length) {
 			assert false : params.length;
