@@ -39,7 +39,7 @@ import java.io.File;
 @Name("Is Script Loaded")
 @Description("Check if the current script or another script, is current loaded")
 @Examples({"script is loaded","script \"example.sk\" is loaded"})
-@Since("INSERT VERSION")
+@Since("$1")
 public class CondScriptLoaded extends Condition{
 	static {
 		Skript.registerCondition(CondScriptLoaded.class, "script[s] [%-strings%] (is|are) loaded", "script[s] [%-strings%] (isn't|is not|aren't|are not) loaded");

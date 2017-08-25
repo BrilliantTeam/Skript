@@ -45,7 +45,7 @@ import java.util.List;
 @Examples({"on book sign:",
 			"	message \"Book Pages: %pages of event-item%\"",
 			"   message \"Book Page 1: %page 1 of event-item%\""})
-@Since("INSERT VERSION")
+@Since("$1")
 public class ExprBookPages extends SimpleExpression<String> {
 	
 	static {

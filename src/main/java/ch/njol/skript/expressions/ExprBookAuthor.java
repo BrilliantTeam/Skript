@@ -36,7 +36,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Description("The author of a book")
 @Examples({"on book sign:",
 			"	message \"Book Title: %author of event-item%\""})
-@Since("INSERT VERSION")
+@Since("$1")
 public class ExprBookAuthor extends SimplePropertyExpression<ItemStack,String> {
 	
 	static {

@@ -43,7 +43,7 @@ import ch.njol.util.Kleenean;
 @Name("Vectors - Velocity")
 @Description("Gets, sets, adds or removes velocity to/from/of an entity")
 @Examples({"set player's velocity to {_v}"})
-@Since("INSERT VERSION")
+@Since("$1")
 public class ExprVelocity extends SimplePropertyExpression<Entity, Vector> {
 	static {
 		register(ExprVelocity.class, Vector.class, "velocity", "entities");

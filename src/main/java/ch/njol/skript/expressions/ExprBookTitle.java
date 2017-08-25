@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Description("The title of a book")
 @Examples({"on book sign:",
 			"	message \"Book Title: %title of event-item%\""})
-@Since("INSERT VERSION")
+@Since("$1")
 public class ExprBookTitle extends SimplePropertyExpression<ItemStack,String> {
 	
 	static {
