@@ -78,6 +78,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -846,5 +847,15 @@ public final class BukkitEventValues {
 				return e.getWorld();
 			}
 		}, 0);
+		//PlayerEditBookEvent
+		EventValues.registerEventValue(PlayerEditBookEvent.class, ItemStack.class, new Getter<ItemStack, PlayerEditBookEvent>() {
+			@Override
+			public ItemStack get(PlayerEditBookEvent e) {
+				ItemStack book = new ItemStack(e.getPlayer().getItemInHand().getType());
+				book.setItemMeta(e.getNewBookMeta());
+				return book;
+			}
+		}, 0);
+		
 	}
 }
