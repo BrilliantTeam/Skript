@@ -113,7 +113,7 @@ public class ExprChatFormat extends SimpleExpression<String>{
 		format = format.replaceAll("%%", "%")
 			.replaceAll("%1\\$s", "[player]")
 			.replaceAll("%2\\$s", "[message]");
-		//Format does uses %s instead of $1$s
+		//Format uses %s instead of %1$s and %2$s
 		if (format.contains("%s")){
 			if (StringUtils.countMatches(format, "%s") >= 2){
 				// Format uses two %s, the order is player, message
