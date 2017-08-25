@@ -27,17 +27,13 @@ public final class FunctionEvent extends Event {
 	// Bukkit stuff
 	private final static HandlerList handlers = new HandlerList();
 	
-	private Function function;
+	private Function<?> function;
 	
 	public <T> FunctionEvent(Function<T> function) {
 		this.function = function;
 	}
 	
-	public void setFunction(Function function) {
-		this.function = function;
-	}
-	
-	public Function getFunction() {
+	public Function<?> getFunction() {
 		return function;
 	}
 	
