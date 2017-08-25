@@ -100,6 +100,7 @@ public abstract class HealthUtils {
 	 * @param e
 	 * @return How many hearts the entity can have at most
 	 */
+	@SuppressWarnings("deprecation") // Why is getMaxHealth deprected WITHOUT universal alternative?
 	public final static double getMaxHealth(final Damageable e) {
 		if (supportsDoubles)
 			return e.getMaxHealth() / 2;
@@ -119,6 +120,7 @@ public abstract class HealthUtils {
 	 * @param e
 	 * @param health How many hearts the entity can have at most
 	 */
+	@SuppressWarnings("deprecation") // Why is setMaxHealth deprected WITHOUT universal alternative?
 	public final static void setMaxHealth(final Damageable e, final double health) {
 		if (supportsDoubles) {
 			e.setMaxHealth(Math.max(Skript.EPSILON / 2, health * 2)); // 0 is not allowed, so just use a small value - smaller than Skript.EPSILON though to compare as 0

@@ -69,20 +69,19 @@ public class EffKill extends Effect {
 			if (entity instanceof EnderDragonPart){
 				entity = ((EnderDragonPart) entity).getParent();
 			}
-			//Ender Dragons won't die via normal damage
-			if ((entity instanceof ArmorStand || entity instanceof Vehicle || entity instanceof EnderDragon) && !(entity instanceof Damageable)) {
+			
+			// Some entities cannot take damage but should be killable
+			if (entity instanceof ArmorStand || entity instanceof Vehicle || entity instanceof EnderDragon) {
 				entity.remove(); // Got complaints in issue tracker, so this is possible... Not sure if good idea, though!
-			} else {
+			} else if (entity instanceof Damageable) {
 				final boolean creative = entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE;
-				if (creative)
+				if (creative) // Set player to survival before applying damage
 					((Player) entity).setGameMode(GameMode.SURVIVAL);
-				// Edge cases, where the entity is damageable but not living
-				if (entity instanceof LivingEntity){
-					HealthUtils.damage((Damageable) entity, HealthUtils.getMaxHealth((LivingEntity) entity) * 100); // just to make sure that it really dies >:)
-				}else{
-					HealthUtils.damage((Damageable) entity, DAMAGE_AMOUNT);
-				}
-				if (creative)
+				
+				assert entity != null;
+				HealthUtils.damage((Damageable) entity, HealthUtils.getMaxHealth((Damageable) entity) * 100); // just to make sure that it really dies >:)
+				
+				if (creative) // Set creative player back to creative
 					((Player) entity).setGameMode(GameMode.CREATIVE);
 			}
 		}
