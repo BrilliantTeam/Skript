@@ -31,15 +31,14 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.eclipse.jdt.annotation.Nullable;
 
-/**
- * @author Andrew Tran
- */
 @Name("Chat Format")
-@Description("Can be used to get/retrieve the chat format")
+@Description("Can be used to get/retrieve the chat format. The sender of a message is " +
+		"represented by [player] or [sender], and the message by [message] or [msg].")
 @Examples({"set the chat format to \"<yellow>[%s] <green>%s\""})
 @Since("INSERT VERSION")
 public class ExprChatFormat extends SimpleExpression<String>{
@@ -60,7 +59,7 @@ public class ExprChatFormat extends SimpleExpression<String>{
 	@Nullable
 	@Override
 	public Class<?>[] acceptChange(Changer.ChangeMode mode) {
-		if (mode == Changer.ChangeMode.SET){
+		if (mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.RESET){
 			return new Class<?>[]{String.class};
 		}
 		return null;
@@ -84,7 +83,7 @@ public class ExprChatFormat extends SimpleExpression<String>{
 	@Override
 	@Nullable
 	protected String[] get(Event e) {
-		return new String[]{((AsyncPlayerChatEvent) e).getFormat()};
+		return new String[]{convertToFriendly(((AsyncPlayerChatEvent) e).getFormat())};
 	}
 	
 	@Override
@@ -92,8 +91,39 @@ public class ExprChatFormat extends SimpleExpression<String>{
 		if (delta == null){
 			return;
 		}
+		String format = null;
 		if (mode == Changer.ChangeMode.SET){
-			((AsyncPlayerChatEvent) e).setFormat((String) delta[0]);
+			format = convertToNormal((String) delta[0]);
+		}else if (mode == Changer.ChangeMode.RESET){
+			format = "<%s> %s";
 		}
+		if (format == null){
+			return;
+		}
+		((AsyncPlayerChatEvent) e).setFormat(format);
+	}
+	
+	public String convertToNormal(String format){
+		return format.replaceAll("%", "%%")
+				.replaceAll("(?i)\\[(player|sender)]", "%1$s")
+				.replaceAll("(?i)\\[(message|msg)]", "%2$s");
+	}
+	
+	public String convertToFriendly(String format){
+		format = format.replaceAll("%%", "%")
+			.replaceAll("%1\\$s", "[player]")
+			.replaceAll("%2\\$s", "[message]");
+		//Format does uses %s instead of $1$s
+		if (format.contains("%s")){
+			if (StringUtils.countMatches(format, "%s") >= 2){
+				// Format uses two %s, the order is player, message
+				format = format.replaceFirst("%s", "[player]");
+				format = format.replaceFirst("%s", "[message]");
+			}else{
+				// Format mixes %<number>$s and %s
+				format = format.replaceFirst("%s", (format.contains("[player]") || format.contains("%1$s") ? "[message]" : "[player]"));
+			}
+		}
+		return format;
 	}
 }
