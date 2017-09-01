@@ -35,6 +35,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
+import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.ParseContext;
@@ -69,6 +70,8 @@ public abstract class Functions {
 	final static Map<String, Signature<?>> signatures = new ConcurrentHashMap<>();
 	
 	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<>();
+	
+	static boolean callFunctionEvents = false;
 	
 	/**
 	 * Register a function written in Java.
@@ -327,4 +330,22 @@ public abstract class Functions {
 		functions.put(func.name, new FunctionData(func));
 	}
 	
+	/**
+	 * Normally, function calls do not cause actual Bukkit events to be
+	 * called. If an addon requires such functionality, it should call this
+	 * method. After doing so, the events will be called. Calling this method
+	 * many times will not cause any additional changes.
+	 * <p>
+	 * Note that calling events is not free; performance might vary
+	 * once you have enabled that.
+	 * 
+	 * @param addon Addon instance. Nullness is checked runtime.
+	 */
+	public static void enableFunctionEvents(@Nullable SkriptAddon addon) {
+		if (addon == null) {
+			throw new SkriptAPIException("enabling function events requires addon instance");
+		}
+		
+		callFunctionEvents = true;
+	}
 }
