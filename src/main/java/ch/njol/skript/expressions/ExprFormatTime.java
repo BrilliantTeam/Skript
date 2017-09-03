@@ -34,6 +34,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Time;
@@ -50,7 +51,7 @@ public class ExprFormatTime extends SimpleExpression<String> {
 	private static final String defaultFormat = "yyyy-MM-dd HH:mm:ss z";
 	
 	static {
-		Skript.registerExpression(ExprFormatTime.class, String.class, ExpressionType.PROPERTY, "%date% formatted human-readable [with %string%]");
+		Skript.registerExpression(ExprFormatTime.class, String.class, ExpressionType.PROPERTY, "%date% formatted human-readable [with %-string%]");
 	}
 	
 	@SuppressWarnings("null")
@@ -64,8 +65,11 @@ public class ExprFormatTime extends SimpleExpression<String> {
 		date = (Expression<Date>) exprs[0];
 		if (exprs[1] != null) {
 			if (!(exprs[1] instanceof Literal)) {
-				Skript.error("Date format must be literal!");
-				return false;
+				VariableString str = (VariableString) exprs[1];
+				if (!str.isSimple()) {
+					Skript.error("Date format must not contain variables!");
+					return false;
+				}
 			}
 			format = new SimpleDateFormat((String) exprs[1].getSingle(null));
 		} else {
