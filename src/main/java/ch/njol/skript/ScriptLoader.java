@@ -21,7 +21,9 @@ package ch.njol.skript;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -90,6 +92,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.CollectionUtils;
+import de.schlichtherle.io.FileInputStream;
 
 /**
  * @author Peter Güttinger
@@ -364,6 +367,19 @@ final public class ScriptLoader {
 	@SuppressWarnings("null")
 	public final static ScriptInfo loadScripts(final Config... configs) {
 		return loadScripts(Arrays.asList(configs));
+	}
+	
+	/**
+	 * Load specified scripts.
+	 * 
+	 * @param files Script files.
+	 * @return Info on the loaded scripts.
+	 * @deprecated Use the methods that take configs as parameters.
+	 */
+	@Deprecated
+	public final static ScriptInfo loadScripts(final File... files) {
+		List<Config> configs = loadStructures(files);
+		return loadScripts(configs);
 	}
 	
 	/**
@@ -701,9 +717,9 @@ final public class ScriptLoader {
 	/**
 	 * Loads structure of given script, currently only for functions. Must be called before
 	 * actually loading that script.
-	 * @param f Script
+	 * @param f Script file.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("resource") // Stream is closed in Config constructor called in loadStructure
 	public final static @Nullable Config loadStructure(final File f) {
 		if (!f.exists()) { // If file does not exist...
 			unloadScript(f); // ... it might be good idea to unload it now
@@ -711,8 +727,34 @@ final public class ScriptLoader {
 		}
 		
 		try {
-			final Config config = new Config(f, true, false, ":");
-			
+			String name = f.getName();
+			assert name != null;
+			return loadStructure(new FileInputStream(f), name);
+		} catch (final IOException e) {
+			Skript.error("Could not load " + f.getName() + ": " + ExceptionUtils.toString(e));
+		}
+		
+		return null;
+	}
+	
+	public final static @Nullable Config loadStructure(final InputStream source, final String name) {
+		try {
+			final Config config = new Config(source, name, true, false, ":");
+			return loadStructure(config);
+		} catch (final IOException e) {
+			Skript.error("Could not load " + name + ": " + ExceptionUtils.toString(e));
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Loads structure of given script, currently only for functions. Must be called before
+	 * actually loading that script.
+	 */
+	@SuppressWarnings("unchecked")
+	public final static @Nullable Config loadStructure(final Config config) {
+		try {
 			//final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
 			
 			try {
@@ -749,10 +791,8 @@ final public class ScriptLoader {
 			}
 			SkriptLogger.setNode(null);
 			return config;
-		} catch (final IOException e) {
-			Skript.error("Could not load " + f.getName() + ": " + ExceptionUtils.toString(e));
 		} catch (final Exception e) {
-			Skript.exception(e, "Could not load " + f.getName());
+			Skript.exception(e, "Could not load " + config.getFileName());
 		} finally {
 			SkriptLogger.setNode(null);
 		}
