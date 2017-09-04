@@ -24,6 +24,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -78,6 +79,7 @@ import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.PluralizingArgsMessage;
 import ch.njol.skript.log.CountingLogHandler;
 import ch.njol.skript.log.ErrorDescLogHandler;
+import ch.njol.skript.log.LogEntry;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -356,6 +358,17 @@ final public class ScriptLoader {
 		// If task was ran asynchronously, returned stats may be wrong
 		// This is probably ok, since loadScripts() will go async if needed
 		return i;
+	}
+	
+	public final static ScriptInfo loadScripts(final List<Config> configs, final Collection<LogEntry> logOut) {
+		final RetainingLogHandler logHandler = SkriptLogger.startRetainingLog();
+		try {
+			return loadScripts(configs);
+		} finally {
+			logOut.addAll(logHandler.getLog());
+			logHandler.clear(); // Remove everything from the log handler
+			logHandler.printLog(); // Won't print anything, but handler is properly closed
+		}
 	}
 	
 	/**
@@ -737,6 +750,12 @@ final public class ScriptLoader {
 		return null;
 	}
 	
+	/**
+	 * Loads structure of given script, currently only for functions. Must be called before
+	 * actually loading that script.
+	 * @param source Source input stream.
+	 * @param name Name of source "file".
+	 */
 	public final static @Nullable Config loadStructure(final InputStream source, final String name) {
 		try {
 			final Config config = new Config(source, name, true, false, ":");
@@ -751,6 +770,7 @@ final public class ScriptLoader {
 	/**
 	 * Loads structure of given script, currently only for functions. Must be called before
 	 * actually loading that script.
+	 * @param config Config object for the script.
 	 */
 	@SuppressWarnings("unchecked")
 	public final static @Nullable Config loadStructure(final Config config) {
