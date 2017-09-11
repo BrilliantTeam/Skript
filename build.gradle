@@ -69,7 +69,7 @@ configurations.all {
 
 processResources {
 	filter ReplaceTokens, tokens: [
-		"version" : project.property("version")
+		"version" :System.getenv('SKRIPT_VERSION') == null ? project.property("version") : System.getenv('SKRIPT_VERSION')
 	]
 }
 
