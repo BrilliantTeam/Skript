@@ -40,36 +40,18 @@ import java.io.File;
 @Description("Check if the current script or another script, is current loaded")
 @Examples({"script is loaded","script \"example.sk\" is loaded"})
 @Since("2.2-dev31")
-public class CondScriptLoaded extends Condition{
+public class CondScriptLoaded extends Condition {
+	
 	static {
 		Skript.registerCondition(CondScriptLoaded.class, "script[s] [%-strings%] (is|are) loaded", "script[s] [%-strings%] (isn't|is not|aren't|are not) loaded");
 	}
-	@SuppressWarnings("null")
+	
+	@Nullable
 	private Expression<String> scripts;
 	@Nullable
 	private File currentScriptFile;
 	
-	@Override
-	public boolean check(Event e) {
-		if (scripts == null) {
-			return ScriptLoader.getLoadedFiles().contains(currentScriptFile);
-		}
-		return scripts.check(e, new Checker<String>() {
-			@Override
-			public boolean check(String scriptName) {
-				return ScriptLoader.getLoadedFiles().contains(SkriptCommand.getScriptFromName(scriptName));
-			}
-		}, isNegated());
-	}
-	
-	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		String scriptName = scripts == null ? "script" : (scripts.isSingle() ? "script" : "scripts" + " " + scripts.toString(e, debug));
-		boolean isSingle = scripts == null || scripts.isSingle();
-		return scriptName + " " + (isSingle ? (isNegated() ? "isn't" : "is") : (isNegated() ? "aren't" : "are")) + " loaded";
-	}
-	
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings({"unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		assert ScriptLoader.currentScript != null;
@@ -78,4 +60,28 @@ public class CondScriptLoaded extends Condition{
 		setNegated(matchedPattern == 1);
 		return true;
 	}
+	
+	@Override
+	public boolean check(Event e) {
+		if (scripts == null) {
+			return ScriptLoader.getLoadedFiles().contains(currentScriptFile);
+		}
+		
+		assert scripts != null;
+		return scripts.check(e, new Checker<String>() {
+			@Override
+			public boolean check(String scriptName) {
+				return ScriptLoader.getLoadedFiles().contains(SkriptCommand.getScriptFromName(scriptName));
+			}
+		}, isNegated());
+	}
+	
+	@SuppressWarnings("null") // Look, we check for nullability there!
+	@Override
+	public String toString(@Nullable Event e, boolean debug) {
+		String scriptName = scripts == null ? "script" : (scripts.isSingle() ? "script" : "scripts" + " " + scripts.toString(e, debug));
+		boolean isSingle = scripts == null || scripts.isSingle();
+		return scriptName + " " + (isSingle ? (isNegated() ? "isn't" : "is") : (isNegated() ? "aren't" : "are")) + " loaded";
+	}
+	
 }
