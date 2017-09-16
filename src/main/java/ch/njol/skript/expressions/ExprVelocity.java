@@ -63,7 +63,7 @@ public class ExprVelocity extends SimplePropertyExpression<Entity, Vector> {
 	@SuppressWarnings("null")
 	public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
 		if ((mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.ADD || mode == Changer.ChangeMode.REMOVE || mode == Changer.ChangeMode.DELETE))
-			return new Class[] {Number.class};
+			return new Class[] {Vector.class};
 		return null;
 	}
 	
