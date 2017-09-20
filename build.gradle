@@ -81,6 +81,11 @@ processResources {
 
 jar {
 	archiveName System.getenv('SKRIPT_JAR_NAME') == null ? 'Skript.jar' : System.getenv("SKRIPT_JAR_NAME")
+	
+	manifest {
+		attributes("Name": "ch/njol/skript",
+				"Sealed": "true")
+	}
 }
 
 license {
