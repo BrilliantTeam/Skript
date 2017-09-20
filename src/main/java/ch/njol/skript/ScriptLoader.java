@@ -360,7 +360,14 @@ final public class ScriptLoader {
 		return i;
 	}
 	
-	public final static ScriptInfo loadScripts(final List<Config> configs, final Collection<LogEntry> logOut) {
+	/**
+	 * Loads specified scripts and places log to given list.
+	 * 
+	 * @param configs Configs for scripts, loaded by {@link #loadStructures(File[])}
+	 * @param logOut List where to place log.
+	 * @return Info on the loaded scripts.
+	 */
+	public final static ScriptInfo loadScripts(final List<Config> configs, final List<LogEntry> logOut) {
 		final RetainingLogHandler logHandler = SkriptLogger.startRetainingLog();
 		try {
 			return loadScripts(configs);
