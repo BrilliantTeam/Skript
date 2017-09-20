@@ -9,14 +9,15 @@ apply plugin: 'maven-publish'
 
 repositories {
 	jcenter()
+	mavenCentral()
 
 	maven {
 		url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
 	}
 
-	maven {
-		url 'https://oss.sonatype.org/content/groups/public/'
-	}
+//	maven {
+//		url 'https://oss.sonatype.org/content/groups/public/'
+//	}
 
 	maven {
 		url 'http://maven.sk89q.com/repo'
