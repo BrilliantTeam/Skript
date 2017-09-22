@@ -21,6 +21,7 @@ package ch.njol.skript;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,7 +95,6 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.CollectionUtils;
-import de.schlichtherle.io.FileInputStream;
 
 /**
  * @author Peter Güttinger
