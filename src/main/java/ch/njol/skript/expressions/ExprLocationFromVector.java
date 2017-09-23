@@ -46,10 +46,11 @@ import org.eclipse.jdt.annotation.Nullable;
 @Since("2.2-dev28")
 public class ExprLocationFromVector extends SimpleExpression<Location> {
 	static {
-		Skript.registerExpression(ExprLocationFromVector.class, Location.class, ExpressionType.SIMPLE,
-				"%vector% [to location] [in] %world%", "location (from|of) %vector% [(from|in)] %world%",
-				"%vector% [to location] [in] %world% with yaw %number% and pitch %number%",
-				"location (from|of) %vector% [(in|from)] %world% with yaw %number% and pitch %number%");
+		// TODO fix slowdowns and enable again, for now nuked for greater good
+//		Skript.registerExpression(ExprLocationFromVector.class, Location.class, ExpressionType.SIMPLE,
+//				"%vector% [to location] [in] %world%", "location (from|of) %vector% [(from|in)] %world%",
+//				"%vector% [to location] [in] %world% with yaw %number% and pitch %number%",
+//				"location (from|of) %vector% [(in|from)] %world% with yaw %number% and pitch %number%");
 	}
 
 	@SuppressWarnings("null")
