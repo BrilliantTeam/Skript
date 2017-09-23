@@ -39,27 +39,27 @@ import ch.njol.util.Kleenean;
 
 
 @Name("Hash")
-@Description({"Hashes the given text using the MD5, SHA-256 or PBKDF2 algorithms. Each algorithm is suitable for different use cases.<p>",
+@Description({"Hashes the given text using the MD5 or SHA-256 algorithms. Each algorithm is suitable for different use cases.<p>",
 		"MD5 is provided mostly for backwards compatibility, as it is outdated and not secure. ",
-		"SHA-256 is more secure, and can used to hash somewhat confidental data like IP addresses. You should NOT use it to hash passwords, though. ",
-		"PBKDF2 is most secure of hashing algorithms that Skript supports. Note that Skript does not salt hashes, that is your responsibility. ",
+		"SHA-256 is more secure, and can used to hash somewhat confidental data like IP addresses and even passwords. ",
+		"It is not <i>that</i> secure out of the box, so please consider using salt when dealing with passwords! ",
 		"When hashing data, you <strong>must</strong> specify algorithms that will be used for security reasons! ",
 		"<p>Please note that a hash cannot be reversed under normal circumstanses. You will not be able to get original value from a hash with Skript."})
 @Examples({
 		"command /setpass <text>:",
 		"	trigger:",
-		"		set {password.%player%} to text-argument hashed with PBKDF2",
+		"		set {password.%player%} to text-argument hashed with SHA-256",
 		"command /login <text>:",
 		"	trigger:",
-		"		{password.%player%} is text-argument hashed with PBKDF2:",
+		"		{password.%player%} is text-argument hashed with SHA-256:",
 		"			message \"login successful.\"",
 		"		else:",
 		"			message \"wrong password!\""})
-@Since("2.0 (2.2-dev32 for algorithms other than MD5)")
+@Since("2.0 (2.2-dev32 for SHA-256)")
 public class ExprHash extends PropertyExpression<String, String> {
 	static {
 		Skript.registerExpression(ExprHash.class, String.class, ExpressionType.SIMPLE,
-				"%strings% hash[ed] with (0¦MD5|1¦SHA-256|2¦PBKDF2)");
+				"%strings% hash[ed] with (0¦MD5|1¦SHA-256)");
 	}
 	
 	@SuppressWarnings("null")
@@ -69,14 +69,11 @@ public class ExprHash extends PropertyExpression<String, String> {
 	static MessageDigest md5;
 	@Nullable
 	static MessageDigest sha256;
-	@Nullable
-	static MessageDigest pbkdf2;
 	
 	static {
 		try {
 			md5 = MessageDigest.getInstance("MD5");
 			sha256 = MessageDigest.getInstance("SHA-256");
-			pbkdf2 = MessageDigest.getInstance("PBKDF2WithHmacSHA1");
 		} catch (final NoSuchAlgorithmException e) {
 			throw new InternalError("JVM does not adhere to Java specifications");
 		}
@@ -98,7 +95,6 @@ public class ExprHash extends PropertyExpression<String, String> {
 		// These can't be null
 		assert md5 != null;
 		assert sha256 != null;
-		assert pbkdf2 != null;
 		
 		// Get correct digest
 		MessageDigest digest = null;
@@ -106,8 +102,6 @@ public class ExprHash extends PropertyExpression<String, String> {
 			digest = md5;
 		else if (algorithm == 1)
 			digest = sha256;
-		else if (algorithm == 2)
-			digest = pbkdf2;
 		else
 			assert false;
 
