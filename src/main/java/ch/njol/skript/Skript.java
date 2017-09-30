@@ -342,7 +342,7 @@ public final class Skript extends JavaPlugin implements Listener {
 					}
 				} catch (final Exception e) {
 					error("Error while loading plugin hooks" + (e.getLocalizedMessage() == null ? "" : ": " + e.getLocalizedMessage()));
-					e.printStackTrace();
+					Skript.exception(e);
 				}
 				
 				Language.setUseLocal(false);
