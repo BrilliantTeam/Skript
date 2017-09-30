@@ -2,12 +2,12 @@
 # Allows specified items to be used as helmets for survival players (Minecraft 1.9 recommended).
 #
 
-options:
-	custom helmets: iron block or gold block or diamond block # Change this to anything you'd like
+aliases:
+	custom helmets = iron block, gold block, diamond block # Change this to anything you'd like
 
 on inventory click:
 	inventory action is place all or nothing
-	cursor slot of player is {@custom helmets} # Check if  item is allowed as helmet
+	cursor slot of player is custom helmets # Check if item is allowed as helmet
 	event-slot is helmet slot of event-player # Check that player clicked the helmet
 	cancel the event
 	set {_old helmet} to helmet of player # Store old helmet
@@ -15,7 +15,7 @@ on inventory click:
 	set cursor slot of player to {_old helmet} # Set player's cursor to old helmet, possibly air
 
 on right click:
-	tool of player is {@custom helmets}
+	tool of player is custom helmets
 	helmet of player is air
 	cancel the event
 	set helmet of player to tool of player
