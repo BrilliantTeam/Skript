@@ -40,6 +40,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
@@ -271,7 +272,13 @@ public abstract class Functions {
 		final Iterator<FunctionData> iter = functions.values().iterator();
 		while (iter.hasNext()) {
 			final FunctionData d = iter.next();
-			if (d != null && d.function instanceof ScriptFunction && script.equals(((ScriptFunction<?>) d.function).trigger.getScript())) {
+			if (d != null && d.function instanceof ScriptFunction) {
+				Trigger trigger = ((ScriptFunction<?>) d.function).trigger;
+				if (trigger == null) // Triggers can be null, make sure this isn't
+					continue;
+				if (!script.equals(trigger.getScript())) // Is this trigger in correct script?
+					continue;
+				
 				iter.remove();
 				r++;
 				final Signature<?> sign = signatures.get(d.function.name);
