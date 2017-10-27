@@ -159,6 +159,11 @@ public class ChatMessages {
 		public List<MessageComponent> extra;
 	}
 	
+	/**
+	 * Parses a string to list of chat message components.
+	 * @param msg Input string.
+	 * @return List with components.
+	 */
 	public static List<MessageComponent> parse(String msg) {
 		char[] chars = msg.toCharArray();
 		
@@ -173,7 +178,22 @@ public class ChatMessages {
 			String param = "";
 			
 			if (c == '<') { // Tag parsing
-				int end = msg.indexOf('>', i);
+				// Find where the tag ends
+				int end = -1;
+				int angleBrackets = 1; // Ignore stuff that looks like tag inside the tag
+				for (int j = i + 1; j < chars.length; j++) {
+					char c2 = chars[j];
+					if (c2 == '<')
+						angleBrackets++;
+					else if (c2 == '>')
+						angleBrackets--;
+					
+					if (angleBrackets == 0) {
+						end = j;
+						break;
+					}
+				}
+				
 				if (end != -1) { // If this COULD be valid tag...
 					String tag = msg.substring(i + 1, end);
 					String name;
