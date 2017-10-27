@@ -50,12 +50,13 @@ Skript has been licensed under GPLv3 for ages...
 Skript uses Gradle for compilation. Use your command prompt of preference and
 navigate to Skript's source directory. Then you can just call Gradle to compile
 and package Skript for you:
-```
-./gradlew clean build
-```
-On Windows environment, replace `./gradlew` with `gradlew.bat`.
 
-You can get source code from the releases page. You may also clone this
+```bash
+./gradlew clean build # on UNIX-based systems (mac, linux)
+gradlew clean build # on Windows
+```
+
+You can get source code from the [releases](https://github.com/bensku/Skript/releases) page. You may also clone this
 repository, but that code might or might not be stable.
 
 ### Importing to Eclipse
