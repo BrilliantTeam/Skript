@@ -53,12 +53,12 @@ public class UnresolvedOfflinePlayer implements OfflinePlayer {
 		resolverThread = Skript.newThread(new Runnable() {
 			@SuppressWarnings({"deprecation", "unused"})
 			@Override
-			public void run() {
-				if (toResolve == null) {
-					toResolve = new LinkedBlockingQueue<>();
-				}
-				
+			public void run() {				
 				while (true) {
+					if (toResolve == null) {
+						toResolve = new LinkedBlockingQueue<>();
+					}
+					
 					try {
 						final UnresolvedOfflinePlayer p = toResolve.take();
 						p.bukkitOfflinePlayer = Bukkit.getOfflinePlayer(p.name);
