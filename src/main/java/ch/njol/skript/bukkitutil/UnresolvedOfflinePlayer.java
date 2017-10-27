@@ -56,7 +56,6 @@ public class UnresolvedOfflinePlayer implements OfflinePlayer {
 			public void run() {
 				if (toResolve == null) {
 					toResolve = new LinkedBlockingQueue<>();
-					return;
 				}
 				
 				while (true) {
