@@ -104,6 +104,10 @@ public final class Parameter<T> {
 		return new Parameter<>(name, type, single, d);
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	@Override
 	public String toString() {
 		return name + ": " + Utils.toEnglishPlural(type.getCodeName(), !single) + (def != null ? " = " + def.toString(null, true) : "");

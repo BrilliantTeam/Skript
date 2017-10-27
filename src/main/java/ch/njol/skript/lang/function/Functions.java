@@ -325,7 +325,7 @@ public abstract class Functions {
 	}
 	
 	@SuppressWarnings("null")
-	public static Iterable<JavaFunction<?>> getJavaFunctions() {
+	public static Collection<JavaFunction<?>> getJavaFunctions() {
 		return javaFunctions.values();
 	}
 

@@ -25,11 +25,18 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
+import org.eclipse.jdt.annotation.Nullable;
+
+import com.bekvon.bukkit.residence.commands.info;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
@@ -66,6 +73,114 @@ public class HTMLGenerator {
 		
 		this.skeleton = readFile(new File(template + "/template.html")); // Skeleton which contains every other page
 	}
+	
+	@SuppressWarnings("null")
+	private static <T> Iterator<T> sortedIterator(Iterator<T> it, Comparator<? super T> comparator) {
+		List<T> list = new ArrayList<>();
+		while (it.hasNext()) {
+			list.add(it.next());
+		}
+		
+		Collections.sort(list, comparator);
+		return list.iterator();
+	}
+	
+	private static class AnnotatedComparator implements Comparator<SyntaxElementInfo<?>> {
+
+		public AnnotatedComparator() {}
+
+		@Override
+		public int compare(@Nullable SyntaxElementInfo<?> o1, @Nullable SyntaxElementInfo<?> o2) {
+			// Nullness check
+			if (o1 == null || o2 == null) {
+				assert false;
+				throw new NullPointerException();
+			}
+			
+			if (o1.c.getAnnotation(NoDoc.class) != null)
+				return 1;
+			else if (o2.c.getAnnotation(NoDoc.class) != null)
+				return -1;
+			
+			String name1 = o1.c.getAnnotation(Name.class).value();
+			String name2 = o2.c.getAnnotation(Name.class).value();
+			
+			return name1.compareTo(name2);
+		}
+		
+	}
+	private static final AnnotatedComparator annotatedComparator = new AnnotatedComparator();
+	
+	private static class EventComparator implements Comparator<SkriptEventInfo<?>> {
+
+		public EventComparator() {}
+
+		@Override
+		public int compare(@Nullable SkriptEventInfo<?> o1, @Nullable SkriptEventInfo<?> o2) {
+			// Nullness check
+			if (o1 == null || o2 == null) {
+				assert false;
+				throw new NullPointerException();
+			}
+			
+			if (o1.c.getAnnotation(NoDoc.class) != null)
+				return 1;
+			else if (o2.c.getAnnotation(NoDoc.class) != null)
+				return -1;
+			
+			return o1.name.compareTo(o2.name);
+		}
+		
+	}
+	private static final EventComparator eventComparator = new EventComparator();
+	
+	private static class ClassInfoComparator implements Comparator<ClassInfo<?>> {
+
+		public ClassInfoComparator() {}
+
+		@Override
+		public int compare(@Nullable ClassInfo<?> o1, @Nullable ClassInfo<?> o2) {
+			// Nullness check
+			if (o1 == null || o2 == null) {
+				assert false;
+				throw new NullPointerException();
+			}
+			
+			if (ClassInfo.NO_DOC.equals(o1.getDocName()))
+				return 1;
+			if (ClassInfo.NO_DOC.equals(o2.getDocName()))
+				return -1;
+			
+			String name1 = o1.getDocName();
+			if (name1 == null)
+				name1 = o1.getCodeName();
+			String name2 = o2.getDocName();
+			if (name2 == null)
+				name2 = o2.getCodeName();
+			
+			return name1.compareTo(name2);
+		}
+		
+	}
+	private static final ClassInfoComparator classInfoComparator = new ClassInfoComparator();
+	
+	private static class FunctionComparator implements Comparator<JavaFunction<?>> {
+
+		public FunctionComparator() {}
+
+		@Override
+		public int compare(@Nullable JavaFunction<?> o1, @Nullable JavaFunction<?> o2) {
+			// Nullness check
+			if (o1 == null || o2 == null) {
+				assert false;
+				throw new NullPointerException();
+			}
+			
+			return o1.getName().compareTo(o2.getName());
+		}
+		
+	}
+	private static final FunctionComparator functionComparator = new FunctionComparator();
 	
 	public void generate() {
 		for (File f : template.listFiles()) {			
@@ -116,7 +231,7 @@ public class HTMLGenerator {
 				String descTemp = readFile(new File(template + "/templates/" + genParams[1]));
 				String genType = genParams[0];
 				if (genType.equals("expressions")) {
-					Iterator<ExpressionInfo<?,?>> it = Skript.getExpressions();
+					Iterator<ExpressionInfo<?,?>> it = sortedIterator(Skript.getExpressions(), annotatedComparator);
 					while (it.hasNext()) {
 						ExpressionInfo<?,?> info = it.next();
 						assert info != null;
@@ -126,35 +241,44 @@ public class HTMLGenerator {
 						generated += desc;
 					}
 				} else if (genType.equals("effects")) {
-					for (SyntaxElementInfo<? extends Effect> info : Skript.getEffects()) {
+					List<SyntaxElementInfo<? extends Effect>> effects = new ArrayList<>(Skript.getEffects());
+					Collections.sort(effects, annotatedComparator);
+					for (SyntaxElementInfo<? extends Effect> info : effects) {
 						assert info != null;
 						if (info.c.getAnnotation(NoDoc.class) != null)
 							continue;
 						generated += generateAnnotated(descTemp, info);
 					}
 				} else if (genType.equals("conditions")) {
-					for (SyntaxElementInfo<? extends Condition> info : Skript.getConditions()) {
+					List<SyntaxElementInfo<? extends Condition>> conditions = new ArrayList<>(Skript.getConditions());
+					Collections.sort(conditions, annotatedComparator);
+					for (SyntaxElementInfo<? extends Condition> info : conditions) {
 						assert info != null;
 						if (info.c.getAnnotation(NoDoc.class) != null)
 							continue;
 						generated += generateAnnotated(descTemp, info);
 					}
 				} else if (genType.equals("events")) {
-					for (SkriptEventInfo<?> info : Skript.getEvents()) {
+					List<SkriptEventInfo<?>> events = new ArrayList<>(Skript.getEvents());
+					Collections.sort(events, eventComparator);
+					for (SkriptEventInfo<?> info : events) {
 						assert info != null;
 						if (info.c.getAnnotation(NoDoc.class) != null)
 							continue;
 						generated += generateEvent(descTemp, info);
 					}
 				} else if (genType.equals("classes")) {
-					for (ClassInfo<?> info : Classes.getClassInfos()) {
+					List<ClassInfo<?>> classes = new ArrayList<>(Classes.getClassInfos());
+					Collections.sort(classes, classInfoComparator);
+					for (ClassInfo<?> info : classes) {
 						if (ClassInfo.NO_DOC.equals(info.getDocName()))
 							continue;
 						assert info != null;
 						generated += generateClass(descTemp, info);
 					}
 				} else if (genType.equals("functions")) {
-					Iterable<JavaFunction<?>> functions = Functions.getJavaFunctions();
+					List<JavaFunction<?>> functions = new ArrayList<>(Functions.getJavaFunctions());
+					Collections.sort(functions, functionComparator);
 					for (JavaFunction<?> info : functions) {
 						assert info != null;
 						generated += generateFunction(descTemp, info);
@@ -363,7 +487,7 @@ public class HTMLGenerator {
 			Parameter<?>[] params = info.getParameters();
 			String[] types = new String[params.length];
 			for (int i = 0; i < types.length; i++) {
-				types[i] = params[i].getType().getDocName();
+				types[i] = params[i].toString();
 			}
 			String line = docName + "(" + Joiner.on(", ").join(types) + ")";
 			patterns += pattern.replace("${element.pattern}", line);
