@@ -167,7 +167,7 @@ public class SimpleEvents {
 		Skript.registerEvent("Zombie Break Door", SimpleEvent.class, EntityBreakDoorEvent.class, "zombie break[ing] [a] [wood[en]] door")
 				.description("Called when a zombie is done breaking a wooden door. Can be cancelled to prevent the zombie from breaking the door.")
 				.examples("")
-				.since("");
+				.since("1.0");
 		Skript.registerEvent("Combust", SimpleEvent.class, EntityCombustEvent.class, "combust[ing]")
 				.description("Called when an entity is set on fire, e.g. by fire or lava, a fireball, or by standing in direct sunlight (zombies, skeletons).")
 				.examples("")
@@ -276,7 +276,7 @@ public class SimpleEvents {
 		Skript.registerEvent("Level Change", SimpleEvent.class, PlayerLevelChangeEvent.class, "[player] level [change]")
 				.description("Called when a player's <a href='../expressions/#ExprLevel'>level</a> changes, e.g. by gathering experience or by enchanting something.")
 				.examples("")
-				.since("");
+				.since("1.0");
 		Skript.registerEvent("Portal", SimpleEvent.class, PlayerPortalEvent.class, "[player] portal")
 				.description("Called when a player uses a nether or end portal. <a href='../effects/#EffCancelEvent'>Cancel the event</a> to prevent the player from teleporting.")
 				.examples("")
@@ -302,8 +302,10 @@ public class SimpleEvents {
 				.since("1.0");
 		Skript.registerEvent("Sprint Toggle", SimpleEvent.class, PlayerToggleSprintEvent.class, "[player] toggl(e|ing) sprint", "[player] sprint toggl(e|ing)")
 				.description("Called when a player starts or stops sprinting. Use <a href='../conditions/#CondIsSprinting'>is sprinting</a> to get whether the player was sprinting before the event was called.")
-				.examples("")
-				.since("");
+				.examples("on sprint toggle:",
+						"	player is not sprinting",
+						"	send \"Run!\"")
+				.since("1.0");
 		Skript.registerEvent("Portal Create", SimpleEvent.class, PortalCreateEvent.class, "portal create")
 				.description("Called when a portal is created, either by a player or mob lighting an obsidian frame on fire, or by a nether portal creating its teleportation target in the nether/overworld.",
 						"Please note that it's not possible to use <a href='../expressions/#ExprEntity'>the player</a> in this event.")
@@ -416,6 +418,9 @@ public class SimpleEvents {
 		}
 		Skript.registerEvent("Player World Change", SimpleEvent.class, PlayerChangedWorldEvent.class, "player world change[d]")
 				.description("Called when a player enters a world. Does not work with other entities!")
+				.examples("on player world change:",
+						"	world is \"city\"",
+					 	"	send \"Welcome to the City!\"")
 				.since("2.2-dev28");
 	}
 }
