@@ -70,9 +70,10 @@ public class Config implements Comparable<Config> {
 	@Nullable
 	File file = null;
 	
-	public Config(final InputStream source, final String fileName, final boolean simple, final boolean allowEmptySections, final String defaultSeparator) throws IOException {
+	public Config(final InputStream source, final String fileName, @Nullable final File file, final boolean simple, final boolean allowEmptySections, final String defaultSeparator) throws IOException {
 		try {
 			this.fileName = fileName;
+			this.file = file; // Might be null, but that is not an issue
 			this.simple = simple;
 			this.allowEmptySections = allowEmptySections;
 			this.defaultSeparator = defaultSeparator;
@@ -96,6 +97,10 @@ public class Config implements Comparable<Config> {
 		} finally {
 			source.close();
 		}
+	}
+	
+	public Config(final InputStream source, final String fileName, final boolean simple, final boolean allowEmptySections, final String defaultSeparator) throws IOException {
+		this(source, fileName, null, simple, allowEmptySections, defaultSeparator);
 	}
 	
 	@SuppressWarnings("resource")
