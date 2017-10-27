@@ -1164,6 +1164,25 @@ click actions:
 	control_drop: drop key with control, drop stack, Ctrl+Q
 	creative: creative action
 	unknown: unknown, unsupported, custom
+	
+# -- Inventory Types --
+inventory types:
+	chest: chest inventory
+	dispenser: dispenser inventory
+	dropper: dropper inventory
+	furnace: furnace inventory
+	workbench: workbench inventory
+	crafting: crafting table inventory
+	enchanting: enchanting table inventory
+	brewing: brewing stand inventory
+	player: player inventory
+	creative: creative inventory
+	merchant: merchant inventory, villager inventory
+	endher_chest: ender chest inventory
+	anvil: anvil inventory
+	beacon: beacon inventory
+	hopper: hopper inventory
+	shulker_box: shulker box inventory
 
 # -- Boolean --
 boolean:

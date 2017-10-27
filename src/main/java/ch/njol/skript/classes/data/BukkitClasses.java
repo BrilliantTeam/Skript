@@ -47,6 +47,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -610,6 +611,40 @@ public class BukkitClasses {
 					@SuppressWarnings("null")
 					@Override
 					public String toVariableNameString(ClickType o) {
+						return o.name();
+					}
+
+					@Override
+					public String getVariableNamePattern() {
+						return "\\S+";
+					}
+					
+				}));
+		
+		final EnumUtils<InventoryType> invTypes = new EnumUtils<>(InventoryType.class, "inventory types");
+		Classes.registerClass(new ClassInfo<>(InventoryType.class, "inventorytype")
+				.user("inventory types?")
+				.name("Inventory Type")
+				.description("Minecraft has several different inventory types with their own use cases.")
+				.usage(invTypes.getAllNames())
+				.examples("")
+				.since("2.2-dev32")
+				.defaultExpression(new EventValueExpression<>(InventoryType.class))
+				.parser(new Parser<InventoryType>() {
+					@Override
+					@Nullable
+					public InventoryType parse(String s, ParseContext context) {
+						return invTypes.parse(s);
+					}
+
+					@Override
+					public String toString(InventoryType o, int flags) {
+						return invTypes.toString(o, flags);
+					}
+
+					@SuppressWarnings("null")
+					@Override
+					public String toVariableNameString(InventoryType o) {
 						return o.name();
 					}
 
