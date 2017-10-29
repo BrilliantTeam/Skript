@@ -47,7 +47,7 @@ import java.util.List;
 public class ExprPermissions extends SimpleExpression<String> {
 
     static {
-        Skript.registerExpression(ExprPermissions.class, String.class, ExpressionType.PROPERTY, "[all] [the] permission[s] of %player%", "%player%'[s] [all] permission[s]");
+        Skript.registerExpression(ExprPermissions.class, String.class, ExpressionType.PROPERTY, "[all] [the] permission[s] of %player%", "%player%['s] [all] permission[s]");
     }
 
     @SuppressWarnings("null")
