@@ -47,7 +47,7 @@ import java.util.List;
 public class ExprPermissions extends SimpleExpression<String> {
 
     static {
-        Skript.registerExpression(ExprPermissions.class, String.class, ExpressionType.PROPERTY, "[all] [the] permission[s] of %player%", "%player%['s] [all] permission[s]");
+        Skript.registerExpression(ExprPermissions.class, String.class, ExpressionType.PROPERTY, "[all] [the] permission[s] of %players%", "%players%'[s] [all] permission[s]");
     }
 
     @SuppressWarnings("null")
@@ -63,17 +63,20 @@ public class ExprPermissions extends SimpleExpression<String> {
     @Override
     @SuppressWarnings("null")
     protected String[] get(Event e) {
-        Player p = player.getSingle(e);
+        Player[] players = player.getAll(e);
 
-        if (p == null){
+        if (players == null){
             return null;
         }
 
         List<String> perms = Lists.newArrayList();
 
-        for (PermissionAttachmentInfo permissionAttachmentInfo : p.getEffectivePermissions()) {
-            perms.add(permissionAttachmentInfo.getPermission());
+        for (Player player : players) {
+            for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
+                perms.add(permissionAttachmentInfo.getPermission());
+            }
         }
+
 
         return perms.toArray(new String[0]);
     }
