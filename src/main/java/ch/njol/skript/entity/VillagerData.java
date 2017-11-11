@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,19 +13,23 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.entity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.variables.Variables;
@@ -35,13 +39,39 @@ import ch.njol.util.coll.CollectionUtils;
  * @author Peter Güttinger
  */
 public class VillagerData extends EntityData<Villager> {
+	
+	/**
+	 * Professions can be for zombies also. These are the ones which are only
+	 * for villagers.
+	 */
+	private static List<Profession> professions;
+	
+	private static final boolean hasNitwit = Skript.isRunningMinecraft(1, 11);
+	
 	static {
 		// professions in order!
-		// FARMER(0), LIBRARIAN(1), PRIEST(2), BLACKSMITH(3), BUTCHER(4);
-		register(VillagerData.class, "villager", Villager.class, 0,
-				"villager", "farmer", "librarian", "priest", "blacksmith", "butcher");
+		// NORMAL(-1), FARMER(0), LIBRARIAN(1), PRIEST(2), BLACKSMITH(3), BUTCHER(4), NITWIT(5);
 		
 		Variables.yggdrasil.registerSingleClass(Profession.class, "Villager.Profession");
+		
+		if (Skript.isRunningMinecraft(1, 10)) { // Post 1.10: Not all professions go for villagers
+			register(VillagerData.class, "villager", Villager.class, 0,
+					"normal", "villager", "farmer", "librarian", "priest", "blacksmith", "butcher", "nitwit");
+			// Normal is for zombie villagers, but needs to be here, since someone thought changing first element in enum was good idea :(
+			
+			professions = new ArrayList<>();
+			for (Profession prof : Profession.values()) {
+				if (!prof.isZombie())
+					professions.add(prof);
+			}
+		} else { // Pre 1.10: method Profession#isZombie() doesn't exist
+			register(VillagerData.class, "villager", Villager.class, 0,
+					"villager", "farmer", "librarian", "priest", "blacksmith", "butcher", "nitwit");
+			
+			List<Profession> prof = Arrays.asList(Profession.values());
+			assert prof != null;
+			professions = prof;
+		}
 	}
 	
 	@Nullable
@@ -72,8 +102,13 @@ public class VillagerData extends EntityData<Villager> {
 		final Villager v = super.spawn(loc);
 		if (v == null)
 			return null;
-		if (profession == null)
-			v.setProfession(CollectionUtils.getRandom(Profession.values()));
+		if (profession == null) { // Randomize profession
+			profession = CollectionUtils.getRandom(professions);
+			v.setProfession(profession);
+		}
+		if (hasNitwit && profession == Profession.NITWIT)
+			v.setRecipes(Collections.emptyList()); // Remove trades from nitwit
+			
 		return v;
 	}
 	

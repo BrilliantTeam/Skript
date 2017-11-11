@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,13 +13,13 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.conditions;
+
+import java.util.Arrays;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
@@ -64,7 +64,7 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class CondCompare extends Condition {
 	
-	private final static Patterns<Relation> patterns = new Patterns<Relation>(new Object[][] {
+	private final static Patterns<Relation> patterns = new Patterns<>(new Object[][] {
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) ((greater|more|higher|bigger|larger) than|above)|\\>) %objects%", Relation.GREATER},
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) (greater|more|higher|bigger|larger|above) [than] or (equal to|the same as)|\\>=) %objects%", Relation.GREATER_OR_EQUAL},
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) ((less|smaller) than|below)|\\<) %objects%", Relation.SMALLER},
@@ -112,7 +112,6 @@ public class CondCompare extends Condition {
 	@SuppressWarnings("null")
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		
 		first = vars[0];
 		second = vars[1];
 		if (vars.length == 3)

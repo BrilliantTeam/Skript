@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.hooks.economy.classes;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -41,7 +39,7 @@ import ch.njol.util.StringUtils;
  */
 public class Money {
 	static {
-		Classes.registerClass(new ClassInfo<Money>(Money.class, "money")
+		Classes.registerClass(new ClassInfo<>(Money.class, "money")
 				.user("money")
 				.name("Money")
 				.description("A certain amount of money. Please note that this differs from <a href='#number'>numbers</a> as it includes a currency symbol or name, but usually the two are interchangeable, e.g. you can both <code>add 100$ to the player's balance</code> and <code>add 100 to the player's balance</code>.")
@@ -91,6 +89,21 @@ public class Money {
 					@Override
 					public Money subtract(final Money value, final Money difference) {
 						return new Money(value.amount - difference.amount);
+					}
+
+					@Override
+					public Money multiply(Money value, Money multiplier) {
+						return new Money(value.getAmount() * multiplier.getAmount());
+					}
+
+					@Override
+					public Money divide(Money value, Money divider) {
+						return new Money(value.getAmount() / divider.getAmount());
+					}
+
+					@Override
+					public Money power(Money value, Money exponent) {
+						throw new UnsupportedOperationException();
 					}
 				}));
 		

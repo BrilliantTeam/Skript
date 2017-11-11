@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import java.io.BufferedWriter;
@@ -63,7 +61,7 @@ public class EffLog extends Effect {
 	
 	private final static File logsFolder = new File(Skript.getInstance().getDataFolder(), "logs");
 	
-	final static HashMap<String, PrintWriter> writers = new HashMap<String, PrintWriter>();
+	final static HashMap<String, PrintWriter> writers = new HashMap<>();
 	static {
 		Skript.closeOnDisable(new Closeable() {
 			@Override

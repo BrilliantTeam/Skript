@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.events;
 
 import java.util.ArrayList;
@@ -68,7 +66,7 @@ public class EvtExperienceSpawn extends SelfRegisteringSkriptEvent {
 		return true;
 	}
 	
-	static Collection<Trigger> triggers = new ArrayList<Trigger>();
+	static Collection<Trigger> triggers = new ArrayList<>();
 	
 	@Override
 	public void register(final Trigger t) {

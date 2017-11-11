@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.localization;
 
 import java.util.HashMap;
@@ -36,7 +34,7 @@ public class Adjective extends Message {
 	private final static int DEFINITE_ARTICLE = -100;
 	private final static String DEFINITE_ARTICLE_TOKEN = "+";
 	
-	private final HashMap<Integer, String> genders = new HashMap<Integer, String>();
+	private final HashMap<Integer, String> genders = new HashMap<>();
 	@Nullable
 	String def;
 	

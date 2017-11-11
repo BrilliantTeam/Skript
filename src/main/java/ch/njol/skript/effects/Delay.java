@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -15,10 +15,8 @@
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * Copyright 2011-2014 Peter Güttinger
- *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import java.util.Collections;
@@ -36,10 +34,14 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.Literal;
+import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.timings.SkriptTimings;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
+import edu.umd.cs.findbugs.ba.bcp.New;
 
 /**
  * @author Peter Güttinger
@@ -62,6 +64,12 @@ public class Delay extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		duration = (Expression<Timespan>) exprs[0];
+		if (duration instanceof Literal) { // If we can, do sanity check for delays
+			long millis = ((Literal<Timespan>) duration).getSingle().getMilliSeconds();
+			if (millis < 50) {
+				Skript.warning("Delays less than one tick are not possible, defaulting to one tick.");
+			}
+		}
 		return true;
 	}
 
@@ -81,9 +89,20 @@ public class Delay extends Effect {
 				public void run() {
 					if (Skript.debug())
 						Skript.info(getIndentation() + "... continuing after " + (System.nanoTime() - start) / 1000000000. + "s");
+					
+					Object timing = null;
+					if (SkriptTimings.enabled()) { // getTrigger call is not free, do it only if we must
+						Trigger trigger = getTrigger();
+						if (trigger != null) {
+							timing = SkriptTimings.start(trigger.getDebugLabel());
+						}
+					}
+					
 					TriggerItem.walk(next, e);
+					
+					SkriptTimings.stop(timing); // Stop timing if it was even started
 				}
-			}, d.getTicks_i());
+			}, d.getTicks_i() < 1 ? 1 : d.getTicks_i()); // Minimum delay is one tick, less than it is useless!
 		}
 		return null;
 	}
@@ -93,6 +112,10 @@ public class Delay extends Effect {
 
 	public final static boolean isDelayed(final Event e) {
 		return delayed.contains(e);
+	}
+
+	public static void addDelayedEvent(Event event){
+		delayed.add(event);
 	}
 
 	@Override

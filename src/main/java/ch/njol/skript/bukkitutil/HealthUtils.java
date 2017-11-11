@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.bukkitutil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -102,6 +100,7 @@ public abstract class HealthUtils {
 	 * @param e
 	 * @return How many hearts the entity can have at most
 	 */
+	@SuppressWarnings("deprecation") // Why is getMaxHealth deprected WITHOUT universal alternative?
 	public final static double getMaxHealth(final Damageable e) {
 		if (supportsDoubles)
 			return e.getMaxHealth() / 2;
@@ -121,6 +120,7 @@ public abstract class HealthUtils {
 	 * @param e
 	 * @param health How many hearts the entity can have at most
 	 */
+	@SuppressWarnings("deprecation") // Why is setMaxHealth deprected WITHOUT universal alternative?
 	public final static void setMaxHealth(final Damageable e, final double health) {
 		if (supportsDoubles) {
 			e.setMaxHealth(Math.max(Skript.EPSILON / 2, health * 2)); // 0 is not allowed, so just use a small value - smaller than Skript.EPSILON though to compare as 0

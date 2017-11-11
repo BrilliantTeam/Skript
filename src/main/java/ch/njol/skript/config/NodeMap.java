@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.config;
 
 import java.util.HashMap;
@@ -34,7 +32,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public class NodeMap {
 	
-	private final Map<String, Node> map = new HashMap<String, Node>();
+	private final Map<String, Node> map = new HashMap<>();
 	
 	public final static boolean inMap(final Node n) {
 		return n instanceof EntryNode || n instanceof SectionNode;

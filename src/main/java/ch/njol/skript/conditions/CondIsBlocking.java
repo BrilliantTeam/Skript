@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.conditions;
 
 import org.bukkit.entity.Player;
@@ -33,9 +31,11 @@ import ch.njol.skript.doc.Since;
  * @author Peter Güttinger
  */
 @Name("Is Blocking")
-@Description("Checks whether a player is blocking with his sword.")
-@Examples("victim is blocking")
-@Since("")
+@Description("Checks whether a player is blocking with his shield.")
+@Examples({"on damage of player:",
+	  	"	victim is blocking",
+	 	"	damage attacker by 0.5 hearts"})
+@Since("<i>unknown</i> (before 2.1)")
 public class CondIsBlocking extends PropertyCondition<Player> {
 	
 	static {

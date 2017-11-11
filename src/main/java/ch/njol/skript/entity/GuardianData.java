@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2013 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.entity;
 
 import org.bukkit.entity.Guardian;
@@ -31,7 +29,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 public class GuardianData extends EntityData<Guardian> {
 
 	static {
-		if(Skript.classExists("org.bukkit.entity.Guardian")){
+		if(Skript.classExists("org.bukkit.entity.Guardian") && !Skript.isRunningMinecraft(1, 11)){
 			EntityData.register(GuardianData.class, "guardian", Guardian.class, 1, "normal guardian", "guardian", "elder guardian");
 		}
 	}
@@ -46,7 +44,7 @@ public class GuardianData extends EntityData<Guardian> {
 		return true;
 	}
 
-	@SuppressWarnings("null")
+	@SuppressWarnings({"null", "deprecation"})
 	@Override
 	protected boolean init(Class<? extends Guardian> c, Guardian e) {
 		if(e != null)
@@ -54,6 +52,7 @@ public class GuardianData extends EntityData<Guardian> {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void set(Guardian entity) {
 		if(isElder)
@@ -61,6 +60,7 @@ public class GuardianData extends EntityData<Guardian> {
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected boolean match(Guardian entity) {
 		return entity.isElder() == isElder;

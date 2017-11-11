@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
 
 import java.util.HashMap;
@@ -38,7 +36,7 @@ public final class EnumUtils<E extends Enum<E>> {
 	private final String languageNode;
 	
 	private String[] names;
-	private final HashMap<String, E> parseMap = new HashMap<String, E>();
+	private final HashMap<String, E> parseMap = new HashMap<>();
 	
 	public EnumUtils(final Class<E> c, final String languageNode) {
 		assert c != null && c.isEnum() : c;

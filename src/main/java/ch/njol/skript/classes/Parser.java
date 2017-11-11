@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,17 +13,16 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.classes;
 
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.StringMode;
 
@@ -45,10 +44,31 @@ public abstract class Parser<T> {
 	 * 
 	 * @param s The String to parse. This string is already trim()med.
 	 * @param context Context of parsing, may not be null
+	 * @param pi Parser instance. Use {@link ParserInstance#submitErrorLog(ch.njol.skript.log.ParseLogHandler)} for your parse log handlers.
+	 * In case other methods (especially in SkriptParser) need that, just pass it to them.
 	 * @return The parsed input or null if the input is invalid for this parser.
 	 */
 	@Nullable
-	public abstract T parse(String s, ParseContext context);
+	public T parse(String s, ParseContext context, ParserInstance pi) {
+		return parse(s, context); // For old code/simple code
+	}
+	
+	/**
+	 * Parses the input. This method may print an error prior to returning null if the input couldn't be parsed.
+	 * <p>
+	 * Remember to override {@link #canParse(ParseContext)} if this parser doesn't parse at all (i.e. you only use it's toString methods) or only parses for certain contexts.
+	 * 
+	 * Note that this method does not provide {@link ParserInstance}; you won't be able to use logging in multithreaded
+	 * parsing environment.
+	 * 
+	 * @param s The String to parse. This string is already trim()med.
+	 * @param context Context of parsing, may not be null
+	 * @return The parsed input or null if the input is invalid for this parser.
+	 */
+	@Nullable
+	public T parse(String s, ParseContext context) {
+		throw new UnsupportedOperationException("Parsing not implemented (remember to override parse method)");
+	}
 	
 	/**
 	 * @return Whether {@link #parse(String, ParseContext)} can actually return something other that null for the given context

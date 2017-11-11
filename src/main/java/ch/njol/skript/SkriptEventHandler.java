@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript;
 
 import java.io.File;
@@ -47,8 +45,7 @@ import ch.njol.skript.command.Commands;
 import ch.njol.skript.lang.SelfRegisteringSkriptEvent;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.function.Functions;
-import ch.njol.skript.timings.Timing;
-import ch.njol.skript.timings.Timings;
+import ch.njol.skript.timings.SkriptTimings;
 
 /**
  * @author Peter Güttinger
@@ -56,9 +53,9 @@ import ch.njol.skript.timings.Timings;
 public abstract class SkriptEventHandler {
 	private SkriptEventHandler() {}
 	
-	final static Map<Class<? extends Event>, List<Trigger>> triggers = new HashMap<Class<? extends Event>, List<Trigger>>();
+	final static Map<Class<? extends Event>, List<Trigger>> triggers = new HashMap<>();
 	
-	private final static List<Trigger> selfRegisteredTriggers = new ArrayList<Trigger>();
+	private final static List<Trigger> selfRegisteredTriggers = new ArrayList<>();
 	
 	private final static Iterator<Trigger> getTriggers(final Class<? extends Event> event) {
 		return new Iterator<Trigger>() {
@@ -114,7 +111,6 @@ public abstract class SkriptEventHandler {
 	};
 	
 	static void check(final Event e) {
-		@SuppressWarnings("null")
 		Iterator<Trigger> ts = getTriggers(e.getClass());
 		if (!ts.hasNext())
 			return;
@@ -136,7 +132,7 @@ public abstract class SkriptEventHandler {
 			logEventStart(e);
 		}
 		
-		if (e instanceof Cancellable && ((Cancellable) e).isCancelled() &&
+		if (e instanceof Cancellable && ((Cancellable) e).isCancelled() && !listenCancelled.contains(e.getClass()) &&
 				!(e instanceof PlayerInteractEvent && (((PlayerInteractEvent) e).getAction() == Action.LEFT_CLICK_AIR || ((PlayerInteractEvent) e).getAction() == Action.RIGHT_CLICK_AIR) && ((PlayerInteractEvent) e).useItemInHand() != Result.DENY)
 				|| e instanceof ServerCommandEvent && (((ServerCommandEvent) e).getCommand() == null || ((ServerCommandEvent) e).getCommand().isEmpty())) {
 			if (Skript.logVeryHigh())
@@ -148,8 +144,13 @@ public abstract class SkriptEventHandler {
 			final Trigger t = ts.next();
 			if (!t.getEvent().check(e))
 				continue;
+			
 			logTriggerStart(t);
+			Object timing = SkriptTimings.start(t.getDebugLabel());
+			
 			t.execute(e);
+			
+			SkriptTimings.stop(timing);
 			logTriggerEnd(t);
 		}
 		
@@ -157,14 +158,8 @@ public abstract class SkriptEventHandler {
 	}
 	
 	private static long startEvent;
-	@Nullable
-	private static Timing timing;
 	
-	@SuppressWarnings("null")
 	public static void logEventStart(final Event e) {
-		if (Timings.enabled())
-			timing = Timings.of(e.getEventName());
-		
 		startEvent = System.nanoTime();
 		if (!Skript.logVeryHigh())
 			return;
@@ -173,9 +168,6 @@ public abstract class SkriptEventHandler {
 	}
 	
 	public static void logEventEnd() {
-		if (timing != null)
-			timing.setEventTime(System.nanoTime() - startEvent);
-		
 		if (!Skript.logVeryHigh())
 			return;
 		Skript.info("== took " + 1. * (System.nanoTime() - startEvent) / 1000000. + " milliseconds ==");
@@ -191,23 +183,16 @@ public abstract class SkriptEventHandler {
 	}
 	
 	public static void logTriggerEnd(final Trigger t) {
-		if (timing != null)
-			timing.addTrigger(t, System.nanoTime() - startTrigger);
-		
 		if (!Skript.logVeryHigh())
 			return;
 		Skript.info("# " + t.getName() + " took " + 1. * (System.nanoTime() - startTrigger) / 1000000. + " milliseconds");
 	}
-	
-	public static void removeTiming() {
-		timing = null;
-	}
-	
-	static void addTrigger(final Class<? extends Event>[] events, final Trigger trigger) {
+
+	public static void addTrigger(final Class<? extends Event>[] events, final Trigger trigger) {
 		for (final Class<? extends Event> e : events) {
 			List<Trigger> ts = triggers.get(e);
 			if (ts == null)
-				triggers.put(e, ts = new ArrayList<Trigger>());
+				triggers.put(e, ts = new ArrayList<>());
 			ts.add(trigger);
 		}
 	}
@@ -217,7 +202,7 @@ public abstract class SkriptEventHandler {
 	 * 
 	 * @param t Trigger that has already been registered to its event
 	 */
-	static void addSelfRegisteringTrigger(final Trigger t) {
+	public static void addSelfRegisteringTrigger(final Trigger t) {
 		assert t.getEvent() instanceof SelfRegisteringSkriptEvent;
 		selfRegisteredTriggers.add(t);
 	}
@@ -268,9 +253,13 @@ public abstract class SkriptEventHandler {
 	/**
 	 * Stores which events are currently registered with Bukkit
 	 */
-	private final static Set<Class<? extends Event>> registeredEvents = new HashSet<Class<? extends Event>>();
+	private final static Set<Class<? extends Event>> registeredEvents = new HashSet<>();
 	private final static Listener listener = new Listener() {};
 	
+	/**
+	 * Registers event handlers for all events which currently loaded
+	 * triggers are using.
+	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	final static void registerBukkitEvents() {
 		for (final Class<? extends Event> e : triggers.keySet()) {
@@ -330,5 +319,10 @@ public abstract class SkriptEventHandler {
 //		}
 //		return false;
 //	}
+	
+	/**
+	 * Events which are listened even if they are cancelled.
+	 */
+	public final static Set<Class<? extends Event>> listenCancelled = new HashSet<>();
 	
 }

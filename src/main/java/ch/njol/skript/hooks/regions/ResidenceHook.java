@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2016 Peter Güttinger and contributors
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.hooks.regions;
 
 import java.io.IOException;
@@ -42,9 +40,11 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.api.ResidenceApi;
+import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.bekvon.bukkit.residence.protection.ResidencePermissions;
+import com.google.common.base.Objects;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -80,18 +80,18 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 	
 	@Override
 	public boolean canBuild_i(final Player p, final Location l) {
-		final ClaimedResidence res = Residence.getResidenceManager().getByLoc(l);
+		final ClaimedResidence res = Residence.getInstance().getResidenceManager().getByLoc(l);
 		if (res == null)
 			return true; // No claim here
 		ResidencePermissions perms = res.getPermissions();
-		return perms.playerHas(p, "build", true);
+		return perms.playerHas(p, Flags.build, true);
 	}
 	
 	@SuppressWarnings("null")
 	@Override
 	public Collection<? extends Region> getRegionsAt_i(final Location l) {
-		final List<ResidenceRegion> ress = new ArrayList<ResidenceRegion>();
-		final ClaimedResidence res = Residence.getResidenceManager().getByLoc(l);
+		final List<ResidenceRegion> ress = new ArrayList<>();
+		final ClaimedResidence res = Residence.getInstance().getResidenceManager().getByLoc(l);
 		if (res == null)
 			return Collections.emptyList();
 		ress.add(new ResidenceRegion(l.getWorld(), res));
@@ -101,7 +101,7 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 	@Override
 	@Nullable
 	public Region getRegion_i(final World world, final String name) {
-		final ClaimedResidence res = Residence.getResidenceManager().getByName(name);
+		final ClaimedResidence res = Residence.getInstance().getResidenceManager().getByName(name);
 		if (res == null)
 			return null;
 		return new ResidenceRegion(world, res);
@@ -150,7 +150,7 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 			if (!(region instanceof String))
 				throw new StreamCorruptedException("Tried to deserialize Residence region with no valid name!");
 			fields.setFields(this);
-			ClaimedResidence res = Residence.getResidenceManager().getByName((String) region);
+			ClaimedResidence res = Residence.getInstance().getResidenceManager().getByName((String) region);
 			if (res == null)
 				throw new StreamCorruptedException("Invalid region " + region + " in world " + world);
 			this.res = res;
@@ -163,7 +163,7 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 
 		@Override
 		public boolean isMember(OfflinePlayer p) {
-			return res.getPermissions().playerHas(p.getName(), "build", false);
+			return res.getPermissions().playerHas(p.getName(), Flags.build, false);
 		}
 
 		@SuppressWarnings("null")
@@ -174,13 +174,13 @@ public class ResidenceHook extends RegionsPlugin<Residence> {
 
 		@Override
 		public boolean isOwner(OfflinePlayer p) {
-			return res.getPermissions().playerHas(p.getName(), "build", false);
+			return Objects.equal(res.getPermissions().getOwnerUUID(), p.getUniqueId());
 		}
 
 		@SuppressWarnings("null")
 		@Override
 		public Collection<OfflinePlayer> getOwners() {
-			return Collections.emptyList();
+			return Collections.singleton(Residence.getInstance().getOfflinePlayer(res.getPermissions().getOwner()));
 		}
 
 		@SuppressWarnings("null")

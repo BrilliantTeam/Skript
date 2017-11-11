@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.entity.Creature;
@@ -54,7 +52,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Examples({"on entity target:",
 		"    entity's target is a player",
 		"    send \"You're being followed by an %entity%!\" to target of entity"})
-@Since("")
+@Since("<i>unknown</i> (before 2.1)")
 public class ExprTarget extends PropertyExpression<LivingEntity, Entity> {
 	static {
 		Skript.registerExpression(ExprTarget.class, Entity.class, ExpressionType.PROPERTY,

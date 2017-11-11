@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,16 +13,15 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.events;
 
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -69,8 +68,8 @@ public final class EvtEntity extends SkriptEvent {
 		if (types != null) {
 			if (StringUtils.startsWithIgnoreCase(parser.expr, "spawn")) {
 				for (final EntityData<?> d : types) {
-					if (!Creature.class.isAssignableFrom(d.getType())) {
-						Skript.error("The spawn event only works for creatures", ErrorQuality.SEMANTIC_ERROR);
+					if (!LivingEntity.class.isAssignableFrom(d.getType()) || HumanEntity.class.isAssignableFrom(d.getType())) {
+						Skript.error("The spawn event only works for living entities (excluding humans)", ErrorQuality.SEMANTIC_ERROR);
 						return false;
 					}
 				}

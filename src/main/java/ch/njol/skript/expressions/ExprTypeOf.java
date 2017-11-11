@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,14 +13,13 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -32,6 +31,7 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.registrations.Converters;
+import edu.umd.cs.findbugs.ba.bcp.New;
 
 /**
  * @author Peter Güttinger
@@ -43,7 +43,7 @@ import ch.njol.skript.registrations.Converters;
 @Since("1.4")
 public class ExprTypeOf extends SimplePropertyExpression<Object, Object> {
 	static {
-		register(ExprTypeOf.class, Object.class, "type", "entitydatas/itemstacks");
+		register(ExprTypeOf.class, Object.class, "type", "entitydatas/itemstacks/inventories");
 	}
 	
 	@Override
@@ -58,6 +58,8 @@ public class ExprTypeOf extends SimplePropertyExpression<Object, Object> {
 			return ((EntityData<?>) o).getSuperType();
 		} else if (o instanceof ItemStack) {
 			return new ItemStack(((ItemStack) o).getType(), 1, ((ItemStack) o).getDurability());
+		} else if (o instanceof Inventory) {
+			return ((Inventory) o).getType();
 		}
 		assert false;
 		return null;

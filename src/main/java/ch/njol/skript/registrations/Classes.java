@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.registrations;
 
 import java.io.ByteArrayInputStream;
@@ -38,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import ch.njol.skript.localization.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -581,10 +580,10 @@ public abstract class Classes {
 	private final static <T> String toString(final @Nullable T o, final StringMode mode, final int flags) {
 		assert flags == 0 || mode == StringMode.MESSAGE;
 		if (o == null)
-			return "<none>";
+			return Language.get("none");
 		if (o.getClass().isArray()) {
 			if (((Object[]) o).length == 0)
-				return "<none>";
+				return Language.get("none");
 			final StringBuilder b = new StringBuilder();
 			boolean first = true;
 			for (final Object i : (Object[]) o) {

@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.events;
 
 import java.util.ArrayList;
@@ -63,10 +61,10 @@ public class EvtAtTime extends SelfRegisteringSkriptEvent implements Comparable<
 		
 		int lastTick; // as Bukkit's scheduler is inconsistent this saves the exact tick when the events were last checked
 		int currentIndex;
-		ArrayList<EvtAtTime> list = new ArrayList<EvtAtTime>();
+		ArrayList<EvtAtTime> list = new ArrayList<>();
 	}
 	
-	final static HashMap<World, EvtAtInfo> triggers = new HashMap<World, EvtAtInfo>();
+	final static HashMap<World, EvtAtInfo> triggers = new HashMap<>();
 	
 	@Nullable
 	private Trigger t;

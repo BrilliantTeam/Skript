@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2016 Peter Güttinger and contributors
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.event.Event;
@@ -52,16 +50,12 @@ public class ExprFinalDamage extends SimpleExpression<Double> {
 		Skript.registerExpression(ExprFinalDamage.class, Double.class, ExpressionType.SIMPLE, "[the] final damage");
 	}
 	
-	@SuppressWarnings("null")
-	private Kleenean delay;
-	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		if (!ScriptLoader.isCurrentEvent(EntityDamageEvent.class)) {
 			Skript.error("The expression 'final damage' can only be used in damage events", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}
-		delay = isDelayed;
 		return true;
 	}
 	

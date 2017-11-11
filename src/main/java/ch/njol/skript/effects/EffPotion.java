@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import org.bukkit.entity.LivingEntity;
@@ -47,11 +45,13 @@ import ch.njol.util.Kleenean;
 		"remove haste from the victim",
 		"on join:",
 		"	apply potion of strength of tier {strength.%player%} to the player for 999 days"})
-@Since("2.0")
+@Since("2.0, 2.2-dev27 (ambient and particle-less potion effects)")
 public class EffPotion extends Effect {
 	static {
 		Skript.registerEffect(EffPotion.class,
-				"apply [potion of] %potioneffecttypes% [potion] [[[of] tier] %-number%] to %livingentities% [for %-timespan%]"
+				"apply [potion of] %potioneffecttypes% [potion] [[[of] tier] %-number%] to %livingentities% [for %-timespan%]",
+				"apply ambient [potion of] %potioneffecttypes% [potion] [[[of] tier] %-number%] to %livingentities% [for %-timespan%]",
+				"apply [potion of] %potioneffecttypes% [potion] [[[of] tier] %-number%] without [any] particles to %livingentities% [for %-timespan%]"
 				//, "apply %itemtypes% to %livingentities%"
 				/*,"remove %potioneffecttypes% from %livingentities%"*/);
 	}
@@ -67,11 +67,13 @@ public class EffPotion extends Effect {
 	@Nullable
 	private Expression<Timespan> duration;
 	private boolean apply;
+	private boolean ambient; // Ambient means less particles
+	private boolean particles; // Particles or no particles?
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		apply = matchedPattern == 0;
+		apply = matchedPattern < 3;
 		if (apply) {
 			potions = (Expression<PotionEffectType>) exprs[0];
 			tier = (Expression<Number>) exprs[1];
@@ -81,6 +83,23 @@ public class EffPotion extends Effect {
 			potions = (Expression<PotionEffectType>) exprs[0];
 			entities = (Expression<LivingEntity>) exprs[1];
 		}
+		
+		// Ambience and particles
+		switch (matchedPattern) {
+			case 0:
+				ambient = false;
+				particles = true;
+				break;
+			case 1:
+				ambient = true;
+				particles = true;
+				break;
+			case 2:
+				ambient = false;
+				particles = false;
+				break;
+		}
+		
 		return true;
 	}
 	
@@ -90,7 +109,7 @@ public class EffPotion extends Effect {
 		if (ts.length == 0)
 			return;
 		if (!apply) {
-			for (final LivingEntity en : entities.getArray(e)) {
+			for (LivingEntity en : entities.getArray(e)) {
 				for (final PotionEffectType t : ts)
 					en.removePotionEffect(t);
 			}
@@ -121,7 +140,7 @@ public class EffPotion extends Effect {
 						}
 					}
 				}
-				en.addPotionEffect(new PotionEffect(t, duration, a), true);
+				en.addPotionEffect(new PotionEffect(t, duration, a, ambient, particles), true);
 			}
 		}
 	}

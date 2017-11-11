@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.config;
 
 import java.io.PrintWriter;
@@ -132,8 +130,8 @@ public abstract class Node {
 	public final static NonNullPair<String, String> splitLine(final String line) {
 		final Matcher m = linePattern.matcher(line);
 		if (m.matches())
-			return new NonNullPair<String, String>("" + m.group(1).replace("##", "#"), "" + m.group(2));
-		return new NonNullPair<String, String>("" + line.replace("##", "#"), "");
+			return new NonNullPair<>("" + m.group(1).replace("##", "#"), "" + m.group(2));
+		return new NonNullPair<>("" + line.replace("##", "#"), "");
 	}
 	
 	@Nullable

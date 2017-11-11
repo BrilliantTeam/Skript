@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2013 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.bukkitutil;
 
 import org.bukkit.block.Biome;
@@ -36,7 +34,7 @@ import ch.njol.skript.util.EnumUtils;
  */
 public abstract class BiomeMappings {
 	
-	private final static EnumUtils<Biome> util = new EnumUtils<Biome>(Biome.class, "biomes");
+	private final static EnumUtils<Biome> util = new EnumUtils<>(Biome.class, "biomes");
 	
 	private final static boolean mapFor19 = Skript.isRunningMinecraft(1, 9);
 	

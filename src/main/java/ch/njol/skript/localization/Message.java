@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.localization;
 
 import java.util.ArrayList;
@@ -37,7 +35,7 @@ import ch.njol.skript.Skript;
 public class Message {
 	
 	// this is most likely faster than registering a listener for each Message
-	final static Collection<Message> messages = new ArrayList<Message>(50);
+	final static Collection<Message> messages = new ArrayList<>(50);
 	static boolean firstChange = true;
 	static {
 		Language.addListener(new LanguageChangeListener() {

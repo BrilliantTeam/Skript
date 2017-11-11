@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.classes.data;
 
 import java.util.Collection;
@@ -37,6 +35,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.aliases.ItemType;
@@ -47,6 +46,7 @@ import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.entity.XpOrbData;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.BlockUtils;
+import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.EnchantmentType;
 import ch.njol.skript.util.Experience;
 import ch.njol.skript.util.Slot;
@@ -308,5 +308,23 @@ public class DefaultConverters {
 //			}
 //			
 //		});
+		
+		// Number - Vector; DISABLED due to performance problems
+//		Converters.registerConverter(Number.class, Vector.class, new Converter<Number, Vector>() {
+//			@Override
+//			@Nullable
+//			public Vector convert(Number number) {
+//				return new Vector(number.doubleValue(), number.doubleValue(), number.doubleValue());
+//			}
+//		});
+
+		// Vector - Direction
+		Converters.registerConverter(Vector.class, Direction.class, new Converter<Vector, Direction>() {
+			@Override
+			@Nullable
+			public Direction convert(Vector vector) {
+				return new Direction(vector);
+			}
+});
 	}
 }

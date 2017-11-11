@@ -57,6 +57,10 @@ automatically download new version: false
 # If you disable this you can still use '/skript update download' to make Skript download the newest version.
 # If you're concerned about changes use '/skript update changes' for a full list of changes since your current version.
 
+update to pre-releases: true
+# Indicates if Skript should update to pre-release builds, which might be unstable. This is enabled by default, if
+# your first Skript version in this server is pre-release.
+
 enable effect commands: false
 effect command token: !
 # If 'enable effect commands' is set to true, chat messages starting with the 'effect command token' will be interpreted as effects and executed.
@@ -159,6 +163,22 @@ soft api exceptions: false
 # However, if Skript or addons of it are not working correctly, this might help.
 # You may also get told to enable this by Skript or addon developers - then do so.
 
+enable timings: false
+# When enabled, triggers in scripts will be present in timings reports.
+# Note that this requires Paper (https://paper.readthedocs.io/en/paper-1.11/) to work; on Bukkit/Spigot this option has no effect.
+# When false, timings are not enabled for scripts even if you're running Paper.
+
+parse links in chat messages: disabled
+# Controls how Skript will try to parse links in chat messages.
+# If 'disabled' or 'false', no links will be automatically parsed.
+# When 'strict', everything starting with http(s):// will be parsed as link.
+# When 'lenient', everything that contains a dot will be interpreted as a link.
+
+color codes reset formatting: true
+# With old Minecraft chat protocol, color codes used to reset formatting of text.
+# With JSON-based new chat protocol, this is not necessary, but can be done
+# manually for compatibility. This is done by default for compatibility.
+
 # ==== Variables ====
 
 databases:
@@ -199,14 +219,19 @@ databases:
 		port: 3306 # 3306 is MySQL's default port, i.e. you likely won't need to change this value
 		user: root
 		password: pass
-		database: skript # The database to use. Skript will automatically create a table 'variables21' in this database if it doesn't exist
-		                 # (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
-		
+		database: skript # The database to use, the table will be created in this database.
+		table: variables21 # The name of the table to create. 'variables21' is the default name, if this was to be omitted.
+		                   # (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
 		# == SQLite/CSV configuration ==
 		file: ./plugins/Skript/variables.db
 		# Where to save the variables to. For a CSV file, the file extension '.csv' is recommended, but not required, but SQLite database files must end in '.db' (SQLibrary forces this).
 		# The file path can either be absolute (e.g. 'C:\whatever\...' [Windows] or '/usr/whatever/...' [Unix]), or relative to the server directory (e.g. './plugins/Skript/...').
-		
+
+		#table: variables21
+		# The name of the table to create. 'variables21' is the default name, if this was to be omitted.
+        # (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
+        # This is generally not required as the the .db file will only be used by Skript, unless you want to split different variables into different tables
+
 		backup interval: 2 hours
 		# Creates a backup of the file every so often. This can be useful if you ever want to revert variables to an older state.
 		# Variables are saved constantly no matter what is set here, thus a server crash will never make you loose any variables.
@@ -226,7 +251,8 @@ databases:
 		user: root
 		password: pass
 		database: skript
-		
+		table: variables21
+
 		monitor changes: true
 		monitor interval: 20 seconds
 	
@@ -240,7 +266,9 @@ databases:
 		
 		file: ./plugins/Skript/variables.db
 		# SQLite databases must end in '.db'
-    	
+    	#table: variables21
+    	# Usually not required, if omitted defaults to variables21 (see above for more details)
+
 		backup interval: 0 # 0 = don't create backups
 		monitor changes: false
 		monitor interval: 20 seconds

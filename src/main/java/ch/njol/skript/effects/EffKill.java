@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,21 +13,14 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import org.bukkit.GameMode;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -57,6 +50,9 @@ public class EffKill extends Effect {
 		Skript.registerEffect(EffKill.class, "kill %entities%");
 	}
 	
+	// Absolutely make sure it dies
+	public static final int DAMAGE_AMOUNT = Integer.MAX_VALUE;
+	
 	@SuppressWarnings("null")
 	private Expression<Entity> entities;
 	
@@ -69,15 +65,23 @@ public class EffKill extends Effect {
 	
 	@Override
 	protected void execute(final Event e) {
-		for (final Entity entity : entities.getArray(e)) {
-			if (entity instanceof ArmorStand || entity instanceof Vehicle) {
+		for (Entity entity : entities.getArray(e)) {
+			if (entity instanceof EnderDragonPart){
+				entity = ((EnderDragonPart) entity).getParent();
+			}
+			
+			// Some entities cannot take damage but should be killable
+			if ((entity instanceof ArmorStand || entity instanceof Vehicle || entity instanceof EnderDragon || entity instanceof Pig) && !(entity instanceof Damageable)) {
 				entity.remove(); // Got complaints in issue tracker, so this is possible... Not sure if good idea, though!
 			} else if (entity instanceof Damageable) {
 				final boolean creative = entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE;
-				if (creative)
+				if (creative) // Set player to survival before applying damage
 					((Player) entity).setGameMode(GameMode.SURVIVAL);
-				HealthUtils.damage((Damageable) entity, HealthUtils.getMaxHealth((LivingEntity) entity) * 100); // just to make sure that it really dies >:)
-				if (creative)
+				
+				assert entity != null;
+				HealthUtils.damage((Damageable) entity, HealthUtils.getMaxHealth((Damageable) entity) * 100); // just to make sure that it really dies >:)
+				
+				if (creative) // Set creative player back to creative
 					((Player) entity).setGameMode(GameMode.CREATIVE);
 			}
 		}

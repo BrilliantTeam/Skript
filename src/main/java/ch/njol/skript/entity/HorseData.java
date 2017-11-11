@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.entity;
 
 import org.bukkit.entity.Horse;
@@ -35,10 +33,12 @@ import ch.njol.skript.variables.Variables;
 /**
  * @author Peter Güttinger
  */
+@SuppressWarnings("deprecation") // Until 1.12: use old deprecated methods for backwards compatibility
 public class HorseData extends EntityData<Horse> {
 	static {
 		if (Skript.classExists("org.bukkit.entity.Horse")) {
-			register(HorseData.class, "horse", Horse.class, 0, "horse", "donkey", "mule", "undead horse", "skeleton horse");
+			if (!Skript.isRunningMinecraft(1, 11)) // For 1.11+ see SimpleEntityData
+				register(HorseData.class, "horse", Horse.class, 0, "horse", "donkey", "mule", "undead horse", "skeleton horse");
 			
 			Variables.yggdrasil.registerSingleClass(Variant.class, "Horse.Variant");
 			Variables.yggdrasil.registerSingleClass(Color.class, "Horse.Color");

@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2013 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang.function;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -39,6 +37,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class ScriptFunction<T> extends Function<T> {
 	
+	@Nullable
 	final Trigger trigger;
 	
 	@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
@@ -77,6 +76,9 @@ public class ScriptFunction<T> extends Function<T> {
 	@Override
 	@Nullable
 	public T[] execute(final FunctionEvent e, final Object[][] params) {
+		if (trigger == null)
+			throw new IllegalStateException("trigger for function is not available");
+		
 		for (int i = 0; i < parameters.length; i++) {
 			final Parameter<?> p = parameters[i];
 			final Object[] val = params[i];
@@ -88,6 +90,8 @@ public class ScriptFunction<T> extends Function<T> {
 				}
 			}
 		}
+		
+		assert trigger != null;
 		trigger.execute(e);
 		returnValueSet = false;
 		return returnValue;

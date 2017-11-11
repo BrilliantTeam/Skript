@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.config;
 
 import java.io.IOException;
@@ -45,7 +43,7 @@ import ch.njol.util.coll.iterator.CheckedIterator;
  */
 public class SectionNode extends Node implements Iterable<Node> {
 	
-	private final ArrayList<Node> nodes = new ArrayList<Node>();
+	private final ArrayList<Node> nodes = new ArrayList<>();
 	
 	public SectionNode(final String key, final String comment, final SectionNode parent, final int lineNum) {
 		super(key, comment, parent, lineNum);
@@ -427,7 +425,7 @@ public class SectionNode extends Node implements Iterable<Node> {
 	}
 	
 	HashMap<String, String> toMap(final String prefix, final String separator) {
-		final HashMap<String, String> r = new HashMap<String, String>();
+		final HashMap<String, String> r = new HashMap<>();
 		for (final Node n : this) {
 			if (n instanceof EntryNode) {
 				r.put(prefix + n.getKey(), ((EntryNode) n).getValue());

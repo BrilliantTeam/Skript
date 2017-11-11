@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.conditions;
 
 import org.bukkit.event.Event;
@@ -72,7 +70,8 @@ public class CondContains extends Condition {
 		containers = exprs[0].getConvertedExpression(Object.class);
 		if (containers == null)
 			return false;
-		if (!(containers instanceof Variable) && !String.class.isAssignableFrom(containers.getReturnType()) && !Inventory.class.isAssignableFrom(containers.getReturnType())) {
+		if (!(containers instanceof Variable) && !String.class.isAssignableFrom(containers.getReturnType()) && !Inventory.class.isAssignableFrom(containers.getReturnType())
+				&& !containers.getReturnType().equals(Object.class)) {
 			final ParseLogHandler h = SkriptLogger.startParseLogHandler();
 			try {
 				Expression<?> c = containers.getConvertedExpression(String.class);
@@ -97,6 +96,8 @@ public class CondContains extends Condition {
 	
 	@Override
 	public boolean check(final Event e) {
+		boolean caseSensitive = SkriptConfig.caseSensitive.value();
+		
 		return containers.check(e, new Checker<Object>() {
 			@Override
 			public boolean check(final Object container) {
@@ -121,12 +122,38 @@ public class CondContains extends Condition {
 						return items.check(e, new Checker<Object>() {
 							@Override
 							public boolean check(final Object type) {
-								return type instanceof String && StringUtils.contains(s, (String) type, SkriptConfig.caseSensitive.value());
+								if (type instanceof Variable) {
+									@SuppressWarnings("unchecked")
+									String toFind = ((Variable<String>) type).getSingle(e);
+									if (toFind != null)
+										return StringUtils.contains(s, toFind, caseSensitive);
+								}
+								return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
 							}
 						}, isNegated());
+					} else if (container instanceof Variable) { // Ok, so we have a variable...
+						Object val = ((Variable<?>) container).getSingle(e);
+						if (val instanceof String) {
+							final String s = (String) val;
+							return items.check(e, new Checker<Object>() {
+	
+								@Override
+								public boolean check(final Object type) {
+									if (type instanceof Variable) {
+										@SuppressWarnings("unchecked")
+										String toFind = ((Variable<String>) type).getSingle(e);
+										if (toFind != null)
+											return StringUtils.contains(s, toFind, caseSensitive);
+									}
+									return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
+								}
+								
+							});
+						}
+						// TODO support similar odd contains checks for inventories
 					}
-					return false;
 				}
+				return false;
 			}
 		});
 	}

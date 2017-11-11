@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,15 +13,14 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang;
 
 import ch.njol.skript.ScriptLoader;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
@@ -46,6 +45,19 @@ public interface SyntaxElement {
 	 * @see ScriptLoader#isCurrentEvent(Class...)
 	 */
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult);
+
+	/**
+	 * Sets parser instance for this syntax element. Make sure to override this, if it is needed.
+	 * If this method is not overridden, it does <b>nothing</b>, since not everything needs
+	 * to know about parsing process or do logging.
+	 * 
+	 * Methods of extending class should be able to retrieve this from protected variable named
+	 * "pi" or "parserInstance", if it is needed. No getter should be written.
+	 * @param pi Parser instance.
+	 */
+	public default void setParserInstance(ParserInstance pi) {
+		
+	}
 	
 	// TODO [code style] add equals to be able to find out whether two elements are equal (useful for e.g. 'if <a>: ... [else] if not <a>: ...')
 	

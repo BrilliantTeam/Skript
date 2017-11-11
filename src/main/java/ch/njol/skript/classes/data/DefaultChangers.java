@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.classes.data;
 
 import java.util.Arrays;
@@ -203,7 +201,7 @@ public class DefaultChangers {
 				switch (mode) {
 					case DELETE:
 						invi.clear();
-						if (invi instanceof PlayerInventory) {
+						if (ItemType.oldInvSize && invi instanceof PlayerInventory) {
 							((PlayerInventory) invi).setArmorContents(new ItemStack[4]);
 							if (((PlayerInventory) invi).getHolder() instanceof Player) {
 								final Player p = (Player) ((PlayerInventory) invi).getHolder();

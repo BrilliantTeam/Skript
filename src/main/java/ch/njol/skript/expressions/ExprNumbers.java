@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.util.Iterator;
@@ -64,7 +62,7 @@ public class ExprNumbers extends SimpleExpression<Number> {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		start = matchedPattern == 0 ? (Expression<Number>) exprs[0] : new SimpleLiteral<Number>(1, false);
+		start = matchedPattern == 0 ? (Expression<Number>) exprs[0] : new SimpleLiteral<>(1, false);
 		end = (Expression<Number>) exprs[1 - matchedPattern];
 		integer = parseResult.mark == 1 || matchedPattern == 1;
 		return true;

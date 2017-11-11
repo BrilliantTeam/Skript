@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
 
 import java.util.HashMap;
@@ -36,16 +34,18 @@ import ch.njol.skript.localization.LanguageChangeListener;
 import ch.njol.skript.localization.Noun;
 import ch.njol.util.coll.CollectionUtils;
 
-/**
- * @author Peter Güttinger
- */
 public enum StructureType {
-	TREE(TreeType.TREE, TreeType.BIG_TREE, TreeType.REDWOOD, TreeType.TALL_REDWOOD, TreeType.SMALL_JUNGLE, TreeType.JUNGLE, TreeType.SWAMP),
+	TREE(TreeType.TREE, TreeType.BIG_TREE, TreeType.REDWOOD, TreeType.TALL_REDWOOD, TreeType.MEGA_REDWOOD,
+			TreeType.BIRCH, TreeType.TALL_BIRCH, TreeType.SMALL_JUNGLE, TreeType.JUNGLE, TreeType.COCOA_TREE,
+			TreeType.ACACIA, TreeType.DARK_OAK, TreeType.SWAMP),
 	
 	REGULAR(TreeType.TREE, TreeType.BIG_TREE), SMALL_REGULAR(TreeType.TREE), BIG_REGULAR(TreeType.BIG_TREE),
 	REDWOOD(TreeType.REDWOOD, TreeType.TALL_REDWOOD), SMALL_REDWOOD(TreeType.REDWOOD), BIG_REDWOOD(TreeType.TALL_REDWOOD),
+	MEGA_REDWOOD(TreeType.MEGA_REDWOOD),
+	BIRCH(TreeType.BIRCH), TALL_BIRCH(TreeType.TALL_BIRCH),
 	JUNGLE(TreeType.SMALL_JUNGLE, TreeType.JUNGLE), SMALL_JUNGLE(TreeType.SMALL_JUNGLE), BIG_JUNGLE(TreeType.JUNGLE),
-	JUNGLE_BUSH(TreeType.JUNGLE_BUSH),
+	JUNGLE_BUSH(TreeType.JUNGLE_BUSH), COCOA_TREE(TreeType.COCOA_TREE),
+	ACACIA(TreeType.ACACIA), DARK_OAK(TreeType.DARK_OAK),
 	SWAMP(TreeType.SWAMP),
 	
 	MUSHROOM(TreeType.RED_MUSHROOM, TreeType.BROWN_MUSHROOM),
@@ -93,7 +93,7 @@ public enum StructureType {
 	/**
 	 * lazy
 	 */
-	final static Map<Pattern, StructureType> parseMap = new HashMap<Pattern, StructureType>();
+	final static Map<Pattern, StructureType> parseMap = new HashMap<>();
 	
 	static {
 		Language.addListener(new LanguageChangeListener() {

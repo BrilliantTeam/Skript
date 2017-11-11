@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.classes;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -49,7 +47,7 @@ public final class ChainedConverter<F, M, T> implements Converter<F, T> {
 	
 	@SuppressWarnings("unchecked")
 	public final static <F, M, T> ChainedConverter<F, M, T> newInstance(final Converter<? super F, ?> first, final Converter<?, ? extends T> second) {
-		return new ChainedConverter<F, M, T>((Converter<? super F, ? extends M>) first, (Converter<? super M, ? extends T>) second);
+		return new ChainedConverter<>((Converter<? super F, ? extends M>) first, (Converter<? super M, ? extends T>) second);
 	}
 	
 	@Override

@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,22 +13,22 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.classes.data;
 
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Chicken;
@@ -41,11 +41,9 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
-import org.bukkit.entity.PoweredMinecart;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Snowball;
-import org.bukkit.entity.StorageMinecart;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownExpBottle;
 import org.bukkit.entity.ThrownPotion;
@@ -62,6 +60,7 @@ import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Comparator;
+import ch.njol.skript.entity.BoatData;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.util.Date;
@@ -199,7 +198,7 @@ public class DefaultComparators {
 	}
 	
 	// EntityData - ItemType
-	final static LinkedHashMap<Class<? extends Entity>, Material> entityMaterials = new LinkedHashMap<Class<? extends Entity>, Material>();
+	final static LinkedHashMap<Class<? extends Entity>, Material> entityMaterials = new LinkedHashMap<>();
 	static {
 		// to fix comparisons of eggs, arrows, etc. (e.g. 'projectile is an arrow')
 		// TODO !Update with every version [entities]
@@ -225,11 +224,21 @@ public class DefaultComparators {
 			entityMaterials.put(HopperMinecart.class, Material.HOPPER_MINECART);
 			entityMaterials.put(ExplosiveMinecart.class, Material.EXPLOSIVE_MINECART);
 			entityMaterials.put(Minecart.class, Material.MINECART);
-		} else {
-			entityMaterials.put(StorageMinecart.class, Material.STORAGE_MINECART);
-			entityMaterials.put(PoweredMinecart.class, Material.POWERED_MINECART);
-			entityMaterials.put(Minecart.class, Material.MINECART);
+		} else { // 1.11 does not have these classes, and we compile against 1.11+ API now
+			try {
+				@SuppressWarnings("unchecked")
+				Class<Entity> storageCart = (Class<Entity>) Class.forName("org.bukkit.entity.StorageMinecart");
+				entityMaterials.put(storageCart, Material.STORAGE_MINECART);
+				@SuppressWarnings("unchecked")
+				Class<Entity> poweredCart = (Class<Entity>) Class.forName("org.bukkit.entity.PoweredMinecart");
+				entityMaterials.put(poweredCart, Material.POWERED_MINECART);
+				entityMaterials.put(Minecart.class, Material.MINECART);
+			} catch (ClassNotFoundException e) {
+				Skript.exception(e, "Cannot initialize material support for minecarts");
+			}
 		}
+		if (Skript.classExists("org.bukkit.entity.ArmorStand"))
+			entityMaterials.put(ArmorStand.class, Material.ARMOR_STAND);
 	}
 	public final static Comparator<EntityData, ItemType> entityItemComparator = new Comparator<EntityData, ItemType>() {
 		@Override
@@ -240,6 +249,8 @@ public class DefaultComparators {
 				return Relation.get(i.isOfType(Material.POTION.getId(), PotionEffectUtils.guessData((ThrownPotion) e)));
 			if (Skript.classExists("org.bukkit.entity.WitherSkull") && e instanceof WitherSkull)
 				return Relation.get(i.isOfType(Material.SKULL_ITEM.getId(), (short) 1));
+			if (e instanceof BoatData)
+				return Relation.get(((BoatData)e).isOfItemType(i));
 			if (entityMaterials.containsKey(e.getType()))
 				return Relation.get(i.isOfType(entityMaterials.get(e.getType()).getId(), (short) 0));
 			for (final Entry<Class<? extends Entity>, Material> m : entityMaterials.entrySet()) {
@@ -276,7 +287,7 @@ public class DefaultComparators {
 		Comparators.registerComparator(OfflinePlayer.class, OfflinePlayer.class, new Comparator<OfflinePlayer, OfflinePlayer>() {
 			@Override
 			public Relation compare(final OfflinePlayer p1, final OfflinePlayer p2) {
-				return Relation.get(p1.getName().equals(p2.getName()));
+				return Relation.get(Objects.equals(p1.getName(), p2.getName()));
 			}
 			
 			@Override
@@ -289,7 +300,8 @@ public class DefaultComparators {
 		Comparators.registerComparator(OfflinePlayer.class, String.class, new Comparator<OfflinePlayer, String>() {
 			@Override
 			public Relation compare(final OfflinePlayer p, final String name) {
-				return Relation.get(p.getName().equalsIgnoreCase(name));
+				String offlineName = p.getName();
+				return offlineName == null ? Relation.NOT_EQUAL : Relation.get(offlineName.equalsIgnoreCase(name));
 			}
 			
 			@Override

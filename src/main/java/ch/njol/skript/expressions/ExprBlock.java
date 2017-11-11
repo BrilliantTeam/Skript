@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.Location;
@@ -66,7 +64,7 @@ public class ExprBlock extends WrapperExpression<Block> {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		if (exprs.length > 0) {
-			setExpr(new ConvertedExpression<Location, Block>(Direction.combine((Expression<? extends Direction>) exprs[0], (Expression<? extends Location>) exprs[1]), Block.class, new Converter<Location, Block>() {
+			setExpr(new ConvertedExpression<>(Direction.combine((Expression<? extends Direction>) exprs[0], (Expression<? extends Location>) exprs[1]), Block.class, new Converter<Location, Block>() {
 				@Override
 				public Block convert(final Location l) {
 					return l.getBlock();
@@ -74,7 +72,7 @@ public class ExprBlock extends WrapperExpression<Block> {
 			}));
 			return true;
 		} else {
-			setExpr(new EventValueExpression<Block>(Block.class));
+			setExpr(new EventValueExpression<>(Block.class));
 			return ((EventValueExpression<Block>) getExpr()).init();
 		}
 	}

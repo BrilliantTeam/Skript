@@ -1,22 +1,22 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
+/**
+ *   This file is part of Skript.
+ *
+ *  Skript is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  Skript is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.util.coll;
 
 import java.util.Arrays;
@@ -200,7 +200,7 @@ public abstract class CollectionUtils {
 		if (map == null)
 			return null;
 		if (map.containsKey(key))
-			return new Pair<T, U>(key, map.get(key));
+			return new Pair<>(key, map.get(key));
 		return null;
 	}
 	
@@ -303,7 +303,7 @@ public abstract class CollectionUtils {
 			return Collections.emptySet();
 		if (sets.length == 1 && sets[0] != null)
 			return sets[0];
-		final Set<E> l = new HashSet<E>(sets[0]);
+		final Set<E> l = new HashSet<>(sets[0]);
 		for (int i = 1; i < sets.length; i++) {
 			if (sets[i] == null)
 				continue;
@@ -324,7 +324,7 @@ public abstract class CollectionUtils {
 			return Collections.emptySet();
 		if (sets.length == 1 && sets[0] != null)
 			return sets[0];
-		final Set<E> l = new HashSet<E>(sets[0]);
+		final Set<E> l = new HashSet<>(sets[0]);
 		for (int i = 1; i < sets.length; i++) {
 			if (sets[i] == null)
 				continue;
@@ -341,6 +341,7 @@ public abstract class CollectionUtils {
 	 * @param array Some objects
 	 * @return The passed array
 	 */
+	@SafeVarargs
 	public static <T> T[] array(final T... array) {
 		return array;
 	}

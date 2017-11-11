@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
 
 import java.io.File;
@@ -146,7 +144,7 @@ public abstract class FileUtils {
 	 * @throws IOException If renaming one of the files caused an IOException. Some files might have been renamed already.
 	 */
 	public final static Collection<File> renameAll(final File directory, final Converter<String, String> renamer) throws IOException {
-		final Collection<File> changed = new ArrayList<File>();
+		final Collection<File> changed = new ArrayList<>();
 		for (final File f : directory.listFiles()) {
 			if (f.isDirectory()) {
 				changed.addAll(renameAll(f, renamer));

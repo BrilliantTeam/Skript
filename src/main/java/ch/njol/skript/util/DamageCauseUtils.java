@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
 
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -30,7 +28,7 @@ import org.eclipse.jdt.annotation.Nullable;
 public abstract class DamageCauseUtils {
 	private DamageCauseUtils() {}
 	
-	private final static EnumUtils<DamageCause> util = new EnumUtils<DamageCause>(DamageCause.class, "damage causes");
+	private final static EnumUtils<DamageCause> util = new EnumUtils<>(DamageCause.class, "damage causes");
 	
 	@Nullable
 	public final static DamageCause parse(final String s) {

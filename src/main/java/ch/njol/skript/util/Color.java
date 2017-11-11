@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
 
 import java.util.HashMap;
@@ -61,7 +59,7 @@ public enum Color implements YggdrasilSerializable {
 	DARK_PURPLE(DyeColor.PURPLE, ChatColor.DARK_PURPLE, org.bukkit.Color.fromRGB(0x7F3FB2)),
 	LIGHT_PURPLE(DyeColor.MAGENTA, ChatColor.LIGHT_PURPLE, org.bukkit.Color.fromRGB(0xB24CD8));
 	
-	private final static String LANGUAGE_NODE = "colors";
+	public final static String LANGUAGE_NODE = "colors";
 	
 	private final DyeColor wool;
 	private final ChatColor chat;
@@ -79,12 +77,12 @@ public enum Color implements YggdrasilSerializable {
 	private final static Color[] byWool = new Color[16];
 	static {
 		for (final Color c : values()) {
-			byWool[c.wool.getData()] = c;
+			byWool[c.wool.getWoolData()] = c;
 		}
 	}
 	
-	final static Map<String, Color> byName = new HashMap<String, Color>();
-	final static Map<String, Color> byEnglishName = new HashMap<String, Color>();
+	final static Map<String, Color> byName = new HashMap<>();
+	final static Map<String, Color> byEnglishName = new HashMap<>();
 	static {
 		Language.addListener(new LanguageChangeListener() {
 			@Override
@@ -105,7 +103,7 @@ public enum Color implements YggdrasilSerializable {
 	}
 	
 	public byte getDye() {
-		return (byte) (15 - wool.getData());
+		return (byte) (15 - wool.getWoolData());
 	}
 	
 	public DyeColor getWoolColor() {
@@ -113,7 +111,7 @@ public enum Color implements YggdrasilSerializable {
 	}
 	
 	public byte getWool() {
-		return wool.getData();
+		return wool.getWoolData();
 	}
 	
 	public String getChat() {
@@ -160,7 +158,7 @@ public enum Color implements YggdrasilSerializable {
 	}
 	
 	public final static Color byWoolColor(final DyeColor color) {
-		return byWool(color.getData());
+		return byWool(color.getWoolData());
 	}
 	
 	public final org.bukkit.Color getBukkitColor() {

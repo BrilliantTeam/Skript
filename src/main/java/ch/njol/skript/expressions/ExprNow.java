@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.event.Event;
@@ -36,11 +34,8 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Date;
 import ch.njol.util.Kleenean;
 
-/**
- * @author Peter Güttinger
- */
 @Name("Now")
-@Description("The current <a href='../classes/#date'>system time</a> of the server. Use <a href='#ExprTime'>time</a> to get the <a href='../classes/#time'>Minecraft time</a> of a world.")
+@Description("The current <a href='classes.html#date'>system time</a> of the server. Use <a href='#ExprTime'>time</a> to get the <a href='classes.html#time'>Minecraft time</a> of a world.")
 @Examples({"broadcast \"Current server time: %now%\""})
 @Since("1.4")
 public class ExprNow extends SimpleExpression<Date> {

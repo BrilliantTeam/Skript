@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.Material;
@@ -69,7 +67,7 @@ public class ExprSignText extends SimpleExpression<String> {
 		if (matchedPattern == 0)
 			line = (Expression<Number>) exprs[0];
 		else
-			line = new SimpleLiteral<Number>(parseResult.mark, false);
+			line = new SimpleLiteral<>(parseResult.mark, false);
 		block = (Expression<Block>) exprs[exprs.length - 1];
 		return true;
 	}

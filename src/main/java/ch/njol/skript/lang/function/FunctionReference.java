@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2013 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang.function;
 
 import java.io.File;
@@ -73,6 +71,7 @@ public class FunctionReference<T> {
 	
 	@SuppressWarnings("unchecked")
 	public boolean validateFunction(final boolean first) {
+		Skript.debug("Validating function " + functionName);
 		final Signature<?> sign = Functions.getSignature(functionName);
 		final Function<?> newFunc = Functions.getFunction(functionName);
 		SkriptLogger.setNode(node);
@@ -84,8 +83,6 @@ public class FunctionReference<T> {
 						+ " These will continue to use the old version of the function until Skript restarts.");
 			return false;
 		}
-		if (newFunc == function)
-			return true;
 		
 		final Class<? extends T>[] returnTypes = this.returnTypes;
 		if (returnTypes != null) {
@@ -143,6 +140,7 @@ public class FunctionReference<T> {
 						+ " These will continue to use the old version of the function until Skript restarts.");
 			return false;
 		}
+		
 		for (int i = 0; i < parameters.length; i++) {
 			final Parameter<?> p = sign.parameters.get(singleUberParam ? 0 : i);
 			final RetainingLogHandler log = SkriptLogger.startRetainingLog();
@@ -176,11 +174,15 @@ public class FunctionReference<T> {
 	protected T[] execute(final Event e) {
 		if (function == null)
 			function = (Function<? extends T>) Functions.getFunction(functionName);
+		if (function == null) { // It might be impossible to resolve functions in some cases!
+			Skript.error("Invalid function call to function that does not exist yet. Be careful when using functions in 'script load' events!");
+			return null; // Return nothing and hope it works
+		}
 		
 		final Object[][] params = new Object[singleUberParam ? 1 : parameters.length][];
 		if (singleUberParam && parameters.length > 1) {
-			final ArrayList<Object> l = new ArrayList<Object>();
-			for (int i = 0; i < params.length; i++)
+			final ArrayList<Object> l = new ArrayList<>();
+			for (int i = 0; i < parameters.length; i++)
 				l.addAll(Arrays.asList(parameters[i].getArray(e))); // TODO what if an argument is not available? pass null or abort?
 			params[0] = l.toArray();
 		} else {

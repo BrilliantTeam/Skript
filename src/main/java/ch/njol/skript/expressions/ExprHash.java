@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.nio.charset.Charset;
@@ -39,59 +37,80 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
-/**
- * @author Peter Güttinger
- */
+
 @Name("Hash")
-@Description({"Hashes the given text using the MD5 algorithm. This is useful for storing passwords or IP addresses without having to store them literally.",
-		"Please note that an MD5 hash is irreversible, i.e. you won't be able to get the original text back (which is the point of storing passwords like this). Brute-force attacks can still be performed on hashes though which can easily crack short or insecure passwords."})
+@Description({"Hashes the given text using the MD5 or SHA-256 algorithms. Each algorithm is suitable for different use cases.<p>",
+		"MD5 is provided mostly for backwards compatibility, as it is outdated and not secure. ",
+		"SHA-256 is more secure, and can used to hash somewhat confidental data like IP addresses and even passwords. ",
+		"It is not <i>that</i> secure out of the box, so please consider using salt when dealing with passwords! ",
+		"When hashing data, you <strong>must</strong> specify algorithms that will be used for security reasons! ",
+		"<p>Please note that a hash cannot be reversed under normal circumstanses. You will not be able to get original value from a hash with Skript."})
 @Examples({
 		"command /setpass <text>:",
 		"	trigger:",
-		"		set {password.%player%} to hashed text-argument",
+		"		set {password.%player%} to text-argument hashed with SHA-256",
 		"command /login <text>:",
 		"	trigger:",
-		"		{password.%player%} is hashed text-argument:",
-		"			message \"login successful.\"",
+		"		{password.%player%} is text-argument hashed with SHA-256:",
+		"			message \"Login successful.\"",
 		"		else:",
-		"			message \"wrong password!\""})
-@Since("2.0")
+		"			message \"Wrong password!\""})
+@Since("2.0, 2.2-dev32 (SHA-256 algorithm)")
 public class ExprHash extends PropertyExpression<String, String> {
 	static {
-		Skript.registerExpression(ExprHash.class, String.class, ExpressionType.PROPERTY, "[md5]( |-)hash(ed|[( |-|)code] of) %strings%");
+		Skript.registerExpression(ExprHash.class, String.class, ExpressionType.SIMPLE,
+				"%strings% hash[ed] with (0¦MD5|1¦SHA-256)");
 	}
 	
 	@SuppressWarnings("null")
 	private final static Charset UTF_8 = Charset.forName("UTF-8");
 	
 	@Nullable
-	static MessageDigest md5 = null;
+	static MessageDigest md5;
+	@Nullable
+	static MessageDigest sha256;
+	
 	static {
 		try {
 			md5 = MessageDigest.getInstance("MD5");
+			sha256 = MessageDigest.getInstance("SHA-256");
 		} catch (final NoSuchAlgorithmException e) {
 			throw new InternalError("JVM does not adhere to Java specifications");
 		}
 	}
 	
+	private int algorithm;
+	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		if (md5 == null) {
-			Skript.error("The Java Virtual Machine running on this server does not support the MD5 algorithm, thus you cannot use the 'hash' expression.");
-			return false;
-		}
 		setExpr((Expression<? extends String>) exprs[0]);
+		algorithm = parseResult.mark;
 		return true;
 	}
 	
 	@SuppressWarnings("null")
 	@Override
 	protected String[] get(final Event e, final String[] source) {
+		// These can't be null
 		assert md5 != null;
+		assert sha256 != null;
+		
+		// Get correct digest
+		MessageDigest digest = null;
+		if (algorithm == 0)
+			digest = md5;
+		else if (algorithm == 1)
+			digest = sha256;
+		else
+			assert false;
+
+		// Apply it to all strings
 		final String[] r = new String[source.length];
 		for (int i = 0; i < r.length; i++)
-			r[i] = toHex(md5.digest(source[i].getBytes(UTF_8)));
+			r[i] = toHex(digest.digest(source[i].getBytes(UTF_8)));
+		
+		
 		return r;
 	}
 	

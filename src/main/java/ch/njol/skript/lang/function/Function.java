@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,16 +13,15 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2013 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang.function;
 
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.classes.ClassInfo;
@@ -92,7 +91,11 @@ public abstract class Function<T> {
 	@SuppressWarnings("null")
 	@Nullable
 	public final T[] execute(final Object[][] params) {
-		final FunctionEvent e = new FunctionEvent();
+		final FunctionEvent<? extends T> e = new FunctionEvent<>(this);
+		
+		if (Functions.callFunctionEvents)
+			Bukkit.getPluginManager().callEvent(e);
+		
 		if (params.length > parameters.length) {
 			assert false : params.length;
 			return null;
@@ -132,7 +135,7 @@ public abstract class Function<T> {
 	 */
 	@SuppressWarnings("null")
 	public Signature<T> getSignature() {
-		return new Signature<T>("unknown", name, Arrays.asList(parameters), returnType, null, single);
+		return new Signature<>("unknown", name, Arrays.asList(parameters), returnType, null, single);
 	}
 	
 }

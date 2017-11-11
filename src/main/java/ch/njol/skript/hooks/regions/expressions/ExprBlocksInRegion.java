@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.hooks.regions.expressions;
 
 import java.util.ArrayList;
@@ -73,7 +71,7 @@ public class ExprBlocksInRegion extends SimpleExpression<Block> {
 	@Override
 	protected Block[] get(final Event e) {
 		final Iterator<Block> iter = iterator(e);
-		final ArrayList<Block> r = new ArrayList<Block>();
+		final ArrayList<Block> r = new ArrayList<>();
 		while (iter.hasNext())
 			r.add(iter.next());
 		return r.toArray(new Block[r.size()]);
@@ -87,7 +85,7 @@ public class ExprBlocksInRegion extends SimpleExpression<Block> {
 			return EmptyIterator.get();
 		return new Iterator<Block>() {
 			private Iterator<Block> current = rs[0].getBlocks();
-			private final Iterator<Region> iter = new ArrayIterator<Region>(rs, 1);
+			private final Iterator<Region> iter = new ArrayIterator<>(rs, 1);
 			
 			@Override
 			public boolean hasNext() {

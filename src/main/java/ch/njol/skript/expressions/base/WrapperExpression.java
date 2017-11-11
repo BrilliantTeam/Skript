@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions.base;
 
 import java.util.Iterator;
@@ -55,7 +53,13 @@ public abstract class WrapperExpression<T> extends SimpleExpression<T> {
 		this.expr = expr;
 	}
 	
+	/**
+	 * Sets wrapped expression. Parser instance is automatically copied from
+	 * this expression.
+	 * @param expr Wrapped expression.
+	 */
 	protected void setExpr(final Expression<? extends T> expr) {
+		expr.setParserInstance(pi);
 		this.expr = expr;
 	}
 	

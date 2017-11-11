@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,16 +13,18 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
+
+import java.time.ZoneId;
+import java.util.TimeZone;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.yggdrasil.YggdrasilSerializable;
 
@@ -31,14 +33,22 @@ import ch.njol.yggdrasil.YggdrasilSerializable;
  */
 public class Date implements Comparable<Date>, YggdrasilSerializable {
 	
+	/**
+	 * Timestamp. Should always be in computer time/UTC/GMT+0.
+	 */
 	private long timestamp;
 	
 	public Date() {
-		timestamp = System.currentTimeMillis();
+		this(System.currentTimeMillis());
 	}
 	
 	public Date(final long timestamp) {
 		this.timestamp = timestamp;
+	}
+	
+	public Date(final long timestamp, final TimeZone zone) {
+		final long offset = zone.getOffset(timestamp);
+		this.timestamp = timestamp - offset;
 	}
 	
 	public Timespan difference(final Date other) {

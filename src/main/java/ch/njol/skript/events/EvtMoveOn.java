@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.events;
 
 import java.util.ArrayList;
@@ -91,7 +89,7 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 	}
 	
 //	private final static HashMap<BlockLocation, List<Trigger>> blockTriggers = new HashMap<BlockLocation, List<Trigger>>();
-	final static HashMap<Integer, List<Trigger>> itemTypeTriggers = new HashMap<Integer, List<Trigger>>();
+	final static HashMap<Integer, List<Trigger>> itemTypeTriggers = new HashMap<>();
 	@SuppressWarnings("null")
 	ItemType[] types = null;
 //	private World world;
@@ -162,7 +160,7 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 	
 	@SuppressWarnings("null")
 	public final static Block getBlock(final PlayerMoveEvent e) {
-		return e.getTo().subtract(0, 0.5, 0).getBlock();
+		return e.getTo().clone().subtract(0, 0.5, 0).getBlock();
 	}
 	
 	@Override
@@ -224,7 +222,7 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 					continue;
 				List<Trigger> ts = itemTypeTriggers.get(d.getId());
 				if (ts == null)
-					itemTypeTriggers.put(d.getId(), ts = new ArrayList<Trigger>());
+					itemTypeTriggers.put(d.getId(), ts = new ArrayList<>());
 				ts.add(trigger);
 			}
 		}

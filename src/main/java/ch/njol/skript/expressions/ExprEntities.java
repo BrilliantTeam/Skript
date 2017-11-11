@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
@@ -46,6 +44,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.BlockingLogHandler;
 import ch.njol.skript.log.LogHandler;
@@ -110,7 +109,8 @@ public class ExprEntities extends SimpleExpression<Entity> {
 			center = (Expression<Location>) exprs[exprs.length - 1];
 			final BlockingLogHandler log = SkriptLogger.startLogHandler(new BlockingLogHandler());
 			try {
-				centerEntity = center.getSource().getConvertedExpression(Entity.class);
+				if (!center.getSource().getReturnType().equals(Location.class)) // Ensure that no location -> entity...
+					centerEntity = center.getSource().getConvertedExpression(Entity.class); // ... when no entity exists
 			} finally {
 				log.stop();
 			}
@@ -138,7 +138,7 @@ public class ExprEntities extends SimpleExpression<Entity> {
 			final Iterator<? extends Entity> iter = iterator(e);
 			if (iter == null || !iter.hasNext())
 				return new Entity[0];
-			final List<Entity> l = new ArrayList<Entity>();
+			final List<Entity> l = new ArrayList<>();
 			while (iter.hasNext())
 				l.add(iter.next());
 			return l.toArray((Entity[]) Array.newInstance(returnType, l.size()));
@@ -194,7 +194,7 @@ public class ExprEntities extends SimpleExpression<Entity> {
 			final Collection<Entity> es = l.getWorld().getNearbyEntities(l, d, d, d);
 			final double radiusSquared = d * d * Skript.EPSILON_MULT;
 			final EntityData<?>[] ts = types.getAll(e);
-			return new CheckedIterator<Entity>(es.iterator(), new NullableChecker<Entity>() {
+			return new CheckedIterator<>(es.iterator(), new NullableChecker<Entity>() {
 				@Override
 				public boolean check(final @Nullable Entity e) {
 					if (e == null || e.getLocation().distanceSquared(l) > radiusSquared)

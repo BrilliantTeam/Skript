@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.Location;
@@ -46,7 +44,7 @@ import ch.njol.util.Math2;
  * @author Peter Güttinger
  */
 @Name("Direction")
-@Description("A helper expression for the <a href='../classes/#direction'>direction type</a>.")
+@Description("A helper expression for the <a href='classes.html#direction'>direction type</a>.")
 @Examples({"thrust the player upwards",
 		"set the block behind the player to water",
 		"loop blocks above the player:",

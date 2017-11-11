@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang.util;
 
 import java.util.Iterator;
@@ -27,6 +25,7 @@ import java.util.NoSuchElementException;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.ClassInfo;
@@ -175,8 +174,9 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 			@Override
 			public boolean check(final F f) {
 				final T t = conv.convert(f);
-				if (t == null)
+				if (t == null) {
 					return false;
+				}
 				return c.check(t);
 			}
 		});

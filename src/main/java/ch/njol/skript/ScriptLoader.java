@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,25 +13,38 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -70,6 +83,7 @@ import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.PluralizingArgsMessage;
 import ch.njol.skript.log.CountingLogHandler;
 import ch.njol.skript.log.ErrorDescLogHandler;
+import ch.njol.skript.log.LogEntry;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -77,6 +91,7 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.ExceptionUtils;
+import ch.njol.skript.util.Task;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Callback;
 import ch.njol.util.Kleenean;
@@ -132,10 +147,10 @@ final public class ScriptLoader {
 		hasDelayBefore = Kleenean.FALSE;
 	}
 	
-	public static List<TriggerSection> currentSections = new ArrayList<TriggerSection>();
-	public static List<Loop> currentLoops = new ArrayList<Loop>();
-	private final static Map<String, ItemType> currentAliases = new HashMap<String, ItemType>();
-	final static HashMap<String, String> currentOptions = new HashMap<String, String>();
+	public static List<TriggerSection> currentSections = new ArrayList<>();
+	public static List<Loop> currentLoops = new ArrayList<>();
+	private final static Map<String, ItemType> currentAliases = new HashMap<>();
+	final static HashMap<String, String> currentOptions = new HashMap<>();
 	
 	public static Map<String, ItemType> getScriptAliases() {
 		return currentAliases;
@@ -160,6 +175,17 @@ final public class ScriptLoader {
 			functions = numFunctions;
 		}
 		
+		/**
+		 * Copy constructor.
+		 * @param loadedscripts
+		 */
+		public ScriptInfo(ScriptInfo o) {
+			files = o.files;
+			triggers = o.triggers;
+			commands = o.commands;
+			functions = o.functions;
+		}
+
 		public void add(final ScriptInfo other) {
 			files += other.files;
 			triggers += other.triggers;
@@ -173,6 +199,11 @@ final public class ScriptLoader {
 			commands -= other.commands;
 			functions -= other.functions;
 		}
+		
+		@Override
+		public String toString() {
+			return "ScriptInfo{files=" + files + ",triggers=" + triggers + ",commands=" + commands + ",functions:" + functions + "}";
+		}
 	}
 	
 //	private final static class SerializedScript {
@@ -184,38 +215,108 @@ final public class ScriptLoader {
 	
 	private static String indentation = "";
 	
-	static ScriptInfo loadScripts() {
+	// Load scripts in separate (one) thread
+	static final BlockingQueue<Runnable> loadQueue = new ArrayBlockingQueue<>(20, true);
+	static final Thread loaderThread;
+	static boolean loadAsync; // See below
+	
+	/**
+	 * Checks if scripts are loaded in separate thread. If true,
+	 * following behavior should be expected:
+	 * <ul>
+	 * <li>Scripts are still unloaded and enabled in server thread
+	 * <li>When reloading a script, old version is unloaded <i>after</i> it has
+	 * been parsed, immediately before it has been loaded
+	 * <li>When reloading all scripts, scripts that were removed are disabled
+	 * after everything has been reloaded
+	 * <li>Script infos returned by most methods are inaccurate
+	 * @return If main thread is not blocked when loading.
+	 */
+	public static boolean isAsync() {
+		return loadAsync;
+	}
+	
+	/**
+	 * All loaded script files.
+	 */
+	@SuppressWarnings("null")
+	static final Set<File> loadedFiles = Collections.synchronizedSet(new HashSet<>());
+	
+	@SuppressWarnings("null") // Collections methods don't return nulls, ever
+	public static Collection<File> getLoadedFiles() {
+		return Collections.unmodifiableCollection(loadedFiles);
+	}
+	
+	// Initialize and start load thread
+	static {
+		loaderThread = new AsyncLoaderThread();
+		loaderThread.start();
+	}
+	
+	private static class AsyncLoaderThread extends Thread {
+		
+		public AsyncLoaderThread() { }
+
+		@Override
+		public void run() {
+			while (true) {
+				try {
+					loadQueue.take().run();
+				} catch (InterruptedException e) {
+					Skript.exception(e); // Bubble it up with instructions on how to report it
+				}
+			}
+		}
+	}
+	
+	static void loadScripts() {
 		final File scriptsFolder = new File(Skript.getInstance().getDataFolder(), Skript.SCRIPTSFOLDER + File.separator);
 		if (!scriptsFolder.isDirectory())
 			scriptsFolder.mkdirs();
 		
 		final Date start = new Date();
 		
-		final ScriptInfo i;
-		
-		final ErrorDescLogHandler h = SkriptLogger.startLogHandler(new ErrorDescLogHandler(null, null, m_no_errors.toString()));
-		try {
-			Language.setUseLocal(false);
+		Runnable task = () -> {
+			final Set<File> oldLoadedFiles = new HashSet<>(loadedFiles);
 			
-			loadStructures(scriptsFolder);
-			i = loadScripts(scriptsFolder);
+			final ScriptInfo i;
 			
-			synchronized (loadedScripts) {
-				loadedScripts.add(i);
+			final ErrorDescLogHandler h = SkriptLogger.startLogHandler(new ErrorDescLogHandler(null, null, m_no_errors.toString()));
+			try {
+				Language.setUseLocal(false);
+				
+				List<Config> configs = loadStructures(scriptsFolder);
+				i = loadScripts(configs);
+			} finally {
+				Language.setUseLocal(true);
+				h.stop();
 			}
-		} finally {
-			Language.setUseLocal(true);
-			h.stop();
-		}
-		
-		if (i.files == 0)
-			Skript.warning(m_no_scripts.toString());
-		if (Skript.logNormal() && i.files > 0)
-			Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
-		
-		SkriptEventHandler.registerBukkitEvents();
-		
-		return i;
+			
+			// Now, make sure that old files that are no longer there are unloaded
+			// Only if this is done using async loading, though!
+			if (loadAsync) {
+				oldLoadedFiles.removeAll(loadedFiles);
+				for (File script : oldLoadedFiles) {
+					assert script != null;
+					
+					// Use internal unload method which does not call validateFunctions()
+					unloadScript_(script);
+					Functions.clearFunctions(script);
+				}
+				Functions.validateFunctions(); // Manually validate functions
+			}
+			
+			if (i.files == 0)
+				Skript.warning(m_no_scripts.toString());
+			if (Skript.logNormal() && i.files > 0)
+				Skript.info(m_scripts_loaded.toString(i.files, i.triggers, i.commands, start.difference(new Date())));
+			
+			SkriptEventHandler.registerBukkitEvents();
+		};
+		if (loadAsync)
+			loadQueue.add(task);
+		else
+			task.run();
 	}
 	
 	/**
@@ -229,125 +330,124 @@ final public class ScriptLoader {
 	};
 	
 	/**
-	 * Loads enabled scripts from the specified directory and it's subdirectories.
+	 * Loads the specified scripts.
 	 * 
-	 * @param directory
-	 * @return Info on the loaded scripts
+	 * @param configs Configs for scripts, loaded by {@link #loadStructures(File[])}
+	 * @return Info on the loaded scripts.
 	 */
-	public final static ScriptInfo loadScripts(final File directory) {
-		final ScriptInfo i = new ScriptInfo();
-		final boolean wasLocal = Language.setUseLocal(false);
-		try {
-			final File[] files = directory.listFiles(scriptFilter);
-			Arrays.sort(files);
-			for (final File f : files) {
-				if (f.isDirectory()) {
-					i.add(loadScripts(f));
-				} else {
-					i.add(loadScript(f));
-				}
-			}
-		} finally {
-			if (wasLocal)
-				Language.setUseLocal(true);
-		}
+	public final static ScriptInfo loadScripts(final List<Config> configs) {
+		ScriptInfo i = new ScriptInfo();
 		
+		Runnable task = () -> {
+			// Do NOT sort here, list must be loaded in order it came in (see issue #667)
+			final boolean wasLocal = Language.setUseLocal(false);
+			try {
+				for (final Config cfg : configs) {
+					assert cfg != null : configs.toString();
+					i.add(loadScript(cfg));
+				}
+			} finally {
+				if (wasLocal)
+					Language.setUseLocal(true);
+			}
+			
+			SkriptEventHandler.registerBukkitEvents();
+		};
+		if (loadAsync && Bukkit.isPrimaryThread())
+			loadQueue.add(task);
+		else
+			task.run();
+		
+		// If task was ran asynchronously, returned stats may be wrong
+		// This is probably ok, since loadScripts() will go async if needed
 		return i;
+	}
+	
+	/**
+	 * Loads specified scripts and places log to given list.
+	 * 
+	 * @param configs Configs for scripts, loaded by {@link #loadStructures(File[])}
+	 * @param logOut List where to place log.
+	 * @return Info on the loaded scripts.
+	 */
+	public final static ScriptInfo loadScripts(final List<Config> configs, final List<LogEntry> logOut) {
+		final RetainingLogHandler logHandler = SkriptLogger.startRetainingLog();
+		try {
+			return loadScripts(configs);
+		} finally {
+			logOut.addAll(logHandler.getLog());
+			logHandler.clear(); // Remove everything from the log handler
+			logHandler.printLog(); // Won't print anything, but handler is properly closed
+		}
 	}
 	
 	/**
 	 * Loads the specified scripts.
 	 * 
-	 * @param files
+	 * @param configs Configs for scripts, loaded by {@link #loadStructure(File)}
 	 * @return Info on the loaded scripts
 	 */
-	public final static ScriptInfo loadScripts(final File[] files) {
-		Arrays.sort(files);
-		final ScriptInfo i = new ScriptInfo();
-		final boolean wasLocal = Language.setUseLocal(false);
-		try {
-			for (final File f : files) {
-				assert f != null : Arrays.toString(files);
-				i.add(loadScript(f));
-			}
-		} finally {
-			if (wasLocal)
-				Language.setUseLocal(true);
-		}
-		
-		synchronized (loadedScripts) {
-			loadedScripts.add(i);
-		}
-		
-		SkriptEventHandler.registerBukkitEvents();
-		
-		return i;
+	@SuppressWarnings("null")
+	public final static ScriptInfo loadScripts(final Config... configs) {
+		return loadScripts(Arrays.asList(configs));
 	}
 	
+	/**
+	 * Load specified scripts.
+	 * 
+	 * @param files Script files.
+	 * @return Info on the loaded scripts.
+	 * @deprecated Use the methods that take configs as parameters.
+	 */
+	@Deprecated
+	public final static ScriptInfo loadScripts(final File... files) {
+		List<Config> configs = loadStructures(files);
+		return loadScripts(configs);
+	}
+	
+	/**
+	 * Represents data for event which is waiting to be loaded.
+	 */
+	private static class ParsedEventData {
+		
+		public ParsedEventData(NonNullPair<SkriptEventInfo<?>, SkriptEvent> info, String event, SectionNode node, List<TriggerItem> items) {
+			this.info = info;
+			this.event = event;
+			this.node = node;
+			this.items = items;
+		}
+		
+		public final NonNullPair<SkriptEventInfo<?>, SkriptEvent> info;
+		public final String event;
+		public final SectionNode node;
+		public final List<TriggerItem> items;
+	}
+	
+	/**
+	 * Loads one script. Only for internal use, as this doesn't register/update
+	 * event handlers.
+	 * @param config Config for script to be loaded.
+	 * @return Info about script that is loaded
+	 */
 	@SuppressWarnings("unchecked")
-	private final static ScriptInfo loadScript(final File f) {
-//		File cache = null;
-//		if (SkriptConfig.enableScriptCaching.value()) {
-//			cache = new File(f.getParentFile(), "cache" + File.separator + f.getName() + "c");
-//			if (cache.exists()) {
-//				final RetainingLogHandler log = SkriptLogger.startRetainingLog();
-//				ObjectInputStream in = null;
-//				try {
-//					in = new ObjectInputStream(new FileInputStream(cache));
-//					final long lastModified = in.readLong();
-//					if (lastModified == f.lastModified()) {
-//						final SerializedScript script = (SerializedScript) in.readObject();
-//						triggersLoop: for (final Trigger t : script.triggers) {
-//							if (t.getEvent() instanceof SelfRegisteringSkriptEvent) {
-//								((SelfRegisteringSkriptEvent) t.getEvent()).register(t);
-//								SkriptEventHandler.addSelfRegisteringTrigger(t);
-//							} else {
-//								for (final SkriptEventInfo<?> e : Skript.getEvents()) {
-//									if (e.c == t.getEvent().getClass()) {
-//										SkriptEventHandler.addTrigger(e.events, t);
-//										continue triggersLoop;
-//									}
-//								}
-//								throw new EmptyStackException();
-//							}
-//						}
-//						for (final ScriptCommand c : script.commands) {
-//							Commands.registerCommand(c);
-//						}
-//						log.printLog();
-//						return new ScriptInfo(1, script.triggers.size(), script.commands.size());
-//					} else {
-//						cache.delete();
-//					}
-//				} catch (final Exception e) {
-//					if (Skript.testing()) {
-//						System.err.println("[debug] Error loading cached script '" + f.getName() + "':");
-//						e.printStackTrace();
-//					}
-//					unloadScript(f);
-//					if (in != null) {
-//						try {
-//							in.close();
-//						} catch (final IOException e1) {}
-//					}
-//					cache.delete();
-//				} finally {
-//					log.stop();
-//					if (in != null) {
-//						try {
-//							in.close();
-//						} catch (final IOException e) {}
-//					}
-//				}
-//			}
-//		}
+	private final static ScriptInfo loadScript(final @Nullable Config config) {
+		if (config == null) { // Something bad happened, hopefully got logged to console
+			return new ScriptInfo();
+		}
+		
+		// When something is parsed, it goes there to be loaded later
+		List<ScriptCommand> commands = new ArrayList<>();
+		List<Function<?>> functions = new ArrayList<>();
+		List<ParsedEventData> events = new ArrayList<>();
+		
+		// Track what is loaded
+		int numTriggers = 0;
+		int numCommands = 0;
+		int numFunctions = 0;
+		
 		try {
-			final Config config = new Config(f, true, false, ":");
 			if (SkriptConfig.keepConfigsLoaded.value())
 				SkriptConfig.configs.add(config);
-			int numTriggers = 0;
-			int numCommands = 0;
-			int numFunctions = 0;
 			
 			currentAliases.clear();
 			currentOptions.clear();
@@ -440,7 +540,6 @@ final public class ScriptLoader {
 							} finally {
 								log.stop();
 							}
-							@SuppressWarnings("null")
 							final ClassInfo<?> ci = Classes.getSuperClassInfo(o.getClass());
 							if (ci.getSerializer() == null) {
 								Skript.error("Can't save '" + ((EntryNode) n).getValue() + "' in a variable");
@@ -469,11 +568,11 @@ final public class ScriptLoader {
 						
 						setCurrentEvent("command", CommandEvent.class);
 						
-						final ScriptCommand c = Commands.loadCommand(node);
+						final ScriptCommand c = Commands.loadCommand(node, false);
 						if (c != null) {
-							numCommands++;
-//							script.commands.add(c);
+							commands.add(c);
 						}
+						numCommands++;
 						
 						deleteCurrentEvent();
 						
@@ -484,8 +583,9 @@ final public class ScriptLoader {
 						
 						final Function<?> func = Functions.loadFunction(node);
 						if (func != null) {
-							numFunctions++;
+							functions.add(func);
 						}
+						numFunctions++;
 						
 						deleteCurrentEvent();
 						
@@ -507,22 +607,16 @@ final public class ScriptLoader {
 					if (Skript.debug() || node.debug())
 						Skript.debug(event + " (" + parsedEvent.getSecond().toString(null, true) + "):");
 					
-					setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
-					final Trigger trigger;
 					try {
-						trigger = new Trigger(config.getFile(), event, parsedEvent.getSecond(), loadItems(node));
+						setCurrentEvent("" + parsedEvent.getFirst().getName().toLowerCase(Locale.ENGLISH), parsedEvent.getFirst().events);
+						events.add(new ParsedEventData(parsedEvent, event, node, loadItems(node)));
 					} finally {
 						deleteCurrentEvent();
 					}
 					
 					if (parsedEvent.getSecond() instanceof SelfRegisteringSkriptEvent) {
-						((SelfRegisteringSkriptEvent) parsedEvent.getSecond()).register(trigger);
-						SkriptEventHandler.addSelfRegisteringTrigger(trigger);
-					} else {
-						SkriptEventHandler.addTrigger(parsedEvent.getFirst().events, trigger);
+						((SelfRegisteringSkriptEvent) parsedEvent.getSecond()).afterParse(config);
 					}
-					
-//					script.triggers.add(trigger);
 					
 					numTriggers++;
 				}
@@ -534,57 +628,93 @@ final public class ScriptLoader {
 			} finally {
 				numErrors.stop();
 			}
-			
-//			if (SkriptConfig.enableScriptCaching.value() && cache != null) {
-//				if (numErrors.getCount() > 0) {
-//					ObjectOutputStream out = null;
-//					try {
-//						cache.getParentFile().mkdirs();
-//						out = new ObjectOutputStream(new FileOutputStream(cache));
-//						out.writeLong(f.lastModified());
-//						out.writeObject(script);
-//					} catch (final NotSerializableException e) {
-//						Skript.exception(e, "Cannot cache " + f.getName());
-//						if (out != null)
-//							out.close();
-//						cache.delete();
-//					} catch (final IOException e) {
-//						Skript.warning("Cannot cache " + f.getName() + ": " + e.getLocalizedMessage());
-//						if (out != null)
-//							out.close();
-//						cache.delete();
-//					} finally {
-//						if (out != null)
-//							out.close();
-//					}
-//				}
-//			}
-			
-			return new ScriptInfo(1, numTriggers, numCommands, numFunctions);
-		} catch (final IOException e) {
-			Skript.error("Could not load " + f.getName() + ": " + ExceptionUtils.toString(e));
 		} catch (final Exception e) {
-			Skript.exception(e, "Could not load " + f.getName());
+			Skript.exception(e, "Could not load " + config.getFileName());
 		} finally {
 			SkriptLogger.setNode(null);
 		}
-		return new ScriptInfo();
+		
+		// In always sync task, enable stuff
+		Callable<Void> callable = new Callable<Void>() {
+
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public @Nullable Void call() throws Exception {				
+				// Unload script IF we're doing async stuff
+				// (else it happened already)
+				File file = config.getFile();
+				if (loadAsync) {
+					if (file != null)
+						unloadScript_(file);
+				}
+				
+				// Now, enable everything!
+				for (ScriptCommand command : commands) {
+					assert command != null;
+					Commands.registerCommand(command);
+				}
+				
+				for (Function<?> func : functions) {
+					assert func != null;
+					Functions.putFunction(func);
+				}
+				
+				for (ParsedEventData event : events) {
+					setCurrentEvent("" + event.info.getFirst().getName().toLowerCase(Locale.ENGLISH), event.info.getFirst().events);
+					
+					final Trigger trigger;
+					try {
+						trigger = new Trigger(config.getFile(), event.event, event.info.getSecond(), event.items);
+						trigger.setLineNumber(event.node.getLine()); // Set line number for debugging
+						trigger.setDebugLabel(config.getFileName() + ": line " + event.node.getLine());
+					} finally {
+						deleteCurrentEvent();
+					}
+					
+					if (event.info.getSecond() instanceof SelfRegisteringSkriptEvent) {
+						((SelfRegisteringSkriptEvent) event.info.getSecond()).register(trigger);
+						SkriptEventHandler.addSelfRegisteringTrigger(trigger);
+					} else {
+						SkriptEventHandler.addTrigger(event.info.getFirst().events, trigger);
+					}
+					
+					deleteCurrentEvent();
+				}
+				
+				// Add to loaded files to use for future reloads
+				loadedFiles.add(file);
+				
+				return null;
+			}
+		};
+		if (loadAsync) { // Need to delegate to main thread
+			Task.callSync(callable);
+		} else { // We are in main thread, execute immediately
+			try {
+				callable.call();
+			} catch (Exception e) {
+				Skript.exception(e);
+			}
+		}
+		
+		return new ScriptInfo(1, numTriggers, numCommands, numFunctions);
 	}
 	
 	/**
-	 * Loads the specified scripts.
+	 * Loads structures of specified scripts.
 	 * 
 	 * @param files
 	 */
-	public final static void loadStructures(final File[] files) {
+	public final static List<Config> loadStructures(final File[] files) {
 		Arrays.sort(files);
+		
+		List<Config> loadedFiles = new ArrayList<>(files.length);
 		for (final File f : files) {
 			assert f != null : Arrays.toString(files);
-			loadStructure(f);
+			loadedFiles.add(loadStructure(f));
 		}
-	
 		
-		SkriptEventHandler.registerBukkitEvents();
+		return loadedFiles;
 	}
 	
 	/**
@@ -592,45 +722,76 @@ final public class ScriptLoader {
 	 * 
 	 * @param directory
 	 */
-	public final static void loadStructures(final File directory) {
+	public final static List<Config> loadStructures(final File directory) {
 		final File[] files = directory.listFiles(scriptFilter);
 		Arrays.sort(files);
+		
+		List<Config> loadedFiles = new ArrayList<>(files.length);
 		for (final File f : files) {
 			if (f.isDirectory()) {
-				loadStructures(f);
+				loadedFiles.addAll(loadStructures(f));
 			} else {
-				loadStructure(f);
+				loadedFiles.add(loadStructure(f));
 			}
 		}
+		return loadedFiles;
 	}
 	
 	/**
 	 * Loads structure of given script, currently only for functions. Must be called before
 	 * actually loading that script.
-	 * @param f Script
+	 * @param f Script file.
+	 */
+	@SuppressWarnings("resource") // Stream is closed in Config constructor called in loadStructure
+	public final static @Nullable Config loadStructure(final File f) {
+		if (!f.exists()) { // If file does not exist...
+			unloadScript(f); // ... it might be good idea to unload it now
+			return null;
+		}
+		
+		try {
+			String name = Skript.getInstance().getDataFolder().toPath().resolve(Skript.SCRIPTSFOLDER).relativize(f.toPath()).toString();
+			assert name != null;
+			return loadStructure(new FileInputStream(f), name);
+		} catch (final IOException e) {
+			Skript.error("Could not load " + f.getName() + ": " + ExceptionUtils.toString(e));
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Loads structure of given script, currently only for functions. Must be called before
+	 * actually loading that script.
+	 * @param source Source input stream.
+	 * @param name Name of source "file".
+	 */
+	public final static @Nullable Config loadStructure(final InputStream source, final String name) {
+		try {
+			final Config config = new Config(source, name,
+					Skript.getInstance().getDataFolder().toPath().resolve(Skript.SCRIPTSFOLDER).resolve(name).toFile(), true, false, ":");
+			return loadStructure(config);
+		} catch (final IOException e) {
+			Skript.error("Could not load " + name + ": " + ExceptionUtils.toString(e));
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Loads structure of given script, currently only for functions. Must be called before
+	 * actually loading that script.
+	 * @param config Config object for the script.
 	 */
 	@SuppressWarnings("unchecked")
-	private final static void loadStructure(final File f) {
+	public final static @Nullable Config loadStructure(final Config config) {
 		try {
-			final Config config = new Config(f, true, false, ":");
-			if (SkriptConfig.keepConfigsLoaded.value())
-				SkriptConfig.configs.add(config);
-			int numTriggers = 0;
-			int numCommands = 0;
-			int numFunctions = 0;
-			
-			currentAliases.clear();
-			currentOptions.clear();
-			currentScript = config;
-			
-//			final SerializedScript script = new SerializedScript();
-			
-			final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
+			//final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
 			
 			try {
 				for (final Node cnode : config.getMainNode()) {
 					if (!(cnode instanceof SectionNode)) {
-						Skript.error("invalid line - all code has to be put into triggers");
+						// Don't spit error yet, we are only pre-parsing...
 						continue;
 					}
 					
@@ -648,9 +809,6 @@ final public class ScriptLoader {
 						setCurrentEvent("function", FunctionEvent.class);
 						
 						final Signature<?> func = Functions.loadSignature(config.getFileName(), node);
-						if (func != null) {
-							numFunctions++;
-						}
 						
 						deleteCurrentEvent();
 						
@@ -660,15 +818,16 @@ final public class ScriptLoader {
 				
 				currentScript = null;
 			} finally {
-				numErrors.stop();
+				//numErrors.stop();
 			}
-		} catch (final IOException e) {
-			Skript.error("Could not load " + f.getName() + ": " + ExceptionUtils.toString(e));
+			SkriptLogger.setNode(null);
+			return config;
 		} catch (final Exception e) {
-			Skript.exception(e, "Could not load " + f.getName());
+			Skript.exception(e, "Could not load " + config.getFileName());
 		} finally {
 			SkriptLogger.setNode(null);
 		}
+		return null; // Oops something went wrong
 	}
 	
 	/**
@@ -705,16 +864,22 @@ final public class ScriptLoader {
 	final static ScriptInfo unloadScript(final File script) {
 		final ScriptInfo r = unloadScript_(script);
 		Functions.clearFunctions(script);
-		//Functions.validateFunctions();
+		Functions.validateFunctions();
 		return r;
 	}
 	
 	private final static ScriptInfo unloadScript_(final File script) {
-		final ScriptInfo info = SkriptEventHandler.removeTriggers(script);
-		synchronized (loadedScripts) {
-			loadedScripts.subtract(info);
+		if (loadedFiles.contains(script)) {
+			final ScriptInfo info = SkriptEventHandler.removeTriggers(script); // Remove triggers
+			synchronized (loadedScripts) { // Update script info
+				loadedScripts.subtract(info);
+			}
+			
+			loadedFiles.remove(script); // We just unloaded it, so...
+			return info; // Return how much we unloaded
 		}
-		return info;
+		
+		return new ScriptInfo(); // Return that we unloaded literally nothing
 	}
 	
 	public final static String replaceOptions(final String s) {
@@ -740,7 +905,7 @@ final public class ScriptLoader {
 		if (Skript.debug())
 			indentation += "    ";
 		
-		final ArrayList<TriggerItem> items = new ArrayList<TriggerItem>();
+		final ArrayList<TriggerItem> items = new ArrayList<>();
 		
 		Kleenean hadDelayBeforeLastIf = Kleenean.FALSE;
 		
@@ -912,6 +1077,7 @@ final public class ScriptLoader {
 		return CollectionUtils.containsSuperclass(currentEvents, event);
 	}
 	
+	@SafeVarargs
 	public final static boolean isCurrentEvent(final Class<? extends Event>... events) {
 		return CollectionUtils.containsAnySuperclass(currentEvents, events);
 	}

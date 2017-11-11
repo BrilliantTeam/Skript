@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import org.bukkit.event.Event;
@@ -38,6 +36,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.TriggerSection;
 import ch.njol.skript.lang.While;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
 
@@ -53,7 +52,7 @@ import ch.njol.util.Kleenean;
 		"	loop-block is not air:",
 		"		exit 2 sections",
 		"	set loop-block to water"})
-@Since("")
+@Since("<i>unknown</i> (before 2.1)")
 public class EffExit extends Effect { // TODO [code style] warn user about code after a stop effect
 	static {
 		Skript.registerEffect(EffExit.class,

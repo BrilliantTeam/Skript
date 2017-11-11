@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,15 +13,19 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
+import org.bukkit.conversations.Conversable;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -33,7 +37,13 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.util.chat.BungeeConverter;
+import ch.njol.skript.util.chat.ChatMessages;
+import ch.njol.skript.util.chat.MessageComponent;
 import ch.njol.util.Kleenean;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 /**
  * @author Peter Güttinger
@@ -45,14 +55,17 @@ import ch.njol.util.Kleenean;
 		"send \"Your kill streak is %{kill streak.%player%}%.\" to player",
 		"if the targeted entity exists:",
 		"	message \"You're currently looking at a %type of the targeted entity%!\""})
-@Since("1.0")
+@Since("1.0, 2.2-dev26 (advanced features)")
 public class EffMessage extends Effect {
+	
 	static {
 		Skript.registerEffect(EffMessage.class, "(message|send [message]) %strings% [to %commandsenders%]");
 	}
 	
-	@SuppressWarnings("null")
+	@Nullable
 	private Expression<String> messages;
+	private boolean canSendRaw;
+	
 	@SuppressWarnings("null")
 	private Expression<CommandSender> recipients;
 	
@@ -60,22 +73,40 @@ public class EffMessage extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		messages = (Expression<String>) exprs[0];
+		canSendRaw = messages instanceof VariableString;
 		recipients = (Expression<CommandSender>) exprs[1];
 		return true;
 	}
 	
 	@Override
 	protected void execute(final Event e) {
-		for (final String message : messages.getArray(e)) {
-//			message = StringUtils.fixCapitalization(message);
+		assert messages != null;
+		if (canSendRaw) {
+			assert messages != null;
+			List<MessageComponent> componentList = ((VariableString) messages).getMessageComponents(e);
+			@SuppressWarnings("null") // Most certainly safe, but I guess not...
+			BaseComponent[] components = BungeeConverter.convert(componentList.toArray(new MessageComponent[componentList.size()]));
 			for (final CommandSender s : recipients.getArray(e)) {
-				s.sendMessage(message);
+				if (s instanceof Player) { // Use JSON chat
+					((Player) s).spigot().sendMessage(components);
+				} else { // Fall back to non-JSON chat
+					assert messages != null;
+					s.sendMessage(messages.getSingle(e));
+				}
+			}
+		} else {
+			assert messages != null;
+			for (final String message : messages.getArray(e)) {
+				for (final CommandSender s : recipients.getArray(e)) {
+					s.sendMessage(message);
+				}
 			}
 		}
 	}
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
+		assert messages != null;
 		return "send " + messages.toString(e, debug) + " to " + recipients.toString(e, debug);
 	}
 }

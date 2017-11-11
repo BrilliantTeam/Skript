@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.events;
 
 import java.lang.invoke.MethodHandle;
@@ -81,13 +79,9 @@ public class EvtBlock extends SkriptEvent {
 				.examples("on fade of snow or ice")
 				.since("1.0");
 		Skript.registerEvent("Form", EvtBlock.class, BlockFormEvent.class, "[block] form[ing] [[of] %itemtypes%]")
-				.description("Called when a block is created, but not by a player, e.g. snow forms due to snowfall, water freezes in cold biomes, or a block spreads (see <a href='#spread'>spread event</a>).")
+				.description("Called when a block is created, but not by a player, e.g. snow forms due to snowfall, water freezes in cold biomes. This isn't called when block spreads (mushroom growth, water physics etc.), as it has its own event (see <a href='#spread'>spread event</a>).")
 				.examples("on form of snow", "on form of a mushroom")
 				.since("1.0");
-		Skript.registerEvent("Block Growth", EvtBlock.class, BlockGrowEvent.class, "(plant|crop|block) grow[(th|ing)] [[of] %itemtypes%]")
-				.description("Called when a crop grows.")
-				.examples("on crop growth")
-				.since("2.2-Fixes-V10");
 	}
 	
 	@Nullable

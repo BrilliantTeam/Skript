@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import org.bukkit.entity.Entity;
@@ -26,6 +24,7 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.PassengerUtils;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -48,7 +47,7 @@ import ch.njol.util.coll.CollectionUtils;
 public class EffVehicle extends Effect {
 	static {
 		Skript.registerEffect(EffVehicle.class,
-				"(make|let|force) %entities% [to] (ride|mount) [(in|on)] %entity/entitydatas%",
+				"(make|let|force) %entities% [to] (ride|mount) [(in|on)] %"+ (PassengerUtils.hasMultiplePassenger() ? "entities" : "entity") +"/entitydatas%",
 				"(make|let|force) %entities% [to] (dismount|(dismount|leave) (from|of|) (any|the[ir]|his|her|) vehicle[s])",
 				"(eject|dismount) (any|the|) passenger[s] (of|from) %entities%");
 	}
@@ -63,7 +62,7 @@ public class EffVehicle extends Effect {
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		passengers = matchedPattern == 2 ? null : (Expression<Entity>) exprs[0];
 		vehicles = matchedPattern == 1 ? null : exprs[exprs.length - 1];
-		if (passengers != null && vehicles != null && !passengers.isSingle() && vehicles.isSingle() && Entity.class.isAssignableFrom(vehicles.getReturnType()))
+		if (!PassengerUtils.hasMultiplePassenger() && passengers != null && vehicles != null && !passengers.isSingle() && vehicles.isSingle() && Entity.class.isAssignableFrom(vehicles.getReturnType()))
 			Skript.warning("An entity can only have one passenger");
 		return true;
 	}
@@ -93,10 +92,11 @@ public class EffVehicle extends Effect {
 		for (final Object v : vs) {
 			if (v instanceof Entity) {
 				((Entity) v).eject();
-				final Entity p = CollectionUtils.getRandom(ps);
-				assert p != null;
-				p.leaveVehicle();
-				((Entity) v).setPassenger(p);
+				for (Entity p : ps){
+					assert p != null;
+					p.leaveVehicle();
+					PassengerUtils.addPassenger((Entity)v, p); //For 1.9 and lower, it will only set the last one.
+				}
 			} else {
 				for (final Entity p : ps) {
 					assert p != null : passengers;
@@ -104,7 +104,7 @@ public class EffVehicle extends Effect {
 					final Entity en = ((EntityData<?>) v).spawn(p.getLocation());
 					if (en == null)
 						return;
-					en.setPassenger(p);
+					PassengerUtils.addPassenger(en, p);
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.config.validate;
 
 import java.util.HashMap;
@@ -48,7 +46,7 @@ public class SectionValidator implements NodeValidator {
 		}
 	}
 	
-	private final HashMap<String, NodeInfo> nodes = new HashMap<String, NodeInfo>();
+	private final HashMap<String, NodeInfo> nodes = new HashMap<>();
 	private boolean allowUndefinedSections = false;
 	private boolean allowUndefinedEntries = false;
 	
@@ -72,7 +70,7 @@ public class SectionValidator implements NodeValidator {
 	}
 	
 	public <T> SectionValidator addEntry(final String name, final Parser<? extends T> parser, final Setter<T> setter, final boolean optional) {
-		addNode(name, new ParsedEntryValidator<T>(parser, setter), optional);
+		addNode(name, new ParsedEntryValidator<>(parser, setter), optional);
 		return this;
 	}
 	

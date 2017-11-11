@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
 
 import java.util.HashMap;
@@ -47,7 +45,7 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 	private final static Noun m_day = new Noun("time.day");
 	final static Noun[] names = {m_tick, m_second, m_minute, m_hour, m_day};
 	final static long[] times = {50L, 1000L, 1000L * 60L, 1000L * 60L * 60L, 1000L * 60L * 60L * 24L};
-	final static HashMap<String, Long> parseValues = new HashMap<String, Long>();
+	final static HashMap<String, Long> parseValues = new HashMap<>();
 	static {
 		Language.addListener(new LanguageChangeListener() {
 			@Override
@@ -183,10 +181,10 @@ public class Timespan implements YggdrasilSerializable, Comparable<Timespan> { /
 	
 	@SuppressWarnings("unchecked")
 	final static NonNullPair<Noun, Long>[] simpleValues = new NonNullPair[] {
-			new NonNullPair<Noun, Long>(m_day,  1000L * 60 * 60 * 24),
-			new NonNullPair<Noun, Long>(m_hour, 1000L * 60 * 60),
-			new NonNullPair<Noun, Long>(m_minute, 1000L * 60),
-			new NonNullPair<Noun, Long>(m_second, 1000L)
+			new NonNullPair<>(m_day,  1000L * 60 * 60 * 24),
+			new NonNullPair<>(m_hour, 1000L * 60 * 60),
+			new NonNullPair<>(m_minute, 1000L * 60),
+			new NonNullPair<>(m_second, 1000L)
 	};
 	
 	public static String toString(final long millis) {

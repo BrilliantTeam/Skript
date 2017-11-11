@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
 
 import java.util.Collection;
@@ -106,8 +104,8 @@ public class EnchantmentType implements YggdrasilSerializable {
 		return enchantmentNames.get(e);
 	}
 	
-	final static Map<Enchantment, String> enchantmentNames = new HashMap<Enchantment, String>();
-	final static Map<String, Enchantment> enchantmentPatterns = new HashMap<String, Enchantment>();
+	final static Map<Enchantment, String> enchantmentNames = new HashMap<>();
+	final static Map<String, Enchantment> enchantmentPatterns = new HashMap<>();
 	static {
 		Language.addListener(new LanguageChangeListener() {
 			@Override

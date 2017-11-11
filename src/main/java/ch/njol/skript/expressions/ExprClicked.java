@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,19 +13,19 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.eclipse.jdt.annotation.Nullable;
@@ -75,7 +75,7 @@ public class ExprClicked extends SimpleExpression<Object> {
 		final Object type = exprs[0] == null ? null : ((Literal<?>) exprs[0]).getSingle();
 		if (type instanceof EntityData) {
 			entityType = (EntityData<?>) type;
-			if (!ScriptLoader.isCurrentEvent(PlayerInteractEntityEvent.class)) {
+			if (!ScriptLoader.isCurrentEvent(PlayerInteractEntityEvent.class) && !ScriptLoader.isCurrentEvent(PlayerInteractAtEntityEvent.class)) {
 				Skript.error("The expression 'clicked entity' can only be used in a click event", ErrorQuality.SEMANTIC_ERROR);
 				return false;
 			}

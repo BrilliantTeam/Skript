@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.conditions;
 
 import org.bukkit.Material;
@@ -38,7 +36,7 @@ import ch.njol.skript.util.Slot;
 @Name("Is Empty")
 @Description("Checks whether an inventory, an inventory slot, or a text is empty.")
 @Examples("player's inventory is empty")
-@Since("")
+@Since("<i>unknown</i> (before 2.1)")
 public class CondIsEmpty extends PropertyCondition<Object> {
 	static {
 		register(CondIsEmpty.class, "empty", "inventories/slots/strings");
@@ -48,8 +46,13 @@ public class CondIsEmpty extends PropertyCondition<Object> {
 	public boolean check(final Object o) {
 		if (o instanceof String)
 			return ((String) o).isEmpty();
-		if (o instanceof Inventory)
-			return !((Inventory) o).iterator().hasNext();
+		if (o instanceof Inventory) {
+			for (ItemStack s : ((Inventory) o).getContents()) {
+				if (s != null && s.getType() != Material.AIR)
+					return false; // There is an item here!
+			}
+			return true;
+		}
 		if (o instanceof Slot) {
 			final Slot s = (Slot) o;
 			final ItemStack i = s.getItem();

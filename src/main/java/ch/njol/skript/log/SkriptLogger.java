@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.log;
 
 import java.util.Collection;
@@ -112,7 +110,7 @@ public abstract class SkriptLogger {
 			int i = 1;
 			while (!h.equals(handlers.remove()))
 				i++;
-			LOGGER.severe("[Skript] " + i + " log handler" + (i == 1 ? " was" : "s were") + " not stopped properly! (at " + getCaller() + ") [if you're a server admin and you see this message please file a bug report at http://dev.bukkit.org/server-mods/skript/tickets/ if there is not already one]");
+			LOGGER.severe("[Skript] " + i + " log handler" + (i == 1 ? " was" : "s were") + " not stopped properly! (at " + getCaller() + ") [if you're a server admin and you see this message please file a bug report at https://github.com/bensku/skript/issues if there is not already one]");
 		}
 	}
 	

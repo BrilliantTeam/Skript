@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2016 Peter Güttinger and contributors
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.hooks.biomes;
 
 import java.io.IOException;
@@ -27,11 +25,9 @@ import org.bukkit.block.Biome;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.hooks.Hook;
-import ch.njol.skript.hooks.ParticlesPlugin;
 import ch.njol.skript.hooks.biomes.BiomeMapUtil.To19Mapping;
 import ch.njol.skript.util.EnumUtils;
 import ch.njol.skript.util.VisualEffect;
-import de.slikey.effectlib.util.ParticleEffect;
 
 /**
  * Hook for multi version biomes.
@@ -63,7 +59,7 @@ public class BiomeHook extends Hook<Skript> {
 	protected void loadClasses() throws IOException {
 		if (Skript.isRunningMinecraft(1, 9)) {// Load only if running 1.9+
 			Skript.getAddonInstance().loadClasses(getClass().getPackage().getName());
-			util19 = new EnumUtils<To19Mapping>(To19Mapping.class, "biomes");
+			util19 = new EnumUtils<>(To19Mapping.class, "biomes");
 		}
 	}
 	

@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.conditions;
 
 import org.bukkit.event.Event;
@@ -67,9 +65,10 @@ public class CondDamageCause extends Condition {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		cause = new EventValueExpression<DamageCause>(DamageCause.class);
+		cause = new EventValueExpression<>(DamageCause.class);
 		expected = (Expression<DamageCause>) exprs[0];
 		setNegated(parseResult.mark == 1);
+		cause.setParserInstance(pi);
 		return ((EventValueExpression<DamageCause>) cause).init();
 	}
 	

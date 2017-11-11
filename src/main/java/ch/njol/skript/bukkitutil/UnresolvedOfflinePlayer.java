@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2013 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.bukkitutil;
 
 import java.util.Map;
@@ -48,24 +46,29 @@ import ch.njol.util.Closeable;
 @SuppressWarnings("null")
 public class UnresolvedOfflinePlayer implements OfflinePlayer {
 	
-	final static LinkedBlockingQueue<UnresolvedOfflinePlayer> toResolve = new LinkedBlockingQueue<UnresolvedOfflinePlayer>();
+	static LinkedBlockingQueue<UnresolvedOfflinePlayer> toResolve;
+	final static Thread resolverThread;
 	
-	final static Thread resolverThread = Skript.newThread(new Runnable() {
-		@SuppressWarnings("deprecation")
-		@Override
-		public void run() {
-			while (true) {
-				try {
-					final UnresolvedOfflinePlayer p = toResolve.take();
-					p.bukkitOfflinePlayer = Bukkit.getOfflinePlayer(p.name);
-					p.callback.run(p);
-				} catch (final InterruptedException e) {
-					break;
+	static {
+		resolverThread = Skript.newThread(new Runnable() {
+			@SuppressWarnings({"deprecation", "unused"})
+			@Override
+			public void run() {				
+				while (true) {
+					if (toResolve == null) {
+						toResolve = new LinkedBlockingQueue<>();
+					}
+					
+					try {
+						final UnresolvedOfflinePlayer p = toResolve.take();
+						p.bukkitOfflinePlayer = Bukkit.getOfflinePlayer(p.name);
+						p.callback.run(p);
+					} catch (final InterruptedException e) {
+						break;
+					}
 				}
 			}
-		}
-	}, "Skript offline player resolver thread (fetches UUIDs from the minecraft servers)");
-	static {
+		}, "Skript offline player resolver thread (fetches UUIDs from the minecraft servers)");
 		resolverThread.start();
 		Skript.closeOnDisable(new Closeable() {
 			@Override
@@ -131,12 +134,6 @@ public class UnresolvedOfflinePlayer implements OfflinePlayer {
 	@Override
 	public boolean isBanned() {
 		return bukkitOfflinePlayer.isBanned();
-	}
-	
-	@Override
-	@Deprecated
-	public void setBanned(final boolean banned) {
-		bukkitOfflinePlayer.setBanned(banned);
 	}
 	
 	@Override

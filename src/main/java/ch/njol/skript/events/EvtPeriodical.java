@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.events;
 
 import org.bukkit.Bukkit;
@@ -43,13 +41,18 @@ import ch.njol.skript.util.Timespan;
 public class EvtPeriodical extends SelfRegisteringSkriptEvent {
 	static {
 		Skript.registerEvent("*Periodical", EvtPeriodical.class, ScheduledNoWorldEvent.class, "every %timespan%")
-				.description(SkriptEventInfo.NO_DOC);
-		Skript.registerEvent("*Periodical", EvtPeriodical.class, ScheduledEvent.class, "every %timespan% in [world[s]] %worlds%")
-				.description("An event that is called periodically. The event is used like 'every &lt;<a href='../classes/#timespan'>timespan</a>&gt;', e.g. 'every second' or 'every 5 minutes'.")
-				.examples("every second",
+				.description("An event that is called periodically.")
+				.examples("every 2 seconds",
 						"every minecraft hour",
-						"every tick # warning: lag!",
-						"every minecraft day in \"world\"")
+						"every ticks #can cause lag (depends on the code in this trigger)",
+						"every minecraft days")
+				.since("1.0");
+		Skript.registerEvent("*Periodical", EvtPeriodical.class, ScheduledEvent.class, "every %timespan% in [world[s]] %worlds%")
+				.description("An event that is called periodically.")
+				.examples("every 2 seconds in \"world\"",
+						"every minecraft hour in \"flatworld\"",
+						"every ticks in \"world\" #can cause lag (depends on the code in this trigger)",
+						"every minecraft days in \"plots\"")
 				.since("1.0");
 	}
 	

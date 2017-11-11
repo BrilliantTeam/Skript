@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.util.ArrayList;
@@ -84,7 +82,7 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 				return new Integer[0];
 			return new Integer[] {t.getTypes().get(0).getId()};
 		}
-		final ArrayList<Integer> r = new ArrayList<Integer>();
+		final ArrayList<Integer> r = new ArrayList<>();
 		for (final ItemType t : source) {
 			for (final ItemData d : t) {
 				r.add(Integer.valueOf(d.getId()));
@@ -170,7 +168,7 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 				return null;
 			if (t.numTypes() == 0)
 				return null;
-			return new SingleItemIterator<Integer>(t.getTypes().get(0).getId());
+			return new SingleItemIterator<>(t.getTypes().get(0).getId());
 		}
 		final Iterator<? extends ItemType> iter = getExpr().iterator(e);
 		if (iter == null || !iter.hasNext())

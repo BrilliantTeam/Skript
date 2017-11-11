@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.entity.LivingEntity;
@@ -37,7 +35,7 @@ import ch.njol.skript.util.Timespan;
 @Description("How much time a player has left underwater before starting to drown.")
 @Examples({"player's remaining air is less than 3 seconds:",
 		"	send \"hurry, get to the surface!\" to the player"})
-@Since("")
+@Since("<i>unknown</i> (before 2.1)")
 public class ExprRemainingAir extends SimplePropertyExpression<LivingEntity, Timespan> {
 	static {
 		register(ExprRemainingAir.class, Timespan.class, "remaining air", "livingentities");

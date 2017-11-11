@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.hooks.regions.expressions;
 
 import java.util.ArrayList;
@@ -80,7 +78,7 @@ public class ExprRegionsAt extends SimpleExpression<Region> {
 		final Location[] ls = locs.getArray(e);
 		if (ls.length == 0)
 			return new Region[0];
-		final ArrayList<Region> r = new ArrayList<Region>();
+		final ArrayList<Region> r = new ArrayList<>();
 		for (final Location l : ls)
 			r.addAll(RegionsPlugin.getRegionsAt(l));
 		return r.toArray(new Region[r.size()]);

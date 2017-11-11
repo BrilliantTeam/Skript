@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.entity;
 
 import org.bukkit.entity.Skeleton;
@@ -33,19 +31,23 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 /**
  * @author Peter Güttinger
  */
+@SuppressWarnings("deprecation") // Until 1.12: use deprecated methods for compatibility
 public class SkeletonData extends EntityData<Skeleton> {
 	
 	private final static boolean hasWither = Skript.methodExists(Skeleton.class, "getSkeletonType");
 	private final static boolean hasStray = Skript.isRunningMinecraft(1, 10);
+	private final static boolean separateClasses = Skript.isRunningMinecraft(1, 11);
 	
 	static {
-		if (hasStray)
-			register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton", "stray");
-		else if (hasWither)
-			register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton");
-		else
-			register(SkeletonData.class, "skeleton", Skeleton.class, "skeleton");
-		
+		// Register nothing on 1.11+ (see SimpleEntityData instead)
+		if (!separateClasses) {
+			if (hasStray)
+				register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton", "stray");
+			else if (hasWither)
+				register(SkeletonData.class, "skeleton", Skeleton.class, 0, "skeleton", "wither skeleton");
+			else
+				register(SkeletonData.class, "skeleton", Skeleton.class, "skeleton");
+		}
 	}
 	
 	private int type;

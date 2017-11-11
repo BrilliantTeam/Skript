@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import java.util.Date;
@@ -52,8 +50,6 @@ import ch.njol.util.Kleenean;
 @Since("1.4, 2.1.1 (ban reason)")
 public class EffBan extends Effect {
 	
-	public final static boolean hasBanList = Skript.classExists("org.bukkit.BanList");
-	
 	static {
 		Skript.registerEffect(EffBan.class,
 				"ban %strings/offlineplayers% [(by reason of|because [of]|on account of|due to) %-string%]", "unban %strings/offlineplayers%",
@@ -74,16 +70,11 @@ public class EffBan extends Effect {
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		players = exprs[0];
 		reason = exprs.length > 1 ? (Expression<String>) exprs[1] : null;
-		if (!hasBanList && reason != null) {
-			Skript.error("Bukkit 1.7.2 R0.4 or later is required to ban players with a reason.");
-			return false;
-		}
 		ban = matchedPattern % 2 == 0;
 		ipBan = matchedPattern >= 2;
 		return true;
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void execute(final Event e) {
 		final String reason = this.reason != null ? this.reason.getSingle(e) : null; // don't check for null, just ignore an invalid reason
@@ -93,52 +84,29 @@ public class EffBan extends Effect {
 			if (o instanceof Player) {
 				if (ipBan) {
 					final String ip = ((Player) o).getAddress().getAddress().getHostAddress();
-					if (hasBanList) {
-						if (ban)
-							Bukkit.getBanList(BanList.Type.IP).addBan(ip, reason, expires, source);
-						else
-							Bukkit.getBanList(BanList.Type.IP).pardon(ip);
-					} else {
-						if (ban)
-							Bukkit.banIP(ip);
-						else
-							Bukkit.unbanIP(ip);
-					}
+					if (ban)
+						Bukkit.getBanList(BanList.Type.IP).addBan(ip, reason, expires, source);
+					else
+						Bukkit.getBanList(BanList.Type.IP).pardon(ip);
 				} else {
-					if (hasBanList) {
-						if (ban)
-							Bukkit.getBanList(BanList.Type.NAME).addBan(((Player) o).getName(), reason, expires, source); // FIXME [UUID] ban UUID
-						else
-							Bukkit.getBanList(BanList.Type.NAME).pardon(((Player) o).getName());
-					} else {
-						((Player) o).setBanned(ban);
-					}
+					if (ban)
+						Bukkit.getBanList(BanList.Type.NAME).addBan(((Player) o).getName(), reason, expires, source); // FIXME [UUID] ban UUID
+					else
+						Bukkit.getBanList(BanList.Type.NAME).pardon(((Player) o).getName());
 				}
 			} else if (o instanceof OfflinePlayer) {
-				if (hasBanList) {
-					if (ban)
-						Bukkit.getBanList(BanList.Type.NAME).addBan(((OfflinePlayer) o).getName(), reason, expires, source);
-					else
-						Bukkit.getBanList(BanList.Type.NAME).pardon(((OfflinePlayer) o).getName());
-				} else {
-					((OfflinePlayer) o).setBanned(ban);
-				}
+				if (ban)
+					Bukkit.getBanList(BanList.Type.NAME).addBan(((OfflinePlayer) o).getName(), reason, expires, source);
+				else
+					Bukkit.getBanList(BanList.Type.NAME).pardon(((OfflinePlayer) o).getName());
 			} else if (o instanceof String) {
 				final String s = (String) o;
-				if (hasBanList) {
-					if (ban) {
-						Bukkit.getBanList(BanList.Type.IP).addBan(s, reason, expires, source);
-						Bukkit.getBanList(BanList.Type.NAME).addBan(s, reason, expires, source);
-					} else {
-						Bukkit.getBanList(BanList.Type.IP).pardon(s);
-						Bukkit.getBanList(BanList.Type.NAME).pardon(s);
-					}
+				if (ban) {
+					Bukkit.getBanList(BanList.Type.IP).addBan(s, reason, expires, source);
+					Bukkit.getBanList(BanList.Type.NAME).addBan(s, reason, expires, source);
 				} else {
-					if (ban)
-						Bukkit.banIP(s);
-					else
-						Bukkit.unbanIP(s);
-					Bukkit.getOfflinePlayer(s).setBanned(ban);
+					Bukkit.getBanList(BanList.Type.IP).pardon(s);
+					Bukkit.getBanList(BanList.Type.NAME).pardon(s);
 				}
 			} else {
 				assert false;

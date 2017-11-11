@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang.util;
 
 import java.lang.reflect.Array;
@@ -140,7 +138,7 @@ public class SimpleLiteral<T> implements Literal<T>, DefaultExpression<T> {
 		final R[] parsedData = Converters.convertArray(data, to, (Class<R>) Utils.getSuperType(to));
 		if (parsedData.length != data.length)
 			return null;
-		return new ConvertedLiteral<T, R>(this, parsedData, (Class<R>) Utils.getSuperType(to));
+		return new ConvertedLiteral<>(this, parsedData, (Class<R>) Utils.getSuperType(to));
 	}
 	
 	@Override

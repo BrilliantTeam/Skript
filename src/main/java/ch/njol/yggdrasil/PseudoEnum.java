@@ -1,3 +1,22 @@
+/**
+ *   This file is part of Skript.
+ *
+ *  Skript is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Skript is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
+ */
 package ch.njol.yggdrasil;
 
 import java.util.ArrayList;
@@ -38,7 +57,7 @@ public abstract class PseudoEnum<T extends PseudoEnum<T>> {
 	@SuppressWarnings({"unchecked", "null"})
 	protected PseudoEnum(final String name) throws IllegalArgumentException {
 		this.name = name;
-		info = getInfo(getClass());
+		info = (Info<T>) getInfo(getClass());
 		info.writeLock.lock();
 		try {
 			if (info.map.containsKey(name))
@@ -168,7 +187,7 @@ public abstract class PseudoEnum<T extends PseudoEnum<T>> {
 	private final static <T extends PseudoEnum<T>> List<T> values(final Class<T> c, final Info<T> info) {
 		info.readLock.lock();
 		try {
-			return new ArrayList<T>(info.values);
+			return new ArrayList<>(info.values);
 		} finally {
 			info.readLock.unlock();
 		}
@@ -238,8 +257,8 @@ public abstract class PseudoEnum<T extends PseudoEnum<T>> {
 	
 	@SuppressWarnings("null")
 	private final static class Info<T extends PseudoEnum<T>> {
-		final List<T> values = new ArrayList<T>();
-		final Map<String, T> map = new HashMap<String, T>();
+		final List<T> values = new ArrayList<>();
+		final Map<String, T> map = new HashMap<>();
 		
 		final ReadWriteLock lock = new ReentrantReadWriteLock(true);
 		final Lock readLock = lock.readLock(), writeLock = lock.writeLock();
@@ -250,13 +269,13 @@ public abstract class PseudoEnum<T extends PseudoEnum<T>> {
 	/**
 	 * Must be synchronised
 	 */
-	private final static Map<Class<? extends PseudoEnum<?>>, Info<?>> infos = new HashMap<Class<? extends PseudoEnum<?>>, Info<?>>();
+	private final static Map<Class<? extends PseudoEnum<?>>, Info<?>> infos = new HashMap<>();
 	
 	private final static <T extends PseudoEnum<T>> Info<T> getInfo(final Class<T> c) {
 		synchronized (infos) {
 			Info<T> info = (Info<T>) infos.get(getDeclaringClass(c));
 			if (info == null)
-				infos.put(c, info = new Info<T>());
+				infos.put(c, info = new Info<>());
 			return info;
 		}
 	}

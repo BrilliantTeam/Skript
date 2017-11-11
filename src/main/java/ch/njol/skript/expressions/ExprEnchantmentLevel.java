@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.util.Map;
@@ -44,7 +42,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("Enchantment Level")
-@Description("The level of a particular <a href='../classes/#enchantment'>enchantment</a> on an item")
+@Description("The level of a particular <a href='classes.html#enchantment'>enchantment</a> on an item")
 @Examples({"player' tool is a sword of sharpness:",
 		"	message \"You have a sword of sharpness %level of sharpness of the player's tool% equipped\""})
 @Since("2.0")

@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,21 +13,29 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2013 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang.function;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public final class FunctionEvent extends Event {
+public final class FunctionEvent<T> extends Event {
 	
 	// Bukkit stuff
 	private final static HandlerList handlers = new HandlerList();
+	
+	private Function<? extends T> function;
+	
+	public FunctionEvent(Function<? extends T> function) {
+		this.function = function;
+	}
+	
+	public Function<? extends T> getFunction() {
+		return function;
+	}
 	
 	@Override
 	public HandlerList getHandlers() {

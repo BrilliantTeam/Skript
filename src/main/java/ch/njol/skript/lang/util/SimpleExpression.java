@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,15 +13,14 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang.util;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.bukkit.event.Event;
@@ -36,6 +35,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Checker;
@@ -53,6 +53,7 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	
 	private int time = 0;
 	
+	@SuppressWarnings("null")
 	protected SimpleExpression() {}
 	
 	@Override
@@ -325,5 +326,10 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	public boolean getAnd() {
 		return true;
 	}
+
+	/**
+	 * Parser instance which is being used or was used to parse this element.
+	 */
+	protected ParserInstance pi;
 	
 }

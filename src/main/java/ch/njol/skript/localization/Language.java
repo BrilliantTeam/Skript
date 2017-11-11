@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.localization;
 
 import java.io.File;
@@ -65,7 +63,7 @@ public class Language {
 	 */
 	private static String name = "english";
 	
-	final static HashMap<String, String> english = new HashMap<String, String>();
+	final static HashMap<String, String> english = new HashMap<>();
 	/**
 	 * May be null.
 	 */
@@ -73,7 +71,7 @@ public class Language {
 	static HashMap<String, String> localized = null;
 	static boolean useLocal = false;
 	
-	private static HashMap<Plugin, Version> langVersion = new HashMap<Plugin, Version>();
+	private static HashMap<Plugin, Version> langVersion = new HashMap<>();
 	
 	public static String getName() {
 		return useLocal ? name : "english";
@@ -208,7 +206,7 @@ public class Language {
 		name = "" + name.toLowerCase();
 		if (name.equals("english"))
 			return true;
-		localized = new HashMap<String, String>();
+		localized = new HashMap<>();
 		boolean exists = load(Skript.getAddonInstance(), name);
 		for (final SkriptAddon addon : Skript.getAddons()) {
 			assert addon != null;
@@ -265,12 +263,12 @@ public class Language {
 	
 	private static HashMap<String, String> load(final @Nullable InputStream in, final String name) {
 		if (in == null)
-			return new HashMap<String, String>();
+			return new HashMap<>();
 		try {
 			return new Config(in, name + ".lang", false, false, ":").toMap(".");
 		} catch (final IOException e) {
 			Skript.exception(e, "Could not load the language file '" + name + ".lang': " + ExceptionUtils.toString(e));
-			return new HashMap<String, String>();
+			return new HashMap<>();
 		} finally {
 			try {
 				in.close();
@@ -284,12 +282,12 @@ public class Language {
 			assert false;
 			return;
 		}
-		HashSet<String> s = new HashSet<String>(english.keySet());
+		HashSet<String> s = new HashSet<>(english.keySet());
 		s.removeAll(loc.keySet());
 		removeIgnored(s);
 		if (!s.isEmpty() && Skript.logNormal())
 			Skript.warning("The following messages have not been translated to " + name + ": " + StringUtils.join(s, ", "));
-		s = new HashSet<String>(loc.keySet());
+		s = new HashSet<>(loc.keySet());
 		s.removeAll(english.keySet());
 		removeIgnored(s);
 		if (!s.isEmpty() && Skript.logHigh())
@@ -304,7 +302,7 @@ public class Language {
 		}
 	}
 	
-	private final static List<LanguageChangeListener> listeners = new ArrayList<LanguageChangeListener>();
+	private final static List<LanguageChangeListener> listeners = new ArrayList<>();
 	
 	public static enum LanguageListenerPriority {
 		EARLIEST, NORMAL, LATEST;

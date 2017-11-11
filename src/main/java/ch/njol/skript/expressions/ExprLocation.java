@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
@@ -61,7 +59,7 @@ public class ExprLocation extends WrapperExpression<Location> {
 			super.setExpr(Direction.combine((Expression<? extends Direction>) exprs[0], (Expression<? extends Location>) exprs[1]));
 			return true;
 		} else {
-			setExpr(new EventValueExpression<Location>(Location.class));
+			setExpr(new EventValueExpression<>(Location.class));
 			return ((EventValueExpression<Location>) getExpr()).init();
 		}
 	}

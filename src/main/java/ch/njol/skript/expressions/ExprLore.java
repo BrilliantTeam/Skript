@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.util.ArrayList;
@@ -146,7 +144,7 @@ public class ExprLore extends SimpleExpression<String> {
 		if (meta == null)
 			meta = Bukkit.getItemFactory().getItemMeta(Material.STONE);
 		final Number n = line != null ? line.getSingle(e) : null;
-		List<String> lore = meta.hasLore() ? new ArrayList<String>(meta.getLore()) : new ArrayList<String>();
+		List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
 		if (n == null) {
 			if (line != null)
 				return;

@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript;
 
 import java.io.File;
@@ -28,8 +26,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.locks.LockSupport;
 
 import org.bukkit.event.EventPriority;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.classes.Converter;
@@ -41,9 +41,12 @@ import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.log.Verbosity;
+import ch.njol.skript.timings.SkriptTimings;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.chat.ChatMessages;
+import ch.njol.skript.util.chat.LinkParseMode;
 import ch.njol.util.Setter;
 
 /**
@@ -97,7 +100,6 @@ public abstract class SkriptConfig {
 	
 	public final static Option<Boolean> usePlayerUUIDsInVariableNames = new Option<Boolean>("use player UUIDs in variable names", false); // TODO change to true later (as well as in the default config)
 	public final static Option<Boolean> enablePlayerVariableFix = new Option<Boolean>("player variable fix", true);
-
 	
 	@SuppressWarnings("null")
 	private final static DateFormat shortDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
@@ -123,7 +125,7 @@ public abstract class SkriptConfig {
 		}
 	}
 	
-	private final static Option<Verbosity> verbosity = new Option<Verbosity>("verbosity", Verbosity.NORMAL, new EnumParser<Verbosity>(Verbosity.class, "verbosity"))
+	final static Option<Verbosity> verbosity = new Option<Verbosity>("verbosity", Verbosity.NORMAL, new EnumParser<Verbosity>(Verbosity.class, "verbosity"))
 			.setter(new Setter<Verbosity>() {
 				@Override
 				public void set(final Verbosity v) {
@@ -171,6 +173,70 @@ public abstract class SkriptConfig {
 			.optional(true);
 	
 	public final static Option<Boolean> apiSoftExceptions = new Option<Boolean>("soft api exceptions", false);
+	
+	public final static Option<Boolean> enableTimings = new Option<Boolean>("enable timings", false)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					if (Skript.classExists("co.aikar.timings.Timings")) { // Check for Paper server
+						if (t)
+							Skript.info("Timings support enabled!");
+						SkriptTimings.setEnabled(t); // Config option will be used
+					} else { // Not running Paper
+						if (t) // Warn the server admin that timings won't work
+							Skript.warning("Timings cannot be enabled! You are running Bukkit/Spigot, but Paper is required.");
+						SkriptTimings.setEnabled(false); // Just to be sure, deactivate timings support completely
+					}
+				}
+				
+			});
+	
+	public final static Option<String> parseLinks = new Option<String>("parse links in chat messages", "disabled")
+			.setter(new Setter<String>() {
+
+				@Override
+				public void set(String t) {
+					switch (t) {
+						case "false":
+						case "disabled":
+							ChatMessages.linkParseMode = LinkParseMode.DISABLED;
+							break;
+						case "true":
+						case "lenient":
+							ChatMessages.linkParseMode = LinkParseMode.LENIENT;
+							break;
+						case "strict":
+							ChatMessages.linkParseMode = LinkParseMode.STRICT;
+							break;
+						default:
+							ChatMessages.linkParseMode = LinkParseMode.DISABLED;
+							Skript.warning("Unknown link parse mode: " + t + ", please use disabled, strict or lenient");
+					}
+				}
+				
+			});
+	
+	public final static Option<Boolean> colorResetCodes = new Option<Boolean>("color codes reset formatting", true)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					ChatMessages.colorResetCodes = t;
+				}
+				
+			});
+	
+	public final static Option<Boolean> asyncLoaderEnabled = new Option<Boolean>("asynchronous script loading", false)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					ScriptLoader.loadAsync = t;
+				}
+				
+			})
+			.optional(true);
 	
 	/**
 	 * This should only be used in special cases

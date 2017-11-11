@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.classes.data;
 
 import java.io.StreamCorruptedException;
@@ -49,7 +47,7 @@ public class JavaClasses {
 	public final static int VARIABLENAME_NUMBERACCURACY = 8;
 	
 	static {
-		Classes.registerClass(new ClassInfo<Object>(Object.class, "object")
+		Classes.registerClass(new ClassInfo<>(Object.class, "object")
 				.user("objects?")
 				.name("Object")
 				.description("The supertype of all types, meaning that if %object% is used in e.g. a condition it will accept all kinds of expressions.")
@@ -57,12 +55,12 @@ public class JavaClasses {
 				.examples("")
 				.since("1.0"));
 		
-		Classes.registerClass(new ClassInfo<Number>(Number.class, "number")
+		Classes.registerClass(new ClassInfo<>(Number.class, "number")
 				.user("num(ber)?s?")
 				.name("Number")
 				.description("A number, e.g. 2.5, 3, or -9812454.",
 						"Please note that many expressions only need integers, i.e. will discard any frational parts of any numbers without producing an error.")
-				.usage("<code>[-]###[.###]</code> (any amount of digits; very large numbers will be truncated though)")
+				.usage("[-]###[.###]</code> (any amount of digits; very large numbers will be truncated though)")
 				.examples("set the player's health to 5.5",
 						"set {_temp} to 2*{_temp} - 2.5")
 				.since("1.0")
@@ -132,11 +130,11 @@ public class JavaClasses {
 					}
 				}).math(Number.class, new NumberArithmetic()));
 		
-		Classes.registerClass(new ClassInfo<Long>(Long.class, "long")
+		Classes.registerClass(new ClassInfo<>(Long.class, "long")
 				.user("int(eger)?s?")
 				.name(ClassInfo.NO_DOC)
 				.before("integer", "short", "byte")
-				.defaultExpression(new SimpleLiteral<Long>((long) 1, true))
+				.defaultExpression(new SimpleLiteral<>((long) 1, true))
 				.parser(new Parser<Long>() {
 					@Override
 					@Nullable
@@ -195,9 +193,9 @@ public class JavaClasses {
 					}
 				}).math(Number.class, new NumberArithmetic()));
 		
-		Classes.registerClass(new ClassInfo<Integer>(Integer.class, "integer")
+		Classes.registerClass(new ClassInfo<>(Integer.class, "integer")
 				.name(ClassInfo.NO_DOC)
-				.defaultExpression(new SimpleLiteral<Integer>(1, true))
+				.defaultExpression(new SimpleLiteral<>(1, true))
 				.parser(new Parser<Integer>() {
 					@Override
 					@Nullable
@@ -256,9 +254,9 @@ public class JavaClasses {
 					}
 				}).math(Number.class, new NumberArithmetic()));
 		
-		Classes.registerClass(new ClassInfo<Double>(Double.class, "double")
+		Classes.registerClass(new ClassInfo<>(Double.class, "double")
 				.name(ClassInfo.NO_DOC)
-				.defaultExpression(new SimpleLiteral<Double>(1., true))
+				.defaultExpression(new SimpleLiteral<>(1., true))
 				.after("long")
 				.before("float", "integer", "short", "byte")
 				.parser(new Parser<Double>() {
@@ -319,9 +317,9 @@ public class JavaClasses {
 					}
 				}).math(Number.class, new NumberArithmetic()));
 		
-		Classes.registerClass(new ClassInfo<Float>(Float.class, "float")
+		Classes.registerClass(new ClassInfo<>(Float.class, "float")
 				.name(ClassInfo.NO_DOC)
-				.defaultExpression(new SimpleLiteral<Float>(1f, true))
+				.defaultExpression(new SimpleLiteral<>(1f, true))
 				.parser(new Parser<Float>() {
 					@Override
 					@Nullable
@@ -380,7 +378,7 @@ public class JavaClasses {
 					}
 				}).math(Number.class, new NumberArithmetic()));
 		
-		Classes.registerClass(new ClassInfo<Boolean>(Boolean.class, "boolean")
+		Classes.registerClass(new ClassInfo<>(Boolean.class, "boolean")
 				.user("booleans?")
 				.name("Boolean")
 				.description("A boolean is a value that is either true or false. Other accepted names are 'on' and 'yes' for true, and 'off' and 'no' for false.")
@@ -451,9 +449,9 @@ public class JavaClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Short>(Short.class, "short")
+		Classes.registerClass(new ClassInfo<>(Short.class, "short")
 				.name(ClassInfo.NO_DOC)
-				.defaultExpression(new SimpleLiteral<Short>((short) 1, true))
+				.defaultExpression(new SimpleLiteral<>((short) 1, true))
 				.parser(new Parser<Short>() {
 					@Override
 					@Nullable
@@ -512,9 +510,9 @@ public class JavaClasses {
 					}
 				}).math(Number.class, new NumberArithmetic()));
 		
-		Classes.registerClass(new ClassInfo<Byte>(Byte.class, "byte")
+		Classes.registerClass(new ClassInfo<>(Byte.class, "byte")
 				.name(ClassInfo.NO_DOC)
-				.defaultExpression(new SimpleLiteral<Byte>((byte) 1, true))
+				.defaultExpression(new SimpleLiteral<>((byte) 1, true))
 				.parser(new Parser<Byte>() {
 					@Override
 					@Nullable
@@ -573,17 +571,17 @@ public class JavaClasses {
 					}
 				}).math(Number.class, new NumberArithmetic()));
 		
-		Classes.registerClass(new ClassInfo<String>(String.class, "string")
+		Classes.registerClass(new ClassInfo<>(String.class, "string")
 				.user("(text|string)s?")
 				.name("Text")
 				.description("Text is simply text, i.e. a sequence of characters, which can optionally contain expressions which will be replaced with a meaningful representation " +
 						"(e.g. %player% will be replaced with the player's name).",
 						"Because scripts are also text, you have to put text into double quotes to tell Skript which part of the line is an effect/expression and which part is the text.",
 						"Please read the article on <a href='../strings/'>Texts and Variable Names</a> to learn more.")
-				.usage("simple: <code>\"...\"</code>",
-						"quotes: <code>\"...\"\"...\"</code>",
-						"expressions: <code>\"...%expression%...\"</code>",
-						"percent signs: <code>\"...%%...\"</code>")
+				.usage("simple: \"...\"",
+						"quotes: \"...\"\"...\"",
+						"expressions: \"...%expression%...\"",
+						"percent signs: \"...%%...\"")
 				.examples("broadcast \"Hello World!\"",
 						"message \"Hello %player%\"",
 						"message \"The id of \"\"%type of tool%\"\" is %id of tool%.\"")
@@ -593,7 +591,7 @@ public class JavaClasses {
 					@Nullable
 					public String parse(final String s, final ParseContext context) {
 						switch (context) {
-							case DEFAULT: // in DEFAULT, parsing is handled by VariableString
+							case DEFAULT: // in DUMMY, parsing is handled by VariableString
 								assert false;
 								return null;
 							case CONFIG: // duh

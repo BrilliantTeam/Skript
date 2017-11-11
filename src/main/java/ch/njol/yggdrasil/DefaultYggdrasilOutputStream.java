@@ -1,24 +1,22 @@
-/*
- *   This file is part of Yggdrasil, a data format to store object graphs, and the Java implementation thereof.
+/**
+ *   This file is part of Skript.
  *
- *  Yggdrasil is free software: you can redistribute it and/or modify
+ *  Skript is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Yggdrasil is distributed in the hope that it will be useful,
+ *  Skript is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2013-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.yggdrasil;
 
 import static ch.njol.yggdrasil.Tag.*;
@@ -55,7 +53,7 @@ public final class DefaultYggdrasilOutputStream extends YggdrasilOutputStream {
 		out.write(t.tag);
 	}
 	
-	private final HashMap<String, Integer> writtenShortStrings = new HashMap<String, Integer>();
+	private final HashMap<String, Integer> writtenShortStrings = new HashMap<>();
 	int nextShortStringID = 0;
 	
 	/**

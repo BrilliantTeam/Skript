@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.event.Event;
@@ -61,8 +59,8 @@ public class ExprSubstring extends SimpleExpression<String> {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		string = (Expression<String>) exprs[parseResult.mark == 0 ? 0 : 1];
-		start = parseResult.mark == 1 ? null : exprs[parseResult.mark == 0 ? 1 : 0] == null ? new SimpleLiteral<Number>(1, false) : (Expression<Number>) exprs[parseResult.mark == 0 ? 1 : 0];
-		end = parseResult.mark == 2 ? null : exprs[parseResult.mark == 0 ? 2 : 0] == null ? new SimpleLiteral<Number>(1, false) : (Expression<Number>) exprs[parseResult.mark == 0 ? 2 : 0];
+		start = parseResult.mark == 1 ? null : exprs[parseResult.mark == 0 ? 1 : 0] == null ? new SimpleLiteral<>(1, false) : (Expression<Number>) exprs[parseResult.mark == 0 ? 1 : 0];
+		end = parseResult.mark == 2 ? null : exprs[parseResult.mark == 0 ? 2 : 0] == null ? new SimpleLiteral<>(1, false) : (Expression<Number>) exprs[parseResult.mark == 0 ? 2 : 0];
 		assert end != null || start != null;
 		return true;
 	}

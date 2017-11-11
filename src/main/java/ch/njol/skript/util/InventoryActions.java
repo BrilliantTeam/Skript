@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2016 Peter Güttinger and contributors
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.util;
 
 import java.util.ArrayList;
@@ -37,7 +35,7 @@ import ch.njol.skript.localization.Noun;
  */
 public class InventoryActions {
 	
-	private final static EnumUtils<InventoryAction> util = new EnumUtils<InventoryAction>(InventoryAction.class, "inventory actions");
+	private final static EnumUtils<InventoryAction> util = new EnumUtils<>(InventoryAction.class, "inventory actions");
 	
 	public static @Nullable InventoryAction parse(String s) {
 		return util.parse(s);

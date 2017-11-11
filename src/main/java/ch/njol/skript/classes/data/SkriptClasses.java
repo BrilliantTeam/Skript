@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,14 +13,13 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.classes.data;
 
+import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.util.Locale;
 import java.util.Map;
@@ -46,6 +45,7 @@ import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.classes.YggdrasilSerializer;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.localization.RegexMessage;
@@ -73,7 +73,7 @@ public class SkriptClasses {
 	public SkriptClasses() {}
 	
 	static {
-		Classes.registerClass(new ClassInfo<ClassInfo>(ClassInfo.class, "classinfo")
+		Classes.registerClass(new ClassInfo<>(ClassInfo.class, "classinfo")
 				.user("types?")
 				.name("Type")
 				.description("Represents a type, e.g. number, object, item type, location, block, world, entity type, etc.",
@@ -155,7 +155,7 @@ public class SkriptClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<WeatherType>(WeatherType.class, "weathertype")
+		Classes.registerClass(new ClassInfo<>(WeatherType.class, "weathertype")
 				.user("weather ?types?", "weather conditions?", "weathers?")
 				.name("Weather Type")
 				.description("The weather types sunny, rainy, and thundering.")
@@ -164,7 +164,7 @@ public class SkriptClasses {
 						"is sunny in the player's world",
 						"message \"It is %weather in the argument's world% in %world of the argument%\"")
 				.since("1.0")
-				.defaultExpression(new SimpleLiteral<WeatherType>(WeatherType.CLEAR, true))
+				.defaultExpression(new SimpleLiteral<>(WeatherType.CLEAR, true))
 				.parser(new Parser<WeatherType>() {
 					@Override
 					@Nullable
@@ -187,9 +187,9 @@ public class SkriptClasses {
 						return "[a-z]+";
 					}
 				})
-				.serializer(new EnumSerializer<WeatherType>(WeatherType.class)));
+				.serializer(new EnumSerializer<>(WeatherType.class)));
 		
-		Classes.registerClass(new ClassInfo<ItemType>(ItemType.class, "itemtype")
+		Classes.registerClass(new ClassInfo<>(ItemType.class, "itemtype")
 				.user("item ?types?", "items", "materials")
 				.name("Item Type")
 				.description("An item type is an alias, e.g. 'a pickaxe', 'all plants', etc., and can result in different items when added to an inventory, " +
@@ -329,7 +329,7 @@ public class SkriptClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Time>(Time.class, "time")
+		Classes.registerClass(new ClassInfo<>(Time.class, "time")
 				.user("times?")
 				.name("Time")
 				.description("A time is a point in a minecraft day's time (i.e. ranges from 0:00 to 23:59), which can vary per world.",
@@ -340,7 +340,7 @@ public class SkriptClasses {
 						"	time is 8 pm",
 						"	broadcast \"It's %time%\"")
 				.since("1.0")
-				.defaultExpression(new EventValueExpression<Time>(Time.class))
+				.defaultExpression(new EventValueExpression<>(Time.class))
 				.parser(new Parser<Time>() {
 					@Override
 					@Nullable
@@ -380,7 +380,7 @@ public class SkriptClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Timespan>(Timespan.class, "timespan")
+		Classes.registerClass(new ClassInfo<>(Timespan.class, "timespan")
 				.user("time ?spans?")
 				.name("Timespan")
 				.description("A timespan is a difference of two different dates or times, e.g '10 minutes'. Timespans are always displayed as real life time, but can be defined as minecraft time, e.g. '5 minecraft days and 12 hours'.",
@@ -445,10 +445,25 @@ public class SkriptClasses {
 					public Timespan subtract(final Timespan value, final Timespan difference) {
 						return new Timespan(Math.max(0, value.getMilliSeconds() - difference.getMilliSeconds()));
 					}
+
+					@Override
+					public Timespan multiply(Timespan value, Timespan multiplier) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Timespan divide(Timespan value, Timespan divider) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Timespan power(Timespan value, Timespan exponent) {
+						throw new UnsupportedOperationException();
+					}
 				}));
 		
 		// TODO remove
-		Classes.registerClass(new ClassInfo<Timeperiod>(Timeperiod.class, "timeperiod")
+		Classes.registerClass(new ClassInfo<>(Timeperiod.class, "timeperiod")
 				.user("time ?periods?", "durations?")
 				.name("Timeperiod")
 				.description("A period of time between two <a href='#time'>times</a>. Mostly useful since you can use this to test for whether it's day, night, dusk or dawn in a specific world.",
@@ -458,7 +473,7 @@ public class SkriptClasses {
 				.examples("time in world is night")
 				.since("1.0")
 				.before("timespan") // otherwise "day" gets parsed as '1 day'
-				.defaultExpression(new SimpleLiteral<Timeperiod>(new Timeperiod(0, 23999), true))
+				.defaultExpression(new SimpleLiteral<>(new Timeperiod(0, 23999), true))
 				.parser(new Parser<Timeperiod>() {
 					@Override
 					@Nullable
@@ -516,7 +531,7 @@ public class SkriptClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Date>(Date.class, "date")
+		Classes.registerClass(new ClassInfo<>(Date.class, "date")
 				.user("dates?")
 				.name("Date")
 				.description("A date is a certain point in the real world's time which can currently only be obtained with <a href='../expressions/#ExprNow'>now</a>.",
@@ -552,9 +567,24 @@ public class SkriptClasses {
 					public Date subtract(final Date value, final Timespan difference) {
 						return new Date(value.getTimestamp() - difference.getMilliSeconds());
 					}
+
+					@Override
+					public Date multiply(Date value, Timespan multiplier) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Date divide(Date value, Timespan divider) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Date power(Date value, Timespan exponent) {
+						throw new UnsupportedOperationException();
+					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Direction>(Direction.class, "direction")
+		Classes.registerClass(new ClassInfo<>(Direction.class, "direction")
 				.user("directions?")
 				.name("Direction")
 				.description("A direction, e.g. north, east, behind, 5 south east, 1.3 meters to the right, etc.",
@@ -565,7 +595,7 @@ public class SkriptClasses {
 						"loop blocks from the block infront of the player to the block 10 below the player:",
 						"	set the block behind the loop-block to water")
 				.since("2.0")
-				.defaultExpression(new SimpleLiteral<Direction>(new Direction(new double[] {0, 0, 0}), true))
+				.defaultExpression(new SimpleLiteral<>(new Direction(new double[] {0, 0, 0}), true))
 				.parser(new Parser<Direction>() {
 					@Override
 					@Nullable
@@ -603,7 +633,7 @@ public class SkriptClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Slot>(Slot.class, "slot")
+		Classes.registerClass(new ClassInfo<>(Slot.class, "slot")
 				.user("(inventory )?slots?")
 				.name("Inventory Slot")
 				.description("Represents a single slot of an <a href='#inventory'>inventory</a>. " +
@@ -618,7 +648,7 @@ public class SkriptClasses {
 						"set the colour of the player's tool to green",
 						"enchant the player's chestplate with projectile protection 5")
 				.since("")
-				.defaultExpression(new EventValueExpression<Slot>(Slot.class))
+				.defaultExpression(new EventValueExpression<>(Slot.class))
 				.changer(new Changer<Slot>() {
 					@SuppressWarnings("unchecked")
 					@Override
@@ -686,7 +716,7 @@ public class SkriptClasses {
 					}
 				}).serializeAs(ItemStack.class));
 		
-		Classes.registerClass(new ClassInfo<Color>(Color.class, "color")
+		Classes.registerClass(new ClassInfo<>(Color.class, "color")
 				.user("colou?rs?")
 				.name("Colour")
 				.description("Wool, dye and chat colours.")
@@ -716,9 +746,9 @@ public class SkriptClasses {
 					public String getVariableNamePattern() {
 						return "[a-z ]+";
 					}
-				}).serializer(new EnumSerializer<Color>(Color.class)));
+				}).serializer(new EnumSerializer<>(Color.class)));
 		
-		Classes.registerClass(new ClassInfo<StructureType>(StructureType.class, "structuretype")
+		Classes.registerClass(new ClassInfo<>(StructureType.class, "structuretype")
 				.user("tree ?types?", "trees?")
 				.name("Tree Type")
 				.description("A tree type represents a tree species or a huge mushroom species. These can be generated in a world with the <a href='../effects/#EffTree'>generate tree</a> effect.")
@@ -726,7 +756,7 @@ public class SkriptClasses {
 				.examples("grow any regular tree at the block",
 						"grow a huge red mushroom above the block")
 				.since("")
-				.defaultExpression(new SimpleLiteral<StructureType>(StructureType.TREE, true))
+				.defaultExpression(new SimpleLiteral<>(StructureType.TREE, true))
 				.parser(new Parser<StructureType>() {
 					@Override
 					@Nullable
@@ -748,9 +778,9 @@ public class SkriptClasses {
 					public String getVariableNamePattern() {
 						return "[a-z ]+";
 					}
-				}).serializer(new EnumSerializer<StructureType>(StructureType.class)));
+				}).serializer(new EnumSerializer<>(StructureType.class)));
 		
-		Classes.registerClass(new ClassInfo<EnchantmentType>(EnchantmentType.class, "enchantmenttype")
+		Classes.registerClass(new ClassInfo<>(EnchantmentType.class, "enchantmenttype")
 				.user("enchant(ing|ment) types?")
 				.name("Enchantment Type")
 				.description("An enchantment with an optional level, e.g. 'sharpness 2' or 'fortune'.")
@@ -800,7 +830,7 @@ public class SkriptClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<Experience>(Experience.class, "experience")
+		Classes.registerClass(new ClassInfo<>(Experience.class, "experience")
 				.name("Experience")
 				.description("Experience points. Please note that Bukkit only allows to give XP, but not remove XP from players. " +
 						"You can however change a player's <a href='../expressions/#ExprLevel'>level</a> and <a href='../expressions/#ExprLevelProgress'>level progress</a> freely.")
@@ -851,7 +881,7 @@ public class SkriptClasses {
 					}
 				}));
 		
-		Classes.registerClass(new ClassInfo<VisualEffect>(VisualEffect.class, "visualeffect")
+		Classes.registerClass(new ClassInfo<>(VisualEffect.class, "visualeffect")
 				.name("Visual Effect")
 				.description("A visible effect, e.g. particles.")
 				.examples("show wolf hearts on the clicked wolf",

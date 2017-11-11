@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,21 +13,22 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import org.bukkit.Material;
+import org.bukkit.entity.AbstractHorse;
+import org.bukkit.entity.ChestedHorse;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.HorseInventory;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -73,6 +74,7 @@ public class EffEquip extends Effect implements Testable {
 	}
 	
 	private final static boolean supportsHorses = Skript.classExists("org.bukkit.entity.Horse");
+	private final static boolean newHorses = Skript.classExists("org.bukkit.entity.AbstractHorse");
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -84,6 +86,21 @@ public class EffEquip extends Effect implements Testable {
 					if (t.isOfType(Material.SADDLE.getId(), (short) 0)) {
 						((Pig) en).setSaddle(true);
 						break;
+					}
+				}
+				continue;
+			} else if (newHorses && en instanceof AbstractHorse) {
+				// Spigot's API is bad, just bad... Abstract horse doesn't have horse inventory!
+				final Inventory invi = ((AbstractHorse) en).getInventory();
+				for (final ItemType t : ts) {
+					for (final ItemStack item : t.getAll()) {
+						if (item.getType() == Material.SADDLE) {
+							invi.setItem(0, item); // Slot 0=saddle
+						} else if (item.getType() == Material.IRON_BARDING || item.getType() == Material.GOLD_BARDING || item.getType() == Material.DIAMOND_BARDING) {
+							invi.setItem(1, item); // Slot 1=armor
+						} else if (item.getType() == Material.CHEST && en instanceof ChestedHorse) {
+							((ChestedHorse) en).setCarryingChest(true);
+						}
 					}
 				}
 				continue;

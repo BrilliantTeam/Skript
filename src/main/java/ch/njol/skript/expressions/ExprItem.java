@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.entity.Item;
@@ -45,7 +43,7 @@ import ch.njol.skript.util.Slot;
 @Examples({"on dispense:",
 		"	item is a clock",
 		"	set the time to 6:00"/*,"	delete the item"*/})
-@Since("")
+@Since("<i>unknown</i> (before 2.1)")
 public class ExprItem extends EventValueExpression<ItemStack> {
 	static {
 		Skript.registerExpression(ExprItem.class, ItemStack.class, ExpressionType.SIMPLE, "[the] item");
@@ -65,11 +63,11 @@ public class ExprItem extends EventValueExpression<ItemStack> {
 	public Class<?>[] acceptChange(final ChangeMode mode) {
 		if (mode == ChangeMode.RESET)
 			return null;
-		item = new EventValueExpression<Item>(Item.class);
+		item = new EventValueExpression<>(Item.class);
 		if (item.init())
 			return new Class[] {ItemType.class};
 		item = null;
-		slot = new EventValueExpression<Slot>(Slot.class);
+		slot = new EventValueExpression<>(Slot.class);
 		if (slot.init())
 			return new Class[] {ItemType.class};
 		slot = null;

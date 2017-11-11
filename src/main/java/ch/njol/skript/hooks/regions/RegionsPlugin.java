@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.hooks.regions;
 
 import java.io.IOException;
@@ -46,7 +44,7 @@ public abstract class RegionsPlugin<P extends Plugin> extends Hook<P> {
 	
 	public RegionsPlugin() throws IOException {}
 	
-	public static Collection<RegionsPlugin<?>> plugins = new ArrayList<RegionsPlugin<?>>(2);
+	public static Collection<RegionsPlugin<?>> plugins = new ArrayList<>(2);
 	
 	static {
 		Variables.yggdrasil.registerClassResolver(new ClassResolver() {
@@ -89,7 +87,7 @@ public abstract class RegionsPlugin<P extends Plugin> extends Hook<P> {
 	public abstract Collection<? extends Region> getRegionsAt_i(Location l);
 	
 	public final static Set<? extends Region> getRegionsAt(final Location l) {
-		final Set<Region> r = new HashSet<Region>();
+		final Set<Region> r = new HashSet<>();
 		for (final RegionsPlugin<?> pl : plugins) {
 			r.addAll(pl.getRegionsAt_i(l));
 		}

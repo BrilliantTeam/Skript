@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,21 +13,21 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
+import org.mozilla.javascript.Script;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
@@ -138,7 +138,7 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	@Nullable
 	protected <R> ConvertedExpression<Object, ? extends R> getConvertedExpr(final Class<R>... to) {
 		if (isVariableLoop && !isIndex) {
-			return new ConvertedExpression<Object, R>(this, (Class<R>) Utils.getSuperType(to), new Converter<Object, R>() {
+			return new ConvertedExpression<>(this, (Class<R>) Utils.getSuperType(to), new Converter<Object, R>() {
 				@Override
 				@Nullable
 				public R convert(final Object o) {

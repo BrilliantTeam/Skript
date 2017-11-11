@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.events;
 
 import org.bukkit.event.Event;
@@ -35,6 +33,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.effects.EffSpawn;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -51,20 +50,20 @@ public class EvtItem extends SkriptEvent {
 		Skript.registerEvent("Dispense", EvtItem.class, BlockDispenseEvent.class, "dispens(e|ing) [[of] %itemtypes%]")
 				.description("Called when a dispenser dispenses an item.")
 				.examples("")
-				.since("");
+				.since("<i>unknown</i> (before 2.1)");
 		Skript.registerEvent("Item Spawn", EvtItem.class, ItemSpawnEvent.class, "item spawn[ing] [[of] %itemtypes%]")
 				.description("Called whenever an item stack is spawned in a world, e.g. as drop of a block or mob, a player throwing items out of his inventory, or a dispenser dispensing an item (not shooting it).")
 				.examples("")
-				.since("");
+				.since("<i>unknown</i> (before 2.1)");
 		Skript.registerEvent("Drop", EvtItem.class, PlayerDropItemEvent.class, "[player] drop[ing] [[of] %itemtypes%]")
 				.description("Called when a player drops an item from his inventory.")
 				.examples("")
-				.since("");
+				.since("<i>unknown</i> (before 2.1)");
 		// TODO limit to InventoryAction.PICKUP_* and similar (e.g. COLLECT_TO_CURSOR)
 		Skript.registerEvent("Craft", EvtItem.class, CraftItemEvent.class, "[player] craft[ing] [[of] %itemtypes%]")
 				.description("Called when a player crafts an item.")
 				.examples("")
-				.since("");
+				.since("<i>unknown</i> (before 2.1)");
 		if (hasPrepareCraftEvent) {
 			Skript.registerEvent("Prepare Craft", EvtItem.class, PrepareItemCraftEvent.class, "[player] (preparing|beginning) craft[ing] [[of] %itemtypes%]")
 					.description("Called just before displaying crafting result to player. Note that setting the result item might or might not work due to Bukkit bugs.")
@@ -74,7 +73,7 @@ public class EvtItem extends SkriptEvent {
 		Skript.registerEvent("Pick Up", EvtItem.class, PlayerPickupItemEvent.class, "[player] (pick[ ]up|picking up) [[of] %itemtypes%]")
 				.description("Called when a player picks up an item. Please note that the item is still on the ground when this event is called.")
 				.examples("")
-				.since("");
+				.since("<i>unknown</i> (before 2.1)");
 		// TODO brew event
 //		Skript.registerEvent("Brew", EvtItem.class, BrewEvent.class, "brew[ing] [[of] %itemtypes%]")
 //				.description("Called when a potion finished brewing.")
@@ -106,6 +105,8 @@ public class EvtItem extends SkriptEvent {
 	@SuppressWarnings("null")
 	@Override
 	public boolean check(final Event e) {
+		if (e instanceof ItemSpawnEvent) // To make 'last dropped item' possible.
+			EffSpawn.lastSpawned = ((ItemSpawnEvent) e).getEntity();
 		if (types == null)
 			return true;
 		final ItemStack is;

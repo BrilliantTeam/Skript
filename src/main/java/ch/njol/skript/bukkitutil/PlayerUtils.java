@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.bukkitutil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -48,7 +46,7 @@ import ch.njol.skript.util.Task;
 public abstract class PlayerUtils {
 	private PlayerUtils() {}
 	
-	final static Set<Player> inviUpdate = new HashSet<Player>();
+	final static Set<Player> inviUpdate = new HashSet<>();
 	
 	public final static void updateInventory(final @Nullable Player p) {
 		if (p != null)
@@ -57,7 +55,6 @@ public abstract class PlayerUtils {
 	
 	// created when first used
 	final static Task task = new Task(Skript.getInstance(), 1, 1) {
-		@SuppressWarnings("deprecation")
 		@Override
 		public void run() {
 			try {

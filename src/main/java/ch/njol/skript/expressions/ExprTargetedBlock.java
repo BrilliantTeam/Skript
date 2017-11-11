@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.util.HashSet;
@@ -67,7 +65,7 @@ public class ExprTargetedBlock extends PropertyExpression<Player, Block> {
 	
 	@Nullable
 	private static Event last = null;
-	private final static WeakHashMap<Player, Block> targetedBlocks = new WeakHashMap<Player, Block>();
+	private final static WeakHashMap<Player, Block> targetedBlocks = new WeakHashMap<>();
 	private static long blocksValidForTick = 0;
 	
 	@SuppressWarnings({"unchecked", "null"})
@@ -85,7 +83,6 @@ public class ExprTargetedBlock extends PropertyExpression<Player, Block> {
 		return Classes.getDebugMessage(getAll(e));
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Nullable
 	Block getTargetedBlock(final @Nullable Player p, final Event e) {
 		if (p == null)
@@ -103,12 +100,8 @@ public class ExprTargetedBlock extends PropertyExpression<Player, Block> {
 //			return ((PlayerInteractEvent) e).getClickedBlock();
 //		}
 		try {
-			Block b;
-			if(Skript.methodExists(Player.class, "getTargetBlock", Set.class, int.class)){
-				b = p.getTargetBlock((Set<Material>)null, SkriptConfig.maxTargetBlockDistance.value());
-			}else{
-				b = p.getTargetBlock((HashSet<Byte>)null, SkriptConfig.maxTargetBlockDistance.value());
-			}if (b.getType() == Material.AIR)
+			Block b = p.getTargetBlock((Set<Material>)null, SkriptConfig.maxTargetBlockDistance.value());
+			if (b.getType() == Material.AIR)
 				b = null;
 			targetedBlocks.put(p, b);
 			return b;

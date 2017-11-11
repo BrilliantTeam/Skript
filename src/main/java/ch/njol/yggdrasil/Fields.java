@@ -1,24 +1,22 @@
-/*
- *   This file is part of Yggdrasil, a data format to store object graphs, and the Java implementation thereof.
+/**
+ *   This file is part of Skript.
  *
- *  Yggdrasil is free software: you can redistribute it and/or modify
+ *  Skript is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Yggdrasil is distributed in the hope that it will be useful,
+ *  Skript is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2013-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.yggdrasil;
 
 import java.io.NotSerializableException;
@@ -176,7 +174,7 @@ public final class Fields implements Iterable<FieldContext> {
 	@Nullable
 	private final Yggdrasil yggdrasil;
 	
-	private final Map<String, FieldContext> fields = new HashMap<String, FieldContext>();
+	private final Map<String, FieldContext> fields = new HashMap<>();
 	
 	/**
 	 * Creates an empty Fields object.
@@ -236,7 +234,7 @@ public final class Fields implements Iterable<FieldContext> {
 		}
 	}
 	
-	private final static Map<Class<?>, Collection<Field>> cache = new HashMap<Class<?>, Collection<Field>>();
+	private final static Map<Class<?>, Collection<Field>> cache = new HashMap<>();
 	
 	/**
 	 * Gets all serialisable fields of the provided class, including superclasses.
@@ -249,8 +247,8 @@ public final class Fields implements Iterable<FieldContext> {
 		Collection<Field> fields = cache.get(c);
 		if (fields != null)
 			return fields;
-		fields = new ArrayList<Field>();
-		final Set<String> ids = new HashSet<String>();
+		fields = new ArrayList<>();
+		final Set<String> ids = new HashSet<>();
 		for (Class<?> sc = c; sc != null; sc = sc.getSuperclass()) {
 			final Field[] fs = sc.getDeclaredFields();
 			for (final Field f : fs) {
@@ -283,7 +281,7 @@ public final class Fields implements Iterable<FieldContext> {
 		final Yggdrasil y = yggdrasil;
 		if (y == null)
 			throw new YggdrasilException("");
-		final Set<FieldContext> excessive = new HashSet<FieldContext>(fields.values());
+		final Set<FieldContext> excessive = new HashSet<>(fields.values());
 		final Class<?> oc = o.getClass();
 		assert oc != null;
 		for (final Field f : getFields(oc)) {

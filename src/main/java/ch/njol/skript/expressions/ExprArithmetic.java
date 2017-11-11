@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
@@ -117,7 +115,7 @@ public class ExprArithmetic extends SimpleExpression<Number> {
 		}
 	}
 	
-	private final static Patterns<Operator> patterns = new Patterns<Operator>(new Object[][] {
+	private final static Patterns<Operator> patterns = new Patterns<>(new Object[][] {
 			
 			{"%number%[ ]+[ ]%number%", Operator.PLUS},
 			{"%number%[ ]-[ ]%number%", Operator.MINUS},
@@ -199,7 +197,7 @@ public class ExprArithmetic extends SimpleExpression<Number> {
 	@Override
 	public Expression<? extends Number> simplify() {
 		if (first instanceof Literal && second instanceof Literal)
-			return new SimpleLiteral<Number>(getArray(null), Number.class, false);
+			return new SimpleLiteral<>(getArray(null), Number.class, false);
 		return this;
 	}
 	

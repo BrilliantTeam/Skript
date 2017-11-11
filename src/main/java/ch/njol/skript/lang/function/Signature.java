@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,15 +13,14 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2016 Peter Güttinger and contributors
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang.function;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,6 +43,8 @@ public class Signature<T> {
 	final NonNullPair<String, Boolean> info;
 	final boolean single;
 	
+	final Collection<FunctionReference<?>> calls;
+	
 	@SuppressWarnings("null")
 	public Signature(String script, String name, List<Parameter<?>> parameters, @Nullable final ClassInfo<T> returnType, @Nullable final NonNullPair<String, Boolean> info, boolean single) {
 		this.script = script;
@@ -52,6 +53,8 @@ public class Signature<T> {
 		this.returnType = returnType;
 		this.info = info;
 		this.single = single;
+		
+		calls = new ArrayList<>();
 	}
 	
 	public String getName() {

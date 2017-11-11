@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.Location;
@@ -55,6 +53,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"set the weather in the player's world to rain"})
 @Since("1.0")
 public class ExprWorld extends PropertyExpression<Object, World> {
+
 	static {
 		Skript.registerExpression(ExprWorld.class, World.class, ExpressionType.PROPERTY, "[the] world [(of|from) %location/entity%]", "%location/entity%['s] world");
 	}

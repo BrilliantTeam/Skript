@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.doc;
 
 import java.io.File;
@@ -94,7 +92,7 @@ public class Documentation {
 		pw.println("UPDATE syntax_elements SET patterns='';");
 		pw.println();
 		pw.println("-- expressions");
-		for (final ExpressionInfo<?, ?> e : new IteratorIterable<ExpressionInfo<?, ?>>(Skript.getExpressions())) {
+		for (final ExpressionInfo<?, ?> e : new IteratorIterable<>(Skript.getExpressions())) {
 			assert e != null;
 			insertSyntaxElement(pw, e, "expression");
 		}
@@ -327,7 +325,7 @@ public class Documentation {
 		pw.println("REPLACE INTO " + table + " (" + fields + ") VALUES ('" + StringUtils.join(values, "','") + "');");
 	}
 	
-	private static ArrayList<Pattern> validation = new ArrayList<Pattern>();
+	private static ArrayList<Pattern> validation = new ArrayList<>();
 	static {
 		validation.add(Pattern.compile("<" + "(?!a href='|/a>|br ?/|/?(i|b|u|code|pre|ul|li|em)>)"));
 		validation.add(Pattern.compile("(?<!</a|'|br ?/|/?(i|b|u|code|pre|ul|li|em))" + ">"));

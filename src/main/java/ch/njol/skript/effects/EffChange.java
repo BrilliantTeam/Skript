@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.effects;
 
 import java.util.Arrays;
@@ -78,7 +76,7 @@ import ch.njol.util.Kleenean;
 		"reset chunk at the targeted block"})
 @Since("1.0 (set, add, remove, delete), 2.0 (remove all)")
 public class EffChange extends Effect {
-	private static Patterns<ChangeMode> patterns = new Patterns<ChangeMode>(new Object[][] {
+	private static Patterns<ChangeMode> patterns = new Patterns<>(new Object[][] {
 			{"(add|give) %objects% to %~objects%", ChangeMode.ADD},
 			{"increase %~objects% by %objects%", ChangeMode.ADD},
 			{"give %~objects% %objects%", ChangeMode.ADD},

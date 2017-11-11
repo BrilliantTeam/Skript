@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011, 2012 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.log;
 
 import java.util.Iterator;
@@ -31,7 +29,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public class HandlerList implements Iterable<LogHandler> {
 	
-	private final LinkedList<LogHandler> list = new LinkedList<LogHandler>();
+	private final LinkedList<LogHandler> list = new LinkedList<>();
 	
 	public void add(final LogHandler h) {
 		list.addFirst(h);

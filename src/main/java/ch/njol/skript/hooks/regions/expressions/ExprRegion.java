@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.hooks.regions.expressions;
 
 import org.bukkit.event.Event;
@@ -37,7 +35,7 @@ import ch.njol.skript.lang.ExpressionType;
  * @author Peter Güttinger
  */
 @Name("Region")
-@Description({"The <a href='../classes/#region'>region</a> involved in an event.",
+@Description({"The <a href='classes.html#region'>region</a> involved in an event.",
 		"This expression requires a supported regions plugin to be installed."})
 @Examples({"on region enter:",
 		"	region is {forbidden region}",

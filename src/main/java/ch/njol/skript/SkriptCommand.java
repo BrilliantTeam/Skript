@@ -1,8 +1,28 @@
+/**
+ *   This file is part of Skript.
+ *
+ *  Skript is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Skript is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
+ */
 package ch.njol.skript;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,14 +35,14 @@ import ch.njol.skript.ScriptLoader.ScriptInfo;
 import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.command.CommandHelp;
+import ch.njol.skript.config.Config;
 import ch.njol.skript.doc.HTMLGenerator;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.PluralizingArgsMessage;
 import ch.njol.skript.log.RedirectingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
-import ch.njol.skript.timings.TimingReporter;
-import ch.njol.skript.timings.Timings;
+import ch.njol.skript.timings.SkriptTimings;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ExceptionUtils;
 import ch.njol.skript.util.FileUtils;
@@ -162,19 +182,21 @@ public class SkriptCommand implements CommandExecutor {
 							return true;
 						}
 						reloading(sender, "script", f.getName());
-						ScriptLoader.unloadScript(f);
-						ScriptLoader.loadStructures(new File[] {f});
-						ScriptLoader.loadScripts(new File[] {f});
+						if (!ScriptLoader.loadAsync)
+							ScriptLoader.unloadScript(f);
+						Config config = ScriptLoader.loadStructure(f);
+						ScriptLoader.loadScripts(config);
 						reloaded(sender, r, "script", f.getName());
 					} else {
 						reloading(sender, "scripts in folder", f.getName());
-						final int disabled = ScriptLoader.unloadScripts(f).files;
-						ScriptLoader.loadStructures(f);
-						final int enabled = ScriptLoader.loadScripts(f).files;
-						if (Math.max(disabled, enabled) == 0)
+						if (!ScriptLoader.loadAsync)
+							ScriptLoader.unloadScripts(f);
+						List<Config> configs = ScriptLoader.loadStructures(f);
+						final int enabled = ScriptLoader.loadScripts(configs).files;
+						if (enabled == 0)
 							info(sender, "reload.empty folder", f.getName());
 						else
-							reloaded(sender, r, "x scripts in folder", f.getName(), Math.max(disabled, enabled));
+							reloaded(sender, r, "x scripts in folder", f.getName(), enabled);
 					}
 				}
 			} else if (args[0].equalsIgnoreCase("enable")) {
@@ -183,8 +205,8 @@ public class SkriptCommand implements CommandExecutor {
 						info(sender, "enable.all.enabling");
 						final File[] files = toggleScripts(new File(Skript.getInstance().getDataFolder(), Skript.SCRIPTSFOLDER), true).toArray(new File[0]);
 						assert files != null;
-						ScriptLoader.loadStructures(files);
-						ScriptLoader.loadScripts(files);
+						List<Config> configs = ScriptLoader.loadStructures(files);
+						ScriptLoader.loadScripts(configs);
 						if (r.numErrors() == 0) {
 							info(sender, "enable.all.enabled");
 						} else {
@@ -211,8 +233,8 @@ public class SkriptCommand implements CommandExecutor {
 						}
 						
 						info(sender, "enable.single.enabling", f.getName());
-						ScriptLoader.loadStructures(new File[] {f});
-						ScriptLoader.loadScripts(new File[] {f});
+						Config config = ScriptLoader.loadStructure(f);
+						ScriptLoader.loadScripts(config);
 						if (r.numErrors() == 0) {
 							info(sender, "enable.single.enabled", f.getName());
 						} else {
@@ -235,8 +257,8 @@ public class SkriptCommand implements CommandExecutor {
 						final File[] ss = scripts.toArray(new File[scripts.size()]);
 						assert ss != null;
 						
-						ScriptLoader.loadStructures(ss);
-						final ScriptInfo i = ScriptLoader.loadScripts(ss);
+						List<Config> configs = ScriptLoader.loadStructures(ss);
+						final ScriptInfo i = ScriptLoader.loadScripts(configs);
 						assert i.files == scripts.size();
 						if (r.numErrors() == 0) {
 							info(sender, "enable.folder.enabled", f.getName(), i.files);
@@ -335,16 +357,6 @@ public class SkriptCommand implements CommandExecutor {
 				}
 			} else if (args[0].equalsIgnoreCase("help")) {
 				skriptCommandHelp.showHelp(sender);
-			} else if (args[0].equalsIgnoreCase("timings")) {
-				if (args[1].equalsIgnoreCase("start")) {
-					Timings.enable();
-					Skript.adminBroadcast(Language.get("timings.start message"));
-				} else if (args[1].equalsIgnoreCase("stop")) {
-					Timings.disable();
-					TimingReporter.saveToFile(TimingReporter.getReport());
-					Timings.clear();
-					Skript.adminBroadcast(Language.get("timings.stop message"));
-				}
 			} else if (args[0].equalsIgnoreCase("gen-docs")) {
 				File templateDir = new File(Skript.getInstance().getDataFolder() + "/doc-templates/");
 				if (!templateDir.exists()) {
@@ -372,6 +384,16 @@ public class SkriptCommand implements CommandExecutor {
 	@Nullable
 	private static File getScriptFromArgs(final CommandSender sender, final String[] args, final int start) {
 		String script = StringUtils.join(args, " ", start, args.length);
+		File f = getScriptFromName(script);
+		if (f == null){
+			Skript.error(sender, (script.endsWith("/") || script.endsWith("\\") ? m_invalid_folder : m_invalid_script).toString(script));
+			return null;
+		}
+		return f;
+	}
+	
+	@Nullable
+	public static File getScriptFromName(String script){
 		final boolean isFolder = script.endsWith("/") || script.endsWith("\\");
 		if (isFolder) {
 			script = script.replace('/', File.separatorChar).replace('\\', File.separatorChar);
@@ -384,7 +406,6 @@ public class SkriptCommand implements CommandExecutor {
 		if (!f.exists()) {
 			f = new File(f.getParentFile(), "-" + f.getName());
 			if (!f.exists()) {
-				Skript.error(sender, (isFolder ? m_invalid_folder : m_invalid_script).toString(script));
 				return null;
 			}
 		}

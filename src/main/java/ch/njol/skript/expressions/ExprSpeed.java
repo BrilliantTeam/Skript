@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import org.bukkit.entity.Player;
@@ -45,7 +43,7 @@ import ch.njol.util.Math2;
 		"Please note that changing a player's speed will change his FOV just like potions do."})
 @Examples({"set the player's walk speed to 1",
 		"increase the argument's fly speed by 0.1"})
-@Since("")
+@Since("<i>unknown</i> (before 2.1)")
 public class ExprSpeed extends SimplePropertyExpression<Player, Float> {
 	static {
 		register(ExprSpeed.class, Float.class, "(0¦walk[ing]|1¦fl(y[ing]|ight))[( |-])speed", "players");

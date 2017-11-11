@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.hooks.regions;
 
 import java.io.IOException;
@@ -26,6 +24,7 @@ import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -116,13 +115,13 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		public Collection<OfflinePlayer> getMembers() {
 			if (supportsUUIDs) {
 				final Collection<UUID> ids = region.getMembers().getUniqueIds();
-				final Collection<OfflinePlayer> r = new ArrayList<OfflinePlayer>(ids.size());
+				final Collection<OfflinePlayer> r = new ArrayList<>(ids.size());
 				for (final UUID id : ids)
 					r.add(Bukkit.getOfflinePlayer(id));
 				return r;
 			} else {
 				final Collection<String> ps = region.getMembers().getPlayers();
-				final Collection<OfflinePlayer> r = new ArrayList<OfflinePlayer>(ps.size());
+				final Collection<OfflinePlayer> r = new ArrayList<>(ps.size());
 				for (final String p : ps)
 					r.add(Bukkit.getOfflinePlayer(p));
 				return r;
@@ -143,13 +142,13 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		public Collection<OfflinePlayer> getOwners() {
 			if (supportsUUIDs) {
 				final Collection<UUID> ids = region.getOwners().getUniqueIds();
-				final Collection<OfflinePlayer> r = new ArrayList<OfflinePlayer>(ids.size());
+				final Collection<OfflinePlayer> r = new ArrayList<>(ids.size());
 				for (final UUID id : ids)
 					r.add(Bukkit.getOfflinePlayer(id));
 				return r;
 			} else {
 				final Collection<String> ps = region.getOwners().getPlayers();
-				final Collection<OfflinePlayer> r = new ArrayList<OfflinePlayer>(ps.size());
+				final Collection<OfflinePlayer> r = new ArrayList<>(ps.size());
 				for (final String p : ps)
 					r.add(Bukkit.getOfflinePlayer(p));
 				return r;
@@ -241,9 +240,13 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	
 	@SuppressWarnings("null")
 	@Override
-	public Collection<? extends Region> getRegionsAt_i(final Location l) {
-		final ArrayList<Region> r = new ArrayList<Region>();
+	public Collection<? extends Region> getRegionsAt_i(@Nullable final Location l) {
+		final ArrayList<Region> r = new ArrayList<>();
 		
+		if (l == null) // Working around possible cause of issue #280
+			return Collections.emptyList();
+		if (l.getWorld() == null)
+			return Collections.emptyList();
 		RegionManager manager = plugin.getRegionManager(l.getWorld());
 		if (manager == null)
 			return r;

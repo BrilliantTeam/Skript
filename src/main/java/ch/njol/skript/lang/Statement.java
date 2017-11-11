@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.lang;
 
 import java.util.Iterator;
@@ -27,6 +25,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.function.EffFunctionCall;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 
@@ -59,5 +58,12 @@ public abstract class Statement extends TriggerItem implements SyntaxElement {
 		}
 		return (Statement) SkriptParser.parse(s, (Iterator) Skript.getStatements().iterator(), defaultError);
 	}
+
+	/**
+	 * Parser instance which is being used or was used to parse this element.
+	 * Note that this variable is naturally not used for static methods.
+	 */
+	@SuppressWarnings("null")
+	protected ParserInstance pi;
 	
 }

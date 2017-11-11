@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,18 +13,17 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.classes;
 
 /**
+ * Represents arithmetic for certain two types. Multiplication, division and
+ * power of methods are optional and may throw UnsupportedOperationExceptions.
  * @param <A> the type of the absolute value
  * @param <R> the type of the relative value
- * @author Peter Güttinger
  */
 public interface Arithmetic<A, R> {
 	
@@ -33,5 +32,11 @@ public interface Arithmetic<A, R> {
 	public A add(A value, R difference);
 	
 	public A subtract(A value, R difference);
+	
+	public A multiply(A value, R multiplier);
+	
+	public A divide(A value, R divider);
+	
+	public A power(A value, R exponent);
 	
 }

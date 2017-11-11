@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,15 +13,14 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions.base;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,6 +38,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.lang.DefaultExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -72,12 +72,13 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	private final Class<? extends T> c;
 	@Nullable
 	private Changer<? super T> changer;
-	private final Map<Class<? extends Event>, Getter<? extends T, ?>> getters = new HashMap<Class<? extends Event>, Getter<? extends T, ?>>();
+	private final Map<Class<? extends Event>, Getter<? extends T, ?>> getters = new HashMap<>();
 	
 	public EventValueExpression(final Class<? extends T> c) {
 		this(c, null);
 	}
 	
+	@SuppressWarnings("null")
 	public EventValueExpression(final Class<? extends T> c, final @Nullable Changer<? super T> changer) {
 		assert c != null;
 		this.c = c;

@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,12 +13,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
-
 package ch.njol.skript.expressions;
 
 import java.util.List;
@@ -133,7 +131,7 @@ public class ExprDrops extends SimpleExpression<ItemStack> {
 						//$FALL-THROUGH$
 					case ADD:
 						if (delta instanceof Inventory) {
-							for (final ItemStack is : new IteratorIterable<ItemStack>(((Inventory) delta).iterator())) {
+							for (final ItemStack is : new IteratorIterable<>(((Inventory) delta).iterator())) {
 								if (is != null)
 									drops.add(is);
 							}
@@ -144,7 +142,7 @@ public class ExprDrops extends SimpleExpression<ItemStack> {
 					case REMOVE:
 					case REMOVE_ALL:
 						if (delta instanceof Inventory) {
-							for (final ItemStack is : new IteratorIterable<ItemStack>(((Inventory) delta).iterator())) {
+							for (final ItemStack is : new IteratorIterable<>(((Inventory) delta).iterator())) {
 								if (is == null)
 									continue;
 								if (mode == ChangeMode.REMOVE)
