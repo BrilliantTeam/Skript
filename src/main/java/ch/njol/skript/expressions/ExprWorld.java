@@ -29,6 +29,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.classes.Changer;
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -41,6 +43,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * @author Peter Güttinger
@@ -53,14 +56,15 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class ExprWorld extends PropertyExpression<Object, World> {
 	static {
-		Skript.registerExpression(ExprWorld.class, World.class, ExpressionType.PROPERTY, "[the] world [of %location/entity%]", "%location/entity%'[s] world");
+		Skript.registerExpression(ExprWorld.class, World.class, ExpressionType.PROPERTY, "[the] world [(of|from) %location/entity%]", "%location/entity%['s] world");
 	}
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		Expression<?> expr = exprs[0];
 		if (expr == null) {
-			expr = new EventValueExpression<World>(World.class);
+			expr = new EventValueExpression<>(World.class);
+			expr.setParserInstance(pi);
 			if (!((EventValueExpression<?>) expr).init())
 				return false;
 		}
@@ -106,4 +110,18 @@ public class ExprWorld extends PropertyExpression<Object, World> {
 		return super.setTime(time, getExpr(), PlayerTeleportEvent.class);
 	}
 	
+	@Override
+	public void change(Event e, Object[] delta, Changer.ChangeMode mode){
+		if (getExpr().getAll(e) instanceof Location[] && delta != null)
+			for (final Location loc : (Location[]) getExpr().getAll(e)) {
+				loc.setWorld((World) delta[0]);
+			}	
+	}
+	
+	@Override
+	public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
+		if (mode == ChangeMode.SET)
+			return CollectionUtils.array(World.class);
+		return null;
+	}
 }
