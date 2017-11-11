@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,10 +35,12 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
+import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
@@ -53,7 +56,6 @@ public abstract class Functions {
 	
 	final static class FunctionData {
 		final Function<?> function;
-		final Collection<FunctionReference<?>> calls = new ArrayList<FunctionReference<?>>();
 		
 		public FunctionData(final Function<?> function) {
 			this.function = function;
@@ -63,14 +65,17 @@ public abstract class Functions {
 	@Nullable
 	public static ScriptFunction<?> currentFunction = null;
 	
-	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<String, JavaFunction<?>>();
-	final static Map<String, FunctionData> functions = new HashMap<String, FunctionData>();
-	final static Map<String, Signature<?>> javaSignatures = new HashMap<String, Signature<?>>();
-	final static Map<String, Signature<?>> signatures = new HashMap<String, Signature<?>>();
+	final static Map<String, JavaFunction<?>> javaFunctions = new HashMap<>();
+	final static Map<String, FunctionData> functions = new ConcurrentHashMap<>();
+	final static Map<String, Signature<?>> javaSignatures = new HashMap<>();
+	final static Map<String, Signature<?>> signatures = new ConcurrentHashMap<>();
 	
-	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<FunctionReference<?>>();
+	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<>();
+	
+	static boolean callFunctionEvents = false;
 	
 	/**
+	 * Register a function written in Java.
 	 * @param function
 	 * @return The passed function
 	 */
@@ -89,9 +94,9 @@ public abstract class Functions {
 	}
 	
 	final static void registerCaller(final FunctionReference<?> r) {
-		final FunctionData d = functions.get(r.functionName);
-		assert d != null;
-		d.calls.add(r);
+		final Signature<?> sign = signatures.get(r.functionName);
+		assert sign != null;
+		sign.calls.add(r);
 	}
 	
 	public final static String functionNamePattern = "[\\p{IsAlphabetic}][\\p{IsAlphabetic}\\p{IsDigit}_]*";
@@ -116,6 +121,8 @@ public abstract class Functions {
 			return error("Invalid function definition. Please check for typos and that the function's name only contains letters and underscores. Refer to the documentation for more information.");
 		final String name = "" + m.group(1);
 		Signature<?> sign = signatures.get(name);
+		if (sign == null) // Signature parsing failed, probably: null signature
+			return null; // This has been reported before...
 		final List<Parameter<?>> params = sign.parameters;
 		final ClassInfo<?> c = sign.returnType;
 		final NonNullPair<String, Boolean> p = sign.info;
@@ -124,7 +131,7 @@ public abstract class Functions {
 			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")" + (c != null && p != null ? " :: " + Utils.toEnglishPlural(c.getCodeName(), p.getSecond()) : "") + ":");
 		
 		@SuppressWarnings("null")
-		final Function<?> f = new ScriptFunction<Object>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
+		final Function<?> f = new ScriptFunction<>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
 //		functions.put(name, new FunctionData(f)); // in constructor
 		return f;
 	}
@@ -146,13 +153,18 @@ public abstract class Functions {
 		final String name = "" + m.group(1); // TODO check for name uniqueness (currently functions with same name silently override each other)
 		final String args = m.group(2);
 		final String returnType = m.group(3);
-		final List<Parameter<?>> params = new ArrayList<Parameter<?>>();
+		final List<Parameter<?>> params = new ArrayList<>();
 		int j = 0;
 		for (int i = 0; i <= args.length(); i = SkriptParser.next(args, i, ParseContext.DEFAULT)) {
 			if (i == -1)
 				return signError("Invalid text/variables/parentheses in the arguments of this function");
 			if (i == args.length() || args.charAt(i) == ',') {
 				final String arg = args.substring(j, i);
+				
+				if (arg.isEmpty()) // Zero-argument function
+					break;
+				
+				// One ore more arguments for this function
 				final Matcher n = paramPattern.matcher(arg);
 				if (!n.matches())
 					return signError("The " + StringUtils.fancyOrderNumber(params.size() + 1) + " argument's definition is invalid. It should look like 'name: type' or 'name: type = default value'.");
@@ -194,8 +206,9 @@ public abstract class Functions {
 		}
 		
 		@SuppressWarnings("unchecked")
-		Signature<?> sign = new Signature<Object>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
+		Signature<?> sign = new Signature<>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
 		Functions.signatures.put(name, sign);
+		Skript.debug("Registered function signature: " + name);
 		return sign;
 	}
 	
@@ -246,7 +259,7 @@ public abstract class Functions {
 		return signatures.get(name);
 	}
 	
-	private final static Collection<FunctionReference<?>> toValidate = new ArrayList<FunctionReference<?>>();
+	private final static Collection<FunctionReference<?>> toValidate = new ArrayList<>();
 	
 	/**
 	 * Remember to call {@link #validateFunctions()} after calling this
@@ -259,11 +272,19 @@ public abstract class Functions {
 		final Iterator<FunctionData> iter = functions.values().iterator();
 		while (iter.hasNext()) {
 			final FunctionData d = iter.next();
-			if (d.function instanceof ScriptFunction && script.equals(((ScriptFunction<?>) d.function).trigger.getScript())) {
+			if (d != null && d.function instanceof ScriptFunction) {
+				Trigger trigger = ((ScriptFunction<?>) d.function).trigger;
+				if (trigger == null) // Triggers can be null, make sure this isn't
+					continue;
+				if (!script.equals(trigger.getScript())) // Is this trigger in correct script?
+					continue;
+				
 				iter.remove();
-				signatures.remove(d.function.name);
 				r++;
-				final Iterator<FunctionReference<?>> it = d.calls.iterator();
+				final Signature<?> sign = signatures.get(d.function.name);
+				assert sign != null; // Function must have signature
+				
+				final Iterator<FunctionReference<?>> it = sign.calls.iterator();
 				while (it.hasNext()) {
 					final FunctionReference<?> c = it.next();
 					if (script.equals(c.script))
@@ -289,10 +310,13 @@ public abstract class Functions {
 		final Iterator<FunctionData> iter = functions.values().iterator();
 		while (iter.hasNext()) {
 			final FunctionData d = iter.next();
-			if (d.function instanceof ScriptFunction)
+			if (d.function instanceof ScriptFunction) {
 				iter.remove();
-			else
-				d.calls.clear();
+			} else {
+				final Signature<?> sign = signatures.get(d.function.name);
+				assert sign != null; // Function must have signature
+				sign.calls.clear();
+			}
 		}
 		signatures.clear();
 		signatures.putAll(javaSignatures);
@@ -301,8 +325,34 @@ public abstract class Functions {
 	}
 	
 	@SuppressWarnings("null")
-	public static Iterable<JavaFunction<?>> getJavaFunctions() {
+	public static Collection<JavaFunction<?>> getJavaFunctions() {
 		return javaFunctions.values();
 	}
+
+	/**
+	 * Puts a function directly to map. Usually no need to do so.
+	 * @param func
+	 */
+	public static void putFunction(Function<?> func) {
+		functions.put(func.name, new FunctionData(func));
+	}
 	
+	/**
+	 * Normally, function calls do not cause actual Bukkit events to be
+	 * called. If an addon requires such functionality, it should call this
+	 * method. After doing so, the events will be called. Calling this method
+	 * many times will not cause any additional changes.
+	 * <p>
+	 * Note that calling events is not free; performance might vary
+	 * once you have enabled that.
+	 * 
+	 * @param addon Addon instance. Nullness is checked runtime.
+	 */
+	public static void enableFunctionEvents(@Nullable SkriptAddon addon) {
+		if (addon == null) {
+			throw new SkriptAPIException("enabling function events requires addon instance");
+		}
+		
+		callFunctionEvents = true;
+	}
 }

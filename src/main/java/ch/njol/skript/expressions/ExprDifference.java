@@ -61,10 +61,13 @@ public class ExprDifference extends SimpleExpression<Object> {
 	@SuppressWarnings("null")
 	private Expression<?> first, second;
 	
-	@SuppressWarnings({"null", "rawtypes"})
+	@SuppressWarnings("rawtypes")
+	@Nullable
 	private Arithmetic math;
 	@SuppressWarnings("null")
 	private Class<?> relativeType;
+	
+	private boolean bothVariables;
 	
 	@SuppressWarnings({"unchecked", "null", "unused"})
 	@Override
@@ -73,9 +76,8 @@ public class ExprDifference extends SimpleExpression<Object> {
 		second = exprs[1];
 		final ClassInfo<?> ci;
 		if (first instanceof Variable && second instanceof Variable) {
-			ci = Classes.getExactClassInfo(Double.class);
-			first = first.getConvertedExpression(Double.class);
-			second = second.getConvertedExpression(Double.class);
+			bothVariables = true;
+			ci = Classes.getExactClassInfo(Object.class);
 		} else if (first instanceof Literal<?> && second instanceof Literal<?>) {
 			first = first.getConvertedExpression(Object.class);
 			second = second.getConvertedExpression(Object.class);
@@ -101,12 +103,17 @@ public class ExprDifference extends SimpleExpression<Object> {
 			ci = Classes.getSuperClassInfo(Utils.getSuperType(first.getReturnType(), second.getReturnType()));
 		}
 		assert ci != null;
-		if (ci.getMath() == null) {
+		if (!ci.getC().equals(Object.class) && ci.getMath() == null) {
 			Skript.error("Can't get the difference of " + CondCompare.f(first) + " and " + CondCompare.f(second), ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}
-		math = ci.getMath();
-		relativeType = ci.getMathRelativeType();
+		if (bothVariables) {
+			// Initialize less stuff, basically
+			relativeType = Object.class; // Relative math type would be null which the parser doesn't like
+		} else {
+			math = ci.getMath();
+			relativeType = ci.getMathRelativeType();
+		}
 		return true;
 	}
 	
@@ -118,7 +125,19 @@ public class ExprDifference extends SimpleExpression<Object> {
 		if (f == null || s == null)
 			return null;
 		final Object[] one = (Object[]) Array.newInstance(relativeType, 1);
+		
+		// If we're comparing variables, math is null right now
+		if (bothVariables) {
+			ClassInfo<?> info = Classes.getSuperClassInfo(f.getClass());
+			math = info.getMath();
+			if (math == null) { // User did something stupid, just return <none> for them
+				return one;
+			}
+		}
+		
+		assert math != null; // NOW it cannot be null
 		one[0] = math.difference(f, s);
+		
 		return one;
 	}
 	

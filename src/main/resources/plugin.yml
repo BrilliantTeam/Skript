@@ -23,8 +23,8 @@ name: Skript
 
 description: Customize Minecraft's mechanics with simple scripts written in plain English sentences.
 
-authors: [Njol, Mirreski, bensku, nfell2009, joeuguce99, RealGatt, RoyCurtis, tim740, Tuke-Nuke]
-website: http://njol.ch/projects/skript
+authors: [Njol, Mirreski, bensku, TheBentoBox, tim740, Tuke-Nuke, TheLimeGlass, xXAndrew28Xx, Sashie, RoyCurtis, nfell2009, Syst3ms, Snow-Pyon]
+website: https://bensku.github.io/Skript
 
 main: ch.njol.skript.Skript
 

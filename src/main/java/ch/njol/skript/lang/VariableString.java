@@ -42,6 +42,7 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.localization.Language;
+import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.log.BlockingLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
@@ -49,6 +50,8 @@ import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.StringMode;
 import ch.njol.skript.util.Utils;
+import ch.njol.skript.util.chat.ChatMessages;
+import ch.njol.skript.util.chat.MessageComponent;
 import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
@@ -76,27 +79,61 @@ public class VariableString implements Expression<String> {
 	
 	@Nullable
 	private final Object[] string;
+	@Nullable
+	private Object[] stringUnformatted;
 	private final boolean isSimple;
 	@Nullable
 	private final String simple;
+	@Nullable
+	private final String simpleUnformatted;
 	private final StringMode mode;
 	
+	/**
+	 * Creates a new VariableString which does not contain variables.
+	 * @param s Content for string.
+	 */
 	private VariableString(final String s) {
 		isSimple = true;
-		simple = s;
+		simpleUnformatted = s.replace("%%", "%"); // This doesn't contain variables, so this wasn't done in newInstance!
+		assert simpleUnformatted != null;
+		simple = Utils.replaceChatStyles(simpleUnformatted);
 		
-		orig = s;
+		orig = simple;
 		string = null;
+		assert simple != null;
 		mode = StringMode.MESSAGE;
 	}
 	
+	/**
+	 * Creates a new VariableString which contains variables.
+	 * @param orig Original string (unparsed).
+	 * @param string Objects, some of them are variables.
+	 * @param mode String mode.
+	 */
 	private VariableString(final String orig, final Object[] string, final StringMode mode) {
 		this.orig = orig;
-		this.string = string;
+		this.string = new Object[string.length];
+		this.stringUnformatted = new Object[string.length];
+		for (int i = 0; i < string.length; i++) {
+			Object o = string[i];
+			if (o instanceof String) {
+				assert this.string != null;
+				this.string[i] = Utils.replaceChatStyles((String) o);
+			} else {
+				assert this.string != null;
+				this.string[i] = o;
+			}
+			
+			// For unformatted string, don't format stuff
+			assert this.stringUnformatted != null;
+			this.stringUnformatted[i] = o;
+		}
+		
 		this.mode = mode;
 		
 		isSimple = false;
 		simple = null;
+		simpleUnformatted = null;
 	}
 	
 	/**
@@ -107,7 +144,7 @@ public class VariableString implements Expression<String> {
 		return newInstance(s, StringMode.MESSAGE);
 	}
 	
-	public final static Map<String, Pattern> variableNames = new HashMap<String, Pattern>();
+	public final static Map<String, Pattern> variableNames = new HashMap<>();
 	
 	/**
 	 * Tests whether a string is correctly quoted, i.e. only has doubled double quotes in it.
@@ -146,11 +183,12 @@ public class VariableString implements Expression<String> {
 	}
 	
 	/**
-	 * Prints errors
+	 * Creates an instance of VariableString by parsing given string.
+	 * Prints errors and returns null if it is somehow invalid.
 	 * 
-	 * @param orig unquoted string
+	 * @param orig Unquoted string to parse.
 	 * @param mode
-	 * @return A new VariableString instance
+	 * @return A new VariableString instance.
 	 */
 	@Nullable
 	public static VariableString newInstance(final String orig, final StringMode mode) {
@@ -161,15 +199,21 @@ public class VariableString implements Expression<String> {
 			Skript.error("The percent sign is used for expressions (e.g. %player%). To insert a '%' type it twice: %%.");
 			return null;
 		}
-		final String s = Utils.replaceChatStyles("" + orig.replace("\"\"", "\""));
-		final ArrayList<Object> string = new ArrayList<Object>(n / 2 + 2);
+		
+		// We must not parse color codes yet, as JSON support would be broken :(
+		final String s = orig.replace("\"\"", "\"");
+		
+		final List<Object> string = new ArrayList<>(n / 2 + 2); // List of strings and expressions
+		
 		int c = s.indexOf('%');
 		if (c != -1) {
 			if (c != 0)
 				string.add(s.substring(0, c));
 			while (c != s.length()) {
 				int c2 = s.indexOf('%', c + 1);
-				int a = c, b;
+				
+				int a = c;
+				int b;
 				while (c2 != -1 && (b = s.indexOf('{', a + 1)) != -1 && b < c2) {
 					a = nextVariableBracket(s, b + 1);
 					if (a == -1) {
@@ -183,6 +227,7 @@ public class VariableString implements Expression<String> {
 					return null;
 				}
 				if (c + 1 == c2) {
+					// %% escaped -> one % in result string
 					if (string.size() > 0 && string.get(string.size() - 1) instanceof String) {
 						string.set(string.size() - 1, (String) string.get(string.size() - 1) + "%");
 					} else {
@@ -233,23 +278,27 @@ public class VariableString implements Expression<String> {
 				c = s.indexOf('%', c2 + 1);
 				if (c == -1)
 					c = s.length();
-				final String l = s.substring(c2 + 1, c);
-				if (!l.isEmpty()) {
+				final String l = s.substring(c2 + 1, c); // Try to get string (non-variable) part
+				if (!l.isEmpty()) { // This is string part (no variables)
 					if (string.size() > 0 && string.get(string.size() - 1) instanceof String) {
+						// We can append last string part in the list, so let's do so
 						string.set(string.size() - 1, (String) string.get(string.size() - 1) + l);
-					} else {
+					} else { // Can't append, just add new part
 						string.add(l);
 					}
 				}
 			}
 		} else {
+			// Only one string, no variable parts
 			string.add(s);
 		}
 		
 		checkVariableConflicts(s, mode, string);
 		
+		// Check if this isn't actually variable string, and return
 		if (string.size() == 1 && string.get(0) instanceof String)
-			return new VariableString("" + string.get(0));
+			return new VariableString(s);
+		
 		final Object[] sa = string.toArray();
 		assert sa != null;
 		return new VariableString(orig, sa, mode);
@@ -385,6 +434,65 @@ public class VariableString implements Expression<String> {
 			}
 		}
 		return "" + b.toString();
+	}
+	
+	/**
+	 * Parses all expressions in the string and returns it.
+	 * Does not parse formatting codes!
+	 * 
+	 * @param e Event to pass to the expressions.
+	 * @return The input string with all expressions replaced.
+	 */
+	public String toUnformattedString(final Event e) {
+		if (isSimple) {
+			assert simpleUnformatted != null;
+			return simpleUnformatted;
+		}
+		final Object[] string = this.stringUnformatted;
+		assert string != null;
+		final StringBuilder b = new StringBuilder();
+		for (int i = 0; i < string.length; i++) {
+			final Object o = string[i];
+			if (o instanceof Expression<?>) {
+				assert mode != StringMode.MESSAGE;
+				b.append(Classes.toString(((Expression<?>) o).getArray(e), true, mode));
+			} else if (o instanceof ExpressionInfo) {
+				assert mode == StringMode.MESSAGE;
+				final ExpressionInfo info = (ExpressionInfo) o;
+				int flags = info.flags;
+				if ((flags & Language.F_PLURAL) == 0 && b.length() > 0 && Math.abs(StringUtils.numberBefore(b, b.length() - 1)) != 1)
+					flags |= Language.F_PLURAL;
+				if (info.toChatStyle) {
+					final String s = Classes.toString(info.expr.getArray(e), flags, null);
+					final String style = Utils.getChatStyle(s);
+					b.append(style == null ? "<" + s + ">" : style);
+				} else {
+					b.append(Classes.toString(info.expr.getArray(e), flags, null));
+				}
+			} else {
+				b.append(o);
+			}
+		}
+		return "" + b.toString();
+	}
+	
+	public List<MessageComponent> getMessageComponents(final Event e) {
+		if (isSimple) {
+			assert simpleUnformatted != null;
+			return ChatMessages.parse(simpleUnformatted);
+		}
+		
+		return ChatMessages.parse(toUnformattedString(e));
+	}
+	
+	/**
+	 * Parses all expressions in the string and returns it in chat JSON format.
+	 * 
+	 * @param e Event to pass to the expressions.
+	 * @return The input string with all expressions replaced.
+	 */
+	public String toChatString(final Event e) {
+		return ChatMessages.toJson(getMessageComponents(e));
 	}
 	
 	@Nullable
@@ -553,7 +661,7 @@ public class VariableString implements Expression<String> {
 	
 	@Override
 	public Iterator<? extends String> iterator(final Event e) {
-		return new SingleItemIterator<String>(toString(e));
+		return new SingleItemIterator<>(toString(e));
 	}
 	
 	@Override

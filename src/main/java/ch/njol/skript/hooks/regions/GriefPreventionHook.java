@@ -168,7 +168,7 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 		@SuppressWarnings({"null", "deprecation"})
 		@Override
 		public Collection<OfflinePlayer> getOwners() {
-			if (claim.isAdminClaim()) // Admin claims do not have owners! (fixes NPE)
+			if (claim.isAdminClaim() || (supportsUUIDs && claim.ownerID == null)) // Not all claims have owners!
 				return Collections.emptyList();
 			else if (supportsUUIDs)
 				return Arrays.asList(Bukkit.getOfflinePlayer(claim.ownerID));

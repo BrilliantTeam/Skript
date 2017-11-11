@@ -42,7 +42,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("Enchantment Level")
-@Description("The level of a particular <a href='../classes/#enchantment'>enchantment</a> on an item")
+@Description("The level of a particular <a href='classes.html#enchantment'>enchantment</a> on an item")
 @Examples({"player' tool is a sword of sharpness:",
 		"	message \"You have a sword of sharpness %level of sharpness of the player's tool% equipped\""})
 @Since("2.0")

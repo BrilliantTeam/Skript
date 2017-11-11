@@ -37,6 +37,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class ScriptFunction<T> extends Function<T> {
 	
+	@Nullable
 	final Trigger trigger;
 	
 	@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
@@ -75,6 +76,9 @@ public class ScriptFunction<T> extends Function<T> {
 	@Override
 	@Nullable
 	public T[] execute(final FunctionEvent e, final Object[][] params) {
+		if (trigger == null)
+			throw new IllegalStateException("trigger for function is not available");
+		
 		for (int i = 0; i < parameters.length; i++) {
 			final Parameter<?> p = parameters[i];
 			final Object[] val = params[i];
@@ -86,6 +90,8 @@ public class ScriptFunction<T> extends Function<T> {
 				}
 			}
 		}
+		
+		assert trigger != null;
 		trigger.execute(e);
 		returnValueSet = false;
 		return returnValue;

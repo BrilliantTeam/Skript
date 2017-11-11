@@ -26,6 +26,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -58,6 +59,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingEvent;
@@ -76,6 +78,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -89,6 +92,7 @@ import org.bukkit.event.vehicle.VehicleEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.weather.WeatherEvent;
 import org.bukkit.event.world.ChunkEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -105,6 +109,7 @@ import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.BlockStateBlock;
 import ch.njol.skript.util.BlockUtils;
 import ch.njol.skript.util.DelayedChangeBlock;
+import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.InventorySlot;
 import ch.njol.skript.util.Slot;
@@ -202,6 +207,17 @@ public final class BukkitEventValues {
 				return new BlockStateBlock(e.getBlockReplacedState());
 			}
 		}, -1);
+		EventValues.registerEventValue(BlockPlaceEvent.class, Direction.class, new Getter<Direction, BlockPlaceEvent>() {
+			@Override
+			@Nullable
+			public Direction get(final BlockPlaceEvent e) {
+				if (e.getBlock() != null) {
+					BlockFace bf = e.getBlockPlaced().getFace(e.getBlockAgainst());
+					return new Direction(new double[]{bf.getModX(), bf.getModY(), bf.getModZ()});
+				}
+				return Direction.ZERO;
+			}
+		}, 0);
 		// BlockFadeEvent
 		EventValues.registerEventValue(BlockFadeEvent.class, Block.class, new Getter<Block, BlockFadeEvent>() {
 			@Override
@@ -291,6 +307,13 @@ public final class BukkitEventValues {
 			@Nullable
 			public Player get(final BlockIgniteEvent e) {
 				return e.getPlayer();
+			}
+		}, 0);
+		EventValues.registerEventValue(BlockIgniteEvent.class, Block.class, new Getter<Block, BlockIgniteEvent>() {
+			@Override
+			@Nullable
+			public Block get(final BlockIgniteEvent e) {
+				return e.getIgnitingBlock();
 			}
 		}, 0);
 		// BlockDispenseEvent
@@ -435,6 +458,14 @@ public final class BukkitEventValues {
 				}
 			}, 0);
 		}
+		// ItemSpawnEvent
+		EventValues.registerEventValue(ItemSpawnEvent.class, ItemStack.class, new Getter<ItemStack, ItemSpawnEvent>() {
+			@Override
+			@Nullable
+			public ItemStack get(final ItemSpawnEvent e) {
+				return e.getEntity().getItemStack();
+			}
+		}, 0);
 		
 		// --- PlayerEvents ---
 		EventValues.registerEventValue(PlayerEvent.class, Player.class, new Getter<Player, PlayerEvent>() {
@@ -586,6 +617,15 @@ public final class BukkitEventValues {
 			@Nullable
 			public ItemStack get(final PlayerInteractEvent e) {
 				return e.getItem();
+			}
+		}, 0);
+		EventValues.registerEventValue(PlayerInteractEvent.class, Direction.class, new Getter<Direction, PlayerInteractEvent>() {
+			@Override
+			@Nullable
+			public Direction get(final PlayerInteractEvent e) {
+				if (e.getBlockFace() != null)
+					return new Direction(new double[]{e.getBlockFace().getModX(), e.getBlockFace().getModY(), e.getBlockFace().getModZ()});
+				return Direction.ZERO; // Same as 'BlockFace.SELF' or literal 'at'
 			}
 		}, 0);
 		// PlayerShearEntityEvent
@@ -799,6 +839,23 @@ public final class BukkitEventValues {
 				return e.getInventory();
 			}
 		}, 0);
+		//PortalCreateEvent
+		EventValues.registerEventValue(PortalCreateEvent.class, World.class, new Getter<World, PortalCreateEvent>() {
+			@Override
+			@Nullable
+			public World get(final PortalCreateEvent e) {
+				return e.getWorld();
+			}
+		}, 0);
+		//PlayerEditBookEvent
+		EventValues.registerEventValue(PlayerEditBookEvent.class, ItemStack.class, new Getter<ItemStack, PlayerEditBookEvent>() {
+			@Override
+			public ItemStack get(PlayerEditBookEvent e) {
+				ItemStack book = new ItemStack(e.getPlayer().getItemInHand().getType());
+				book.setItemMeta(e.getNewBookMeta());
+				return book;
+			}
+		}, 0);
+		
 	}
-	
 }

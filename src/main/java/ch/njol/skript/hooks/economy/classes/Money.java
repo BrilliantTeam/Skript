@@ -90,6 +90,21 @@ public class Money {
 					public Money subtract(final Money value, final Money difference) {
 						return new Money(value.amount - difference.amount);
 					}
+
+					@Override
+					public Money multiply(Money value, Money multiplier) {
+						return new Money(value.getAmount() * multiplier.getAmount());
+					}
+
+					@Override
+					public Money divide(Money value, Money divider) {
+						return new Money(value.getAmount() / divider.getAmount());
+					}
+
+					@Override
+					public Money power(Money value, Money exponent) {
+						throw new UnsupportedOperationException();
+					}
 				}));
 		
 		Comparators.registerComparator(Money.class, Money.class, new Comparator<Money, Money>() {

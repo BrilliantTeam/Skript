@@ -21,6 +21,8 @@ package ch.njol.skript.lang;
 
 import org.bukkit.event.Event;
 
+import ch.njol.skript.config.Config;
+
 /**
  * @author Peter Güttinger
  */
@@ -49,6 +51,15 @@ public abstract class SelfRegisteringSkriptEvent extends SkriptEvent {
 	@Override
 	public final boolean check(final Event e) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * This method is called when this event is parsed. Overriding this is
+	 * optional, and usually not needed.
+	 * @param config Script that is being parsed
+	 */
+	public void afterParse(Config config) {
+		// DO NOTHING
 	}
 	
 }

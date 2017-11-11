@@ -19,46 +19,39 @@
  */
 package ch.njol.skript.expressions;
 
-import java.text.SimpleDateFormat;
-
 import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.util.Date;
-import ch.njol.skript.util.Time;
 
 @Name("Unix Timestamp")
-@Description("Converts real world date to Unix timestamp (yyyy-MM-dd HH:mm:ss z).")
-@Examples("unix time of now")
-@Since("2.2-dev20")
-public class ExprUnixTime extends SimplePropertyExpression<Date,String> {
+@Description("Converts given date to Unix timestamp. This is roughly how many seconds have elapsed since 1 January 1970.")
+@Examples("unix timestamp of now")
+@Since("2.2-dev31")
+public class ExprUnixTicks extends SimplePropertyExpression<Date, Number> {
 	
 	static {
-		register(ExprUnixTime.class, String.class, "[unix] time[stamp]", "dates");
+		register(ExprUnixTicks.class, Number.class, "unix timestamp", "dates");
 	}
-	
-	private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-	
+
 	@Override
 	@Nullable
-	public String convert(Date f) {
-		return format.format(new java.util.Date(f.getTimestamp()));
-	}
-	
-	@Override
-	public Class<? extends String> getReturnType() {
-		return String.class;
+	public Number convert(Date f) {
+		return f.getTimestamp() / 1000.0;
 	}
 
 	@Override
 	protected String getPropertyName() {
 		return "unix timestamp";
+	}
+	
+	@Override
+	public Class<? extends Number> getReturnType() {
+		return Number.class;
 	}
 	
 }

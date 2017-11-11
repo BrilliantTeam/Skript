@@ -27,6 +27,7 @@ import org.bukkit.World;
 import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.function.FunctionEvent;
@@ -378,11 +379,32 @@ public class DefaultFunctions {
 				return new Vector[] {new Vector(((Number)params[0][0]).doubleValue(), ((Number)params[1][0]).doubleValue(), ((Number)params[2][0]).doubleValue())};
 			}
 			
-		}
-		.description("Constructs a vector.")
-		.examples("vector(0, 0, 0)")
-		.since("2.2-dev23")
-		);
+		}.description("Creates a new vector, which can be used with various expressions, effects and functions.")
+				.examples("vector(0, 0, 0)")
+				.since("2.2-dev23"));
+		
+		Functions.registerFunction(new JavaFunction<Long>("calcExperience", new Parameter[] {
+				new Parameter<>("level", longClass, true, null)},
+				longClass, true) {
+
+			@Override
+			public Long[] execute(FunctionEvent e, Object[][] params) {
+				long level = (long) params[0][0];
+				long exp = 0;
+			    if (level <= 0)
+			        exp = 0;
+			    else if (level >= 1 && level <= 15)
+			        exp = level * level + 6 * level;
+			    else if (level >= 16 && level <= 30) // Truncating decimal parts probably works
+			        exp = (int) (2.5 * level * level - 40.5 * level - 360);
+			    else // Half experience points do not exist, anyway
+			        exp = (int) (4.5 * level * level - 162.5 * level - 2220);
+				
+				return new Long[] {exp};
+			}
+			
+		}.description("Calculates experience needed to achieve given level in Minecraft.")
+				.since("2.2-dev32"));
 		
 	}
 	

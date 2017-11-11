@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @SuppressWarnings({"unchecked"})
 @Name("Item Amount")
-@Description("Gets the amount of an <a href='../classes/#itemstack'>item stack</a>.")
+@Description("Gets the amount of an <a href='classes.html#itemstack'>item stack</a>.")
 @Examples("send \"You have got %item amount of player's tool% %player's tool% in your hand !\" to player")
 @Since("2.2-dev24")
 public class ExprItemAmount extends SimpleExpression<Number>{

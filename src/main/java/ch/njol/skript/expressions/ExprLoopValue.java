@@ -20,6 +20,7 @@
 package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

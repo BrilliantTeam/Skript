@@ -74,6 +74,7 @@ import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.mirre.FilterPrintStream;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Callback;
 import ch.njol.util.NonNullPair;
@@ -91,7 +92,7 @@ public abstract class Commands {
 	public final static Message m_correct_usage = new Message("commands.correct usage");
 	public final static Message m_internal_error = new Message("commands.internal error");
 	
-	private final static Map<String, ScriptCommand> commands = new HashMap<String, ScriptCommand>();
+	private final static Map<String, ScriptCommand> commands = new HashMap<>();
 	
 	@Nullable
 	private static SimpleCommandMap commandMap = null;
@@ -318,6 +319,11 @@ public abstract class Commands {
 	
 	@Nullable
 	public final static ScriptCommand loadCommand(final SectionNode node) {
+		return loadCommand(node, true);
+	}
+	
+	@Nullable
+	public final static ScriptCommand loadCommand(final SectionNode node, final boolean alsoRegister) {
 		final String key = node.getKey();
 		if (key == null)
 			return null;
@@ -346,16 +352,16 @@ public abstract class Commands {
 		
 		final String command = "" + m.group(1).toLowerCase();
 		final ScriptCommand existingCommand = commands.get(command);
-		if (existingCommand != null && existingCommand.getLabel().equals(command)) {
+		if (alsoRegister && existingCommand != null && existingCommand.getLabel().equals(command)) {
 			final File f = existingCommand.getScript();
-			Skript.error("A command with the name /" + command + " is already defined" + (f == null ? "" : " in " + f.getName()));
+			Skript.error("A command with the name /" + existingCommand.getName() + " is already defined" + (f == null ? "" : " in " + f.getName()));
 			return null;
 		}
 		
 		final String arguments = m.group(3) == null ? "" : m.group(3);
 		final StringBuilder pattern = new StringBuilder();
 		
-		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<Argument<?>>(); //Mirre
+		List<Argument<?>> currentArguments = Commands.currentArguments = new ArrayList<>(); //Mirre
 		m = argumentPattern.matcher(arguments);
 		int lastEnd = 0;
 		int optionals = 0;
@@ -424,11 +430,11 @@ public abstract class Commands {
 		
 		final String usage = ScriptLoader.replaceOptions(node.get("usage", desc));
 		final String description = ScriptLoader.replaceOptions(node.get("description", ""));
-		ArrayList<String> aliases = new ArrayList<String>(Arrays.asList(ScriptLoader.replaceOptions(node.get("aliases", "")).split("\\s*,\\s*/?")));
+		ArrayList<String> aliases = new ArrayList<>(Arrays.asList(ScriptLoader.replaceOptions(node.get("aliases", "")).split("\\s*,\\s*/?")));
 		if (aliases.get(0).startsWith("/"))
 			aliases.set(0, aliases.get(0).substring(1));
 		else if (aliases.get(0).isEmpty())
-			aliases = new ArrayList<String>(0);
+			aliases = new ArrayList<>(0);
 		final String permission = ScriptLoader.replaceOptions(node.get("permission", ""));
 		final String permissionMessage = ScriptLoader.replaceOptions(node.get("permission message", ""));
 		final SectionNode trigger = (SectionNode) node.get("trigger");
@@ -465,8 +471,10 @@ public abstract class Commands {
 			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage, aliases, permission, permissionMessage, executableBy, ScriptLoader.loadItems(trigger));
 		} finally {
 			Commands.currentArguments = null;
-		}	
-		registerCommand(c);
+		}
+		
+		if (alsoRegister)
+			registerCommand(c);
 		
 		if (Skript.logVeryHigh() && !Skript.debug())
 			Skript.info("registered command " + desc);
@@ -480,6 +488,14 @@ public abstract class Commands {
 //	}
 	
 	public static void registerCommand(final ScriptCommand command) {
+		// Validate that there are no duplicates
+		final ScriptCommand existingCommand = commands.get(command.getLabel());
+		if (existingCommand != null && existingCommand.getLabel().equals(command.getLabel())) {
+			final File f = existingCommand.getScript();
+			Skript.error("A command with the name /" + existingCommand.getName() + " is already defined" + (f == null ? "" : " in " + f.getName()));
+			return;
+		}
+		
 		if (commandMap != null) {
 			assert cmKnownCommands != null;// && cmAliases != null;
 			command.register(commandMap, cmKnownCommands, cmAliases);

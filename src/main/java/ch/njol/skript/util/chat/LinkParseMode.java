@@ -17,11 +17,25 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
+package ch.njol.skript.util.chat;
+
 /**
- * @author Peter Güttinger
+ * Parse mode for links in chat messages.
  */
-@NonNullByDefault
-package ch.njol.skript.hooks.particles;
-
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
+public enum LinkParseMode {
+	
+	/**
+	 * Parses nothing automatically as a link.
+	 */
+	DISABLED,
+	
+	/**
+	 * Parses everything that starts with http(s):// as a link.
+	 */
+	STRICT,
+	
+	/**
+	 * Parses everything with "." as a link.
+	 */
+	LENIENT
+}

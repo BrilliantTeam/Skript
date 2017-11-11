@@ -20,6 +20,7 @@
 package ch.njol.skript.lang.function;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,6 +43,8 @@ public class Signature<T> {
 	final NonNullPair<String, Boolean> info;
 	final boolean single;
 	
+	final Collection<FunctionReference<?>> calls;
+	
 	@SuppressWarnings("null")
 	public Signature(String script, String name, List<Parameter<?>> parameters, @Nullable final ClassInfo<T> returnType, @Nullable final NonNullPair<String, Boolean> info, boolean single) {
 		this.script = script;
@@ -50,6 +53,8 @@ public class Signature<T> {
 		this.returnType = returnType;
 		this.info = info;
 		this.single = single;
+		
+		calls = new ArrayList<>();
 	}
 	
 	public String getName() {

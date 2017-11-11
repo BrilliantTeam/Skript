@@ -56,6 +56,7 @@ import org.bukkit.entity.Guardian;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Husk;
+import org.bukkit.entity.Illusioner;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -143,7 +144,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 	private final static List<SimpleEntityDataInfo> types = new ArrayList<>();
 	static {
 		types.add(new SimpleEntityDataInfo("arrow", Arrow.class));
-		types.add(new SimpleEntityDataInfo("boat", Boat.class));
+		if (!Skript.methodExists(Boat.class, "getWoodType")) // Only for 1.9 and lower. See BoatData instead
+			types.add(new SimpleEntityDataInfo("boat", Boat.class));
 		types.add(new SimpleEntityDataInfo("blaze", Blaze.class));
 		types.add(new SimpleEntityDataInfo("chicken", Chicken.class));
 		types.add(new SimpleEntityDataInfo("mooshroom", MushroomCow.class));
@@ -227,6 +229,9 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("evoker fangs", EvokerFangs.class));
 			types.add(new SimpleEntityDataInfo("vex", Vex.class));
 			types.add(new SimpleEntityDataInfo("vindicator", Vindicator.class));
+		}
+		if (Skript.classExists("org.bukkit.entity.Illusioner")) {
+			types.add(new SimpleEntityDataInfo("illusioner", Illusioner.class));
 		}
 		// TODO !Update with every version [entities]
 		

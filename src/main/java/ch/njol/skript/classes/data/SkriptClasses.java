@@ -19,6 +19,7 @@
  */
 package ch.njol.skript.classes.data;
 
+import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.util.Locale;
 import java.util.Map;
@@ -444,6 +445,21 @@ public class SkriptClasses {
 					public Timespan subtract(final Timespan value, final Timespan difference) {
 						return new Timespan(Math.max(0, value.getMilliSeconds() - difference.getMilliSeconds()));
 					}
+
+					@Override
+					public Timespan multiply(Timespan value, Timespan multiplier) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Timespan divide(Timespan value, Timespan divider) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Timespan power(Timespan value, Timespan exponent) {
+						throw new UnsupportedOperationException();
+					}
 				}));
 		
 		// TODO remove
@@ -550,6 +566,21 @@ public class SkriptClasses {
 					@Override
 					public Date subtract(final Date value, final Timespan difference) {
 						return new Date(value.getTimestamp() - difference.getMilliSeconds());
+					}
+
+					@Override
+					public Date multiply(Date value, Timespan multiplier) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Date divide(Date value, Timespan divider) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Date power(Date value, Timespan exponent) {
+						throw new UnsupportedOperationException();
 					}
 				}));
 		

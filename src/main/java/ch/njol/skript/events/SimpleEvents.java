@@ -38,6 +38,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -46,6 +47,7 @@ import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepRegrowWoolEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -55,6 +57,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -70,6 +73,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
@@ -89,6 +93,8 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 import org.spigotmc.event.entity.EntityMountEvent;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptEventHandler;
+import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.util.coll.CollectionUtils;
 
@@ -161,7 +167,7 @@ public class SimpleEvents {
 		Skript.registerEvent("Zombie Break Door", SimpleEvent.class, EntityBreakDoorEvent.class, "zombie break[ing] [a] [wood[en]] door")
 				.description("Called when a zombie is done breaking a wooden door. Can be cancelled to prevent the zombie from breaking the door.")
 				.examples("")
-				.since("");
+				.since("1.0");
 		Skript.registerEvent("Combust", SimpleEvent.class, EntityCombustEvent.class, "combust[ing]")
 				.description("Called when an entity is set on fire, e.g. by fire or lava, a fireball, or by standing in direct sunlight (zombies, skeletons).")
 				.examples("")
@@ -270,7 +276,7 @@ public class SimpleEvents {
 		Skript.registerEvent("Level Change", SimpleEvent.class, PlayerLevelChangeEvent.class, "[player] level [change]")
 				.description("Called when a player's <a href='../expressions/#ExprLevel'>level</a> changes, e.g. by gathering experience or by enchanting something.")
 				.examples("")
-				.since("");
+				.since("1.0");
 		Skript.registerEvent("Portal", SimpleEvent.class, PlayerPortalEvent.class, "[player] portal")
 				.description("Called when a player uses a nether or end portal. <a href='../effects/#EffCancelEvent'>Cancel the event</a> to prevent the player from teleporting.")
 				.examples("")
@@ -296,8 +302,10 @@ public class SimpleEvents {
 				.since("1.0");
 		Skript.registerEvent("Sprint Toggle", SimpleEvent.class, PlayerToggleSprintEvent.class, "[player] toggl(e|ing) sprint", "[player] sprint toggl(e|ing)")
 				.description("Called when a player starts or stops sprinting. Use <a href='../conditions/#CondIsSprinting'>is sprinting</a> to get whether the player was sprinting before the event was called.")
-				.examples("")
-				.since("");
+				.examples("on sprint toggle:",
+						"	player is not sprinting",
+						"	send \"Run!\"")
+				.since("1.0");
 		Skript.registerEvent("Portal Create", SimpleEvent.class, PortalCreateEvent.class, "portal create")
 				.description("Called when a portal is created, either by a player or mob lighting an obsidian frame on fire, or by a nether portal creating its teleportation target in the nether/overworld.",
 						"Please note that it's not possible to use <a href='../expressions/#ExprEntity'>the player</a> in this event.")
@@ -394,5 +402,25 @@ public class SimpleEvents {
 				.description("Called when player's currently viewed inventory is closed.")
 				.examples("")
 				.since("2.2-dev21");
+		Skript.registerEvent("Slime Split", SimpleEvent.class, SlimeSplitEvent.class, "slime split")
+				.description("Called when a slime splits. Usually this happens when a big slime dies.")
+				.examples("")
+				.since("2.2-dev26");
+		if (Skript.classExists("org.bukkit.event.entity.EntityResurrectEvent")) {
+			Skript.registerEvent("Resurrect Attempt", SimpleEvent.class, EntityResurrectEvent.class, "[entity] resurrect attempt")
+					.description("Called when an entity dies, always. If they are not holding a totem, this is calcelled - you can, however, uncancel it.")
+					.examples("on resurrect attempt:",
+							"	entity is player",
+							"	entity has permission \"admin.undying\"",
+							"	uncancel the event")
+					.since("2.2-dev28");
+			SkriptEventHandler.listenCancelled.add(EntityResurrectEvent.class); // Listen this even when cancelled
+		}
+		Skript.registerEvent("Player World Change", SimpleEvent.class, PlayerChangedWorldEvent.class, "player world change[d]")
+				.description("Called when a player enters a world. Does not work with other entities!")
+				.examples("on player world change:",
+						"	world is \"city\"",
+					 	"	send \"Welcome to the City!\"")
+				.since("2.2-dev28");
 	}
 }

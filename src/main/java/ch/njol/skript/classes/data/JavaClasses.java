@@ -60,7 +60,7 @@ public class JavaClasses {
 				.name("Number")
 				.description("A number, e.g. 2.5, 3, or -9812454.",
 						"Please note that many expressions only need integers, i.e. will discard any frational parts of any numbers without producing an error.")
-				.usage("<code>[-]###[.###]</code> (any amount of digits; very large numbers will be truncated though)")
+				.usage("[-]###[.###]</code> (any amount of digits; very large numbers will be truncated though)")
 				.examples("set the player's health to 5.5",
 						"set {_temp} to 2*{_temp} - 2.5")
 				.since("1.0")
@@ -578,10 +578,10 @@ public class JavaClasses {
 						"(e.g. %player% will be replaced with the player's name).",
 						"Because scripts are also text, you have to put text into double quotes to tell Skript which part of the line is an effect/expression and which part is the text.",
 						"Please read the article on <a href='../strings/'>Texts and Variable Names</a> to learn more.")
-				.usage("simple: <code>\"...\"</code>",
-						"quotes: <code>\"...\"\"...\"</code>",
-						"expressions: <code>\"...%expression%...\"</code>",
-						"percent signs: <code>\"...%%...\"</code>")
+				.usage("simple: \"...\"",
+						"quotes: \"...\"\"...\"",
+						"expressions: \"...%expression%...\"",
+						"percent signs: \"...%%...\"")
 				.examples("broadcast \"Hello World!\"",
 						"message \"Hello %player%\"",
 						"message \"The id of \"\"%type of tool%\"\" is %id of tool%.\"")

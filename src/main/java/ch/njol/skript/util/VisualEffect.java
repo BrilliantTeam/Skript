@@ -20,9 +20,7 @@
 package ch.njol.skript.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
@@ -40,7 +38,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.hooks.ParticlesPlugin;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -54,10 +51,6 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.iterator.SingleItemIterator;
 import ch.njol.yggdrasil.YggdrasilSerializable;
-import de.slikey.effectlib.util.ParticleEffect;
-import de.slikey.effectlib.util.ParticleEffect.ParticleData;
-import de.slikey.effectlib.util.ParticleEffect.BlockData;
-import de.slikey.effectlib.util.ParticleEffect.ItemData;
 
 /**
  * @author Peter Güttinger
@@ -90,54 +83,54 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		WOLF_SMOKE(EntityEffect.WOLF_SMOKE),
 		
 		// Particles
-		FIREWORKS_SPARK(Effect.FIREWORKS_SPARK),
-		CRIT(Effect.CRIT),
-		MAGIC_CRIT(Effect.MAGIC_CRIT),
-		POTION_SWIRL(Effect.POTION_SWIRL) {
+		FIREWORKS_SPARK(Particle.FIREWORKS_SPARK),
+		CRIT(Particle.CRIT),
+		MAGIC_CRIT(Particle.CRIT_MAGIC),
+		POTION_SWIRL(Particle.SPELL_MOB) {
 			@Override
 			public boolean isColorable() {
 				return true;
 			}
 		},
-		POTION_SWIRL_TRANSPARENT(Effect.POTION_SWIRL_TRANSPARENT) {
+		POTION_SWIRL_TRANSPARENT(Particle.SPELL_MOB_AMBIENT) {
 			@Override
 			public boolean isColorable() {
 				return true;
 			}
 		},
-		SPELL(Effect.SPELL),
-		INSTANT_SPELL(Effect.INSTANT_SPELL),
-		WITCH_SPELL(Effect.WITCH_MAGIC),
-		NOTE(Effect.NOTE),
-		PORTAL(Effect.PORTAL),
-		FLYING_GLYPH(Effect.FLYING_GLYPH),
-		FLAME(Effect.FLAME),
-		LAVA_POP(Effect.LAVA_POP),
-		FOOTSTEP(Effect.FOOTSTEP),
-		SPLASH(Effect.SPLASH),
-		PARTICLE_SMOKE(Effect.PARTICLE_SMOKE), // Why separate particle... ?
-		EXPLOSION_HUGE(Effect.EXPLOSION_HUGE),
-		EXPLOSION_LARGE(Effect.EXPLOSION_LARGE),
-		EXPLOSION(Effect.EXPLOSION),
-		VOID_FOG(Effect.VOID_FOG),
-		SMALL_SMOKE(Effect.SMALL_SMOKE),
-		CLOUD(Effect.CLOUD),
-		COLOURED_DUST(Effect.COLOURED_DUST) {
+		SPELL(Particle.SPELL),
+		INSTANT_SPELL(Particle.SPELL_INSTANT),
+		WITCH_SPELL(Particle.SPELL_WITCH),
+		NOTE(Particle.NOTE),
+		PORTAL(Particle.PORTAL),
+		FLYING_GLYPH(Particle.ENCHANTMENT_TABLE),
+		FLAME(Particle.FLAME),
+		LAVA_POP(Particle.LAVA),
+		FOOTSTEP(Particle.FOOTSTEP),
+		SPLASH(Particle.WATER_SPLASH),
+		PARTICLE_SMOKE(Particle.SMOKE_NORMAL), // Why separate particle... ?
+		EXPLOSION_HUGE(Particle.EXPLOSION_HUGE),
+		EXPLOSION_LARGE(Particle.EXPLOSION_LARGE),
+		EXPLOSION(Particle.EXPLOSION_NORMAL),
+		VOID_FOG(Particle.SUSPENDED_DEPTH),
+		SMALL_SMOKE(Particle.TOWN_AURA),
+		CLOUD(Particle.CLOUD),
+		COLOURED_DUST(Particle.REDSTONE) {
 			@Override
 			public boolean isColorable() {
 				return true;
 			}
 		},
-		SNOWBALL_BREAK(Effect.SNOWBALL_BREAK),
-		WATER_DRIP(Effect.WATERDRIP),
-		LAVA_DRIP(Effect.LAVADRIP),
-		SNOW_SHOVEL(Effect.SNOW_SHOVEL),
-		SLIME(Effect.SLIME),
-		HEART(Effect.HEART),
-		ANGRY_VILLAGER(Effect.VILLAGER_THUNDERCLOUD),
-		HAPPY_VILLAGER(Effect.HAPPY_VILLAGER),
-		LARGE_SMOKE(Effect.LARGE_SMOKE),
-		ITEM_CRACK(Effect.ITEM_BREAK) {
+		SNOWBALL_BREAK(Particle.SNOWBALL),
+		WATER_DRIP(Particle.DRIP_WATER),
+		LAVA_DRIP(Particle.DRIP_LAVA),
+		SNOW_SHOVEL(Particle.SNOW_SHOVEL),
+		SLIME(Particle.SLIME),
+		HEART(Particle.HEART),
+		ANGRY_VILLAGER(Particle.VILLAGER_ANGRY),
+		HAPPY_VILLAGER(Particle.VILLAGER_HAPPY),
+		LARGE_SMOKE(Particle.SMOKE_LARGE),
+		ITEM_CRACK(Particle.ITEM_CRACK) {
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
 				if (raw == null)
@@ -153,7 +146,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				}
 			}
 		},
-		BLOCK_BREAK(Effect.TILE_BREAK) {
+		BLOCK_BREAK(Particle.BLOCK_CRACK) {
 			@SuppressWarnings("null")
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
@@ -170,7 +163,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				}
 			}
 		},
-		BLOCK_DUST(Effect.TILE_DUST) {
+		BLOCK_DUST(Particle.BLOCK_DUST) {
 			@SuppressWarnings("null")
 			@Override
 			public Object getData(final @Nullable Object raw, final Location l) {
@@ -186,12 +179,18 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 					return raw;
 				}
 			}
-		};
+		},
 		
+		// 1.11 particles
+		TOTEM("TOTEM"),
+		SPIT("SPIT");
+		
+		@Nullable
 		final Object effect;
 		@Nullable
 		final String name;
 		
+		@SuppressWarnings("deprecation")
 		private Type(final Effect effect) {
 			this.effect = effect;
 			this.name = effect.getName();
@@ -199,6 +198,22 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		
 		private Type(final EntityEffect effect) {
 			this.effect = effect;
+			this.name = null;
+		}
+		
+		private Type(final Particle effect) {
+			this.effect = effect;
+			this.name = null;
+		}
+		
+		private Type(final String name) {
+			Particle real = null;
+			try {
+				real = Particle.valueOf(name);
+			} catch (IllegalArgumentException e) {
+				// This MC version does not support this particle...
+			}
+			this.effect = real;
 			this.name = null;
 		}
 		
@@ -237,7 +252,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	
 	@Nullable
 	static SyntaxElementInfo<VisualEffect> info;
-	final static List<Type> types = new ArrayList<Type>(Type.values().length);
+	final static List<Type> types = new ArrayList<>(Type.values().length);
 	final static Noun[] names = new Noun[Type.values().length];
 	static {
 		Language.addListener(new LanguageChangeListener() {
@@ -245,7 +260,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			public void onLanguageChange() {
 				final Type[] ts = Type.values();
 				types.clear();
-				final List<String> patterns = new ArrayList<String>(ts.length);
+				final List<String> patterns = new ArrayList<>(ts.length);
 				for (int i = 0; i < ts.length; i++) {
 					final String node = LANGUAGE_NODE + "." + ts[i].name();
 					final String pattern = Language.get_(node + ".pattern");
@@ -267,7 +282,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				}
 				final String[] ps = patterns.toArray(new String[patterns.size()]);
 				assert ps != null;
-				info = new SyntaxElementInfo<VisualEffect>(ps, VisualEffect.class);
+				info = new SyntaxElementInfo<>(ps, VisualEffect.class);
 			}
 		});
 	}
@@ -277,8 +292,6 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	private Object data;
 	private float speed = 0;
 	private float dX, dY, dZ = 0;
-	@Nullable
-	private org.bukkit.Color color;
 	
 	/**
 	 * For parsing & deserialisation
@@ -291,13 +304,29 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		type = types.get(matchedPattern);
 		
+		if (type.effect == null) {
+			Skript.error("Minecraft " + Skript.getMinecraftVersion() + " version does not support particle " + type);
+			return false;
+		}
+		
 		if (type.isColorable()) {
 			for (Expression<?> expr : exprs) {
 				if (expr == null) continue;
-				else if (expr.getReturnType() == Color.class) {
-					color = ((Color) expr.getSingle(null)).getBukkitColor();
+				else if (expr.getReturnType().isAssignableFrom(Color.class)) {
+					org.bukkit.Color color = ((Color) expr.getSingle(null)).getBukkitColor();
+					
+					/*
+					 * Colored particles use dX, dY and dZ as RGB values which
+					 * have range from 0 to 1.
+					 * 
+					 * For now, only speed exactly 1 is allowed.
+					 */
+					dX = color.getRed() / 255.0f + 0.00001f;
+					dY = color.getGreen() / 255.0f;
+					dZ = color.getBlue() / 255.0f;
+					speed = 1;
 				} else {
-					data = expr.getSingle(null);
+					Skript.exception("Color not specified for colored particle");
 				}
 			}
 		} else {
@@ -340,7 +369,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		final SyntaxElementInfo<VisualEffect> info = VisualEffect.info;
 		if (info == null)
 			return null;
-		return SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), new SingleItemIterator<SyntaxElementInfo<VisualEffect>>(info), null);
+		return SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), new SingleItemIterator<>(info), null);
 	}
 	
 	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e) {
@@ -354,25 +383,41 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			if (e != null)
 				e.playEffect((EntityEffect) type.effect);
 		} else {
-			if (EFFECT_LIB && ((Effect) type.effect).getType() == Effect.Type.PARTICLE) { // Only particles for now
-				ParticlesPlugin<?> plugin = ParticlesPlugin.plugin;
-				assert plugin != null;
-				plugin.playEffect(ps, l, count, radius, type, data, speed, dX, dY, dZ, color);
-			} else {
+			if (type.effect instanceof Particle) {
+				// Particle effect...
+				Object pData = type.getData(data, l);
+				
+				assert type.effect != null;
+				// Check that data has correct type (otherwise bad things will happen)
+				if (pData != null && !((Particle) type.effect).getDataType().isAssignableFrom(pData.getClass())) {
+					pData = null;
+					Skript.warning("Incompatible particle data, resetting it!");
+				}
+				
 				if (ps == null) {
-					int id = 0;
-					int dataId = 0;
-					Object pData = type.getData(data, l);
-					
-					if (pData instanceof Material) {
-						id = ((Material) pData).getId();
-					} else if (pData instanceof MaterialData) {
-						id = ((MaterialData) pData).getItemTypeId();
-						dataId = ((MaterialData) pData).getData();
+					// Colored particles must be played one at time; otherwise, colors are broken
+					if (type.isColorable()) {
+						for (int i = 0; i < count; i++) {
+							l.getWorld().spawnParticle((Particle) type.effect, l, 0, dX, dY, dZ, speed, pData);
+						}
+					} else {
+						l.getWorld().spawnParticle((Particle) type.effect, l, count, dX, dY, dZ, speed, pData);
 					}
-					//Skript.info("dX: " + dX + " dY: " + dY + " dZ: " + dZ);
-					
-					l.getWorld().spigot().playEffect(l, (Effect) type.effect, id, dataId, dX, dY, dZ, speed, count, radius);
+				} else {
+					for (final Player p : ps) {
+						if (type.isColorable()) {
+							for (int i = 0; i < count; i++) {
+								p.spawnParticle((Particle) type.effect, l, 0, dX, dY, dZ, speed, pData);
+							}
+						} else {
+							p.spawnParticle((Particle) type.effect, l, count, dX, dY, dZ, speed, pData);
+						}
+					}
+				}
+			} else {
+				// Non-particle effect (whatever Spigot API says, there are a few)
+				if (ps == null) {
+					l.getWorld().spigot().playEffect(l, (Effect) type.effect, 0, 0, dX, dY, dZ, speed, count, radius);
 				} else {
 					for (final Player p : ps)
 						p.playEffect(l, (Effect) type.effect, type.getData(data, l));

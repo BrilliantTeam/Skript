@@ -20,12 +20,19 @@
 package ch.njol.skript;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -61,6 +68,15 @@ public class Updater {
 	
 	@Nullable
 	private static Gson gson;
+	private static boolean gsonUnavailable;
+	
+	static {
+		// Only initialize GSON if available
+		if (Skript.classExists("com.google.gson.Gson"))
+			gson = new Gson();
+		else
+			gsonUnavailable = true;
+	}
 	
 	final static AtomicReference<String> error = new AtomicReference<>();
 	public static volatile UpdateState state = UpdateState.NOT_STARTED;
@@ -139,11 +155,21 @@ public class Updater {
 	    public String toString() {
 	    	return tag_name;
 	    }
+	    
+	    public class Author {
+	    	public String login;
+	    	public int id;
+	    }
+	    
+	    public Author author;
 	}
 	
 	@SuppressWarnings("null")
 	public static void start() {
 		Skript.debug("Initializing updater");
+		
+		if (gsonUnavailable) // Something wrong with GSON...
+			return;
 		
 		long period;
 		if (SkriptConfig.checkForNewVersion.value())
@@ -160,8 +186,6 @@ public class Updater {
 		assert str != null : "Cannot deserialize null string";
 		@SuppressWarnings("serial")
 		Type listType = new TypeToken<List<ResponseEntry>>() {}.getType();
-		if (gson == null) // Initialize GSON if it wasn't initialized before
-			gson = new Gson();
 		assert gson != null;
 		List<ResponseEntry> responses = gson.fromJson(str, listType);
 		assert responses != null;
@@ -193,7 +217,7 @@ public class Updater {
 		private CommandSender sender;
 		
 		public String tryLoadReleases(URL url) throws IOException, SocketTimeoutException {
-			Skript.debug("Trying to load releases from " + url + "...");
+			//Skript.debug("Trying to load releases from " + url + "...");
 			Scanner scan = null;
 			try {
 				scan = new Scanner(url.openStream(), "UTF-8");
@@ -202,7 +226,7 @@ public class Updater {
 					throw new IOException("Null output from scanner!");
 				return out;
 			} finally {
-				Skript.debug("Closing scanner NOW!");
+				//Skript.debug("Closing scanner NOW!");
 				if (scan != null)
 					scan.close();
 			}
@@ -239,7 +263,7 @@ public class Updater {
 		
 		@Override
 		public void run() {
-			Skript.debug("Beginning update checking");
+			//Skript.debug("Beginning update checking");
 			state = UpdateState.CHECKING;
 			
 			URL url = null;
@@ -259,7 +283,7 @@ public class Updater {
 				try {
 					response = tryLoadReleases(url);
 				} catch (SocketTimeoutException e) {
-					Skript.debug("Socket timeout in updater, but we can probably try again!");
+					//Skript.debug("Socket timeout in updater, but we can probably try again!");
 					// Do nothing here, we'll just try again...
 				} catch (IOException e) {
 					error.set(ExceptionUtils.toString(e));
@@ -334,7 +358,54 @@ public class Updater {
 			}
 			assert url != null;
 			
-			// TODO does anybody actually use this?
+			// Validate new release (only bensku can make auto-updateable releases for security reasons)
+			if (update.author.id != 4330456) {
+				Skript.exception("Unauthorized Skript release! Author " + update.author.login + " (" + update.author.id + ") is not recognized.");
+				return;
+			}
+			
+			// Attempt to open connection on new jar
+			int maxTries = SkriptConfig.updaterDownloadTries.value();
+			int tries = 0;
+			ReadableByteChannel ch = null;
+			while (ch == null) {
+				try {
+					ch = Channels.newChannel(url.openStream());
+				} catch (SocketTimeoutException e) {
+					Skript.debug("Socket timeout in updater, but we can probably try again!");
+					// Do nothing here, we'll just try again...
+				} catch (IOException e) {
+					error.set(ExceptionUtils.toString(e));
+					Skript.info(sender, "" + m_check_error);
+				}
+				
+				
+				tries++;
+				if (tries >= maxTries && ch == null) {
+					error.set("Can't reach update server");
+					Skript.info(sender, "" + m_check_error);
+					state = UpdateState.ERROR;
+					return;
+				}
+			}
+			assert ch != null;
+			
+			// Attempt to transfer data from network to file
+			try {
+				FileChannel file = FileChannel.open(Paths.get("skript-update.jar"), StandardOpenOption.CREATE);
+				file.transferFrom(ch, 0, 1024 * 1024 * 10); // 10 mb is max file size for safety reasons
+				file.close();
+			} catch (IOException e) {
+				error.set(ExceptionUtils.toString(e));
+				Skript.info(sender, "" + m_check_error);
+			}
+			
+			// Close connection, no matter what
+			try {
+				ch.close();
+			} catch (IOException e) {
+				Skript.exception(e);
+			}
 		}
 	}
 }

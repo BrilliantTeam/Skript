@@ -14,6 +14,9 @@ not: not
 neither: neither
 nor: nor
 
+# What null (nothing) should show up as in a string/text
+none: <none>
+
 genders:
 	0:
 		id: a
@@ -367,6 +370,15 @@ tree types:
 	big_redwood:
 		name: tall redwood¦s
 		pattern: (big|tall) (fir|pine|spruce|redwood)s?
+	mega_redwood:
+		name: mega redwood¦s
+		pattern: (mega|giant) (fir|pine|spruce|redwood)s?
+	birch:
+		name: birch¦es
+		pattern: birch(es)?
+	tall_birch:
+		name: tall birch¦es
+		pattern: (tall|big) birch(es)?
 	jungle:
 		name: jungle tree¦s
 		pattern: (any )?jungle trees?
@@ -376,6 +388,15 @@ tree types:
 	big_jungle:
 		name: big jungle tree¦s
 		pattern: (big|tall|huge|giant|large) jungle trees?
+	cocoa_tree:
+		name: cocoa tree¦s
+		pattern: cocoa trees?
+	acacia:
+		name: acacia¦s
+		pattern: acacias?
+	dark_oak:
+		name: dark oak¦s
+		pattern: dark oaks?
 	jungle_bush:
 		name: bush¦es
 		pattern: (jungle )?bush(es)?
@@ -431,7 +452,7 @@ colors:
 		names: cyan, aqua, dark cyan, dark aqua, dark turquoise, dark turquois
 	light_cyan:
 		adjective: light cyan
-		names: light cyan, light aqua, turquoise, turquois
+		names: light cyan, light aqua, turquoise, turquois, light blue
 	dark_green:
 		adjective: green
 		names: green, dark green
@@ -463,8 +484,13 @@ chat styles:
 	italic: italic, italics, i
 	strikethrough: strikethrough, strike, s
 	underline: underlined, underline, u
-	magic: magic
+	magic: magic, obfuscated
 	reset: reset, r
+	open_url: link, open url, url
+	run_command: run command, command, cmd
+	suggest_command: suggest command
+	change_page: change page
+	show_text: tooltip, show text
 
 # -- Directions --
 directions:
@@ -519,6 +545,27 @@ entities:
 	boat:
 		name: boat¦s
 		pattern: boat(|1¦s)
+	any boat:
+		name: boat¦s
+		pattern: any boat(|1¦s)
+	oak boat:
+		name: oak boat¦s
+		pattern: oak boat(|1¦s)	
+	spruce boat:
+		name: spruce boat¦s
+		pattern: spruce boat(|1¦s)
+	birch boat:
+		name: birch boat¦s
+		pattern: birch boat(|1¦s)
+	jungle boat:
+		name: jungle boat¦s
+		pattern: jungle boat(|1¦s)
+	acacia boat:
+		name: acacia boat¦s
+		pattern: acacia boat(|1¦s)
+	dark oak boat:
+		name: dark oak boat¦s
+		pattern: dark oak boat(|1¦s)
 	blaze:
 		name: blaze¦s
 		pattern: blaze(|1¦s)
@@ -678,6 +725,9 @@ entities:
 		name: TNT
 		pattern: ([primed] TNT(2¦|1¦s)|TNT entit(y|1¦ies))
 	villager:
+		name: villager¦s
+		pattern: <age> villager(|1¦s)|(4¦)[villager] (kid(|1¦s)|child(|1¦ren))
+	normal:
 		name: villager¦s
 		pattern: <age> villager(|1¦s)|(4¦)[villager] (kid(|1¦s)|child(|1¦ren))
 	farmer:
@@ -865,12 +915,33 @@ entities:
 	evoker fangs:
 		name: evoker fangs
 		pattern: evoker fangs
+	illusioner:
+		name: illusioner¦s
+		pattern: illusioner(|1¦s)
 	vex:
 		name: vex¦es
 		pattern: vex(|1¦es)
 	vindicator:
 		name: vindicator¦s
 		pattern: vindicator(|1¦s)
+	parrot:
+		name: parrot¦s
+		pattern: parrot(|1¦s)
+	red parrot:
+		name: red parrot¦s
+		pattern: red parrot(|1¦s)
+	blue parrot:
+		name: blue parrot¦s
+		pattern: blue parrot(|1¦s)
+	green parrot:
+		name: green parrot¦s
+		pattern: green parrot(|1¦s)
+	cyan parrot:
+		name: cyan parrot¦s
+		pattern: cyan parrot(|1¦s)
+	gray parrot:
+		name: gray parrot¦s
+		pattern:  gray parrot(|1¦s)
 	monster:
 		name: monster¦s
 		pattern: monster(|1¦s)
@@ -1048,6 +1119,12 @@ visual effects:
 	block_dust:
 		name: block dust @-
 		pattern: [sprinting] dust of [%itemtype%]
+	totem:
+		name: totem @-
+		pattern: totem
+	spit:
+		name: spit @-
+		pattern: spit
 	area_expression: [with [offset of %number%, %number%(,| and) %number%][[and ]speed %number%]]
 
 # -- Inventory Actions --
@@ -1087,6 +1164,25 @@ click actions:
 	control_drop: drop key with control, drop stack, Ctrl+Q
 	creative: creative action
 	unknown: unknown, unsupported, custom
+	
+# -- Inventory Types --
+inventory types:
+	chest: chest inventory
+	dispenser: dispenser inventory
+	dropper: dropper inventory
+	furnace: furnace inventory
+	workbench: workbench inventory
+	crafting: crafting table inventory
+	enchanting: enchanting table inventory
+	brewing: brewing stand inventory
+	player: player inventory
+	creative: creative inventory
+	merchant: merchant inventory, villager inventory
+	endher_chest: ender chest inventory
+	anvil: anvil inventory
+	beacon: beacon inventory
+	hopper: hopper inventory
+	shulker_box: shulker box inventory
 
 # -- Boolean --
 boolean:
