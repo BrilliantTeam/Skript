@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.UnsafeValues;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
@@ -163,14 +164,52 @@ public class AliasesProvider {
 		}
 	}
 	
-	private List<String> parseKeyPattern(String key) {
+	private List<String> parseKeyPattern(String name) {
 		List<String> versions = new ArrayList<>();
+		
+		for (int i = 0; i < name.length(); i++) {
+			char c = name.charAt(i);
+			
+			if (c == '[') { // Optional part: versions with and without it
+				int end = name.indexOf(']', i);
+				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(i + 1, end), name.substring(end + 1))));
+				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(end + 1))));
+			} else if (c == '(') { // Choose one part: versions for multiple options
+				int end = name.indexOf(')', i);
+				int n = 0;
+				int last = i;
+				boolean hasParts = false;
+				for (int j = i + 1; j < end; j++) {
+					char x = name.charAt(j);
+					if (x == '(') {
+						n++;
+					} else if (x == ')') {
+						n--;
+					} else if (x == '|') {
+						if (n > 0)
+							continue;
+						hasParts = true;
+						versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(last + 1, j), name.substring(end + 1))));
+						last = j;
+					}
+				}
+				if (!hasParts) {
+					//Skript.error(m_brackets_error.toString());
+					// TODO error reporting
+					return versions;
+				}
+				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(last + 1, end), name.substring(end + 1))));
+			}
+		}
 		
 		return versions;
 	}
 	
-	private void loadAlias(String pattern, String data) {
-		
+	private void loadAlias(String name, String data) {
+		List<String> patterns = parseKeyPattern(name);
+		for (String p : patterns) {
+			
+		}
 	}
 
 	@Nullable

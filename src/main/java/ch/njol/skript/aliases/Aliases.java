@@ -155,7 +155,7 @@ public abstract class Aliases {
 	 * 
 	 * @param parts
 	 */
-	private final static String concatenate(final String... parts) {
+	final static String concatenate(final String... parts) {
 		assert parts.length >= 2;
 		final StringBuilder b = new StringBuilder();
 		for (int i = 0; i < parts.length; i++) {
