@@ -70,7 +70,7 @@ public class ExprChatRecipients extends SimpleExpression<Player> {
 	@Override
 	public Class<?>[] acceptChange(final ChangeMode mode) {
 		if (mode == ChangeMode.ADD || mode == ChangeMode.SET || mode == ChangeMode.DELETE || mode == ChangeMode.REMOVE)
-			return CollectionUtils.array(Player.class, Player[].class);
+			return CollectionUtils.array(Player[].class);
 		return null;
 	}
 
