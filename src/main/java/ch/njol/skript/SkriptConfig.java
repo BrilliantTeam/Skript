@@ -238,6 +238,9 @@ public abstract class SkriptConfig {
 			})
 			.optional(true);
 	
+	public final static Option<Boolean> allowUnsafePlatforms = new Option<Boolean>("allow unsafe platforms", false)
+			.optional(true);
+	
 	/**
 	 * This should only be used in special cases
 	 */

@@ -192,6 +192,43 @@ public final class Skript extends JavaPlugin implements Listener {
 	public final static Message m_invalid_reload = new Message("skript.invalid reload"),
 			m_finished_loading = new Message("skript.finished loading");
 	
+	public static ServerPlatform getServerPlatform() {
+		if (classExists("co.aikar.timings.Timings")) {
+			return ServerPlatform.BUKKIT_PAPER; // Could be Sponge, but it doesn't work at all at the moment
+		} else if (classExists("org.spigotmc.SpigotConfig")) {
+			if (classExists("java.net.glowstone.GlowServer")) {
+				return ServerPlatform.BUKKIT_GLOWSTONE;
+			} else {
+				return ServerPlatform.BUKKIT_SPIGOT;
+			}
+		} else if (classExists("org.bukkit.craftbukkit.CraftServer")) {
+			return ServerPlatform.BUKKIT_CRAFTBUKKIT;
+		} else {
+			return ServerPlatform.BUKKIT_UNKNOWN;
+		}
+	}
+	
+	@Override
+	public void onLoad() {
+		ServerPlatform platform = getServerPlatform();
+		if (!platform.works) {
+			Skript.error("It seems that this server platform (" + platform.name + ") does not work with Skript.");
+			if (SkriptConfig.allowUnsafePlatforms.value()) {
+				Skript.error("However, you have chosen to ignore this. Skript will probably still not work.");
+			} else {
+				Skript.error("To prevent potentially unsafe behaviour, Skript has been disabled.");
+				Skript.error("You may re-enable it by adding a configuration option 'allow unsafe platforms: true'");
+				Skript.error("Note that it is unlikely that Skript works correctly even if you do so.");
+				Skript.error("A better idea would be to install Paper or Spigot in place of your current server.");
+				getPluginLoader().disablePlugin(this); // Really disable Skript now
+			}
+		} else if (!platform.supported) {
+			Skript.warning("This server platform (" + platform.name + ") is not supported by Skript.");
+			Skript.warning("It will still probably work, but if it does not, you are on your own.");
+			Skript.warning("Skript officially supports Paper and Spigot.");
+		}
+	}
+	
 	@Override
 	public void onEnable() {
 		if (disabled) {
