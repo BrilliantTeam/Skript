@@ -488,9 +488,9 @@ chat styles:
 	reset: reset, r
 	open_url: link, open url, url
 	run_command: run command, command, cmd
-	suggest_command: suggest command
+	suggest_command: suggest command, sgt
 	change_page: change page
-	show_text: tooltip, show text
+	show_text: tooltip, show text, ttp
 
 # -- Directions --
 directions:
