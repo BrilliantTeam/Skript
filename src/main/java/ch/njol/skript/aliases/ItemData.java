@@ -23,7 +23,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.UnsafeValues;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -38,59 +40,46 @@ import ch.njol.yggdrasil.YggdrasilSerializable;
  */
 @SuppressWarnings("deprecation")
 public class ItemData implements Cloneable, YggdrasilSerializable {
+	
 	static {
 		Variables.yggdrasil.registerSingleClass(ItemData.class, "ItemData");
 	}
 	
+	@SuppressWarnings("null")
+	private static final UnsafeValues unsafe = Bukkit.getUnsafe();
+	
 	/**
-	 * Only ItemType may set this directly.
+	 * ItemStack, which is used for everything but serialization.
+	 * It should be handled by underlying NMS stack that is probably
+	 * modified using UnsafeValues.
 	 */
-	int typeid = -1;
-	public short dataMin = -1;
-	public short dataMax = -1;
+	transient ItemStack stack;
 	
-	public ItemData(final int typeid) {
-		this.typeid = typeid;
+	/**
+	 * Tags for item in Mojangson (JSON) string representation.
+	 */
+	String tags;
+	
+	/**
+	 * Type of the item as Bukkit material.
+	 */
+	Material type;
+	
+	public ItemData(Material type, String tags) {
+		this.type = type;
+		this.tags = tags;
+		
+		stack = new ItemStack(type);
+		unsafe.modifyItemStack(stack, tags);
 	}
 	
-	public ItemData(final int typeid, final short data) {
-		if (data < -1)
-			throw new IllegalArgumentException("data (" + data + ") must be >= -1");
-		this.typeid = typeid;
-		dataMin = dataMax = data;
-	}
-	
-	public ItemData(final int typeid, final short dMin, final short dMax) {
-		if (dMin < -1 || dMax < -1)
-			throw new IllegalArgumentException("datas (" + dMin + "," + dMax + ") must be >= -1");
-		if (dMin == -1 && dMax != -1 || dMin != -1 && dMax == -1)
-			throw new IllegalArgumentException("dataMin (" + dMin + ") and dataMax (" + dMax + ") must either both be -1 or positive");
-		if (dMin > dMax)
-			throw new IllegalArgumentException("dataMin (" + dMin + ") must not be grater than dataMax (" + dMax + ")");
-		this.typeid = typeid;
-		dataMin = dMin;
-		dataMax = dMax;
-	}
-	
-	public ItemData() {
-		typeid = -1;
-		dataMin = -1;
-		dataMax = -1;
-	}
-	
-	public ItemData(final ItemStack i) {
-		typeid = i.getTypeId();
-		dataMin = dataMax = i.getDurability();// <- getData() returns a new data object based on the durability (see Bukkit source)
-	}
-	
-	public ItemData(final ItemData other) {
-		typeid = other.typeid;
-		dataMax = other.dataMax;
-		dataMin = other.dataMin;
+	public ItemData(ItemData data) {
+		this(data.type, data.tags);
 	}
 	
 	public int getId() {
-		return typeid;
+		// Won't work with 1.13!
+		return type.getId();
 	}
 	
 	/**
@@ -101,14 +90,16 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 */
 	public boolean isOfType(final @Nullable ItemStack item) {
 		if (item == null)
-			return typeid == 0;
+			return type == Material.AIR;
 		return isOfType(item.getTypeId(), item.getDurability());
 	}
 	
+	@Deprecated
 	public boolean isOfType(final int id, final short data) {
 		return (typeid == -1 || typeid == id) && (dataMin == -1 || dataMin <= data) && (dataMax == -1 || data <= dataMax);
 	}
 	
+	@Deprecated
 	public boolean isSupertypeOf(final ItemData other) {
 		return (typeid == -1 || other.typeid == typeid) && (dataMin == -1 || dataMin <= other.dataMin) && (dataMax == -1 || dataMax >= other.dataMax);
 	}
@@ -118,6 +109,7 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 */
 	@Override
 	public String toString() {
+		// TODO aliases provider or something else?
 		return Aliases.getMaterialName(typeid, dataMin, dataMax, false);
 	}
 	
@@ -139,11 +131,12 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		if (!(obj instanceof ItemData))
 			return false;
 		final ItemData other = (ItemData) obj;
-		return other.typeid == typeid && other.dataMin == dataMin && other.dataMax == dataMax;
+		return other.type == type && other.tags == tags;
 	}
 	
 	@Override
 	public int hashCode() {
+		// TODO
 		return (typeid * 31 + dataMin) * 31 + dataMax;
 	}
 	
