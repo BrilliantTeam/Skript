@@ -25,10 +25,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
+import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.Config;
@@ -41,37 +46,20 @@ import ch.njol.skript.config.SectionNode;
  */
 public class AliasesProvider {
 	
-	private Map<String,ItemType> aliases;
+	private Map<String, ItemType> aliases;
+	
 	@SuppressWarnings("deprecation")
 	private UnsafeValues unsafe;
 	
-	public static class MojangsonElement {
-		
-		private String key;
-		private String value;
-		
-		public MojangsonElement(String key, String value) {
-			this.key = key;
-			this.value = value;
-		}
-		
-		public String getKey() {
-			return key;
-		}
-		
-		public String getValue() {
-			return value;
-		}
-	}
+	private Gson gson;
 	
 	public static class Variation {
 		
 		@Nullable
 		private String id;
-		@Nullable
-		private List<MojangsonElement> tags;
+		private Map<String, Object> tags;
 		
-		public Variation(@Nullable String id, @Nullable List<MojangsonElement> tags) {
+		public Variation(@Nullable String id, Map<String, Object> tags) {
 			this.id = id;
 			this.tags = tags;
 		}
@@ -81,18 +69,24 @@ public class AliasesProvider {
 			return id;
 		}
 		
-		@Nullable
-		public List<MojangsonElement> getTags() {
+		public Map<String, Object> getTags() {
 			return tags;
 		}
 	}
 	
 	private Map<String, Map<String, Variation>> variations;
 	
-	@SuppressWarnings({"deprecation", "null"})
 	public AliasesProvider() {
 		aliases = new HashMap<>(3000);
-		unsafe = Bukkit.getUnsafe();
+		variations = new HashMap<>(500);
+		gson = new Gson();
+		
+		@SuppressWarnings("deprecation")
+		UnsafeValues values = Bukkit.getUnsafe();
+		if (values == null) {
+			throw new RuntimeException("unsafe values are not available; cannot initialize aliases backend");
+		}
+		unsafe = values;
 	}
 	
 	public void load(SectionNode root) {
@@ -117,32 +111,16 @@ public class AliasesProvider {
 		}
 	}
 	
-	private List<MojangsonElement> parseMojangson(String raw) {
-		List<MojangsonElement> list = new ArrayList<>();
-		String[] split = raw.split(","); // TODO this is lazy way to split a string
-		
-		for (String part : split) {
-			String[] parts = part.split("=");
-			String key = parts[0];
-			String value = parts[1];
-			
-			// Make sure that there actually was = in string
-			if (key == null || value == null) {
-				// TODO error reporting
-				continue;
-			}
-			
-			list.add(new MojangsonElement(key, value));
-		}
-		
-		return list;
+	@SuppressWarnings("null")
+	private Map<String, Object> parseMojangson(String raw) {
+		return (Map<String, Object>) gson.fromJson(raw, Object.class);
 	}
 	
 	@Nullable
 	public Variation parseVariation(String raw) {
-		String[] parts = raw.split(" ");
-		String id = parts[0];
-		String tags = parts[1];
+		int firstSpace = raw.indexOf(' ');
+		String id = raw.substring(0, firstSpace);
+		String tags = raw.substring(firstSpace + 1);
 		if (id == null || tags == null) {
 			// TODO error reporting
 			return null;
@@ -160,7 +138,15 @@ public class AliasesProvider {
 				continue;
 			}
 			
-			vars.put(node.getKey(), parseVariation(((EntryNode) node).getValue()));
+			String pattern = node.getKey();
+			assert pattern != null;
+			List<String> keys = parseKeyPattern(pattern);
+			Variation var = parseVariation(((EntryNode) node).getValue());
+			
+			// Put var there for all keys it matches with
+			for (String key : keys) {
+				vars.put(key, var);
+			}
 		}
 	}
 	
@@ -207,9 +193,65 @@ public class AliasesProvider {
 	
 	private void loadAlias(String name, String data) {
 		List<String> patterns = parseKeyPattern(name);
+		int firstSpace = data.indexOf(' ');
+		String id = data.substring(0, firstSpace);
+		Map<String, Object> tags = parseMojangson(data.substring(firstSpace + 1));
+		
 		for (String p : patterns) {
-			
+			loadVariedAlias(name, id, tags);
 		}
+	}
+	
+	private void loadVariedAlias(String name, String id, Map<String, Object> tags) {
+		// Find {variations}
+		boolean hasVariations = false;
+		for (int i = 0; i < name.length(); i++) {
+			char c = name.charAt(i);
+			
+			// Variation start here
+			if (c == '{') {
+				hasVariations = true;
+				
+				int end = name.indexOf('}', i);
+				if (end == -1) {
+					// TODO error reporting
+					continue;
+				}
+				
+				// Take variation name from between brackets
+				String varName = name.substring(i + 1, end);
+				// Get variations for that id and hope they exist
+				Map<String, Variation> vars = variations.get(varName);
+				if (vars == null) {
+					// TODO error reporting
+					continue;
+				}
+				
+				// Iterate over variations
+				for (Entry<String, Variation> entry : vars.entrySet()) {
+					Map<String, Object> combinedTags = new HashMap<>(tags.size() + entry.getValue().getTags().size());
+					combinedTags.putAll(tags);
+					combinedTags.putAll(entry.getValue().getTags());
+					loadVariedAlias(entry.getKey(), id, combinedTags);
+				}
+				
+				// Move to end of this variation
+				i = end;
+			}
+		}
+		
+		// Enough recursion! No more variations, just alias
+		if (!hasVariations) {
+			loadReadyAlias(name, id, tags);
+		}
+	}
+	
+	private void loadReadyAlias(String name, String id, Map<String, Object> tags) {
+		// Prepare and modify ItemStack (using somewhat Unsafe methods)
+		ItemStack stack = new ItemStack(Material.AIR);
+		unsafe.modifyItemStack(stack, gson.toJson(tags));
+		
+		
 	}
 
 	@Nullable
