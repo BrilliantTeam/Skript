@@ -21,6 +21,8 @@ package ch.njol.skript.aliases;
 
 import java.util.HashMap;
 
+import org.bukkit.Material;
+
 import ch.njol.skript.Skript;
 import ch.njol.util.NonNullPair;
 
@@ -28,10 +30,10 @@ final class MaterialName {
 	String singular;
 	String plural;
 	int gender = 0;
-	private final int id;
-	final HashMap<NonNullPair<Short, Short>, NonNullPair<String, String>> names = new HashMap<NonNullPair<Short, Short>, NonNullPair<String, String>>();
+	private final Material id;
+	final HashMap<NonNullPair<Short, Short>, NonNullPair<String, String>> names = new HashMap<>();
 	
-	public MaterialName(final int id, final String singular, final String plural, final int gender) {
+	public MaterialName(final Material id, final String singular, final String plural, final int gender) {
 		this.id = id;
 		this.singular = singular;
 		this.plural = plural;
@@ -42,12 +44,12 @@ final class MaterialName {
 //		if (names == null)
 //			return p ? plural : singular;
 		@SuppressWarnings("null")
-		NonNullPair<String, String> s = names.get(new NonNullPair<Short, Short>(Short.valueOf(dataMin), Short.valueOf(dataMax)));
+		NonNullPair<String, String> s = names.get(new NonNullPair<>(Short.valueOf(dataMin), Short.valueOf(dataMax)));
 		if (s != null)
 			return p ? s.getSecond() : s.getFirst();
 		if (dataMin == -1 && dataMax == -1 || dataMin == 0 && dataMax == 0)
 			return p ? plural : singular;
-		s = names.get(new NonNullPair<Short, Short>((short) -1, (short) -1));
+		s = names.get(new NonNullPair<>((short) -1, (short) -1));
 		if (s != null)
 			return p ? s.getSecond() : s.getFirst();
 		return p ? plural : singular;
@@ -57,7 +59,7 @@ final class MaterialName {
 //		if (names == null)
 //			return p ? plural : singular;
 		@SuppressWarnings("null")
-		final NonNullPair<String, String> s = names.get(new NonNullPair<Short, Short>(Short.valueOf(dataMin), Short.valueOf(dataMax)));
+		final NonNullPair<String, String> s = names.get(new NonNullPair<>(Short.valueOf(dataMin), Short.valueOf(dataMax)));
 		if (s != null)
 			return p ? s.getSecond() : s.getFirst();
 		if (dataMin == -1 && dataMax == -1 || dataMin == 0 && dataMax == 0)

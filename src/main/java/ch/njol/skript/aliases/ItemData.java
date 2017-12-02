@@ -21,6 +21,7 @@ package ch.njol.skript.aliases;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.bukkit.Bukkit;
@@ -28,6 +29,9 @@ import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.variables.Variables;
@@ -47,6 +51,8 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	
 	@SuppressWarnings("null")
 	private static final UnsafeValues unsafe = Bukkit.getUnsafe();
+	
+	private static final Gson gson;
 	
 	/**
 	 * ItemStack, which is used for everything but serialization.
@@ -77,6 +83,10 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		this(data.type, data.tags);
 	}
 	
+	public ItemData() {
+		this(Material.AIR, "");
+	}
+	
 	public int getId() {
 		// Won't work with 1.13!
 		return type.getId();
@@ -86,17 +96,12 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 * Tests whether the given item is of this type.
 	 * 
 	 * @param item
-	 * @return Whether the given item is of this type. If <tt>item</tt> is <tt>null</tt> this returns <tt>getId() == 0</tt>.
+	 * @return Whether the given item is of this type.
 	 */
 	public boolean isOfType(final @Nullable ItemStack item) {
 		if (item == null)
 			return type == Material.AIR;
-		return isOfType(item.getTypeId(), item.getDurability());
-	}
-	
-	@Deprecated
-	public boolean isOfType(final int id, final short data) {
-		return (typeid == -1 || typeid == id) && (dataMin == -1 || dataMin <= data) && (dataMax == -1 || data <= dataMax);
+		return item.isSimilar(stack);
 	}
 	
 	@Deprecated
@@ -136,8 +141,7 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	
 	@Override
 	public int hashCode() {
-		// TODO
-		return (typeid * 31 + dataMin) * 31 + dataMax;
+		return stack.hashCode();
 	}
 	
 	/**
@@ -150,12 +154,17 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 */
 	@Nullable
 	public ItemData intersection(final ItemData other) {
-		if (other.dataMin != -1 && dataMin != -1 && (other.dataMax < dataMin || dataMax < other.dataMin) || other.typeid != -1 && typeid != -1 && other.typeid != typeid)
+		if (other.type != type) // Different type, no intersection possible
 			return null;
 		
-		return new ItemData(typeid == -1 ? other.typeid : typeid,
-				(short) Math.max(dataMin, other.dataMin),
-				dataMax == -1 ? other.dataMax : (other.dataMax == -1 ? dataMax : (short) Math.min(dataMax, other.dataMax)));
+		Map<String, Object> myTags = (Map<String, Object>) gson.fromJson(tags, Object.class);
+		Map<String, Object> theirTags = (Map<String, Object>) gson.fromJson(other.tags, Object.class);
+		Map<String, Object> commonTags = Maps.difference(myTags, theirTags).entriesInCommon();
+		if (commonTags.isEmpty()) // No intersection exists
+			return null;
+		
+		ItemData intersection = new ItemData(type, gson.toJson(commonTags));
+		return intersection;
 	}
 	
 	public ItemStack getRandom() {
