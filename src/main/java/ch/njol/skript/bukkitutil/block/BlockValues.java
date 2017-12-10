@@ -1,4 +1,4 @@
-/**
+/*
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,38 +13,27 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * Copyright 2011-2017 Peter Güttinger and contributors
+ * 
+ * 
+ * Copyright 2011-2016 Peter Güttinger and contributors
+ * 
  */
-package ch.njol.skript.aliases;
 
-import java.util.HashMap;
+package ch.njol.skript.bukkitutil.block;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 
-import ch.njol.skript.Skript;
-import ch.njol.util.NonNullPair;
-
-final class MaterialName {
-	String singular;
-	String plural;
-	int gender = 0;
-	Material id;
+/**
+ * Contains all data block has that is needed for comparisions.
+ */
+public abstract class BlockValues {
 	
-	public MaterialName(final Material id, final String singular, final String plural, final int gender) {
-		this.id = id;
-		this.singular = singular;
-		this.plural = plural;
-		this.gender = gender;
-	}
+	public abstract void setBlock(Block block, boolean applyPhysics);
 	
-	public String toString(boolean p) {
-		return p ? plural : singular;
-	}
+	public abstract boolean equals(BlockValues other);
 	
-	public String getDebugName(boolean p) {
-		// TODO more useful debug name wouldn't hurt
-		return p ? plural : singular;
-	}
+	@Override
+	public abstract int hashCode();
+	
 }

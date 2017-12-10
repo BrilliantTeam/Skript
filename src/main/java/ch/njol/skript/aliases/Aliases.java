@@ -65,10 +65,7 @@ public abstract class Aliases {
 	private final static boolean newPotions = Skript.isRunningMinecraft(1, 9);
 	
 	private final static AliasesProvider provider = new AliasesProvider();
-	
-	private final static HashMap<String, ItemType> getAliases() {
-		return Language.isUsingLocal() ? aliases_localised : aliases_english;
-	}
+	private static AliasesProvider localProvider = new AliasesProvider();
 	
 	@Nullable
 	private final static ItemType getAlias_i(final String s) {
@@ -167,42 +164,28 @@ public abstract class Aliases {
 	@SuppressWarnings("null")
 	private final static Pattern numberWordPattern = Pattern.compile("\\d+\\s+.+");
 	
-	/**
-	 * Gets the custom name of of a material, or the default if none is set.
-	 * 
-	 * @param id
-	 * @param data
-	 * @return The material's name
-	 */
-	public final static String getMaterialName(final int id, final short data, final boolean plural) {
-		return getMaterialName(id, data, data, plural);
-	}
-	
-	public final static String getDebugMaterialName(final int id, final short data, final boolean plural) {
-		return getDebugMaterialName(id, data, data, plural);
-	}
-	
-	public final static String getMaterialName(final int id, final short dataMin, final short dataMax, final boolean plural) {
-		final MaterialName n = getMaterialNames().get(Integer.valueOf(id));
-		if (n == null) {
-			return "" + id;
+	@SuppressWarnings("null")
+	public static final String getMaterialName(ItemData type, boolean plural) {
+		MaterialName name = provider.getMaterialName(type);
+		if (name == null) {
+			return "" + type.type;
 		}
-		return n.toString(dataMin, dataMax, plural);
+		return name.toString(plural);
 	}
 	
-	public final static String getDebugMaterialName(final int id, final short dataMin, final short dataMax, final boolean plural) {
-		final MaterialName n = getMaterialNames().get(Integer.valueOf(id));
+	public final static String getDebugMaterialName(ItemData type, boolean plural) {
+		final MaterialName n = provider.getMaterialName(type);
 		if (n == null) {
-			return "" + id + ":" + dataMin + (dataMax == dataMin ? "" : "-" + dataMax);
+			return "" + type.type;
 		}
-		return n.getDebugName(dataMin, dataMax, plural);
+		return n.getDebugName(plural);
 	}
 	
 	/**
 	 * @return The ietm's gender or -1 if no name is found
 	 */
-	public final static int getGender(final int id, final short dataMin, final short dataMax) {
-		final MaterialName n = getMaterialNames().get(Integer.valueOf(id));
+	public final static int getGender(ItemData item) {
+		final MaterialName n = provider.getMaterialName(item);
 		if (n != null)
 			return n.gender;
 		return -1;
@@ -212,9 +195,8 @@ public abstract class Aliases {
 	 * @return how many ids are missing an alias, including the 'any id' (-1)
 	 */
 	final static int addMissingMaterialNames() {
-		final HashMap<Integer, MaterialName> materialNames = getMaterialNames();
 		int r = 0;
-		final StringBuilder missing = new StringBuilder(m_missing_aliases + " ");
+		StringBuilder missing = new StringBuilder(m_missing_aliases + " ");
 		for (final Material m : Material.values()) {
 			if (materialNames.get(Integer.valueOf(m.getId())) == null) {
 				materialNames.put(Integer.valueOf(m.getId()), new MaterialName(m.getId(), "" + m.toString().toLowerCase().replace('_', ' '), "" + m.toString().toLowerCase().replace('_', ' '), 0));

@@ -45,6 +45,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.lang.Unit;
 import ch.njol.skript.localization.Adjective;
 import ch.njol.skript.localization.GeneralWords;
@@ -144,12 +145,12 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	
 	public ItemType() {}
 	
-	public ItemType(final int id) {
+	public ItemType(Material id) {
 		add_(new ItemData(id));
 	}
 	
-	public ItemType(final int id, final short data) {
-		add_(new ItemData(id, data));
+	public ItemType(Material id, String tags) {
+		add_(new ItemData(id, tags));
 	}
 	
 	public ItemType(final ItemData d) {
@@ -167,9 +168,10 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		}
 	}
 	
+	// TODO find a way to fix this; very hard to do sadly
 	public ItemType(final Block b) {
 //		amount = 1;
-		add_(new ItemData(b.getTypeId(), b.getData()));
+		add_(new ItemData(b.getType()));
 		// TODO metadata - spawners, skulls, etc.
 	}
 	
@@ -290,29 +292,33 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return true;
 	}
 	
-	public boolean isOfType(final @Nullable ItemStack item) {
+	public boolean isOfType(@Nullable ItemStack item) {
 		if (item == null)
-			return isOfType(0, (short) 0);
+			return isOfType(Material.AIR, null);
 		if (!hasMeta(item))
 			return false;
-		return isOfType(item.getTypeId(), item.getDurability());
+		return isOfType(new ItemData(item));
 	}
 	
-	public boolean isOfType(final @Nullable Block block) {
-		if (enchantments != null)
+	public boolean isOfType(@Nullable Block block) {
+		if (enchantments != null) // TODO verify what this means (and if it is still required)
 			return false;
 		if (block == null)
-			return isOfType(0, (short) 0);
-		return isOfType(block.getTypeId(), block.getData());
-		// TODO metadata
+			return isOfType(Material.AIR, null);
+		
+		return isOfType(new ItemData(block));
 	}
 	
-	public boolean isOfType(final int id, final short data) {
-		for (final ItemData type : types) {
-			if (type.isOfType(id, data))
+	public boolean isOfType(ItemData type) {
+		for (final ItemData myType : types) {
+			if (myType.equals(type))
 				return true;
 		}
 		return false;
+	}
+	
+	public boolean isOfType(Material id, @Nullable String tags) {
+		return isOfType(new ItemData(id, tags));
 	}
 	
 	public boolean isSupertypeOf(final ItemType other) {
@@ -372,7 +378,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	public boolean hasItem() {
 		for (final ItemData d : types) {
-			if (d.getId() > Skript.MAXBLOCKID)
+			if (!d.type.isBlock())
 				return true;
 		}
 		return false;
@@ -383,7 +389,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	public boolean hasBlock() {
 		for (final ItemData d : types) {
-			if (d.getId() <= Skript.MAXBLOCKID)
+			if (d.type.isBlock())
 				return true;
 		}
 		return false;
@@ -398,9 +404,9 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	public boolean setBlock(final Block block, final boolean applyPhysics) {
 		for (final ItemData d : types) {
-			if (d.typeid > Skript.MAXBLOCKID)
+			if (!d.type.isBlock()) // Ignore items which cannot be placed
 				continue;
-			if (BlockUtils.set(block, d.typeid, (byte) d.dataMin, (byte) d.dataMax, applyPhysics))
+			if (BlockUtils.set(block, d, applyPhysics))
 				return true;
 		}
 		return false;
@@ -445,7 +451,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	private void add_(final @Nullable ItemData type) {
 		if (type != null) {
 			types.add(type);
-			numItems += type.numItems();
+			//numItems += type.numItems();
 			modified();
 		}
 	}
@@ -454,7 +460,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		for (final ItemData type : types) {
 			if (type != null) {
 				this.types.add(type);
-				numItems += type.numItems();
+				//numItems += type.numItems();
 			}
 		}
 		modified();
@@ -462,14 +468,14 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	
 	public void remove(final ItemData type) {
 		if (types.remove(type)) {
-			numItems -= type.numItems();
+			//numItems -= type.numItems();
 			modified();
 		}
 	}
 	
 	void remove(final int index) {
 		final ItemData type = types.remove(index);
-		numItems -= type.numItems();
+		//numItems -= type.numItems();
 		modified();
 	}
 	
@@ -631,8 +637,8 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			return null;
 		int item = random.nextInt(numItems);
 		int i = -1;
-		while (item >= 0)
-			item -= types.get(++i).numItems();
+//		while (item >= 0)
+//			item -= types.get(++i).numItems();
 		final ItemStack is = types.get(i).getRandom();
 		is.setAmount(getAmount());
 		if (meta != null)
@@ -653,7 +659,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	public boolean hasSpace(final Inventory invi) {
 		if (!isAll()) {
-			if (getItem().types.size() != 1 || getItem().types.get(0).hasDataRange() || getItem().types.get(0).typeid == -1)
+			if (getItem().types.size() != 1)
 				return false;
 		}
 		return addTo(getStorageContents(invi));
@@ -1168,14 +1174,14 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	/**
-	 * Gets raw item names ("minecraft:some_item"). Works even if server doesn't support them,
-	 * since Bukkit API doesn't in any case.
+	 * Gets raw item names ("minecraft:some_item").
 	 * @return names
 	 */
 	public List<String> getRawNames() {
+		// TODO improve, as we now use raw names internally
 		List<String> rawNames = new ArrayList<>();
 		for (ItemData data : types) {
-			rawNames.add("minecraft:" + Material.getMaterial(data.typeid).toString().toLowerCase()
+			rawNames.add("minecraft:" + data.type.toString().toLowerCase()
 					.replace("leash", "lead") // Add hacky code here :)
 					.replace("wood", "planks")
 					);

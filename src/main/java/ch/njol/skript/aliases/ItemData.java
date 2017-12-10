@@ -27,12 +27,15 @@ import java.util.NoSuchElementException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
+import ch.njol.skript.bukkitutil.block.BlockCompat;
+import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.coll.CollectionUtils;
@@ -52,18 +55,20 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	@SuppressWarnings("null")
 	private static final UnsafeValues unsafe = Bukkit.getUnsafe();
 	
-	private static final Gson gson;
+	private static final Gson gson = new Gson();
 	
 	/**
 	 * ItemStack, which is used for everything but serialization.
 	 * It should be handled by underlying NMS stack that is probably
 	 * modified using UnsafeValues.
 	 */
+	@Nullable
 	transient ItemStack stack;
 	
 	/**
 	 * Tags for item in Mojangson (JSON) string representation.
 	 */
+	@Nullable
 	String tags;
 	
 	/**
@@ -71,7 +76,16 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 */
 	Material type;
 	
-	public ItemData(Material type, String tags) {
+	boolean isAnything;
+	
+	/**
+	 * When this ItemData represents a block, this contains information to
+	 * allow comparing it against other blocks.
+	 */
+	@Nullable
+	transient BlockValues blockValues;
+	
+	public ItemData(Material type, @Nullable String tags) {
 		this.type = type;
 		this.tags = tags;
 		
@@ -79,17 +93,29 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		unsafe.modifyItemStack(stack, tags);
 	}
 	
+	public ItemData(Material type) {
+		this.type = type;
+		
+		stack = new ItemStack(type);
+	}
+	
 	public ItemData(ItemData data) {
 		this(data.type, data.tags);
 	}
 	
-	public ItemData() {
-		this(Material.AIR, "");
+	public ItemData(ItemStack stack) {
+		this.stack = stack;
+		this.type = stack.getType();
 	}
 	
-	public int getId() {
-		// Won't work with 1.13!
-		return type.getId();
+	public ItemData(Block block) {
+		this.type = block.getType();
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(block);
+	}
+	
+	public ItemData() {
+		this.type = Material.AIR; // Fake type, but we have a good reason to not allow null there
+		this.isAnything = true;
 	}
 	
 	/**
@@ -98,15 +124,15 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 * @param item
 	 * @return Whether the given item is of this type.
 	 */
-	public boolean isOfType(final @Nullable ItemStack item) {
+	public boolean isOfType(@Nullable ItemStack item) {
 		if (item == null)
 			return type == Material.AIR;
 		return item.isSimilar(stack);
 	}
 	
-	@Deprecated
-	public boolean isSupertypeOf(final ItemData other) {
-		return (typeid == -1 || other.typeid == typeid) && (dataMin == -1 || dataMin <= other.dataMin) && (dataMax == -1 || dataMax >= other.dataMax);
+	public boolean isSupertypeOf(ItemData o) {
+		// TODO implement this; how?
+		return false;
 	}
 	
 	/**
@@ -114,19 +140,18 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 */
 	@Override
 	public String toString() {
-		// TODO aliases provider or something else?
-		return Aliases.getMaterialName(typeid, dataMin, dataMax, false);
+		return Aliases.getMaterialName(this, false);
 	}
 	
 	public String toString(final boolean debug, final boolean plural) {
-		return debug ? Aliases.getDebugMaterialName(typeid, dataMin, dataMax, plural) : Aliases.getMaterialName(typeid, dataMin, dataMax, plural);
+		return debug ? Aliases.getDebugMaterialName(this, plural) : Aliases.getMaterialName(this, plural);
 	}
 	
 	/**
 	 * @return The item's gender or -1 if no name is found
 	 */
 	public int getGender() {
-		return Aliases.getGender(typeid, dataMin, dataMax);
+		return Aliases.getGender(this);
 	}
 	
 	@Override
@@ -135,13 +160,39 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 			return true;
 		if (!(obj instanceof ItemData))
 			return false;
+		
 		final ItemData other = (ItemData) obj;
-		return other.type == type && other.tags == tags;
+		if (stack != null && other.stack != null) { // Stack check is possible
+			return stack.equals(other.stack);
+		}
+		if (other.type != type)
+			return false;
+		
+		if (blockValues != null) {
+			if (other.blockValues != null) {
+				return blockValues.equals(other.blockValues);
+			} else {
+				return true; // Type matched, and we have no more data to compare
+			}
+		} else if (tags != null) {
+			if (other.tags != null) {
+				return tags.equals(other.tags);
+			} else {
+				return true; // Type matched, and we have no more data to compare
+			}
+		}
+		
+		return true; // Types are same, no tags or block values
 	}
 	
 	@Override
 	public int hashCode() {
-		return stack.hashCode();
+		if (stack != null)
+			return stack.hashCode();
+		else if (blockValues != null)
+			return blockValues.hashCode() << 14 | type.hashCode();
+		else
+			return type.ordinal();
 	}
 	
 	/**
@@ -168,21 +219,15 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	}
 	
 	public ItemStack getRandom() {
-		int type = typeid;
-		if (type == -1) {
-			final Material m = CollectionUtils.getRandom(Material.values(), 1);
-			assert m != null;
-			type = m.getId();
+		Material m = type;
+		if (isAnything) { // Any material
+			m = CollectionUtils.getRandom(Material.values(), 1);
 		}
-		if (dataMin == -1 && dataMax == -1) {
-			return new ItemStack(type, 1);
-		} else {
-			return new ItemStack(type, 1, (short) (Utils.random(dataMin, dataMax + 1)));
-		}
+		return new ItemStack(type, 1);
 	}
 	
 	public Iterator<ItemStack> getAll() {
-		if (typeid == -1) {
+		if (isAnything) {
 			return new Iterator<ItemStack>() {
 				
 				@SuppressWarnings("null")
@@ -205,30 +250,8 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 				
 			};
 		}
-		if (dataMin == dataMax)
-			return new SingleItemIterator<ItemStack>(new ItemStack(typeid, 1, dataMin == -1 ? 0 : dataMin));
-		return new Iterator<ItemStack>() {
-			
-			private short data = dataMin;
-			
-			@Override
-			public boolean hasNext() {
-				return data <= dataMax;
-			}
-			
-			@Override
-			public ItemStack next() {
-				if (!hasNext())
-					throw new NoSuchElementException();
-				return new ItemStack(typeid, 1, data++);
-			}
-			
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-			
-		};
+		
+		return new SingleItemIterator<>(getRandom());
 	}
 	
 	@Override
@@ -236,12 +259,13 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		return new ItemData(this);
 	}
 	
-	public boolean hasDataRange() {
-		return dataMin != dataMax;
+	public Material getType() {
+		return type;
 	}
 	
-	public int numItems() {
-		return dataMax - dataMin + 1;
+	@Nullable
+	public BlockValues getBlockValues() {
+		return blockValues;
 	}
 	
 }

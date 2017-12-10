@@ -47,6 +47,7 @@ import ch.njol.skript.config.SectionNode;
 public class AliasesProvider {
 	
 	private Map<String, ItemType> aliases;
+	private Map<ItemData, MaterialName> materialNames;
 	
 	@SuppressWarnings("deprecation")
 	private UnsafeValues unsafe;
@@ -78,6 +79,7 @@ public class AliasesProvider {
 	
 	public AliasesProvider() {
 		aliases = new HashMap<>(3000);
+		materialNames = new HashMap<>(3000);
 		variations = new HashMap<>(500);
 		gson = new Gson();
 		
@@ -120,8 +122,11 @@ public class AliasesProvider {
 	public Variation parseVariation(String raw) {
 		int firstSpace = raw.indexOf(' ');
 		String id = raw.substring(0, firstSpace);
+		if (id.equals("-"))
+			id = null;
+		
 		String tags = raw.substring(firstSpace + 1);
-		if (id == null || tags == null) {
+		if (tags.isEmpty()) {
 			// TODO error reporting
 			return null;
 		}
@@ -232,7 +237,13 @@ public class AliasesProvider {
 					Map<String, Object> combinedTags = new HashMap<>(tags.size() + entry.getValue().getTags().size());
 					combinedTags.putAll(tags);
 					combinedTags.putAll(entry.getValue().getTags());
-					loadVariedAlias(entry.getKey(), id, combinedTags);
+					
+					String variedId = entry.getValue().getId();
+					if (variedId == null) {
+						variedId = id;
+					}
+					
+					loadVariedAlias(entry.getKey(), variedId, combinedTags);
 				}
 				
 				// Move to end of this variation
@@ -248,10 +259,15 @@ public class AliasesProvider {
 	
 	private void loadReadyAlias(String name, String id, Map<String, Object> tags) {
 		// Prepare and modify ItemStack (using somewhat Unsafe methods)
-		ItemStack stack = new ItemStack(Material.AIR);
+		ItemStack stack = new ItemStack(unsafe.getMaterialFromInternalName(id));
 		unsafe.modifyItemStack(stack, gson.toJson(tags));
 		
-		
+		// Construct the item type and put it to aliases
+		ItemData data = new ItemData(stack);
+		ItemType type = new ItemType(data);
+		aliases.put(name, type);
+
+		// Material names are filled elsewhere (TODO)
 	}
 
 	@Nullable
@@ -266,4 +282,8 @@ public class AliasesProvider {
 		return null;
 	}
 	
+	@Nullable
+	public MaterialName getMaterialName(ItemData type) {
+		return materialNames.get(type);
+	}
 }

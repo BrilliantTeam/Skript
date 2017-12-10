@@ -29,6 +29,8 @@ import org.bukkit.material.Directional;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemData;
+import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.util.coll.CollectionUtils;
 
 /**
@@ -95,6 +97,17 @@ public abstract class BlockUtils {
 			BlockFace.WEST, BlockFace.NORTH
 	};
 	
+	public static boolean set(Block block, ItemData type, boolean applyPhysics) {
+		BlockValues values = type.getBlockValues();
+		if (values != null)
+			values.setBlock(block, applyPhysics);
+		else
+			block.setType(type.getType(), applyPhysics);
+		
+		// TODO advanced features
+		return true;
+	}
+	
 	/**
 	 * @param b
 	 * @param type
@@ -103,6 +116,7 @@ public abstract class BlockUtils {
 	 * @param applyPhysics TODO add effect that sets block without physics checks
 	 * @return Whether the block could be set successfully
 	 */
+	// TODO remove after studying a bit more
 	public static boolean set(final Block b, final int type, byte dataMin, byte dataMax, final boolean applyPhysics) {
 		final boolean any = dataMin == -1 && dataMax == -1;
 		if (dataMin == -1)
