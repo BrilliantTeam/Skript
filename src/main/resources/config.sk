@@ -158,7 +158,7 @@ disable variable will not be saved warnings: false
 # By Mirre.
 
 disable variable missing and/or warnings: false
-#Disables the "List is missing 'and' or 'or', defaulting to 'and'" warning when reloading your script.
+# Disables the "List is missing 'and' or 'or', defaulting to 'and'" warning when reloading your script.
 
 soft api exceptions: false
 # Allows Skript to ignore certain actions which would normally result in thrown exceptions.
