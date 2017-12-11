@@ -103,7 +103,7 @@ public abstract class Functions {
 	
 	@SuppressWarnings("null")
 	private final static Pattern functionPattern = Pattern.compile("function (" + functionNamePattern + ")\\((.*)\\)(?: :: (.+))?", Pattern.CASE_INSENSITIVE),
-			paramPattern = Pattern.compile("\\s*(.+?)\\s*:\\s*(.+?)(?:\\s*=\\s*(.+))?\\s*");
+			paramPattern = Pattern.compile("\\s*(.+?)\\s*:(?=[^:]*$)\\s*(.+?)(?:\\s*=\\s*(.+))?\\s*");
 	
 	/**
 	 * Loads a function from given node.
