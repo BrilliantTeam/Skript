@@ -47,8 +47,8 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class EffKill extends Effect {
 	static {
-		Skript.registerEffect(EffKill.class, "kill %entities%",
-																				 "kill %entities% without drops");
+		Skript.registerEffect(EffKill.class, "kill %entities%", 
+				      "kill %entities% without drops");
 	}
 	
 	// Absolutely make sure it dies
