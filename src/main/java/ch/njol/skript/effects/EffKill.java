@@ -47,7 +47,8 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class EffKill extends Effect {
 	static {
-		Skript.registerEffect(EffKill.class, "kill %entities%");
+		Skript.registerEffect(EffKill.class, "kill %entities%",
+																				 "kill %entities% without drops");
 	}
 	
 	// Absolutely make sure it dies
@@ -55,23 +56,28 @@ public class EffKill extends Effect {
 	
 	@SuppressWarnings("null")
 	private Expression<Entity> entities;
+	private boolean withoutDrops;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		entities = (Expression<Entity>) vars[0];
+		withoutDrops = matchedPattern == 1;
 		return true;
 	}
 	
 	@Override
 	protected void execute(final Event e) {
 		for (Entity entity : entities.getArray(e)) {
-			if (entity instanceof EnderDragonPart){
+
+ 
+			if (entity instanceof EnderDragonPart) {
 				entity = ((EnderDragonPart) entity).getParent();
 			}
-			
+
 			// Some entities cannot take damage but should be killable
-			if ((entity instanceof ArmorStand || entity instanceof Vehicle || entity instanceof EnderDragon || entity instanceof Pig) && !(entity instanceof Damageable)) {
+			if (withoutDrops || (entity instanceof Vehicle && !(entity instanceof Pig || entity instanceof AbstractHorse)) 
+				|| entity instanceof ArmorStand || entity instanceof EnderDragon || !(entity instanceof Damageable)) {
 				entity.remove(); // Got complaints in issue tracker, so this is possible... Not sure if good idea, though!
 			} else if (entity instanceof Damageable) {
 				final boolean creative = entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE;
@@ -89,7 +95,7 @@ public class EffKill extends Effect {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "kill " + entities.toString(e, debug);
+		return "kill " + entities.toString(e, debug) + (withoutDrops ? " without drops" : "");
 	}
 	
 }
