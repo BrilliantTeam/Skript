@@ -40,11 +40,13 @@ import ch.njol.util.Kleenean;
  */
 @Name("Kill")
 @Description({"Kills an entity.",
-		"Note: This effect does not set the entitie's health to 0 (which causes issues), but damages the entity by 100 times its maximum health."})
+		"Note: This effect does not set the entitie's health to 0 (which causes issues), but damages the entity by 100 times its maximum health."
+		"Note 2: The kill without drops effect does more than just remove the drops, be careful when using it."})
 @Examples({"kill the player",
 		"kill all creepers in the player's world",
-		"kill all endermen, witches and bats"})
-@Since("1.0")
+		"kill all endermen, witches and bats",
+		"kill all slimes without drops"})
+@Since("1.0, 2.2-dev33 (without drops)")
 public class EffKill extends Effect {
 	static {
 		Skript.registerEffect(EffKill.class, "kill %entities%", 
