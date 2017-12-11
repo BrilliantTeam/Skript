@@ -36,6 +36,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.Time;
+import ch.njol.skript.util.Timeperiod;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -79,7 +80,7 @@ public class ExprTime extends PropertyExpression<World, Time> {
 			case REMOVE:
 				return CollectionUtils.array(Timespan.class);
 			case SET:
-				return CollectionUtils.array(Time.class);
+				return CollectionUtils.array(Time.class, Timeperiod.class);
 			case DELETE:
 			case REMOVE_ALL:
 			case RESET:
@@ -95,9 +96,9 @@ public class ExprTime extends PropertyExpression<World, Time> {
 		switch (mode) {
 			case SET:
 				assert delta != null;
-				final Time time = (Time) delta[0];
+				final int time = delta[0] instanceof Time ? ((Time) delta[0]).getTicks() : ((Timeperiod) delta[0]).start;
 				for (final World w : worlds) {
-					w.setTime(time.getTicks());
+					w.setTime(time);
 				}
 				break;
 			case REMOVE:
