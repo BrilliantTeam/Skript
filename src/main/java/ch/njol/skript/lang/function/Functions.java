@@ -168,7 +168,7 @@ public abstract class Functions {
 				final Matcher n = paramPattern.matcher(arg);
 				if (!n.matches())
 					return signError("The " + StringUtils.fancyOrderNumber(params.size() + 1) + " argument's definition is invalid. It should look like 'name: type' or 'name: type = default value'.");
-				final String paramName = "" + n.group(1);
+				final String paramName = "" + (n.group(1).endsWith("*") ? n.group(1).substring(0, n.group(1).length() - 3) : n.group(1));
 				for (final Parameter<?> p : params) {
 					if (p.name.toLowerCase(Locale.ENGLISH).equals(paramName.toLowerCase(Locale.ENGLISH)))
 						return signError("Each argument's name must be unique, but the name '" + paramName + "' occurs at least twice.");
