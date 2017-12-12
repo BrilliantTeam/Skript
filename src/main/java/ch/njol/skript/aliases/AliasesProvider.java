@@ -198,16 +198,30 @@ public class AliasesProvider {
 	
 	private void loadAlias(String name, String data) {
 		List<String> patterns = parseKeyPattern(name);
-		int firstSpace = data.indexOf(' ');
-		String id = data.substring(0, firstSpace);
-		Map<String, Object> tags = parseMojangson(data.substring(firstSpace + 1));
 		
-		for (String p : patterns) {
-			loadVariedAlias(name, id, tags);
+		for (String item : data.split(",")) { // All aliases may be lists of items or just other aliases
+			item = item.trim(); // These could mess up following check among other things
+			int firstSpace = item.indexOf(' ');
+			
+			String id; // Id or alias
+			Map<String, Object> tags;
+			if (firstSpace == -1) {
+				id = item;
+				tags = null;
+			} else {
+				id = item.substring(0, firstSpace);
+				tags = parseMojangson(item.substring(firstSpace + 1));
+			}
+			assert id != null;
+			
+			for (String p : patterns) {
+				assert p != null; // No nulls in this list
+				loadVariedAlias(p, id, tags);
+			}
 		}
 	}
 	
-	private void loadVariedAlias(String name, String id, Map<String, Object> tags) {
+	private void loadVariedAlias(String name, String id, @Nullable Map<String, Object> tags) {
 		// Find {variations}
 		boolean hasVariations = false;
 		for (int i = 0; i < name.length(); i++) {
@@ -234,9 +248,14 @@ public class AliasesProvider {
 				
 				// Iterate over variations
 				for (Entry<String, Variation> entry : vars.entrySet()) {
-					Map<String, Object> combinedTags = new HashMap<>(tags.size() + entry.getValue().getTags().size());
-					combinedTags.putAll(tags);
-					combinedTags.putAll(entry.getValue().getTags());
+					Map<String, Object> combinedTags;
+					if (tags != null) {
+						combinedTags = new HashMap<>(tags.size() + entry.getValue().getTags().size());
+						combinedTags.putAll(tags);
+						combinedTags.putAll(entry.getValue().getTags());
+					} else {
+						combinedTags = entry.getValue().getTags();
+					}
 					
 					String variedId = entry.getValue().getId();
 					if (variedId == null) {
@@ -257,15 +276,23 @@ public class AliasesProvider {
 		}
 	}
 	
-	private void loadReadyAlias(String name, String id, Map<String, Object> tags) {
+	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags) {
 		// Prepare and modify ItemStack (using somewhat Unsafe methods)
 		ItemStack stack = new ItemStack(unsafe.getMaterialFromInternalName(id));
-		unsafe.modifyItemStack(stack, gson.toJson(tags));
+		if (tags != null) {
+			unsafe.modifyItemStack(stack, gson.toJson(tags));
+		}
 		
-		// Construct the item type and put it to aliases
+		// Check if there is item type already, create otherwise
+		ItemType type = aliases.get(name);
+		if (type == null) {
+			type = new ItemType();
+			aliases.put(name, type);
+		}
+		
+		// Construct the item data and put it to type
 		ItemData data = new ItemData(stack);
-		ItemType type = new ItemType(data);
-		aliases.put(name, type);
+		type.add(data);
 
 		// Material names are filled elsewhere (TODO)
 	}

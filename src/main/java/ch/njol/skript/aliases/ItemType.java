@@ -79,7 +79,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	/**
 	 * Note to self: use {@link #add_(ItemData)} to add item datas, don't add them directly to this list.
 	 */
-	final ArrayList<ItemData> types = new ArrayList<>();
+	final List<ItemData> types = new ArrayList<>();
 	
 	private boolean all = false;
 	
