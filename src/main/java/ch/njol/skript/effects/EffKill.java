@@ -46,11 +46,11 @@ import ch.njol.util.Kleenean;
 		"kill all creepers in the player's world",
 		"kill all endermen, witches and bats",
 		"kill all slimes without drops"})
-@Since("1.0, 2.2-dev33 (without drops)")
+@Since("1.0, 2.2-dev33 (erase entities)")
 public class EffKill extends Effect {
 	static {
 		Skript.registerEffect(EffKill.class, "kill %entities%", 
-				      "kill %entities% without drops");
+				      "(erase|wipe) %entities%");
 	}
 	
 	// Absolutely make sure it dies
@@ -58,13 +58,17 @@ public class EffKill extends Effect {
 	
 	@SuppressWarnings("null")
 	private Expression<Entity> entities;
-	private boolean withoutDrops;
+	private boolean erase;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		entities = (Expression<Entity>) vars[0];
-		withoutDrops = matchedPattern == 1;
+		erase = matchedPattern == 1;
+
+		if (erase && Player.class.isAssignableFrom(entities.getReturnType())) {
+			Skript.warning("Erasing a player might cause unintended behaviors, be careful about it.");
+		}
 		return true;
 	}
 	
@@ -76,9 +80,8 @@ public class EffKill extends Effect {
 			if (entity instanceof EnderDragonPart) {
 				entity = ((EnderDragonPart) entity).getParent();
 			}
-
 			// Some entities cannot take damage but should be killable
-			if (withoutDrops || (entity instanceof Vehicle && !(entity instanceof Pig || entity instanceof AbstractHorse)) 
+			if (erase || (entity instanceof Vehicle && !(entity instanceof Pig || entity instanceof AbstractHorse)) 
 				|| entity instanceof ArmorStand || entity instanceof EnderDragon || !(entity instanceof Damageable)) {
 				entity.remove(); // Got complaints in issue tracker, so this is possible... Not sure if good idea, though!
 			} else if (entity instanceof Damageable) {
@@ -97,7 +100,7 @@ public class EffKill extends Effect {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "kill " + entities.toString(e, debug) + (withoutDrops ? " without drops" : "");
+		return "kill " + entities.toString(e, debug) + (erase ? " without drops" : "");
 	}
 	
 }
