@@ -38,14 +38,14 @@ import ch.njol.util.Kleenean;
 /**
  * @author Peter Güttinger
  */
-@Name("Kill")
-@Description({"Kills an entity.",
+@Name("Kill/Erase")
+@Description({"Kills/Erases an entity.",
 		"Note: This effect does not set the entitie's health to 0 (which causes issues), but damages the entity by 100 times its maximum health.",
-		"Note 2: The kill without drops effect does more than just remove the drops, be careful when using it."})
+		"Note 2: The erase entities effect will execute the Entity#remove method which isn't the same as killing the entity, be careful when using it."})
 @Examples({"kill the player",
 		"kill all creepers in the player's world",
 		"kill all endermen, witches and bats",
-		"kill all slimes without drops"})
+		"erase all slimes"})
 @Since("1.0, 2.2-dev33 (erase entities)")
 public class EffKill extends Effect {
 	static {
@@ -100,7 +100,7 @@ public class EffKill extends Effect {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "kill " + entities.toString(e, debug) + (erase ? " without drops" : "");
+		return erase ? "erase" : "kill" + entities.toString(e, debug);
 	}
 	
 }
