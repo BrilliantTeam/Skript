@@ -198,19 +198,15 @@ public abstract class Aliases {
 		int r = 0;
 		StringBuilder missing = new StringBuilder(m_missing_aliases + " ");
 		for (final Material m : Material.values()) {
-			if (materialNames.get(Integer.valueOf(m.getId())) == null) {
-				materialNames.put(Integer.valueOf(m.getId()), new MaterialName(m.getId(), "" + m.toString().toLowerCase().replace('_', ' '), "" + m.toString().toLowerCase().replace('_', ' '), 0));
+			assert m != null;
+			ItemData data = new ItemData(m);
+			if (provider.getMaterialName(data) == null) { // Material name is missing
+				provider.setMaterialName(data, new MaterialName(m, "" + m.toString().toLowerCase().replace('_', ' '), "" + m.toString().toLowerCase().replace('_', ' '), 0));
 				missing.append(m.getId() + ", ");
 				r++;
 			}
 		}
-		final MaterialName m = materialNames.get(Integer.valueOf(-1));
-		if (m == null) {
-			materialNames.put(Integer.valueOf(-1), new MaterialName(-1, Language.get("aliases.anything"), Language.get("aliases.anything"), 0));
-			missing.append("<any>, ");
-			r++;
-		}
-		if (r > 0)
+		if (r > 0) // Give a warning about missing aliases we just worked around
 			Skript.warning("" + missing.substring(0, missing.length() - 2));
 		return r;
 	}

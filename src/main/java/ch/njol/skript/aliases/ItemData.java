@@ -76,6 +76,9 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 */
 	Material type;
 	
+	/**
+	 * If this represents all possible items.
+	 */
 	boolean isAnything;
 	
 	/**
@@ -91,12 +94,17 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		
 		stack = new ItemStack(type);
 		unsafe.modifyItemStack(stack, tags);
+		assert stack != null; // Yeah nope; modifyItemStack is not THAT Unsafe
+		
+		// Initialize block values with a terrible hack
+		blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 	}
 	
 	public ItemData(Material type) {
 		this.type = type;
 		
 		stack = new ItemStack(type);
+		blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 	}
 	
 	public ItemData(ItemData data) {
@@ -106,6 +114,7 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	public ItemData(ItemStack stack) {
 		this.stack = stack;
 		this.type = stack.getType();
+		blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 	}
 	
 	public ItemData(Block block) {

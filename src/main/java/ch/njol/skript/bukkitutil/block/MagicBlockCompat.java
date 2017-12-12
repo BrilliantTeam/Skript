@@ -23,6 +23,7 @@ package ch.njol.skript.bukkitutil.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Block compatibility implemented with magic numbers. No other choice until
@@ -41,6 +42,13 @@ public class MagicBlockCompat implements BlockCompat {
 			this.data = block.getData(); // Some black magic here, please look away...
 		}
 		
+		@SuppressWarnings("deprecation")
+		public MagicBlockValues(ItemStack stack) {
+			this.id = stack.getType();
+			this.data = stack.getData().getData(); // And terrible hack again
+		}
+
+		@SuppressWarnings("deprecation")
 		@Override
 		public void setBlock(Block block, boolean applyPhysics) {
 			block.setType(id);
@@ -67,6 +75,11 @@ public class MagicBlockCompat implements BlockCompat {
 	@Override
 	public BlockValues getBlockValues(Block block) {
 		return new MagicBlockValues(block);
+	}
+
+	@Override
+	public BlockValues getBlockValues(ItemStack stack) {
+		return new MagicBlockValues(stack);
 	}
 	
 }

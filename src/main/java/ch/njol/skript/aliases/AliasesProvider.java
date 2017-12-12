@@ -286,4 +286,8 @@ public class AliasesProvider {
 	public MaterialName getMaterialName(ItemData type) {
 		return materialNames.get(type);
 	}
+
+	public void setMaterialName(ItemData data, MaterialName materialName) {
+		materialNames.put(data, materialName);
+	}
 }

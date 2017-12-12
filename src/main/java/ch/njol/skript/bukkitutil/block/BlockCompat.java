@@ -22,6 +22,7 @@
 package ch.njol.skript.bukkitutil.block;
 
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Methods which operate with blocks but are not compatible across some
@@ -35,10 +36,18 @@ public interface BlockCompat {
 	static final BlockCompat INSTANCE = new MagicBlockCompat();
 	
 	/**
-	 * Gets block value from a block. The value can be compared to other values
+	 * Gets block values from a block. The value can be compared to other values
 	 * if needed, but cannot be used to retrieve any other data.
 	 * @param block Block to retrieve value from.
-	 * @return Block value
+	 * @return Block values.
 	 */
 	BlockValues getBlockValues(Block block);
+
+	/**
+	 * Gets block values from a item stack. The value can be compared to other values
+	 * if needed, but cannot be used to retrieve any other data.
+	 * @param stack Item that would be placed as the block
+	 * @return Block values.
+	 */
+	BlockValues getBlockValues(ItemStack stack);
 }
