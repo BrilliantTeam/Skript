@@ -40,7 +40,7 @@ import ch.njol.util.Kleenean;
  */
 @Name("Kill")
 @Description({"Kills an entity.",
-		"Note: This effect does not set the entitie's health to 0 (which causes issues), but damages the entity by 100 times its maximum health."
+		"Note: This effect does not set the entitie's health to 0 (which causes issues), but damages the entity by 100 times its maximum health.",
 		"Note 2: The kill without drops effect does more than just remove the drops, be careful when using it."})
 @Examples({"kill the player",
 		"kill all creepers in the player's world",
