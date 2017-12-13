@@ -72,7 +72,6 @@ import ch.njol.skript.localization.Message;
 import ch.njol.skript.log.BukkitLoggerFilter;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
-import ch.njol.skript.mirre.FilterPrintStream;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Utils;
@@ -172,33 +171,13 @@ public abstract class Commands {
 				return;
 			if (SkriptConfig.enableEffectCommands.value() && e.getCommand().startsWith(SkriptConfig.effectCommandToken.value())) {
 				if (handleEffectCommand(e.getSender(), e.getCommand())) {
-					e.setCommand("");
-					suppressUnknownCommandMessage = true;
+					e.setCancelled(true);
 				}
 				return;
-			}
-			if (handleCommand(e.getSender(), e.getCommand())) {
-				e.setCommand("");
-				suppressUnknownCommandMessage = true;
 			}
 		}
 	};
 	
-	public static boolean suppressUnknownCommandMessage = false;
-	static {
-		BukkitLoggerFilter.addFilter(new Filter() {
-			@Override
-			public boolean isLoggable(final @Nullable LogRecord record) {
-				if (record == null)
-					return false;
-				if (suppressUnknownCommandMessage && record.getMessage() != null && record.getMessage().startsWith("Unknown command. Type")) {
-					suppressUnknownCommandMessage = false;
-					return false;
-				}
-				return true;
-			}
-		});
-	}
 	
 	@Nullable
 	private final static Listener pre1_3chatListener = Skript.classExists("org.bukkit.event.player.AsyncPlayerChatEvent") ? null : new Listener() {
