@@ -106,7 +106,6 @@ import ch.njol.skript.log.LogEntry;
 import ch.njol.skript.log.LogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.log.Verbosity;
-import ch.njol.skript.mirre.FilterPrintStream;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.registrations.Converters;
@@ -237,7 +236,6 @@ public final class Skript extends JavaPlugin implements Listener {
 			return;
 		}
 		
-		//System.setOut(new FilterPrintStream(System.out));
 		
 		ChatMessages.registerListeners();
 		Language.loadDefault(getAddonInstance());
