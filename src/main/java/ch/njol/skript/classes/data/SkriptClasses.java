@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import ch.njol.skript.Skript;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -880,38 +881,39 @@ public class SkriptClasses {
 						}
 					}
 				}));
-		
-		Classes.registerClass(new ClassInfo<>(VisualEffect.class, "visualeffect")
-				.name("Visual Effect")
-				.description("A visible effect, e.g. particles.")
-				.examples("show wolf hearts on the clicked wolf",
-						"play mob spawner flames at the targeted block to the player")
-				.usage(VisualEffect.getAllNames())
-				.since("2.1")
-				.user("(visual|particle) effects?")
-				.parser(new Parser<VisualEffect>() {
-					@Override
-					@Nullable
-					public VisualEffect parse(final String s, final ParseContext context) {
-						return VisualEffect.parse(s);
-					}
-					
-					@Override
-					public String toString(final VisualEffect e, final int flags) {
-						return e.toString(flags);
-					}
-					
-					@Override
-					public String toVariableNameString(final VisualEffect e) {
-						return e.toString();
-					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return ".*";
-					}
-				})
-				.serializer(new YggdrasilSerializer<VisualEffect>()));
+		if (!Skript.isRunningMinecraft(1, 8)) {
+			Classes.registerClass(new ClassInfo<>(VisualEffect.class, "visualeffect")
+					.name("Visual Effect")
+					.description("A visible effect, e.g. particles.")
+					.examples("show wolf hearts on the clicked wolf",
+							"play mob spawner flames at the targeted block to the player")
+					.usage(VisualEffect.getAllNames())
+					.since("2.1")
+					.user("(visual|particle) effects?")
+					.parser(new Parser<VisualEffect>() {
+						@Override
+						@Nullable
+						public VisualEffect parse(final String s, final ParseContext context) {
+							return VisualEffect.parse(s);
+						}
+
+						@Override
+						public String toString(final VisualEffect e, final int flags) {
+							return e.toString(flags);
+						}
+
+						@Override
+						public String toVariableNameString(final VisualEffect e) {
+							return e.toString();
+						}
+
+						@Override
+						public String getVariableNamePattern() {
+							return ".*";
+						}
+					})
+					.serializer(new YggdrasilSerializer<VisualEffect>()));
+		}
 	}
 	
 }
