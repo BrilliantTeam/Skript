@@ -169,7 +169,6 @@ public abstract class Functions {
 				if (!n.matches())
 					return signError("The " + StringUtils.fancyOrderNumber(params.size() + 1) + " argument's definition is invalid. It should look like 'name: type' or 'name: type = default value'.");
 				final String paramName = "" + n.group(1);
-				String rParamName = paramName.endsWith("*") ? paramName.substring(0, paramName.length() - 1) + "1" : paramName;
 				for (final Parameter<?> p : params) {
 					if (p.name.toLowerCase(Locale.ENGLISH).equals(paramName.toLowerCase(Locale.ENGLISH)))
 						return signError("Each argument's name must be unique, but the name '" + paramName + "' occurs at least twice.");
@@ -181,7 +180,9 @@ public abstract class Functions {
 					c = Classes.getClassInfoFromUserInput(pl.getFirst());
 				if (c == null)
 					return signError("Cannot recognise the type '" + n.group(2) + "'");
-				final Parameter<?> p = Parameter.newInstance(rParamName, c, !paramName.endsWith("*") ? pl.getSecond() : !pl.getSecond(), n.group(3));
+				String rParamName = paramName.endsWith("*") ? paramName.substring(0, paramName.length() - 3) +
+									(!pl.getSecond() ? "::1" : "") : paramName;
+				final Parameter<?> p = Parameter.newInstance(rParamName, c, !pl.getSecond(), n.group(3));
 				if (p == null)
 					return null;
 				params.add(p);
