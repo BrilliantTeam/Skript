@@ -38,19 +38,16 @@ import ch.njol.util.Kleenean;
 /**
  * @author Peter Güttinger
  */
-@Name("Kill/Erase")
-@Description({"Kills/Erases an entity.",
-		"Note: This effect does not set the entitie's health to 0 (which causes issues), but damages the entity by 100 times its maximum health.",
-		"Note 2: The erase entities effect will execute the Entity#remove method which isn't the same as killing the entity, be careful when using it."})
+@Name("Kill")
+@Description({"Kills an entity.",
+		"Note: This effect does not set the entitie's health to 0 (which causes issues), but damages the entity by 100 times its maximum health."})
 @Examples({"kill the player",
 		"kill all creepers in the player's world",
-		"kill all endermen, witches and bats",
-		"erase all slimes"})
-@Since("1.0, 2.2-dev33 (erase entities)")
+		"kill all endermen, witches and bats"})
+@Since("1.0")
 public class EffKill extends Effect {
 	static {
-		Skript.registerEffect(EffKill.class, "kill %entities%", 
-				      "(erase|wipe) %entities%");
+		Skript.registerEffect(EffKill.class, "kill %entities%");
 	}
 	
 	// Absolutely make sure it dies
@@ -64,11 +61,6 @@ public class EffKill extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		entities = (Expression<Entity>) vars[0];
-		erase = matchedPattern == 1;
-
-		if (erase && Player.class.isAssignableFrom(entities.getReturnType())) {
-			Skript.warning("Erasing a player might cause unintended behaviors, be careful about it.");
-		}
 		return true;
 	}
 	
@@ -81,7 +73,7 @@ public class EffKill extends Effect {
 				entity = ((EnderDragonPart) entity).getParent();
 			}
 			// Some entities cannot take damage but should be killable
-			if (erase || (entity instanceof Vehicle && !(entity instanceof Pig || entity instanceof AbstractHorse)) 
+			if ((entity instanceof Vehicle && !(entity instanceof Pig || entity instanceof AbstractHorse)) 
 				|| entity instanceof ArmorStand || entity instanceof EnderDragon || !(entity instanceof Damageable)) {
 				entity.remove(); // Got complaints in issue tracker, so this is possible... Not sure if good idea, though!
 			} else if (entity instanceof Damageable) {
@@ -100,7 +92,7 @@ public class EffKill extends Effect {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return erase ? "erase" : "kill" + entities.toString(e, debug);
+		return "kill" + entities.toString(e, debug);
 	}
 	
 }
