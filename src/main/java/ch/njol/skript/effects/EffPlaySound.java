@@ -76,12 +76,17 @@ public class EffPlaySound extends Effect {
 	@Override
 	protected void execute(Event e) {
 		Location l = location.getSingle(e);
-
+		Sound soundEnum = null;
 		String s = sound.getSingle(e);
+
 		if (s != null) {
 			float vol = volume != null ? volume.getSingle(e).floatValue() : 0;
 			float pi = pitch != null ? pitch.getSingle(e).floatValue() : 0;
-			Sound soundEnum = Sound.valueOf(s.toUpperCase(Locale.ENGLISH));
+
+			try {
+				soundEnum = Sound.valueOf(s.toUpperCase(Locale.ENGLISH));
+			} catch(IllegalArgumentException e1) {}
+
 			if (players != null) {
 				if (soundEnum == null) {
 					for (Player p : players.getAll(e)) {
