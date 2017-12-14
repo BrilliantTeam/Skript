@@ -881,7 +881,7 @@ public class SkriptClasses {
 						}
 					}
 				}));
-		if (!Skript.isRunningMinecraft(1, 8)) {
+		if (Skript.classExists("org.bukkit.Particle")) {
 			Classes.registerClass(new ClassInfo<>(VisualEffect.class, "visualeffect")
 					.name("Visual Effect")
 					.description("A visible effect, e.g. particles.")
