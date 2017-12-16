@@ -74,7 +74,11 @@ public class JavaClasses {
 							return Long.valueOf(s);
 						} catch (final NumberFormatException e) {}
 						try {
-							return s.endsWith("%") ? Double.parseDouble(s.substring(0, s.length() - 1)) / 100 : Double.parseDouble(s);
+							Double d = s.endsWith("%") ? Double.parseDouble(s.substring(0, s.length() - 1)) / 100 : Double.parseDouble(s);
+							if (d.isNaN() || d.isInfinite()) {
+								return null;
+							}
+							return d;
 						} catch (final NumberFormatException e) {
 							return null;
 						}
