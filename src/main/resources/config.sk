@@ -157,6 +157,9 @@ disable variable will not be saved warnings: false
 # Disables the "... i.e contents cannot be saved ..." warning when reloading and something in your scripts sets a variable(non local) to a value that is not serializable.
 # By Mirre.
 
+disable variable missing and/or warnings: false
+# Disables the "List is missing 'and' or 'or', defaulting to 'and'" warning when reloading your script.
+
 soft api exceptions: false
 # Allows Skript to ignore certain actions which would normally result in thrown exceptions.
 # If everything works correctly, you should keep this option disabled. It might cause problems in some cases.
