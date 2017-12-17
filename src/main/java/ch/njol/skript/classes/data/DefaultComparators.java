@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Objects;
 
+import ch.njol.util.Kleenean;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -89,10 +90,18 @@ public class DefaultComparators {
 			public Relation compare(final Number n1, final Number n2) {
 				if (n1 instanceof Long && n2 instanceof Long)
 					return Relation.get(n1.longValue() - n2.longValue());
-				final double diff = n1.doubleValue() - n2.doubleValue();
-				if (Math.abs(diff) < Skript.EPSILON)
-					return Relation.EQUAL;
-				return Relation.get(diff);
+				Double d1 = n1.doubleValue(),
+					   d2 = n2.doubleValue();
+				if (d1.isNaN() || d2.isNaN()) {
+					return Relation.SMALLER;
+				} else if (d1.isInfinite() || d2.isInfinite()) {
+					return d1 > d2 ? Relation.GREATER : d1 < d2 ? Relation.SMALLER : Relation.EQUAL;
+				} else {
+					final double diff = d1 - d2;
+					if (Math.abs(diff) < Skript.EPSILON)
+						return Relation.EQUAL;
+					return Relation.get(diff);
+				}
 			}
 			
 			@Override
