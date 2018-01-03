@@ -391,11 +391,16 @@ public abstract class Aliases {
 	}
 	
 	public static void clear() {
-		
+		provider.clearAliases();
 	}
 	
 	public static void load() {
 		File aliasesFolder = new File(Skript.getInstance().getDataFolder(), "aliases");
+		try {
+			loadDirectory(aliasesFolder);
+		} catch (IOException e) {
+			Skript.exception(e);
+		}
 	}
 	
 	public static void loadDirectory(File dir) throws IOException {

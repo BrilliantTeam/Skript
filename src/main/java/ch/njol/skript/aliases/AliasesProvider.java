@@ -299,13 +299,12 @@ public class AliasesProvider {
 
 	@Nullable
 	public ItemType getAlias(String alias) {
-		// TODO Auto-generated method stub
-		return null;
+		return aliases.get(alias);
 	}
 
 	@Nullable
 	public ItemType getForMinecraftId(String id) {
-		// TODO Auto-generated method stub
+		// TODO forgot what this method would be used for
 		return null;
 	}
 	
