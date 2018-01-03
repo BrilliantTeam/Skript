@@ -317,4 +317,10 @@ public class AliasesProvider {
 	public void setMaterialName(ItemData data, MaterialName materialName) {
 		materialNames.put(data, materialName);
 	}
+
+	public void clearAliases() {
+		aliases.clear();
+		materialNames.clear();
+		variations.clear();
+	}
 }
