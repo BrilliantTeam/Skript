@@ -45,7 +45,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemData.OldItemData;
 import ch.njol.skript.bukkitutil.block.BlockValues;
+import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.lang.Unit;
 import ch.njol.skript.localization.Adjective;
 import ch.njol.skript.localization.GeneralWords;
@@ -67,6 +69,43 @@ import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 @SuppressWarnings("deprecation")
 public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>, YggdrasilExtendedSerializable {
 	
+	/**
+	 * Uses default behavior to serialize data. However, when deserializing,
+	 * old data will be automatically updated.
+	 */
+	public static class ItemTypeSerializer extends Serializer<ItemType> {
+
+		@Override
+		public Fields serialize(ItemType o) throws NotSerializableException {
+			Fields f = new Fields(o);
+			return f;
+		}
+
+		@Override
+		public void deserialize(ItemType o, Fields f) throws StreamCorruptedException, NotSerializableException {
+			f.setFields(o);
+			
+			// Legacy data (before aliases rework) update
+			if (o.types.get(0).getClass().equals(OldItemData.class)) { // Sorry generics :)
+				for (Object d : o.types) {
+					OldItemData old = (OldItemData) d;
+					// TODO
+				}
+			}
+		}
+
+		@Override
+		public boolean mustSyncDeserialization() {
+			return false;
+		}
+
+		@Override
+		protected boolean canBeInstantiated() {
+			return true;
+		}
+		
+	}
+	
 	private final static Message m_named = new Message("aliases.named");
 	
 	// 1.4.5
@@ -79,7 +118,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	/**
 	 * Note to self: use {@link #add_(ItemData)} to add item datas, don't add them directly to this list.
 	 */
-	final List<ItemData> types = new ArrayList<>();
+	final ArrayList<ItemData> types = new ArrayList<>();
 	
 	private boolean all = false;
 	
@@ -143,7 +182,9 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		}
 	}
 	
-	public ItemType() {}
+	public ItemType() {
+		
+	}
 	
 	public ItemType(Material id) {
 		add_(new ItemData(id));

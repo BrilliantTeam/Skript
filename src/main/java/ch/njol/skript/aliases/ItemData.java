@@ -42,14 +42,22 @@ import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.SingleItemIterator;
 import ch.njol.yggdrasil.YggdrasilSerializable;
 
-/**
- * @author Peter Güttinger
- */
 @SuppressWarnings("deprecation")
 public class ItemData implements Cloneable, YggdrasilSerializable {
 	
 	static {
-		Variables.yggdrasil.registerSingleClass(ItemData.class, "ItemData");
+		Variables.yggdrasil.registerSingleClass(ItemData.class, "NewItemData");
+		Variables.yggdrasil.registerSingleClass(OldItemData.class, "ItemData");
+	}
+	
+	/**
+	 * Represents old ItemData (before aliases rework and MC 1.13).
+	 */
+	public static class OldItemData {
+		
+		int typeid = -1;
+		public short dataMin = -1;
+		public short dataMax = -1;
 	}
 	
 	@SuppressWarnings("null")
