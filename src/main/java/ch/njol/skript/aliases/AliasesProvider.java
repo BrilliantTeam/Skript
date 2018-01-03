@@ -46,14 +46,34 @@ import ch.njol.skript.config.SectionNode;
  */
 public class AliasesProvider {
 	
+	/**
+	 * All aliases that are currently loaded by this provider.
+	 */
 	private Map<String, ItemType> aliases;
+	
+	/**
+	 * Material names for aliases this provider has.
+	 */
 	private Map<ItemData, MaterialName> materialNames;
 	
+	/**
+	 * Bukkit's UnsafeValues allows us to do stuff that would otherwise
+	 * require NMS. It has existed for a long time, too, so 1.9 support is
+	 * not particularly hard to achieve.
+	 */
 	@SuppressWarnings("deprecation")
 	private UnsafeValues unsafe;
 	
+	/**
+	 * Tags are in JSON format. We may need GSON when merging tags
+	 * (which might be done if variations are used).
+	 */
 	private Gson gson;
 	
+	/**
+	 * Represents a variation of material. It could, for example, define one
+	 * more tag or change base id, but keep tag intact.
+	 */
 	public static class Variation {
 		
 		@Nullable
@@ -75,8 +95,14 @@ public class AliasesProvider {
 		}
 	}
 	
+	/**
+	 * Contains all variations. {@link #loadVariedAlias} uses this.
+	 */
 	private Map<String, Map<String, Variation>> variations;
 	
+	/**
+	 * Constructs a new aliases provider with no data.
+	 */
 	public AliasesProvider() {
 		aliases = new HashMap<>(3000);
 		materialNames = new HashMap<>(3000);
@@ -91,11 +117,15 @@ public class AliasesProvider {
 		unsafe = values;
 	}
 	
+	/**
+	 * Loads aliases from a section node.
+	 * @param root Root section node for us to load.
+	 */
 	public void load(SectionNode root) {
 		for (Node node : root) {
 			// Section nodes are for variations
 			if (node instanceof SectionNode) {
-				loadVariations((SectionNode) node);
+				variations.put(node.getKey(), loadVariations((SectionNode) node));
 				continue;
 			}
 			
@@ -107,19 +137,33 @@ public class AliasesProvider {
 			
 			// Get key and value from entry node
 			String key = node.getKey();
+			if (key == null) {
+				// TODO error reporting
+				continue;
+			}
 			String value = ((EntryNode) node).getValue();
 			
-			
+			loadAlias(key, value);
 		}
 	}
 	
+	/**
+	 * Uses GSON to parse Mojang's JSON format to a map.
+	 * @param raw Raw JSON.
+	 * @return String,Object map.
+	 */
 	@SuppressWarnings("null")
 	private Map<String, Object> parseMojangson(String raw) {
 		return (Map<String, Object>) gson.fromJson(raw, Object.class);
 	}
 	
+	/**
+	 * Parses a single variation from a string.
+	 * @param raw Raw variation info.
+	 * @return Variation instance.
+	 */
 	@Nullable
-	public Variation parseVariation(String raw) {
+	private Variation parseVariation(String raw) {
 		int firstSpace = raw.indexOf(' ');
 		String id = raw.substring(0, firstSpace);
 		if (id.equals("-"))
@@ -134,7 +178,12 @@ public class AliasesProvider {
 		return new Variation(id, parseMojangson(tags));
 	}
 	
-	private void loadVariations(SectionNode root) {
+	/**
+	 * Loads variations from a section node.
+	 * @param root Root node for this variation.
+	 * @return Map of variations by their names.
+	 */
+	private Map<String, Variation> loadVariations(SectionNode root) {
 		Map<String, Variation> vars = new HashMap<>();
 		for (Node node : root) {
 			// Sanity check
@@ -153,8 +202,15 @@ public class AliasesProvider {
 				vars.put(key, var);
 			}
 		}
+		
+		return vars;
 	}
 	
+	/**
+	 * Parses alias key pattern using some black magic.
+	 * @param name Key/name of alias.
+	 * @return All strings that match aliase with this pattern.
+	 */
 	private List<String> parseKeyPattern(String name) {
 		List<String> versions = new ArrayList<>();
 		
@@ -196,6 +252,11 @@ public class AliasesProvider {
 		return versions;
 	}
 	
+	/**
+	 * Loads an alias with given name (key pattern) and data (material id and tags).
+	 * @param name Name of alias.
+	 * @param data Data of alias.
+	 */
 	private void loadAlias(String name, String data) {
 		List<String> patterns = parseKeyPattern(name);
 		
@@ -221,6 +282,13 @@ public class AliasesProvider {
 		}
 	}
 	
+	/**
+	 * Loads alias which may contain variations.
+	 * @param name Alias name without patterns, which still might contain
+	 * variation blocks.
+	 * @param id Base id of material that this alias represents.
+	 * @param tags Base tags of material that this alias represents.
+	 */
 	private void loadVariedAlias(String name, String id, @Nullable Map<String, Object> tags) {
 		// Find {variations}
 		boolean hasVariations = false;
@@ -276,6 +344,12 @@ public class AliasesProvider {
 		}
 	}
 	
+	/**
+	 * Loads an alias which does not have variations.
+	 * @param name Name of alias without any patterns or variation blocks.
+	 * @param id Id of material.
+	 * @param tags Tags for material.
+	 */
 	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags) {
 		// Prepare and modify ItemStack (using somewhat Unsafe methods)
 		ItemStack stack = new ItemStack(unsafe.getMaterialFromInternalName(id));
@@ -294,7 +368,7 @@ public class AliasesProvider {
 		ItemData data = new ItemData(stack);
 		type.add(data);
 
-		// Material names are filled elsewhere (TODO)
+		// TODO fill material name
 	}
 
 	@Nullable
