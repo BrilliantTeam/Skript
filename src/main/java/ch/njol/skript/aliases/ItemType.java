@@ -321,6 +321,10 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return isOfType(new ItemData(id, tags));
 	}
 	
+	public boolean isOfType(Material id) {
+		return isOfType(new ItemData(id, null));
+	}
+	
 	public boolean isSupertypeOf(final ItemType other) {
 //		if (all != other.all)
 //			return false;

@@ -114,7 +114,7 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	public ItemData(ItemStack stack) {
 		this.stack = stack;
 		this.type = stack.getType();
-		blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 	}
 	
 	public ItemData(Block block) {

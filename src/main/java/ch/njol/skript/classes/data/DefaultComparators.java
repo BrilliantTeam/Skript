@@ -252,20 +252,22 @@ public class DefaultComparators {
 	public final static Comparator<EntityData, ItemType> entityItemComparator = new Comparator<EntityData, ItemType>() {
 		@Override
 		public Relation compare(final EntityData e, final ItemType i) {
+			// TODO fix broken comparisions - will probably require updating potion API of Skript
+			
 			if (e instanceof Item)
 				return Relation.get(i.isOfType(((Item) e).getItemStack()));
-			if (e instanceof ThrownPotion)
-				return Relation.get(i.isOfType(Material.POTION.getId(), PotionEffectUtils.guessData((ThrownPotion) e)));
-			if (Skript.classExists("org.bukkit.entity.WitherSkull") && e instanceof WitherSkull)
-				return Relation.get(i.isOfType(Material.SKULL_ITEM.getId(), (short) 1));
+//			if (e instanceof ThrownPotion)
+//				return Relation.get(i.isOfType(Material.POTION.getId(), PotionEffectUtils.guessData((ThrownPotion) e)));
+//			if (Skript.classExists("org.bukkit.entity.WitherSkull") && e instanceof WitherSkull)
+//				return Relation.get(i.isOfType(Material.SKULL_ITEM.getId(), (short) 1));
 			if (e instanceof BoatData)
 				return Relation.get(((BoatData)e).isOfItemType(i));
-			if (entityMaterials.containsKey(e.getType()))
-				return Relation.get(i.isOfType(entityMaterials.get(e.getType()).getId(), (short) 0));
-			for (final Entry<Class<? extends Entity>, Material> m : entityMaterials.entrySet()) {
-				if (m.getKey().isAssignableFrom(e.getType()))
-					return Relation.get(i.isOfType(m.getValue().getId(), (short) 0));
-			}
+//			if (entityMaterials.containsKey(e.getType()))
+//				return Relation.get(i.isOfType(entityMaterials.get(e.getType()).getId(), (short) 0));
+//			for (final Entry<Class<? extends Entity>, Material> m : entityMaterials.entrySet()) {
+//				if (m.getKey().isAssignableFrom(e.getType()))
+//					return Relation.get(i.isOfType(m.getValue().getId(), (short) 0));
+//			}
 			return Relation.NOT_EQUAL;
 		}
 		
@@ -429,11 +431,11 @@ public class DefaultComparators {
 			public Relation compare(final DamageCause dc, final ItemType t) {
 				switch (dc) {
 					case FIRE:
-						return Relation.get(t.isOfType(Material.FIRE.getId(), (short) -1));
+						return Relation.get(t.isOfType(Material.LAVA));
 					case LAVA:
-						return Relation.get(t.isOfType(Material.LAVA.getId(), (short) -1) && t.isOfType(Material.STATIONARY_LAVA.getId(), (short) -1));
+						return Relation.get(t.isOfType(Material.LAVA) && t.isOfType(Material.STATIONARY_LAVA));
 					case MAGIC:
-						return Relation.get(t.isOfType(Material.POTION.getId(), (short) -1));
+						return Relation.get(t.isOfType(Material.POTION));
 						//$CASES-OMITTED$
 					default:
 						return Relation.NOT_EQUAL;
