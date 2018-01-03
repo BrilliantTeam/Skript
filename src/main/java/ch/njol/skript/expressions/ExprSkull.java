@@ -28,6 +28,7 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.MaterialData;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -86,12 +87,15 @@ public class ExprSkull extends SimplePropertyExpression<Object, ItemType> {
 		} else {
 			return null;
 		}
-		@SuppressWarnings("deprecation")
-		final ItemType i = new ItemType(Material.SKULL_ITEM.getId(), (short) type.ordinal());
+		final ItemType i;
+		final SkullMeta s = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
 		if (o instanceof OfflinePlayer) {
-			final SkullMeta s = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
-			s.setOwner(((OfflinePlayer) o).getName());
+			i = new ItemType(Material.SKULL_ITEM);
+			s.setOwningPlayer((OfflinePlayer) o);
 			i.setItemMeta(s);
+		} else {
+			// TODO 1.13 will change this so each skull gets their own id (except player skulls)
+			i = new ItemType(Material.SKULL_ITEM, "{SkullType=" + type.ordinal() + "}");
 		}
 		return i;
 	}

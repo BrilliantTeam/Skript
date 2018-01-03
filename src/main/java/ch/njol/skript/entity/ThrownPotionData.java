@@ -55,13 +55,12 @@ public class ThrownPotionData extends EntityData<ThrownPotion> {
 	protected boolean init(final Literal<?>[] exprs, final int matchedPattern, final ParseResult parseResult) {
 		if (exprs.length > 0 && exprs[0] != null) {
 			if ((Converters.convert((ItemType[]) exprs[0].getAll(), ItemType.class, new Converter<ItemType, ItemType>() {
-				@SuppressWarnings("deprecation")
 				@Override
 				@Nullable
 				public ItemType convert(final ItemType t) {
 					ItemType r = null;
 					for (final ItemData d : t.getTypes()) {
-						if (d.getId() == Material.POTION.getId()) {
+						if (d.getType() == Material.POTION) {
 							if (r == null)
 								r = new ItemType(d);
 							else

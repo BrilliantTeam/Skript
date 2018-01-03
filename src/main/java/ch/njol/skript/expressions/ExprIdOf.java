@@ -80,12 +80,12 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 			final ItemType t = getExpr().getSingle(e);
 			if (t == null)
 				return new Integer[0];
-			return new Integer[] {t.getTypes().get(0).getId()};
+			return new Integer[] {t.getTypes().get(0).getType().getId()};
 		}
 		final ArrayList<Integer> r = new ArrayList<>();
 		for (final ItemType t : source) {
 			for (final ItemData d : t) {
-				r.add(Integer.valueOf(d.getId()));
+				r.add(Integer.valueOf(d.getType().getId()));
 			}
 		}
 		return r.toArray(new Integer[r.size()]);
@@ -158,7 +158,6 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 		}
 	}
 	
-	@SuppressWarnings("null")
 	@Override
 	@Nullable
 	public Iterator<Integer> iterator(final Event e) {
@@ -168,7 +167,7 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 				return null;
 			if (t.numTypes() == 0)
 				return null;
-			return new SingleItemIterator<>(t.getTypes().get(0).getId());
+			return new SingleItemIterator<>(t.getTypes().get(0).getType().getId());
 		}
 		final Iterator<? extends ItemType> iter = getExpr().iterator(e);
 		if (iter == null || !iter.hasNext())
@@ -188,7 +187,7 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 			public Integer next() {
 				if (!hasNext())
 					throw new NoSuchElementException();
-				return current.next().getId();
+				return current.next().getType().getId();
 			}
 			
 			@Override

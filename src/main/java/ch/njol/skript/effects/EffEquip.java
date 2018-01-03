@@ -83,7 +83,7 @@ public class EffEquip extends Effect implements Testable {
 		for (final LivingEntity en : entities.getArray(e)) {
 			if (en instanceof Pig) {
 				for (final ItemType t : ts) {
-					if (t.isOfType(Material.SADDLE.getId(), (short) 0)) {
+					if (t.isOfType(Material.SADDLE)) {
 						((Pig) en).setSaddle(true);
 						break;
 					}
