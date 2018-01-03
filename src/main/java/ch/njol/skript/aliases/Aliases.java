@@ -364,7 +364,7 @@ public abstract class Aliases {
 				i = i.clone();
 				for (int j = 0; j < i.numTypes(); j++) {
 					final ItemData d = i.getTypes().get(j);
-					if (d.getId() > Skript.MAXBLOCKID) {
+					if (d.getType().isBlock()) {
 						i.remove(d);
 						j--;
 					}
@@ -377,7 +377,7 @@ public abstract class Aliases {
 			if ((i = getAlias_i("" + s.substring(0, s.length() - (b ? itemSingular.length() : itemPlural.length()) - 1))) != null) {
 				for (int j = 0; j < i.numTypes(); j++) {
 					final ItemData d = i.getTypes().get(j);
-					if (d.getId() != -1 && d.getId() <= Skript.MAXBLOCKID) {
+					if (!d.isAnything && d.getType().isBlock()) {
 						i.remove(d);
 						j--;
 					}
