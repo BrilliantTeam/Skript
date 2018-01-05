@@ -72,6 +72,8 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	/**
 	 * Uses default behavior to serialize data. However, when deserializing,
 	 * old data will be automatically updated.
+	 * 
+	 * This is registered in SkriptClasses.
 	 */
 	public static class ItemTypeSerializer extends Serializer<ItemType> {
 
