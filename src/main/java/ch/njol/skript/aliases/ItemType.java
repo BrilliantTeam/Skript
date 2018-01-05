@@ -69,47 +69,6 @@ import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 @SuppressWarnings("deprecation")
 public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>, YggdrasilExtendedSerializable {
 	
-	/**
-	 * Uses default behavior to serialize data. However, when deserializing,
-	 * old data will be automatically updated.
-	 * 
-	 * This is registered in SkriptClasses.
-	 */
-	public static class ItemTypeSerializer extends Serializer<ItemType> {
-
-		@Override
-		public Fields serialize(ItemType o) throws NotSerializableException {
-			Fields f = new Fields(o);
-			return f;
-		}
-
-		@Override
-		public void deserialize(ItemType o, Fields f) throws StreamCorruptedException, NotSerializableException {
-			f.setFields(o);
-			
-			// Legacy data (before aliases rework) update
-			if (!o.types.isEmpty() && o.types.get(0).getClass().equals(OldItemData.class)) { // Sorry generics :)
-				for (int i = 0; i < o.types.size(); i++) {
-					OldItemData old = (OldItemData) (Object) o.types.get(i); // Grab and hack together OldItemData
-					ItemData data = new ItemData(Material.values()[old.typeid]); // Create new ItemData based on it
-					o.types.set(i, data); // Replace old with new
-					// TODO support for data values
-				}
-			}
-		}
-
-		@Override
-		public boolean mustSyncDeserialization() {
-			return false;
-		}
-
-		@Override
-		protected boolean canBeInstantiated() {
-			return true;
-		}
-		
-	}
-	
 	private final static Message m_named = new Message("aliases.named");
 	
 	// 1.4.5
@@ -124,8 +83,14 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	final ArrayList<ItemData> types = new ArrayList<>();
 	
+	/**
+	 * Whether this ItemType represents all types or not.
+	 */
 	private boolean all = false;
 	
+	/**
+	 * Amount of items or -1 if it doesn't matter.
+	 */
 	private int amount = -1;
 	
 	/**
@@ -141,7 +106,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * Guaranteed to be of type ItemMeta.
 	 */
 	@Nullable
-	transient Object meta = null;
+	transient ItemMeta meta = null;
 	
 	/**
 	 * ItemTypes to use instead of this one if adding to an inventory or setting a block.
@@ -286,10 +251,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return meta;
 	}
 	
-	public void setItemMeta(final Object meta) {
-		if (!itemMetaSupported || !(meta instanceof ItemMeta))
-			throw new IllegalStateException("" + meta);
-		unsetItemMetaEnchs((ItemMeta) meta);
+	public void setItemMeta(ItemMeta meta) {
 		this.meta = meta;
 		if (item != null) {
 			item = item.clone();
@@ -1216,10 +1178,17 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	@Override
 	public void deserialize(final Fields fields) throws StreamCorruptedException, NotSerializableException {
 		enchantments = fields.getAndRemoveObject("enchantments", Map.class);
-		meta = fields.getAndRemoveObject("meta", Object.class);
-		if (meta != null && !(meta instanceof ItemMeta))
-			throw new StreamCorruptedException();
 		fields.setFields(this);
+		
+		// Legacy data (before aliases rework) update
+		if (types.isEmpty() && types.get(0).getClass().equals(OldItemData.class)) { // Sorry generics :)
+			for (int i = 0; i < types.size(); i++) {
+				OldItemData old = (OldItemData) (Object) types.get(i); // Grab and hack together OldItemData
+				ItemData data = new ItemData(Material.values()[old.typeid]); // Create new ItemData based on it
+				types.set(i, data); // Replace old with new
+				// TODO support for data values
+			}
+		}
 	}
 	
 	/**

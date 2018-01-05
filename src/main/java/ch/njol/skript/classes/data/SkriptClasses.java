@@ -251,7 +251,7 @@ public class SkriptClasses {
 						return "itemtype:.+";
 					}
 				})
-				.serializer(new ItemType.ItemTypeSerializer()));
+				.serializer(new YggdrasilSerializer<>()));
 		
 		Classes.registerClass(new ClassInfo<>(Time.class, "time")
 				.user("times?")
