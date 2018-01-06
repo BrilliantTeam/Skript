@@ -112,29 +112,6 @@ public abstract class Aliases {
 	private final static ArgsMessage m_loaded_x_aliases_from = new ArgsMessage("aliases.loaded x aliases from");
 	private final static ArgsMessage m_loaded_x_aliases = new ArgsMessage("aliases.loaded x aliases");
 	
-	final static class Variations extends HashMap<String, HashMap<String, ItemType>> {
-		private final static long serialVersionUID = -139481665727386819L;
-	}
-	
-	private static int nextBracket(final String s, final char closingBracket, final char openingBracket, final int start) {
-		int n = 0;
-		assert s.charAt(start) == openingBracket;
-		for (int i = start + 1; i < s.length(); i++) {
-			if (s.charAt(i) == '\\') {
-				i++;
-				continue;
-			} else if (s.charAt(i) == closingBracket) {
-				if (n == 0)
-					return i;
-				n--;
-			} else if (s.charAt(i) == openingBracket) {
-				n++;
-			}
-		}
-		Skript.error(m_invalid_brackets.toString(openingBracket + "" + closingBracket));
-		return -1;
-	}
-	
 	/**
 	 * Concatenates parts of an alias's name. This currently 'lowercases' the first character of any part if there's no space in front of it. It also replaces double spaces with a
 	 * single one and trims the resulting string.
@@ -164,7 +141,6 @@ public abstract class Aliases {
 	@SuppressWarnings("null")
 	private final static Pattern numberWordPattern = Pattern.compile("\\d+\\s+.+");
 	
-	@SuppressWarnings("null")
 	public static final String getMaterialName(ItemData type, boolean plural) {
 		MaterialName name = provider.getMaterialName(type);
 		if (name == null) {

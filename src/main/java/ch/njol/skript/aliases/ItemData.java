@@ -28,7 +28,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.Maps;
@@ -64,25 +66,30 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	private static final UnsafeValues unsafe = Bukkit.getUnsafe();
 	
 	private static final Gson gson = new Gson();
+	@SuppressWarnings("null")
+	private static final ItemFactory itemFactory = Bukkit.getServer().getItemFactory();
 	
 	/**
 	 * ItemStack, which is used for everything but serialization.
-	 * It should be handled by underlying NMS stack that is probably
-	 * modified using UnsafeValues.
 	 */
-	@Nullable
 	transient ItemStack stack;
 	
 	/**
-	 * Tags for item in Mojangson (JSON) string representation.
+	 * ItemMeta of stack.
 	 */
-	@Nullable
-	String tags;
+	ItemMeta meta;
 	
 	/**
 	 * Type of the item as Bukkit material.
 	 */
 	Material type;
+	
+	/**
+	 * Amount of items in stack. If it is less than 1, it will not matter in
+	 * comparisons and its absolute value will be used when adding this to
+	 * an inventory.
+	 */
+	int amount;
 	
 	/**
 	 * If this represents all possible items.
@@ -96,43 +103,63 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	@Nullable
 	transient BlockValues blockValues;
 	
-	public ItemData(Material type, @Nullable String tags) {
+	public ItemData(Material type, int amount, @Nullable String tags) {
 		this.type = type;
-		this.tags = tags;
+		this.amount = amount;
 		
-		stack = new ItemStack(type);
+		this.stack = new ItemStack(type, Math.abs(amount));
 		unsafe.modifyItemStack(stack, tags);
 		assert stack != null; // Yeah nope; modifyItemStack is not THAT Unsafe
 		
 		// Initialize block values with a terrible hack
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+		
+		// Grab item meta (may be null)
+		assert stack != null;
+		this.meta = stack.getItemMeta();
+	}
+	
+	public ItemData(Material type, @Nullable String tags) {
+		this(type, 1, tags);
+	}
+	
+	public ItemData(Material type, int amount) {
+		this.type = type;
+		
+		this.stack = new ItemStack(type, Math.abs(amount));
 		blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+		this.meta = itemFactory.getItemMeta(type);
 	}
 	
 	public ItemData(Material type) {
-		this.type = type;
-		
-		stack = new ItemStack(type);
-		blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+		this(type, 1);
 	}
 	
 	public ItemData(ItemData data) {
-		this(data.type, data.tags);
+		this(data.type, data.amount);
 	}
 	
 	public ItemData(ItemStack stack) {
 		this.stack = stack;
+		this.amount = stack.getAmount();
 		this.type = stack.getType();
-		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack); // Grab block values from stack
+		this.meta = stack.getItemMeta(); // Grab meta from stack
 	}
 	
 	public ItemData(Block block) {
 		this.type = block.getType();
+		this.amount = 1; // Blocks are not stacked in the world
+		this.stack = new ItemStack(type, amount);
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(block);
+		this.meta = stack.getItemMeta();
 	}
 	
 	public ItemData() {
 		this.type = Material.AIR; // Fake type, but we have a good reason to not allow null there
 		this.isAnything = true;
+		this.meta = itemFactory.getItemMeta(Material.AIR); // And same thing here: no nulls
+		this.stack = new ItemStack(Material.AIR);
 	}
 	
 	/**
@@ -153,7 +180,8 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	}
 	
 	/**
-	 * Returns <code>Aliases.{@link Aliases#getMaterialName(int, short, short, boolean) getMaterialName}(typeid, dataMin, dataMax, false)</code>
+	 * Returns <code>Aliases.{@link Aliases#getMaterialName(ItemData, boolean) getMaterialName}(ItemData, boolean)</code>
+	 * called with this object and relevant plurarily setting.
 	 */
 	@Override
 	public String toString() {
@@ -178,38 +206,18 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		if (!(obj instanceof ItemData))
 			return false;
 		
-		final ItemData other = (ItemData) obj;
-		if (stack != null && other.stack != null) { // Stack check is possible
-			return stack.equals(other.stack);
-		}
-		if (other.type != type)
-			return false;
+		ItemData other = (ItemData) obj;
+		if (isAnything || other.isAnything) // First, isAnything check
+			return true;
 		
-		if (blockValues != null) {
-			if (other.blockValues != null) {
-				return blockValues.equals(other.blockValues);
-			} else {
-				return true; // Type matched, and we have no more data to compare
-			}
-		} else if (tags != null) {
-			if (other.tags != null) {
-				return tags.equals(other.tags);
-			} else {
-				return true; // Type matched, and we have no more data to compare
-			}
-		}
-		
-		return true; // Types are same, no tags or block values
+		if (amount > 0 && other.amount > 0)
+			return other.stack.equals(stack);
+		return other.stack.isSimilar(stack);
 	}
 	
 	@Override
 	public int hashCode() {
-		if (stack != null)
-			return stack.hashCode();
-		else if (blockValues != null)
-			return blockValues.hashCode() << 14 | type.hashCode();
-		else
-			return type.ordinal();
+		return stack.hashCode();
 	}
 	
 	/**
@@ -225,50 +233,16 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		if (other.type != type) // Different type, no intersection possible
 			return null;
 		
-		Map<String, Object> myTags = (Map<String, Object>) gson.fromJson(tags, Object.class);
-		Map<String, Object> theirTags = (Map<String, Object>) gson.fromJson(other.tags, Object.class);
-		Map<String, Object> commonTags = Maps.difference(myTags, theirTags).entriesInCommon();
-		if (commonTags.isEmpty()) // No intersection exists
-			return null;
-		
-		ItemData intersection = new ItemData(type, gson.toJson(commonTags));
-		return intersection;
+		// TODO implement meta intersection
+		return null;
 	}
 	
-	public ItemStack getRandom() {
-		Material m = type;
-		if (isAnything) { // Any material
-			m = CollectionUtils.getRandom(Material.values(), 1);
-		}
-		return new ItemStack(type, 1);
-	}
-	
-	public Iterator<ItemStack> getAll() {
-		if (isAnything) {
-			return new Iterator<ItemStack>() {
-				
-				@SuppressWarnings("null")
-				private final Iterator<Material> iter = Arrays.asList(Material.values()).listIterator(1); // ignore air
-				
-				@Override
-				public boolean hasNext() {
-					return iter.hasNext();
-				}
-				
-				@Override
-				public ItemStack next() {
-					return new ItemStack(iter.next(), 1);
-				}
-				
-				@Override
-				public void remove() {
-					throw new UnsupportedOperationException();
-				}
-				
-			};
-		}
-		
-		return new SingleItemIterator<>(getRandom());
+	/**
+	 * Returns the ItemStack backing this 
+	 * @return
+	 */
+	public ItemStack getStack() {
+		return stack;
 	}
 	
 	@Override
@@ -283,6 +257,19 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	@Nullable
 	public BlockValues getBlockValues() {
 		return blockValues;
+	}
+	
+	public ItemMeta getItemMeta() {
+		return meta;
+	}
+	
+	public void setItemMeta(ItemMeta meta) {
+		this.meta = meta;
+		stack.setItemMeta(meta);
+		if (blockValues != null) { // If block values exist, update them from stack
+			assert stack != null;
+			blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+		}
 	}
 	
 }

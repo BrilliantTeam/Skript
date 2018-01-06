@@ -98,16 +98,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	private int numItems = 0;
 	
-	// TODO empty == unenchanted, add expression "unenchanted <item>"
-	@Nullable
-	transient Map<Enchantment, Integer> enchantments = null;
-	
-	/**
-	 * Guaranteed to be of type ItemMeta.
-	 */
-	@Nullable
-	transient ItemMeta meta = null;
-	
 	/**
 	 * ItemTypes to use instead of this one if adding to an inventory or setting a block.
 	 */
@@ -151,9 +141,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		}
 	}
 	
-	public ItemType() {
-		
-	}
+	public ItemType() {}
 	
 	public ItemType(Material id) {
 		add_(new ItemData(id));
