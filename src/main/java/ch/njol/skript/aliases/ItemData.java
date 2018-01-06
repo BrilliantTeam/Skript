@@ -164,9 +164,8 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	}
 	
 	public boolean isSupertypeOf(ItemData o) {
-		// Since moving away from numeric ids, we use aliases to provide supertypes
-		
-		return false;
+		// Since numeric ids are not used anymore, supertype-ness is based on aliases
+		return Aliases.isSupertypeOf(this, o);
 	}
 	
 	/**

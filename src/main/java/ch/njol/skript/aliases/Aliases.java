@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -402,5 +403,18 @@ public abstract class Aliases {
 			
 			provider.load((SectionNode) n);
 		}
+	}
+	
+	/**
+	 * Checks if the first parameter is supertype of second.
+	 * @param first First item data.
+	 * @param second Second item data.
+	 * @return If first is supertype of second.
+	 */
+	public static boolean isSupertypeOf(ItemData first, ItemData second) {
+		Set<ItemData> subtypes = provider.getSubtypes(first);
+		if (subtypes != null)
+			return subtypes.contains(second);
+		return false;
 	}
 }
