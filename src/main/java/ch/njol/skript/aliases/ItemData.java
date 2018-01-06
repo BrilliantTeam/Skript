@@ -38,6 +38,7 @@ import com.google.gson.Gson;
 
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
+import ch.njol.skript.localization.Message;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.coll.CollectionUtils;
@@ -69,6 +70,8 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	@SuppressWarnings("null")
 	private static final ItemFactory itemFactory = Bukkit.getServer().getItemFactory();
 	
+	private final static Message m_named = new Message("aliases.named");
+	
 	/**
 	 * ItemStack, which is used for everything but serialization.
 	 */
@@ -85,13 +88,6 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	Material type;
 	
 	/**
-	 * Amount of items in stack. If it is less than 1, it will not matter in
-	 * comparisons and its absolute value will be used when adding this to
-	 * an inventory.
-	 */
-	int amount;
-	
-	/**
 	 * If this represents all possible items.
 	 */
 	boolean isAnything;
@@ -103,11 +99,10 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	@Nullable
 	transient BlockValues blockValues;
 	
-	public ItemData(Material type, int amount, @Nullable String tags) {
+	public ItemData(Material type, @Nullable String tags) {
 		this.type = type;
-		this.amount = amount;
 		
-		this.stack = new ItemStack(type, Math.abs(amount));
+		this.stack = new ItemStack(type);
 		unsafe.modifyItemStack(stack, tags);
 		assert stack != null; // Yeah nope; modifyItemStack is not THAT Unsafe
 		
@@ -117,10 +112,6 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		// Grab item meta (may be null)
 		assert stack != null;
 		this.meta = stack.getItemMeta();
-	}
-	
-	public ItemData(Material type, @Nullable String tags) {
-		this(type, 1, tags);
 	}
 	
 	public ItemData(Material type, int amount) {
@@ -136,12 +127,11 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	}
 	
 	public ItemData(ItemData data) {
-		this(data.type, data.amount);
+		this(data.stack);
 	}
 	
 	public ItemData(ItemStack stack) {
 		this.stack = stack;
-		this.amount = stack.getAmount();
 		this.type = stack.getType();
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack); // Grab block values from stack
 		this.meta = stack.getItemMeta(); // Grab meta from stack
@@ -149,8 +139,7 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	
 	public ItemData(Block block) {
 		this.type = block.getType();
-		this.amount = 1; // Blocks are not stacked in the world
-		this.stack = new ItemStack(type, amount);
+		this.stack = new ItemStack(type);
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(block);
 		this.meta = stack.getItemMeta();
 	}
@@ -175,7 +164,8 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	}
 	
 	public boolean isSupertypeOf(ItemData o) {
-		// TODO implement this; how?
+		// Since moving away from numeric ids, we use aliases to provide supertypes
+		
 		return false;
 	}
 	
@@ -185,11 +175,16 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 */
 	@Override
 	public String toString() {
-		return Aliases.getMaterialName(this, false);
+		StringBuilder builder = new StringBuilder(Aliases.getMaterialName(this, false));
+		if (meta.hasDisplayName()) {
+			builder.append(" ").append(m_named).append(" ");
+			builder.append(meta.getDisplayName());
+		}
+		return builder.toString();
 	}
 	
 	public String toString(final boolean debug, final boolean plural) {
-		return debug ? Aliases.getDebugMaterialName(this, plural) : Aliases.getMaterialName(this, plural);
+		return toString(); // TODO better debug info
 	}
 	
 	/**
@@ -210,8 +205,6 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		if (isAnything || other.isAnything) // First, isAnything check
 			return true;
 		
-		if (amount > 0 && other.amount > 0)
-			return other.stack.equals(stack);
 		return other.stack.isSimilar(stack);
 	}
 	
@@ -238,8 +231,9 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	}
 	
 	/**
-	 * Returns the ItemStack backing this 
-	 * @return
+	 * Returns the ItemStack backing this ItemData.
+	 * It is not a copy, so please be careful.
+	 * @return Item stack.
 	 */
 	public ItemStack getStack() {
 		return stack;

@@ -22,9 +22,12 @@
 package ch.njol.skript.aliases;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
@@ -101,18 +104,24 @@ public class AliasesProvider {
 	private Map<String, Map<String, Variation>> variations;
 	
 	/**
+	 * Subtypes of materials.
+	 */
+	private Map<ItemData, Set<ItemData>> subtypes;
+	
+	/**
 	 * Constructs a new aliases provider with no data.
 	 */
 	public AliasesProvider() {
 		aliases = new HashMap<>(3000);
 		materialNames = new HashMap<>(3000);
 		variations = new HashMap<>(500);
+		subtypes = new HashMap<>(1000);
 		gson = new Gson();
 		
 		@SuppressWarnings("deprecation")
 		UnsafeValues values = Bukkit.getUnsafe();
 		if (values == null) {
-			throw new RuntimeException("unsafe values are not available; cannot initialize aliases backend");
+			throw new RuntimeException("unsafe values are not available; cannot initialize this aliases provider");
 		}
 		unsafe = values;
 	}
@@ -152,7 +161,7 @@ public class AliasesProvider {
 	 * @param raw Raw JSON.
 	 * @return String,Object map.
 	 */
-	@SuppressWarnings("null")
+	@SuppressWarnings({"null", "unchecked"})
 	private Map<String, Object> parseMojangson(String raw) {
 		return (Map<String, Object>) gson.fromJson(raw, Object.class);
 	}
@@ -350,23 +359,44 @@ public class AliasesProvider {
 	 * @param id Id of material.
 	 * @param tags Tags for material.
 	 */
+	@SuppressWarnings("deprecation")
 	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags) {
-		// Prepare and modify ItemStack (using somewhat Unsafe methods)
-		ItemStack stack = new ItemStack(unsafe.getMaterialFromInternalName(id));
-		if (tags != null) {
-			unsafe.modifyItemStack(stack, gson.toJson(tags));
+		// First, try to find if aliases already has a type with this id
+		// (so that aliases can refer to each other)
+		ItemType typeOfId = aliases.get(id);
+		List<ItemData> datas;
+		if (typeOfId != null) { // If it exists, use datas from it
+			datas = typeOfId.getTypes();
+		} else { // ... but quite often, we just got Vanilla id
+			// Prepare and modify ItemStack (using somewhat Unsafe methods)
+			ItemStack stack = new ItemStack(unsafe.getMaterialFromInternalName(id));
+			if (tags != null) {
+				unsafe.modifyItemStack(stack, gson.toJson(tags));
+			}
+			
+			datas = Collections.singletonList(new ItemData(stack));
 		}
 		
-		// Check if there is item type already, create otherwise
+		// Check if there is item type with this name already, create otherwise
 		ItemType type = aliases.get(name);
 		if (type == null) {
 			type = new ItemType();
 			aliases.put(name, type);
 		}
 		
-		// Construct the item data and put it to type
-		ItemData data = new ItemData(stack);
-		type.add(data);
+		// Add item datas we got earlier to the type
+		assert datas != null;
+		type.addAll(datas);
+		
+		// Make datas subtypes of the type we have here
+		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
+			Set<ItemData> subs = subtypes.get(data);
+			if (subs == null) {
+				subs = new HashSet<>(datas.size());
+				subtypes.put(data, subs);
+			}
+			subs.addAll(datas); // Add all datas (the ones we have here)
+		}
 
 		// TODO fill material name
 	}
@@ -395,5 +425,10 @@ public class AliasesProvider {
 		aliases.clear();
 		materialNames.clear();
 		variations.clear();
+	}
+	
+	@Nullable
+	public Set<ItemData> getSubtypes(ItemData supertype) {
+		return subtypes.get(supertype);
 	}
 }
