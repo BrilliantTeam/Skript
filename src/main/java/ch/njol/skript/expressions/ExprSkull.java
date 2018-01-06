@@ -24,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.entity.Zombie;
@@ -84,6 +85,8 @@ public class ExprSkull extends SimplePropertyExpression<Object, ItemType> {
 			type = SkullType.PLAYER;
 		} else if (o instanceof Creeper || o instanceof CreeperData) {
 			type = SkullType.CREEPER;
+		} else if (o instanceof EnderDragon || o instanceof EntityData && EnderDragon.class.isAssignableFrom(((EntityData<?>) o).getType())) {
+			type = SkullType.DRAGON;
 		} else {
 			return null;
 		}
