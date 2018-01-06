@@ -79,7 +79,17 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public final static boolean rawNamesSupported = Skript.isRunningMinecraft(1, 8);
 	
 	/**
-	 * Note to self: use {@link #add_(ItemData)} to add item datas, don't add them directly to this list.
+	 * DO NOT ADD ItemDatas to this list directly!
+	 * <p>
+	 * This contains all ItemDatas that this ItemType represents. This can mean
+	 * a few different things:
+	 * <ol>
+	 * <li>One ItemData with amount set to it -  in case this ItemType
+	 * only represents that.
+	 * <li>Multiple ItemDatas which each have amount of 1 or -1 - in case
+	 * this represents multiple items (e.g. dirt, oak wood and stone).
+	 * </ol>
+	 * In future there may be further optimizations done.
 	 */
 	final ArrayList<ItemData> types = new ArrayList<>();
 	
@@ -92,11 +102,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * Amount of items or -1 if it doesn't matter.
 	 */
 	private int amount = -1;
-	
-	/**
-	 * How many different items this item type represents
-	 */
-	private int numItems = 0;
 	
 	/**
 	 * ItemTypes to use instead of this one if adding to an inventory or setting a block.
@@ -158,12 +163,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public ItemType(final ItemStack i) {
 		amount = i.getAmount();
 		add_(new ItemData(i));
-		if (!i.getEnchantments().isEmpty())
-			enchantments = new HashMap<>(i.getEnchantments());
-		if (itemMetaSupported) {
-			meta = i.getItemMeta();
-			unsetItemMetaEnchs((ItemMeta) meta);
-		}
 	}
 	
 	// TODO find a way to fix this; very hard to do sadly
@@ -176,17 +175,12 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	private ItemType(final ItemType i) {
 		all = i.all;
 		amount = i.amount;
-		numItems = i.numItems;
 		final ItemType bl = i.block, it = i.item;
 		block = bl == null ? null : bl.clone();
 		item = it == null ? null : it.clone();
-		final Object m = i.meta;
-		meta = m == null ? null : ((ItemMeta) m).clone();
 		for (final ItemData d : i) {
 			types.add(d.clone());
 		}
-		if (i.enchantments != null)
-			enchantments = new HashMap<>(i.enchantments);
 	}
 	
 	/**
@@ -234,57 +228,11 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		this.all = all;
 	}
 	
-	@Nullable
-	public Object getItemMeta() {
-		return meta;
-	}
-	
-	public void setItemMeta(ItemMeta meta) {
-		this.meta = meta;
-		if (item != null) {
-			item = item.clone();
-			item.meta = meta;
-		}
-		if (block != null) {
-			block = block.clone();
-			block.meta = meta;
-		}
-	}
-	
 	private final static void unsetItemMetaEnchs(final @Nullable ItemMeta meta) {
 		if (meta == null)
 			return;
 		for (final Enchantment e : meta.getEnchants().keySet())
 			meta.removeEnchant(e);
-	}
-	
-	/**
-	 * @param item
-	 * @return Whether the given item has correct enchantments & ItemMeta, but doesn't check its type
-	 */
-	private boolean hasMeta(final @Nullable ItemStack item) {
-		final Map<Enchantment, Integer> enchs = enchantments;
-		if (enchs != null) {
-			if (item == null)
-				return false;
-			for (final Entry<Enchantment, Integer> e : enchs.entrySet()) {
-				if (e.getValue() == -1 ? item.getEnchantmentLevel(e.getKey()) == 0 : item.getEnchantmentLevel(e.getKey()) != e.getValue())
-					return false;
-			}
-		}
-		final Object meta = this.meta;
-		if (meta != null && !ignoreMeta) {
-			if (item == null)
-				return false;
-			final ItemMeta m = item.getItemMeta();
-			unsetItemMetaEnchs(m);
-			
-			
-			
-			if (!meta.equals(m))
-				return false;
-		}
-		return true;
 	}
 	
 	public boolean isOfType(@Nullable ItemStack item) {
@@ -296,8 +244,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	public boolean isOfType(@Nullable Block block) {
-		if (enchantments != null) // TODO verify what this means (and if it is still required)
-			return false;
 		if (block == null)
 			return isOfType(Material.AIR, null);
 		
@@ -325,19 +271,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 //			return false;
 		if (amount != -1 && other.amount != amount)
 			return false;
-		final Map<Enchantment, Integer> enchs = enchantments;
-		if (enchs != null) {
-			final Map<Enchantment, Integer> oenchs = other.enchantments;
-			if (oenchs == null)
-				return false;
-			for (final Entry<Enchantment, Integer> o : oenchs.entrySet()) {
-				final Integer t = enchs.get(o.getKey());
-				if (t == null || !t.equals(o.getValue()))
-					return false;
-			}
-		}
-		if (meta != null && !meta.equals(other.meta))
-			return false;
 		outer: for (final ItemData o : other.types) {
 			assert o != null;
 			for (final ItemData t : types) {
@@ -355,19 +288,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	public ItemType getBlock() {
-//		if (block == null) {
-//			ItemType i = clone();
-//			for (int j = 0; j < i.numTypes(); j++) {
-//				final ItemData d = i.getTypes().get(j);
-//				if (d.getId() > Skript.MAXBLOCKID) {
-//					i.remove(d);
-//					j--;
-//				}
-//			}
-//			if (i.getTypes().isEmpty())
-//				return this;
-//			return block = i;
-//		}
 		final ItemType block = this.block;
 		return block == null ? this : block;
 	}
@@ -478,31 +398,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		modified();
 	}
 	
-	public void addEnchantment(final Enchantment e, final int level) {
-		Map<Enchantment, Integer> enchs = enchantments;
-		if (enchs == null)
-			enchantments = enchs = new HashMap<>();
-		enchs.put(e, level);
-	}
-	
-	@SuppressWarnings("null") // New Eclipse didn't like this, even if it IS very safe
-	public void addEnchantments(final Map<Enchantment, Integer> enchantments) {
-		if (this.enchantments == null)
-			this.enchantments = new HashMap<>(enchantments);
-		else
-			this.enchantments.putAll(enchantments);
-	}
-	
-	public void clearEnchantments() {
-		if (enchantments != null)
-			enchantments.clear();
-	}
-	
-	@Nullable
-	public Map<Enchantment, Integer> getEnchantments() {
-		return enchantments;
-	}
-	
 	@Override
 	public Iterator<ItemStack> containerIterator() {
 		return new Iterator<ItemStack>() {
@@ -529,10 +424,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 					throw new NoSuchElementException();
 				final ItemStack is = cdi.next();
 				is.setAmount(getAmount());
-				if (meta != null)
-					is.setItemMeta(Bukkit.getItemFactory().asMetaFor((ItemMeta) meta, is.getType()));
-				if (enchantments != null)
-					is.addUnsafeEnchantments(enchantments);
 				return is;
 			}
 			
@@ -1023,19 +914,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return types;
 	}
 	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (all ? 1231 : 1237);
-		result = prime * result + amount;
-		final Map<Enchantment, Integer> enchs = enchantments;
-		result = prime * result + ((enchs == null) ? 0 : enchs.hashCode());
-		final Object m = meta;
-		result = prime * result + ((m == null) ? 0 : m.hashCode());
-		result = prime * result + types.hashCode();
-		return result;
-	}
+	
 	
 	@Override
 	public boolean equals(final @Nullable Object obj) {
@@ -1049,18 +928,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		if (all != other.all)
 			return false;
 		if (amount != other.amount)
-			return false;
-		final Map<Enchantment, Integer> enchs = enchantments;
-		if (enchs == null) {
-			if (other.enchantments != null)
-				return false;
-		} else if (!enchs.equals(other.enchantments))
-			return false;
-		final Object m = meta;
-		if (m == null) {
-			if (other.meta != null)
-				return false;
-		} else if (!m.equals(other.meta))
 			return false;
 		if (!types.equals(other.types))
 			return false;
@@ -1157,15 +1024,11 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	@Override
 	public Fields serialize() throws NotSerializableException {
 		final Fields f = new Fields(this);
-		// both are serialisable with Yggdrasil
-		f.putObject("enchantments", enchantments);
-		f.putObject("meta", meta);
 		return f;
 	}
 	
 	@Override
 	public void deserialize(final Fields fields) throws StreamCorruptedException, NotSerializableException {
-		enchantments = fields.getAndRemoveObject("enchantments", Map.class);
 		fields.setFields(this);
 		
 		// Legacy data (before aliases rework) update
