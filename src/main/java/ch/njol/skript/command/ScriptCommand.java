@@ -98,7 +98,7 @@ public class ScriptCommand implements CommandExecutor {
 	
 	private transient PluginCommand bukkitCommand;
 
-	private Map<UUID,ch.njol.skript.util.Date> lastUsageMap = new HashMap<>();
+	private Map<UUID,Date> lastUsageMap = new HashMap<>();
 
 	/**
 	 * Creates a new SkriptCommand.
