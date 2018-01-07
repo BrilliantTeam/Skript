@@ -20,6 +20,10 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -30,15 +34,22 @@ import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
+@Name("Date Ago/Later")
+@Description("A date the specified timespan before/after another date.")
+@Examples({"set {_yesterday} to 1 day ago"})
+@Since("INSERT VERSION")
 public class ExprDateAgoLater extends SimpleExpression<Date> {
 
     static {
         Skript.registerExpression(ExprDateAgoLater.class, Date.class, ExpressionType.COMBINED,
-                "%timespan% (ago|in the past)", "%timespan% (later|from now)");
+                "%timespan% (ago|in the past|before [the] [date] %-date%)",
+                "%timespan% (later|(from|after) [the] [date] %-date%)");
     }
 
     @SuppressWarnings("null")
     private Expression<Timespan> timespan;
+    @SuppressWarnings("null")
+    private Expression<Date> date;
     @SuppressWarnings("null")
     private boolean ago;
 
@@ -46,10 +57,10 @@ public class ExprDateAgoLater extends SimpleExpression<Date> {
     @Override
     protected Date[] get(Event e) {
         Timespan timespan = this.timespan.getSingle(e);
-        if (timespan == null) {
+        Date date = this.date == null ? new Date() : this.date.getSingle(e);
+        if (timespan == null || date == null) {
             return null;
         }
-        Date date = new Date();
         if (ago) {
             date.subtract(timespan);
         } else {
@@ -77,6 +88,7 @@ public class ExprDateAgoLater extends SimpleExpression<Date> {
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         timespan = (Expression<Timespan>) exprs[0];
+        date = (Expression<Date>) exprs[1];
         ago = matchedPattern == 0;
         return true;
     }
