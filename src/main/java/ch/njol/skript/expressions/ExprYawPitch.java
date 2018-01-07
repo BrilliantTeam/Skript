@@ -113,7 +113,7 @@ public class ExprYawPitch extends SimplePropertyExpression<Location, Number> {
 	
 		//Some random method decided to use for converting to positive values.
 		public float convertToPositive(float f) {
-			if (f * -1 == Math.abs(f))
+			if (f != 0 && f * -1 == Math.abs(f))
 				return 360 + f;
 			return f;
 		}	
