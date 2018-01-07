@@ -91,7 +91,7 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Timespan> {
 
     @Override
     public String toString(@Nullable Event e, boolean debug) {
-        return "the remaining time";
+        return "the " + (remaining ? "remaining" : "elapsed") + " time";
     }
 
     @Override
