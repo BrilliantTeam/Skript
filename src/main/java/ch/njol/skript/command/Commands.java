@@ -36,6 +36,7 @@ import java.util.logging.LogRecord;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.njol.skript.util.Timespan;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -136,6 +137,8 @@ public abstract class Commands {
 			.addEntry("description", true)
 			.addEntry("permission", true)
 			.addEntry("permission message", true)
+			.addEntry("cooldown", true)
+			.addEntry("cooldown message", true)
 			.addEntry("aliases", true)
 			.addEntry("executable by", true)
 			.addSection("trigger", false);
@@ -430,11 +433,26 @@ public abstract class Commands {
 				Skript.warning("'executable by' should be either be 'players', 'console', or both, but found '" + b + "'");
 			}
 		}
-		
+
+		final String cooldownString = ScriptLoader.replaceOptions(node.get("cooldown", ""));
+		Timespan cooldown = null;
+		if (!cooldownString.isEmpty()) {
+			// ParseContext doesn't matter for Timespan's parser
+			cooldown = Classes.parse(cooldownString, Timespan.class, ParseContext.DEFAULT);
+			if (cooldown == null) {
+				Skript.warning("'" + cooldownString + "' is an invalid timespan for the cooldown");
+			}
+		}
+		final String cooldownMessage = ScriptLoader.replaceOptions(node.get("cooldown message", ""));
+
 		if (!permissionMessage.isEmpty() && permission.isEmpty()) {
 			Skript.warning("command /" + command + " has a permission message set, but not a permission");
 		}
-		
+
+		if (!cooldownMessage.isEmpty() && cooldown == null) {
+			Skript.warning("command /" + command + " has a cooldown message set, but not a cooldown");
+		}
+
 		if (Skript.debug() || node.debug())
 			Skript.debug("command " + desc + ":");
 		
@@ -447,7 +465,9 @@ public abstract class Commands {
 		Commands.currentArguments = currentArguments;
 		final ScriptCommand c;
 		try {
-			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage, aliases, permission, permissionMessage, executableBy, ScriptLoader.loadItems(trigger));
+			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage,
+					aliases, permission, permissionMessage, cooldown, cooldownMessage, executableBy,
+					ScriptLoader.loadItems(trigger));
 		} finally {
 			Commands.currentArguments = null;
 		}

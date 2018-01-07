@@ -22,16 +22,11 @@ package ch.njol.skript.command;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
+import ch.njol.skript.util.Date;
+import ch.njol.skript.util.Timespan;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -80,8 +75,11 @@ public class ScriptCommand implements CommandExecutor {
 	private List<String> activeAliases;
 	private final String permission, permissionMessage;
 	private final String description;
+	@Nullable
+	private final Timespan cooldown;
+	private final String cooldownMessage;
 	final String usage;
-	
+
 	final Trigger trigger;
 	
 	private final String pattern;
@@ -91,7 +89,9 @@ public class ScriptCommand implements CommandExecutor {
 	final int executableBy;
 	
 	private transient PluginCommand bukkitCommand;
-	
+
+	private Map<UUID,ch.njol.skript.util.Date> lastUsageMap = new HashMap<>();
+
 	/**
 	 * Creates a new SkriptCommand.
 	 * 
@@ -105,13 +105,19 @@ public class ScriptCommand implements CommandExecutor {
 	 * @param permissionMessage message to display if the player doesn't have the given permission
 	 * @param items trigger to execute
 	 */
-	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments, final String description, final String usage, final ArrayList<String> aliases, final String permission, final String permissionMessage, final int executableBy, final List<TriggerItem> items) {
+	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments,
+						 final String description, final String usage, final ArrayList<String> aliases,
+						 final String permission, final String permissionMessage, @Nullable  final Timespan cooldown,
+						 final String cooldownMessage, final int executableBy, final List<TriggerItem> items) {
 		Validate.notNull(name, pattern, arguments, description, usage, aliases, items);
 		this.name = name;
 		label = "" + name.toLowerCase();
 		this.permission = permission;
 		this.permissionMessage = permissionMessage.isEmpty() ? Language.get("commands.no permission message") : Utils.replaceEnglishChatStyles(permissionMessage);
-		
+
+		this.cooldown = cooldown;
+		this.cooldownMessage = permissionMessage.isEmpty() ? Language.get("commands.cooldown message") : Utils.replaceEnglishChatStyles(cooldownMessage);
+
 		final Iterator<String> as = aliases.iterator();
 		while (as.hasNext()) { // remove aliases that are the same as the command
 			if (as.next().equalsIgnoreCase(label))
@@ -177,7 +183,28 @@ public class ScriptCommand implements CommandExecutor {
 			sender.sendMessage(permissionMessage);
 			return false;
 		}
-		
+
+		if (sender instanceof Player && cooldown != null) {
+			UUID uuid = ((Player) sender).getUniqueId();
+			if (lastUsageMap.containsKey(uuid)) {
+				Date lastUsage = lastUsageMap.get(uuid);
+				Timespan cooldown = this.cooldown;
+				// Needed otherwise Eclipse compiler complains :| ???
+				assert cooldown != null;
+				// Not using System.currentTimeMillis() in case ch.njol.skript.util.Date impl changes
+				long currentTimestamp = new Date().getTimestamp();
+				// If the timespan since the lastUsage is more than or equal to the cooldown
+				if ((currentTimestamp - lastUsage.getTimestamp()) >= cooldown.getMilliSeconds()) {
+					lastUsageMap.remove(uuid);
+				} else {
+					sender.sendMessage(cooldownMessage);
+					return false;
+				}
+			} else {
+				lastUsageMap.put(uuid, new Date());
+			}
+		}
+
 		if (Bukkit.isPrimaryThread()) {
 			execute2(sender, commandLabel, rest);
 		} else {
@@ -352,7 +379,12 @@ public class ScriptCommand implements CommandExecutor {
 	public String getLabel() {
 		return label;
 	}
-	
+
+	@Nullable
+	public Timespan getCooldown() {
+		return cooldown;
+	}
+
 	public List<String> getAliases() {
 		return aliases;
 	}
