@@ -67,10 +67,7 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Timespan> {
         }
         ScriptCommandEvent event = ((ScriptCommandEvent) e);
         ScriptCommand scriptCommand = event.getSkriptCommand();
-        if (scriptCommand.getCooldown() == null) {
-            return null;
-        }
-        if (!(event.getSender() instanceof Player)) {
+        if (scriptCommand.getCooldown() == null || !(event.getSender() instanceof Player)) {
             return null;
         }
         UUID uuid = ((Player) event.getSender()).getUniqueId();
