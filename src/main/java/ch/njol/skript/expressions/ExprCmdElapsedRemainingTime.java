@@ -34,14 +34,15 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import java.util.UUID;
 
-@Name("Elapsed/Remaining Time")
-@Description({"Only usable in command events. The elapsed remaining time until the command may be executed again as per the cooldown."})
+@Name("Cooldown Time/Remaining Time/Elapsed Time/Cooldown Bypass Permission")
+@Description({"Only usable in command events. Represents the cooldown time, the remaining time, or elapsed time (time since last execution), or the cooldown bypass permission."})
 @Examples({
         "command /home:",
         "\tcooldown: 10 seconds",
@@ -50,30 +51,45 @@ import java.util.UUID;
         "\t\tteleport player to {home::%player%}"
 })
 @Since("INSERT VERSION")
-public class ExprCmdElapsedRemainingTime extends SimpleExpression<Timespan> {
+public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
 
     static {
-        Skript.registerExpression(ExprCmdElapsedRemainingTime.class, Timespan.class, ExpressionType.SIMPLE,
-                "[the] (0¦remaining|1¦elapsed) time[span] [of] [the] [(cooldown|wait)] [((of|for)[the] [current] command)]");
+        Skript.registerExpression(ExprCmdElapsedRemainingTime.class, Object.class, ExpressionType.SIMPLE,
+                "[the] (0¦remaining|1¦elapsed|2¦cooldown|3¦cooldown bypass perm[ission]) [time][ ][span] [of] [the] [(cooldown|wait)] [((of|for)[the] [current] command)]");
     }
 
-    private boolean remaining;
+    private int mark;
 
     @Override
     @Nullable
-    protected Timespan[] get(Event e) {
+    protected Object[] get(Event e) {
         if (!(e instanceof ScriptCommandEvent)) {
             return null;
         }
         ScriptCommandEvent event = ((ScriptCommandEvent) e);
         ScriptCommand scriptCommand = event.getSkriptCommand();
-        if (scriptCommand.getCooldown() == null || !(event.getSender() instanceof Player)) {
+
+        CommandSender sender = event.getSender();
+        if (scriptCommand.getCooldown() == null || !(sender instanceof Player)) {
             return null;
         }
-        UUID uuid = ((Player) event.getSender()).getUniqueId();
-        long ms = remaining ? scriptCommand.getRemainingMilliseconds(uuid) :
-                scriptCommand.getElapsedMilliseconds(uuid);
-        return new Timespan[]{new Timespan(ms)};
+        Player player = (Player) event.getSender();
+        UUID uuid = player.getUniqueId();
+
+        switch (mark) {
+            case 0:
+            case 1:
+                long ms = mark == 1
+                        ? scriptCommand.getRemainingMilliseconds(uuid)
+                        : scriptCommand.getElapsedMilliseconds(uuid);
+                return new Timespan[]{new Timespan(ms)};
+            case 2:
+                return new Timespan[]{scriptCommand.getCooldown()};
+            case 3:
+                return new String[]{scriptCommand.getCooldownBypass()};
+        }
+
+        return null;
     }
 
     @Override
@@ -82,22 +98,37 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Timespan> {
     }
 
     @Override
-    public Class<? extends Timespan> getReturnType() {
-        return Timespan.class;
+    public Class<?> getReturnType() {
+        return mark <= 2 ? Timespan.class : String.class;
     }
 
     @Override
     public String toString(@Nullable Event e, boolean debug) {
-        return "the " + (remaining ? "remaining" : "elapsed") + " time";
+        return "the " + getExpressionName();
     }
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        remaining = parseResult.mark == 0;
+        mark = parseResult.mark;
         if (!ScriptLoader.isCurrentEvent(ScriptCommandEvent.class)) {
-            Skript.error("The expression '" + (remaining ? "remaining" : "elapsed") + " time' can only be used within a command", ErrorQuality.SEMANTIC_ERROR);
+            Skript.error("The expression '" + getExpressionName() + " time' can only be used within a command", ErrorQuality.SEMANTIC_ERROR);
             return false;
         }
         return true;
+    }
+
+    @Nullable
+    private String getExpressionName() {
+        switch (mark) {
+            case 0:
+                return "remaining time";
+            case 1:
+                return "elapsed time";
+            case 2:
+                return "cooldown";
+            case 3:
+                return "cooldown bypass permission";
+        }
+        return null;
     }
 }

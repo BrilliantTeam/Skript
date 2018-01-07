@@ -420,8 +420,11 @@ public class ScriptCommand implements CommandExecutor {
 
 	public long getElapsedMilliseconds(UUID uuid) {
 		Date lastUsage = lastUsageMap.get(uuid);
-		System.out.println(lastUsage == null ? 0 : new Date().getTimestamp() - lastUsage.getTimestamp());
 		return lastUsage == null ? 0 : new Date().getTimestamp() - lastUsage.getTimestamp();
+	}
+
+	public String getCooldownBypass() {
+		return cooldownBypass;
 	}
 
 	public List<String> getAliases() {
