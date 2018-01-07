@@ -449,7 +449,7 @@ public abstract class Commands {
 			Skript.warning("command /" + command + " has a permission message set, but not a permission");
 		}
 
-		if (!cooldownMessage.isEmpty() && cooldown == null) {
+		if (!cooldownMessage.isEmpty() && cooldownString.isEmpty()) {
 			Skript.warning("command /" + command + " has a cooldown message set, but not a cooldown");
 		}
 
