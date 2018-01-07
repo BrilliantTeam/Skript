@@ -36,6 +36,7 @@ import java.util.logging.LogRecord;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.util.Timespan;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -443,13 +444,18 @@ public abstract class Commands {
 				Skript.warning("'" + cooldownString + "' is an invalid timespan for the cooldown");
 			}
 		}
-		final String cooldownMessage = ScriptLoader.replaceOptions(node.get("cooldown message", ""));
+		final String cooldownMessageString = ScriptLoader.replaceOptions(node.get("cooldown message", ""));
+		boolean usingCooldownMessage = !cooldownMessageString.isEmpty();
+		VariableString cooldownMessage = null;
+		if (usingCooldownMessage) {
+			cooldownMessage = VariableString.newInstance(cooldownMessageString);
+		}
 
 		if (!permissionMessage.isEmpty() && permission.isEmpty()) {
 			Skript.warning("command /" + command + " has a permission message set, but not a permission");
 		}
 
-		if (!cooldownMessage.isEmpty() && cooldownString.isEmpty()) {
+		if (usingCooldownMessage && cooldownString.isEmpty()) {
 			Skript.warning("command /" + command + " has a cooldown message set, but not a cooldown");
 		}
 

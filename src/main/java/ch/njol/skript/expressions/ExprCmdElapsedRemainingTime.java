@@ -21,6 +21,7 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.command.ScriptCommand;
 import ch.njol.skript.command.ScriptCommandEvent;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -33,27 +34,49 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
-@Name("Cooldown")
-@Description({"Only usable in command events. The cooldown of the command"})
-@Examples({"send \"The cooldown of this command is: %cooldown%\""})
+import java.util.UUID;
+
+@Name("Elapsed/Remaining Time")
+@Description({"Only usable in command events. The elapsed remaining time until the command may be executed again as per the cooldown."})
+@Examples({
+        "command /home:",
+        "\tcooldown: 10 seconds",
+        "\tcooldown message: You last teleported home %elapsed time% ago, you may teleport home again in %remaining time%",
+        "\ttrigger:",
+        "\t\tteleport player to {home::%player%}"
+})
 @Since("INSERT VERSION")
-public class ExprCmdCooldown extends SimpleExpression<Timespan> {
+public class ExprCmdElapsedRemainingTime extends SimpleExpression<Timespan> {
 
     static {
-        Skript.registerExpression(ExprCmdCooldown.class, Timespan.class, ExpressionType.SIMPLE,
-                "[the] cooldown [((of|for) [the] [current] command)]");
+        Skript.registerExpression(ExprCmdElapsedRemainingTime.class, Timespan.class, ExpressionType.SIMPLE,
+                "[the] (0¦remaining|2¦elapsed) time[span] [of] [the] [(cooldown|wait)] [((of|for)[the] [currnet] command)]");
     }
 
-    @Nullable
+    private boolean remaining;
+
     @Override
+    @Nullable
     protected Timespan[] get(Event e) {
         if (!(e instanceof ScriptCommandEvent)) {
             return null;
         }
-        return new Timespan[]{((ScriptCommandEvent) e).getSkriptCommand().getCooldown()};
+        ScriptCommandEvent event = ((ScriptCommandEvent) e);
+        ScriptCommand scriptCommand = event.getSkriptCommand();
+        if (scriptCommand.getCooldown() == null) {
+            return null;
+        }
+        if (!(event.getSender() instanceof Player)) {
+            return null;
+        }
+        UUID uuid = ((Player) event.getSender()).getUniqueId();
+        long ms = remaining ? scriptCommand.getRemainingMilliseconds(uuid) :
+                scriptCommand.getElapsedMilliseconds(uuid);
+        return new Timespan[]{new Timespan(ms)};
     }
 
     @Override
@@ -68,15 +91,16 @@ public class ExprCmdCooldown extends SimpleExpression<Timespan> {
 
     @Override
     public String toString(@Nullable Event e, boolean debug) {
-        return "the cooldown of the command";
+        return "the remaining time";
     }
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         if (!ScriptLoader.isCurrentEvent(ScriptCommandEvent.class)) {
-            Skript.error("The expression 'cooldown' can only be used within a command", ErrorQuality.SEMANTIC_ERROR);
+            Skript.error("The expression 'remaining time' can only be used within a command", ErrorQuality.SEMANTIC_ERROR);
             return false;
         }
+        remaining = parseResult.mark == 0;
         return true;
     }
 }

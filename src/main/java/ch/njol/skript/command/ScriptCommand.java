@@ -33,6 +33,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Timespan;
 import org.bukkit.Bukkit;
@@ -85,7 +88,7 @@ public class ScriptCommand implements CommandExecutor {
 	private final String description;
 	@Nullable
 	private final Timespan cooldown;
-	private final String cooldownMessage;
+	private final Expression<String> cooldownMessage;
 	final String usage;
 
 	final Trigger trigger;
@@ -116,7 +119,7 @@ public class ScriptCommand implements CommandExecutor {
 	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments,
 						 final String description, final String usage, final ArrayList<String> aliases,
 						 final String permission, final String permissionMessage, @Nullable  final Timespan cooldown,
-						 final String cooldownMessage, final int executableBy, final List<TriggerItem> items) {
+						 @Nullable final VariableString cooldownMessage, final int executableBy, final List<TriggerItem> items) {
 		Validate.notNull(name, pattern, arguments, description, usage, aliases, items);
 		this.name = name;
 		label = "" + name.toLowerCase();
@@ -124,7 +127,9 @@ public class ScriptCommand implements CommandExecutor {
 		this.permissionMessage = permissionMessage.isEmpty() ? Language.get("commands.no permission message") : Utils.replaceEnglishChatStyles(permissionMessage);
 
 		this.cooldown = cooldown;
-		this.cooldownMessage = permissionMessage.isEmpty() ? Language.get("commands.cooldown message") : Utils.replaceEnglishChatStyles(cooldownMessage);
+		this.cooldownMessage = cooldownMessage == null
+				? new SimpleLiteral<>(Language.get("commands.cooldown message"),false)
+				: cooldownMessage;
 
 		final Iterator<String> as = aliases.iterator();
 		while (as.hasNext()) { // remove aliases that are the same as the command
@@ -192,20 +197,17 @@ public class ScriptCommand implements CommandExecutor {
 			return false;
 		}
 
+		final ScriptCommandEvent event = new ScriptCommandEvent(ScriptCommand.this, sender);
+
 		if (sender instanceof Player && cooldown != null) {
 			UUID uuid = ((Player) sender).getUniqueId();
 			if (lastUsageMap.containsKey(uuid)) {
 				Date lastUsage = lastUsageMap.get(uuid);
-				Timespan cooldown = this.cooldown;
-				// Needed otherwise Eclipse compiler complains :| ???
-				assert cooldown != null;
-				// Not using System.currentTimeMillis() in case ch.njol.skript.util.Date impl changes
-				long currentTimestamp = new Date().getTimestamp();
 				// If the timespan since the lastUsage is more than or equal to the cooldown
-				if ((currentTimestamp - lastUsage.getTimestamp()) >= cooldown.getMilliSeconds()) {
+				if (getRemainingMilliseconds(uuid) <= 0) {
 					lastUsageMap.remove(uuid);
 				} else {
-					sender.sendMessage(cooldownMessage);
+					sender.sendMessage(cooldownMessage.getSingle(event));
 					return false;
 				}
 			} else {
@@ -214,22 +216,20 @@ public class ScriptCommand implements CommandExecutor {
 		}
 
 		if (Bukkit.isPrimaryThread()) {
-			execute2(sender, commandLabel, rest);
+			execute2(event, sender, commandLabel, rest);
 		} else {
 			// must not wait for the command to complete as some plugins call commands in such a way that the server will deadlock
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					execute2(sender, commandLabel, rest);
+					execute2(event, sender, commandLabel, rest);
 				}
 			});
 		}
 		return true; // Skript prints its own error message anyway
 	}
 	
-	boolean execute2(final CommandSender sender, final String commandLabel, final String rest) {
-		final ScriptCommandEvent event = new ScriptCommandEvent(ScriptCommand.this, sender);
-		
+	boolean execute2(final ScriptCommandEvent event, final CommandSender sender, final String commandLabel, final String rest) {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			final boolean ok = SkriptParser.parseArguments(rest, ScriptCommand.this, event);
@@ -391,6 +391,26 @@ public class ScriptCommand implements CommandExecutor {
 	@Nullable
 	public Timespan getCooldown() {
 		return cooldown;
+	}
+
+	public long getRemainingMilliseconds(UUID uuid) {
+		Date lastUsage = lastUsageMap.get(uuid);
+		if (lastUsage == null) {
+			return 0;
+		}
+		Timespan cooldown = this.cooldown;
+		assert cooldown != null;
+		long remaining = cooldown.getMilliSeconds() - getElapsedMilliseconds(uuid);
+		if (remaining < 0) {
+			remaining = 0;
+		}
+		return remaining;
+	}
+
+	public long getElapsedMilliseconds(UUID uuid) {
+		Date lastUsage = lastUsageMap.get(uuid);
+		System.out.println(lastUsage == null ? 0 : new Date().getTimestamp() - lastUsage.getTimestamp());
+		return lastUsage == null ? 0 : new Date().getTimestamp() - lastUsage.getTimestamp();
 	}
 
 	public List<String> getAliases() {
