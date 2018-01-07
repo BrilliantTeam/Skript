@@ -96,11 +96,11 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Timespan> {
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+        remaining = parseResult.mark == 0;
         if (!ScriptLoader.isCurrentEvent(ScriptCommandEvent.class)) {
-            Skript.error("The expression 'remaining time' can only be used within a command", ErrorQuality.SEMANTIC_ERROR);
+            Skript.error("The expression '" + (remaining ? "remaining" : "elapsed") + " time' can only be used within a command", ErrorQuality.SEMANTIC_ERROR);
             return false;
         }
-        remaining = parseResult.mark == 0;
         return true;
     }
 }
