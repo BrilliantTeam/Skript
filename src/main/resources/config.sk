@@ -198,7 +198,7 @@ databases:
 	
 	# Each database definition must be in a separate section. You can choose any name for the sections, as long as it's not already used.
 	database 1:
-		# an example database to describe all possible options.
+		# An example database to describe all possible options.
 		
 		type: disabled
 		# The type of this database. Allowed values are 'CSV', 'SQLite', 'MySQL' and 'disabled'.
@@ -224,7 +224,7 @@ databases:
 		password: pass
 		database: skript # The database to use, the table will be created in this database.
 		table: variables21 # The name of the table to create. 'variables21' is the default name, if this was to be omitted.
-		                   # (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
+											 # (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
 		# == SQLite/CSV configuration ==
 		file: ./plugins/Skript/variables.db
 		# Where to save the variables to. For a CSV file, the file extension '.csv' is recommended, but not required, but SQLite database files must end in '.db' (SQLibrary forces this).
@@ -232,8 +232,8 @@ databases:
 
 		#table: variables21
 		# The name of the table to create. 'variables21' is the default name, if this was to be omitted.
-        # (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
-        # This is generally not required as the the .db file will only be used by Skript, unless you want to split different variables into different tables
+		# (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
+		# This is generally not required as the the .db file will only be used by Skript, unless you want to split different variables into different tables
 
 		backup interval: 2 hours
 		# Creates a backup of the file every so often. This can be useful if you ever want to revert variables to an older state.
@@ -269,8 +269,8 @@ databases:
 		
 		file: ./plugins/Skript/variables.db
 		# SQLite databases must end in '.db'
-    	#table: variables21
-    	# Usually not required, if omitted defaults to variables21 (see above for more details)
+		#table: variables21
+		# Usually not required, if omitted defaults to variables21 (see above for more details)
 
 		backup interval: 0 # 0 = don't create backups
 		monitor changes: false
