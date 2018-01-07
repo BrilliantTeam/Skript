@@ -54,7 +54,7 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Timespan> {
 
     static {
         Skript.registerExpression(ExprCmdElapsedRemainingTime.class, Timespan.class, ExpressionType.SIMPLE,
-                "[the] (0¦remaining|1¦elapsed) time[span] [of] [the] [(cooldown|wait)] [((of|for)[the] [currnet] command)]");
+                "[the] (0¦remaining|1¦elapsed) time[span] [of] [the] [(cooldown|wait)] [((of|for)[the] [current] command)]");
     }
 
     private boolean remaining;
