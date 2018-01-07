@@ -224,7 +224,7 @@ databases:
 		password: pass
 		database: skript # The database to use, the table will be created in this database.
 		table: variables21 # The name of the table to create. 'variables21' is the default name, if this was to be omitted.
-											 # (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
+							# (If the table exists but is defined differently that how Skript expects it to be you'll get errors and no variables will be saved and/or loaded)
 		# == SQLite/CSV configuration ==
 		file: ./plugins/Skript/variables.db
 		# Where to save the variables to. For a CSV file, the file extension '.csv' is recommended, but not required, but SQLite database files must end in '.db' (SQLibrary forces this).
