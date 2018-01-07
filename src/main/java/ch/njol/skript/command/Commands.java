@@ -140,6 +140,7 @@ public abstract class Commands {
 			.addEntry("permission message", true)
 			.addEntry("cooldown", true)
 			.addEntry("cooldown message", true)
+			.addEntry("cooldown bypass", true)
 			.addEntry("aliases", true)
 			.addEntry("executable by", true)
 			.addSection("trigger", false);
@@ -444,12 +445,15 @@ public abstract class Commands {
 				Skript.warning("'" + cooldownString + "' is an invalid timespan for the cooldown");
 			}
 		}
+
 		final String cooldownMessageString = ScriptLoader.replaceOptions(node.get("cooldown message", ""));
 		boolean usingCooldownMessage = !cooldownMessageString.isEmpty();
 		VariableString cooldownMessage = null;
 		if (usingCooldownMessage) {
 			cooldownMessage = VariableString.newInstance(cooldownMessageString);
 		}
+
+		String cooldownBypass = ScriptLoader.replaceOptions(node.get("cooldown bypass", ""));
 
 		if (!permissionMessage.isEmpty() && permission.isEmpty()) {
 			Skript.warning("command /" + command + " has a permission message set, but not a permission");
@@ -472,7 +476,7 @@ public abstract class Commands {
 		final ScriptCommand c;
 		try {
 			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage,
-					aliases, permission, permissionMessage, cooldown, cooldownMessage, executableBy,
+					aliases, permission, permissionMessage, cooldown, cooldownMessage, cooldownBypass, executableBy,
 					ScriptLoader.loadItems(trigger));
 		} finally {
 			Commands.currentArguments = null;

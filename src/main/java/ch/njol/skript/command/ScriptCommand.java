@@ -89,6 +89,7 @@ public class ScriptCommand implements CommandExecutor {
 	@Nullable
 	private final Timespan cooldown;
 	private final Expression<String> cooldownMessage;
+	private final String cooldownBypass;
 	final String usage;
 
 	final Trigger trigger;
@@ -118,8 +119,9 @@ public class ScriptCommand implements CommandExecutor {
 	 */
 	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments,
 						 final String description, final String usage, final ArrayList<String> aliases,
-						 final String permission, final String permissionMessage, @Nullable  final Timespan cooldown,
-						 @Nullable final VariableString cooldownMessage, final int executableBy, final List<TriggerItem> items) {
+						 final String permission, final String permissionMessage, @Nullable final Timespan cooldown,
+						 @Nullable final VariableString cooldownMessage, final String cooldownBypass,
+						 final int executableBy, final List<TriggerItem> items) {
 		Validate.notNull(name, pattern, arguments, description, usage, aliases, items);
 		this.name = name;
 		label = "" + name.toLowerCase();
@@ -130,6 +132,7 @@ public class ScriptCommand implements CommandExecutor {
 		this.cooldownMessage = cooldownMessage == null
 				? new SimpleLiteral<>(Language.get("commands.cooldown message"),false)
 				: cooldownMessage;
+		this.cooldownBypass = cooldownBypass;
 
 		final Iterator<String> as = aliases.iterator();
 		while (as.hasNext()) { // remove aliases that are the same as the command
@@ -199,19 +202,27 @@ public class ScriptCommand implements CommandExecutor {
 
 		final ScriptCommandEvent event = new ScriptCommandEvent(ScriptCommand.this, sender);
 
-		if (sender instanceof Player && cooldown != null) {
-			UUID uuid = ((Player) sender).getUniqueId();
-			if (lastUsageMap.containsKey(uuid)) {
-				Date lastUsage = lastUsageMap.get(uuid);
-				// If the timespan since the lastUsage is more than or equal to the cooldown
-				if (getRemainingMilliseconds(uuid) <= 0) {
+		cooldownCheck : {
+			if (sender instanceof Player && cooldown != null) {
+				Player player = ((Player) sender);
+				UUID uuid = player.getUniqueId();
+
+				// Cooldown bypass
+				if (!cooldownBypass.isEmpty() && player.hasPermission(cooldownBypass)) {
 					lastUsageMap.remove(uuid);
-				} else {
-					sender.sendMessage(cooldownMessage.getSingle(event));
-					return false;
+					break cooldownCheck;
 				}
-			} else {
-				lastUsageMap.put(uuid, new Date());
+
+				if (lastUsageMap.containsKey(uuid)) {
+					if (getRemainingMilliseconds(uuid) <= 0) {
+						lastUsageMap.remove(uuid);
+					} else {
+						sender.sendMessage(cooldownMessage.getSingle(event));
+						return false;
+					}
+				} else {
+					lastUsageMap.put(uuid, new Date());
+				}
 			}
 		}
 
