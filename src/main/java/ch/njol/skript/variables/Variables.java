@@ -273,7 +273,10 @@ public abstract class Variables {
 	 */
 	@Nullable
 	public final static Object getVariable(final String name, final @Nullable Event e, final boolean local) {
-		String n = name.toLowerCase(Locale.ENGLISH);
+		String n = name;
+        if (SkriptConfig.caseInsensitiveVariables.value()) {
+            n = name.toLowerCase(Locale.ENGLISH);
+        }
 	    if (local) {
 			final VariablesMap map = localVariables.get(e);
 			if (map == null)
@@ -296,7 +299,10 @@ public abstract class Variables {
 	 * @param value The variable's value. Use <tt>null</tt> to delete the variable.
 	 */
 	public final static void setVariable(final String name, @Nullable Object value, final @Nullable Event e, final boolean local) {
-        String n = name.toLowerCase(Locale.ENGLISH);
+        String n = name;
+        if (SkriptConfig.caseInsensitiveVariables.value()) {
+            n = name.toLowerCase(Locale.ENGLISH);
+        }
 	    if (value != null) {
 			assert !n.endsWith("::*");
 			@SuppressWarnings("null")
