@@ -92,7 +92,7 @@ public abstract class Utils {
 		if (is1 == null || is2 == null)
 			return is1 == is2;
 		return is1.getType() == is2.getType() && is1.getDurability() == is2.getDurability()
-				&& (ItemType.itemMetaSupported ? is1.getItemMeta().equals(is2.getItemMeta()) : is1.getEnchantments().equals(is2.getEnchantments()));
+				&& is1.getItemMeta().equals(is2.getItemMeta());
 	}
 	
 	/**

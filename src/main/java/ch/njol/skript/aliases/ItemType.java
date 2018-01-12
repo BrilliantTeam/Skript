@@ -95,6 +95,12 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	@Nullable
 	private ItemType item = null, block = null;
 	
+	/**
+	 * Meta that applies for all ItemDatas there.
+	 */
+	@Nullable
+	private ItemMeta globalMeta;
+	
 	void setItem(final @Nullable ItemType item) {
 		if (equals(item)) { // can happen if someone defines a 'x' and 'x item/block' alias that have the same value, e.g. 'dirt' and 'dirt block'
 			this.item = null;
@@ -954,5 +960,33 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		}
 		
 		return rawNames;
+	}
+	
+	/**
+	 * Gets all enchantments of this item.
+	 * @return Enchantments.
+	 */
+	@Nullable
+	public Map<Enchantment,Integer> getEnchantments() {
+		if (globalMeta == null)
+			return null;
+		assert globalMeta != null;
+		Map<Enchantment,Integer> enchants = globalMeta.getEnchants();
+		if (enchants.isEmpty())
+			return null;
+		return enchants;
+	}
+
+	/**
+	 * Adds enchantments to this item type.
+	 * @param enchantments Enchantments.
+	 */
+	public void addEnchantments(Map<Enchantment,Integer> enchantments) {
+		if (globalMeta == null)
+			globalMeta = ItemData.itemFactory.getItemMeta(Material.STONE);
+		for (Map.Entry<Enchantment,Integer> entry : enchantments.entrySet()) {
+			assert globalMeta != null;
+			globalMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+		}
 	}
 }

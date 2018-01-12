@@ -68,7 +68,7 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	
 	private static final Gson gson = new Gson();
 	@SuppressWarnings("null")
-	private static final ItemFactory itemFactory = Bukkit.getServer().getItemFactory();
+	static final ItemFactory itemFactory = Bukkit.getServer().getItemFactory();
 	
 	private final static Message m_named = new Message("aliases.named");
 	
