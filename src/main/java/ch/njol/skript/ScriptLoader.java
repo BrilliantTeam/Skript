@@ -526,7 +526,7 @@ final public class ScriptLoader {
 								Skript.error("Invalid use of percent signs in variable name");
 								continue;
 							}
-							if (Variables.getVariable(n.getKey(), null, false) != null)
+							if (Variables.getVariable(((EntryNode) n).getKey(), null, false) != null)
 								continue;
 							Object o;
 							final ParseLogHandler log = SkriptLogger.startParseLogHandler();
