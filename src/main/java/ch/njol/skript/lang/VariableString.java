@@ -309,8 +309,11 @@ public class VariableString implements Expression<String> {
 			return;
 		if (name.startsWith("%")) {// inside the if to only print this message once per variable
 			final Config script = ScriptLoader.currentScript;
-			if (script != null)
-				Skript.warning("Starting a variable's name with an expression is discouraged ({" + name + "}). You could prefix it with the script's name: {" + StringUtils.substring(script.getFileName(), 0, -3) + "." + name + "}");
+			if (script != null) {
+				if (!SkriptConfig.disableVariableStartingWithExpressionWarnings.value()) {
+					Skript.warning("Starting a variable's name with an expression is discouraged ({" + name + "}). You could prefix it with the script's name: {" + StringUtils.substring(script.getFileName(), 0, -3) + "." + name + "}");
+				}
+			}
 		}
 		
 		final Pattern pattern;
