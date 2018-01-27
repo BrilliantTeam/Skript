@@ -19,5 +19,6 @@
  */
 package ch.njol.skript.util;
 
+// This class acts as a filler for the visualeffect type on Minecraft versions with org.bukkit.Particle absent
 public class VisualEffectDummy {
 }
