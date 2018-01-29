@@ -381,7 +381,10 @@ public abstract class Aliases {
 	}
 	
 	public static void loadDirectory(File dir) throws IOException {
-		for (File f : dir.listFiles()) {
+		File[] files = dir.listFiles();
+		if (files == null)
+			return; // listFiles returns null if there are no files (... why?)
+		for (File f : files) {
 			if (f.isDirectory())
 				loadDirectory(f);
 			else

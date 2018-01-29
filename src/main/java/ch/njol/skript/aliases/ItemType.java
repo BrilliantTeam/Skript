@@ -21,6 +21,7 @@ package ch.njol.skript.aliases;
 
 import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,16 +62,49 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.BlockUtils;
 import ch.njol.skript.util.Container;
 import ch.njol.skript.util.Container.ContainerType;
+import ch.njol.skript.variables.Variables;
 import ch.njol.skript.util.EnchantmentType;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.coll.iterator.EmptyIterable;
 import ch.njol.util.coll.iterator.SingleItemIterable;
+import ch.njol.yggdrasil.FieldHandler;
 import ch.njol.yggdrasil.Fields;
+import ch.njol.yggdrasil.Fields.FieldContext;
 import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 
 @ContainerType(ItemStack.class)
 @SuppressWarnings("deprecation")
 public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>, YggdrasilExtendedSerializable {
+	
+	static {
+		// This handles updating ItemType and ItemData variable records
+		Variables.yggdrasil.registerFieldHandler(new FieldHandler() {
+			
+			@Override
+			public boolean missingField(Object o, Field field) throws StreamCorruptedException {
+				if (!(o instanceof ItemType || o instanceof ItemData))
+					return false;
+				if (field.getName().equals("globalMeta"))
+					return true; // Just null, no need for updating that data
+				return false;
+			}
+			
+			@Override
+			public boolean incompatibleField(Object o, Field f, FieldContext field) throws StreamCorruptedException {
+				return false;
+			}
+			
+			@Override
+			public boolean excessiveField(Object o, FieldContext field) throws StreamCorruptedException {
+				if (!(o instanceof ItemType || o instanceof ItemData))
+					return false;
+				String id = field.getID();
+				if (id.equals("meta") || id.equals("enchantments") || id.equals("ignoreMeta") || id.equals("numItems"))
+					return true;
+				return false;
+			}
+		});
+	}
 	
 	/**
 	 * DO NOT ADD ItemDatas to this list directly!
