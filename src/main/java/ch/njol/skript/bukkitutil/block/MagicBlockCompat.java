@@ -23,6 +23,8 @@ package ch.njol.skript.bukkitutil.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -31,24 +33,22 @@ import org.bukkit.inventory.ItemStack;
  */
 public class MagicBlockCompat implements BlockCompat {
 	
+	@SuppressWarnings({"deprecation", "null"})
 	private class MagicBlockValues extends BlockValues {
 
 		private Material id;
 		private byte data;
 
-		@SuppressWarnings("deprecation")
-		public MagicBlockValues(Block block) {
+		public MagicBlockValues(BlockState block) {
 			this.id = block.getType();
-			this.data = block.getData(); // Some black magic here, please look away...
+			this.data = block.getRawData(); // Some black magic here, please look away...
 		}
 		
-		@SuppressWarnings("deprecation")
 		public MagicBlockValues(ItemStack stack) {
 			this.id = stack.getType();
 			this.data = stack.getData().getData(); // And terrible hack again
 		}
 
-		@SuppressWarnings("deprecation")
 		@Override
 		public void setBlock(Block block, boolean applyPhysics) {
 			block.setType(id);
@@ -71,15 +71,24 @@ public class MagicBlockCompat implements BlockCompat {
 		}
 		
 	}
-	
-	@Override
-	public BlockValues getBlockValues(Block block) {
-		return new MagicBlockValues(block);
-	}
 
 	@Override
 	public BlockValues getBlockValues(ItemStack stack) {
 		return new MagicBlockValues(stack);
+	}
+
+	@Override
+	public BlockValues getBlockValues(BlockState block) {
+		return new MagicBlockValues(block);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public BlockState fallingBlockToState(FallingBlock entity) {
+		BlockState state = entity.getWorld().getBlockAt(0, 0, 0).getState();
+		state.setType(entity.getMaterial());
+		state.setRawData(entity.getBlockData());
+		return state;
 	}
 	
 }

@@ -230,11 +230,11 @@ public class SkriptClasses {
 						final StringBuilder b = new StringBuilder("itemtype:");
 						b.append(t.getInternalAmount());
 						b.append("," + t.isAll());
-						for (final ItemData d : t.getTypes()) {
-							b.append("," + d.getId());
-							b.append(":" + d.dataMin);
-							b.append("/" + d.dataMax);
-						}
+//						for (final ItemData d : t.getTypes()) { // FIXME maybe add this back
+//							b.append("," + d.getId());
+//							b.append(":" + d.dataMin);
+//							b.append("/" + d.dataMax);
+//						}
 						final Map<Enchantment, Integer> enchs = t.getEnchantments();
 						if (enchs != null && !enchs.isEmpty()) {
 							b.append("|");

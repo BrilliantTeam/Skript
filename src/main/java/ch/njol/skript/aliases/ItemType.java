@@ -33,10 +33,12 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.RandomAccess;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -152,9 +154,9 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		add_(new ItemData(i));
 	}
 	
-	public ItemType(Block b) {
+	public ItemType(BlockState b) {
 //		amount = 1;
-		add_(new ItemData(b.getType()));
+		add_(new ItemData(b));
 		// TODO metadata - spawners, skulls, etc.
 	}
 	
@@ -168,7 +170,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			types.add(d.clone());
 		}
 	}
-	
+
 	/**
 	 * Removes the item and block aliases from this alias as it now represents a different item.
 	 */
@@ -221,11 +223,17 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return isOfType(new ItemData(item));
 	}
 	
-	public boolean isOfType(@Nullable Block block) {
+	public boolean isOfType(@Nullable BlockState block) {
 		if (block == null)
 			return isOfType(Material.AIR, null);
 		
 		return isOfType(new ItemData(block));
+	}
+	
+	public boolean isOfType(@Nullable Block block) {
+		if (block == null)
+			return isOfType(Material.AIR, null);
+		return isOfType(block.getState());
 	}
 	
 	public boolean isOfType(ItemData type) {
@@ -987,6 +995,21 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		for (Map.Entry<Enchantment,Integer> entry : enchantments.entrySet()) {
 			assert globalMeta != null;
 			globalMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+		}
+	}
+
+	/**
+	 * Clears all enchantments from this item type except the ones that are
+	 * defined for individual item datas only.
+	 */
+	public void clearEnchantments() {
+		if (globalMeta == null)
+			return; // No enchantments
+		assert globalMeta != null;
+		Set<Enchantment> enchants = globalMeta.getEnchants().keySet();
+		for (Enchantment ench : enchants) {
+			assert globalMeta != null;
+			globalMeta.removeEnchant(ench);
 		}
 	}
 }

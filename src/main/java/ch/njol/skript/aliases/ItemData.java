@@ -28,6 +28,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -137,11 +138,15 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		this.meta = stack.getItemMeta(); // Grab meta from stack
 	}
 	
-	public ItemData(Block block) {
+	public ItemData(BlockState block) {
 		this.type = block.getType();
 		this.stack = new ItemStack(type);
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(block);
 		this.meta = stack.getItemMeta();
+	}
+	
+	public ItemData(Block block) {
+		this(block.getState());
 	}
 	
 	public ItemData() {

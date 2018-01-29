@@ -21,7 +21,10 @@
 
 package ch.njol.skript.bukkitutil.block;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -36,18 +39,40 @@ public interface BlockCompat {
 	static final BlockCompat INSTANCE = new MagicBlockCompat();
 	
 	/**
-	 * Gets block values from a block. The value can be compared to other values
+	 * Gets block values from a block state. They can be compared to other
+	 * values if needed, but cannot be used to retrieve any other data.
+	 * @param block Block state to retrieve value from.
+	 * @return Block values.
+	 */
+	BlockValues getBlockValues(BlockState block);
+	
+	/**
+	 * Gets block values from a block. They can be compared to other values
 	 * if needed, but cannot be used to retrieve any other data.
 	 * @param block Block to retrieve value from.
 	 * @return Block values.
 	 */
-	BlockValues getBlockValues(Block block);
+	@SuppressWarnings("null")
+	default BlockValues getBlockValues(Block block) {
+		return getBlockValues(block.getState());
+	}
 
 	/**
-	 * Gets block values from a item stack. The value can be compared to other values
+	 * Gets block values from a item stack. They can be compared to other values
 	 * if needed, but cannot be used to retrieve any other data.
 	 * @param stack Item that would be placed as the block
 	 * @return Block values.
 	 */
 	BlockValues getBlockValues(ItemStack stack);
+	
+	/**
+	 * Creates a block state from a falling block.
+	 * @param entity Falling block entity
+	 * @return Block state.
+	 */
+	BlockState fallingBlockToState(FallingBlock entity);
+	
+	default BlockValues getBlockValues(FallingBlock entity) {
+		return getBlockValues(fallingBlockToState(entity));
+	}
 }

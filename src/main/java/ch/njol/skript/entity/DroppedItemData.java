@@ -122,10 +122,11 @@ public class DroppedItemData extends EntityData<Item> {
 	@Override
 	@Deprecated
 	protected boolean deserialize(final String s) {
-		if (s.isEmpty())
-			return true;
-		types = ItemType.deserialize(s);
-		return types != null;
+		throw new UnsupportedOperationException("old serialization is no longer supported");
+//		if (s.isEmpty())
+//			return true;
+//		types = ItemType.deserialize(s);
+//		return types != null;
 	}
 	
 	@Override

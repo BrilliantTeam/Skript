@@ -31,6 +31,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemData;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.block.BlockCompat;
+import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -67,8 +69,8 @@ public class FallingBlockData extends EntityData<FallingBlock> {
 					t = t.getBlock().clone();
 					final Iterator<ItemData> iter = t.iterator();
 					while (iter.hasNext()) {
-						final int id = iter.next().getId();
-						if (id <= 0 || id > Skript.MAXBLOCKID)
+						final Material id = iter.next().getType();
+						if (!id.isBlock())
 							iter.remove();
 					}
 					if (t.numTypes() == 0)
@@ -89,8 +91,8 @@ public class FallingBlockData extends EntityData<FallingBlock> {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected boolean init(final @Nullable Class<? extends FallingBlock> c, final @Nullable FallingBlock e) {
-		if (e != null)
-			types = new ItemType[] {new ItemType(e.getBlockId(), e.getBlockData())};
+		if (e != null) // TODO material data support
+			types = new ItemType[] {new ItemType(BlockCompat.INSTANCE.fallingBlockToState(e))};
 		return true;
 	}
 	
@@ -99,7 +101,7 @@ public class FallingBlockData extends EntityData<FallingBlock> {
 	protected boolean match(final FallingBlock entity) {
 		if (types != null) {
 			for (final ItemType t : types) {
-				if (t.isOfType(entity.getBlockId(), entity.getBlockData()))
+				if (t.isOfType(BlockCompat.INSTANCE.fallingBlockToState(entity)))
 					return true;
 			}
 			return false;
@@ -166,10 +168,11 @@ public class FallingBlockData extends EntityData<FallingBlock> {
 	@Override
 	@Deprecated
 	protected boolean deserialize(final String s) {
-		if (s.isEmpty())
-			return true;
-		types = ItemType.deserialize(s);
-		return types != null;
+		throw new UnsupportedOperationException("old serialization is not supported");
+//		if (s.isEmpty())
+//			return true;
+//		types = ItemType.deserialize(s);
+//		return types != null;
 	}
 	
 	@Override
