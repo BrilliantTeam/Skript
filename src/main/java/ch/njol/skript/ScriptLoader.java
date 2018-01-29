@@ -892,7 +892,7 @@ final public class ScriptLoader {
 					Skript.error("undefined option " + m.group());
 					return m.group();
 				}
-				return option;
+				return Matcher.quoteReplacement(option);
 			}
 		});
 		assert r != null;

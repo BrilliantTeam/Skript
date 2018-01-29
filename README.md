@@ -24,8 +24,8 @@ use common sense: what might Skript developer need to know to solve your issue?
 
 If issue has been reported before, and is open, you can comment to it to ask if there
 has been progress or provide more information. If it has been closed, you can do
-same thing, but then it might be good idea to ping `@bensku` since closed issues
-are not often checked.
+same thing, but then it might be good idea to ping `@bensku` and/or `@Snow-Pyon`
+since closed issues are not often checked.
 
 Finally, there is no guarantee that issue will be resolved. Sometimes it might be
 harder than it sounds to you; in other cases, no one has time to take look at it.
@@ -131,7 +131,24 @@ Note that these repositories are provided as-is, for now. I cannot currently spe
 * [SkUnity Forums](https://forums.skunity.com/)
 * [Original Skript at BukkitDev](https://dev.bukkit.org/bukkit-plugins/skript/) (inactive)
 * [Addon Releases @SkUnity](https://forums.skunity.com/forums/addon-releases/)
-* [Skript Chat Discord invite](https://discord.gg/0lx4QhQvwelCZbEX) 
+* [Skript Chat Discord invite](https://discord.gg/0lx4QhQvwelCZbEX)
 * [Skript Hub](https://skripthub.net/)
 
 Note that these resources are not maintained by me. If you notice something wrong in them, do not contact me.
+
+## Developers
+Current team behind Skript:
+
+* [bensku](https://github.com/bensku) (Skript maintainer/developer)
+* [Snow-Pyon](https://github.com/Snow-Pyon) (Skript developer)
+* [TheBentoBox](https://github.com/TheBentoBox) (issue tracker manager)
+
+Also, of course, we should thank [Njol](https://github.com/Njol) for creating
+Skript and [Mirreski](https://github.com/Mirreski) for maintaining it for a
+long time.
+
+In addition to that, Skript has received a lot of pull requests over time.
+You can find all contributors [here](https://github.com/bensku/Skript/graphs/contributors).
+
+All code is owned by its writer, licensed for others under GPLv3 (see LICENSE)
+unless otherwise specified.

@@ -31,7 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.lang.util.SimpleLiteral;
+import ch.njol.skript.util.Date;
+import ch.njol.skript.util.Timespan;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -80,8 +86,12 @@ public class ScriptCommand implements CommandExecutor {
 	private List<String> activeAliases;
 	private final String permission, permissionMessage;
 	private final String description;
+	@Nullable
+	private final Timespan cooldown;
+	private final Expression<String> cooldownMessage;
+	private final String cooldownBypass;
 	final String usage;
-	
+
 	final Trigger trigger;
 	
 	private final String pattern;
@@ -91,7 +101,9 @@ public class ScriptCommand implements CommandExecutor {
 	final int executableBy;
 	
 	private transient PluginCommand bukkitCommand;
-	
+
+	private Map<UUID,Date> lastUsageMap = new HashMap<>();
+
 	/**
 	 * Creates a new SkriptCommand.
 	 * 
@@ -105,13 +117,23 @@ public class ScriptCommand implements CommandExecutor {
 	 * @param permissionMessage message to display if the player doesn't have the given permission
 	 * @param items trigger to execute
 	 */
-	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments, final String description, final String usage, final ArrayList<String> aliases, final String permission, final String permissionMessage, final int executableBy, final List<TriggerItem> items) {
+	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments,
+						 final String description, final String usage, final ArrayList<String> aliases,
+						 final String permission, final String permissionMessage, @Nullable final Timespan cooldown,
+						 @Nullable final VariableString cooldownMessage, final String cooldownBypass,
+						 final int executableBy, final List<TriggerItem> items) {
 		Validate.notNull(name, pattern, arguments, description, usage, aliases, items);
 		this.name = name;
 		label = "" + name.toLowerCase();
 		this.permission = permission;
 		this.permissionMessage = permissionMessage.isEmpty() ? Language.get("commands.no permission message") : Utils.replaceEnglishChatStyles(permissionMessage);
-		
+
+		this.cooldown = cooldown;
+		this.cooldownMessage = cooldownMessage == null
+				? new SimpleLiteral<>(Language.get("commands.cooldown message"),false)
+				: cooldownMessage;
+		this.cooldownBypass = cooldownBypass;
+
 		final Iterator<String> as = aliases.iterator();
 		while (as.hasNext()) { // remove aliases that are the same as the command
 			if (as.next().equalsIgnoreCase(label))
@@ -177,24 +199,48 @@ public class ScriptCommand implements CommandExecutor {
 			sender.sendMessage(permissionMessage);
 			return false;
 		}
-		
+
+		final ScriptCommandEvent event = new ScriptCommandEvent(ScriptCommand.this, sender);
+
+		cooldownCheck : {
+			if (sender instanceof Player && cooldown != null) {
+				Player player = ((Player) sender);
+				UUID uuid = player.getUniqueId();
+
+				// Cooldown bypass
+				if (!cooldownBypass.isEmpty() && player.hasPermission(cooldownBypass)) {
+					lastUsageMap.remove(uuid);
+					break cooldownCheck;
+				}
+
+				if (lastUsageMap.containsKey(uuid)) {
+					if (getRemainingMilliseconds(uuid) <= 0) {
+						lastUsageMap.remove(uuid);
+					} else {
+						sender.sendMessage(cooldownMessage.getSingle(event));
+						return false;
+					}
+				} else {
+					lastUsageMap.put(uuid, new Date());
+				}
+			}
+		}
+
 		if (Bukkit.isPrimaryThread()) {
-			execute2(sender, commandLabel, rest);
+			execute2(event, sender, commandLabel, rest);
 		} else {
 			// must not wait for the command to complete as some plugins call commands in such a way that the server will deadlock
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					execute2(sender, commandLabel, rest);
+					execute2(event, sender, commandLabel, rest);
 				}
 			});
 		}
 		return true; // Skript prints its own error message anyway
 	}
 	
-	boolean execute2(final CommandSender sender, final String commandLabel, final String rest) {
-		final ScriptCommandEvent event = new ScriptCommandEvent(ScriptCommand.this, sender);
-		
+	boolean execute2(final ScriptCommandEvent event, final CommandSender sender, final String commandLabel, final String rest) {
 		final ParseLogHandler log = SkriptLogger.startParseLogHandler();
 		try {
 			final boolean ok = SkriptParser.parseArguments(rest, ScriptCommand.this, event);
@@ -352,7 +398,35 @@ public class ScriptCommand implements CommandExecutor {
 	public String getLabel() {
 		return label;
 	}
-	
+
+	@Nullable
+	public Timespan getCooldown() {
+		return cooldown;
+	}
+
+	public long getRemainingMilliseconds(UUID uuid) {
+		Date lastUsage = lastUsageMap.get(uuid);
+		if (lastUsage == null) {
+			return 0;
+		}
+		Timespan cooldown = this.cooldown;
+		assert cooldown != null;
+		long remaining = cooldown.getMilliSeconds() - getElapsedMilliseconds(uuid);
+		if (remaining < 0) {
+			remaining = 0;
+		}
+		return remaining;
+	}
+
+	public long getElapsedMilliseconds(UUID uuid) {
+		Date lastUsage = lastUsageMap.get(uuid);
+		return lastUsage == null ? 0 : new Date().getTimestamp() - lastUsage.getTimestamp();
+	}
+
+	public String getCooldownBypass() {
+		return cooldownBypass;
+	}
+
 	public List<String> getAliases() {
 		return aliases;
 	}
