@@ -129,6 +129,7 @@ public class AliasesProvider {
 	 * @param root Root section node for us to load.
 	 */
 	public void load(SectionNode root) {
+		Skript.debug("Loading aliases node: " + root.getKey() + " from " + root.getConfig().getFileName());
 		for (Node node : root) {
 			// Section nodes are for variations
 			if (node instanceof SectionNode) {
@@ -221,6 +222,7 @@ public class AliasesProvider {
 	private List<String> parseKeyPattern(String name) {
 		List<String> versions = new ArrayList<>();
 		
+		boolean simple = true; // Simple patterns are used as-is
 		for (int i = 0; i < name.length(); i++) {
 			char c = name.charAt(i);
 			
@@ -228,6 +230,7 @@ public class AliasesProvider {
 				int end = name.indexOf(']', i);
 				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(i + 1, end), name.substring(end + 1))));
 				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(end + 1))));
+				simple = false; // Not simple, has optional group
 			} else if (c == '(') { // Choose one part: versions for multiple options
 				int end = name.indexOf(')', i);
 				int n = 0;
@@ -253,8 +256,11 @@ public class AliasesProvider {
 					return versions;
 				}
 				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(last + 1, end), name.substring(end + 1))));
+				simple = false; // Not simple, has choice group
 			}
 		}
+		if (simple)
+			versions.add(name);
 		
 		return versions;
 	}
@@ -265,7 +271,9 @@ public class AliasesProvider {
 	 * @param data Data of alias.
 	 */
 	private void loadAlias(String name, String data) {
+		Skript.debug("Loading alias: " + name + " = " + data);
 		List<String> patterns = parseKeyPattern(name);
+		Skript.debug("Patterns: " + patterns);
 		
 		for (String item : data.split(",")) { // All aliases may be lists of items or just other aliases
 			item = item.trim(); // These could mess up following check among other things
