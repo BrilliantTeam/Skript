@@ -69,16 +69,12 @@ public class ExprUnbreakable extends PropertyExpression<ItemType, ItemType> {
 			public ItemType convert(final ItemType i) {
 				ItemType clone = i.clone();
 				
-				Object meta = clone.getItemMeta();
+				ItemMeta meta = clone.getItemMeta();
 				if (meta == null) {
 					ItemStack random = clone.getRandom(); // Should not happen, but...
 					if (random == null)
 						return clone;
 					meta = random.getItemMeta();
-				}
-				if (!(meta instanceof ItemMeta)) {
-					Skript.error("Unknown item meta type, can't make item unbreakable!");
-					return clone;
 				}
 				
 				((ItemMeta) meta).spigot().setUnbreakable(true);

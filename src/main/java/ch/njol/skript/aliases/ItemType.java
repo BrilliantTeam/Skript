@@ -44,6 +44,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -169,6 +170,10 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		for (final ItemData d : i) {
 			types.add(d.clone());
 		}
+	}
+
+	public ItemType(Block block) {
+		this(block.getState());
 	}
 
 	/**
@@ -1011,5 +1016,31 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			assert globalMeta != null;
 			globalMeta.removeEnchant(ench);
 		}
+	}
+	
+	/**
+	 * Gets item meta that applies to this type if it exists.
+	 * @return Item meta or null.
+	 */
+	@Nullable
+	public ItemMeta getItemMeta() {
+		return globalMeta;
+	}
+
+	/**
+	 * Sets item meta that is applied for everything this type represents.
+	 * Note that previous item meta is overridden if it exists.
+	 * @param meta New item meta.
+	 */
+	public void setItemMeta(ItemMeta meta) {
+		globalMeta = meta;
+	}
+	
+	/**
+	 * Clears item meta from this type. Metas which individual item dates may
+	 * have will not be touched.
+	 */
+	public void clearItemMeta() {
+		globalMeta = null;
 	}
 }
