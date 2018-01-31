@@ -73,7 +73,6 @@ import ch.njol.yggdrasil.Fields.FieldContext;
 import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 
 @ContainerType(ItemStack.class)
-@SuppressWarnings("deprecation")
 public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>, YggdrasilExtendedSerializable {
 	
 	static {
@@ -885,6 +884,16 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (all ? 1231 : 1237);
+		result = prime * result + amount;
+		result = prime * result + types.hashCode();
+		return result;
+	}
+	
+	@Override
 	public String toString() {
 		return toString(false, 0, null);
 	}
@@ -993,17 +1002,17 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	/**
-	 * Gets raw item names ("minecraft:some_item").
-	 * @return names
+	 * Gets raw item names ("minecraft:some_item"). If they are not available,
+	 * empty list will be returned.
+	 * @return names List of names that could be retrieved.
 	 */
 	public List<String> getRawNames() {
-		// TODO improve, as we now use raw names internally
 		List<String> rawNames = new ArrayList<>();
 		for (ItemData data : types) {
-			rawNames.add("minecraft:" + data.type.toString().toLowerCase()
-					.replace("leash", "lead") // Add hacky code here :)
-					.replace("wood", "planks")
-					);
+			assert data != null;
+			String id = Aliases.getMinecraftId(data);
+			if (id != null)
+				rawNames.add(id);
 		}
 		
 		return rawNames;

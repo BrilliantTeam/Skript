@@ -108,6 +108,8 @@ public class AliasesProvider {
 	 */
 	private Map<ItemData, Set<ItemData>> subtypes;
 	
+	private Map<ItemData, String> minecraftIds;
+	
 	/**
 	 * Constructs a new aliases provider with no data.
 	 */
@@ -116,6 +118,7 @@ public class AliasesProvider {
 		materialNames = new HashMap<>(3000);
 		variations = new HashMap<>(500);
 		subtypes = new HashMap<>(1000);
+		minecraftIds = new HashMap<>(3000);
 		gson = new Gson();
 		
 		@SuppressWarnings("deprecation")
@@ -401,7 +404,7 @@ public class AliasesProvider {
 		assert datas != null;
 		type.addAll(datas);
 		
-		// Make datas subtypes of the type we have here
+		// Make datas subtypes of the type we have here and handle Minecraft ids
 		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
 			Set<ItemData> subs = subtypes.get(data);
 			if (subs == null) {
@@ -409,6 +412,8 @@ public class AliasesProvider {
 				subtypes.put(data, subs);
 			}
 			subs.addAll(datas); // Add all datas (the ones we have here)
+			
+			minecraftIds.put(data, id); // Register Minecraft id for the data, too
 		}
 
 		// TODO fill material name
@@ -420,9 +425,8 @@ public class AliasesProvider {
 	}
 
 	@Nullable
-	public ItemType getForMinecraftId(String id) {
-		// TODO forgot what this method would be used for
-		return null;
+	public String getMinecraftId(ItemData data) {
+		return minecraftIds.get(data);
 	}
 	
 	@Nullable

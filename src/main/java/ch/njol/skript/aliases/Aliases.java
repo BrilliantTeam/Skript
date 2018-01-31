@@ -420,4 +420,14 @@ public abstract class Aliases {
 			return subtypes.contains(second);
 		return false;
 	}
+
+	/**
+	 * Gets a Vanilla Minecraft material id for given item data.
+	 * @param data Item data.
+	 * @return Minecraft item id.
+	 */
+	@Nullable
+	public static String getMinecraftId(ItemData data) {
+		return provider.getMinecraftId(data);
+	}
 }
