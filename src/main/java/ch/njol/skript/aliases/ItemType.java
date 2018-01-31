@@ -124,7 +124,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * are treated as their absolute values when adding items to inventories
 	 * and otherwise used as "doesn't matter" flags.
 	 */
-	private int amount = 0;
+	private int amount = -1;
 	
 	/**
 	 * ItemTypes to use instead of this one if adding to an inventory or setting a block.

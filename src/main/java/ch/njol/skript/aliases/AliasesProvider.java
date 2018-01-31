@@ -41,6 +41,8 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.localization.Noun;
+import ch.njol.util.NonNullPair;
 
 /**
  * Provides aliases on Bukkit/Spigot platform.
@@ -383,11 +385,16 @@ public class AliasesProvider {
 			datas = Collections.singletonList(new ItemData(stack));
 		}
 		
+		// Create plural form of the alias (warning: I don't understand it either)
+		NonNullPair<String, Integer> plain = Noun.stripGender(name, name); // Name without gender and its gender token
+		NonNullPair<String, String> forms = Noun.getPlural(plain.getFirst()); // Singular and plural forms
+		
 		// Check if there is item type with this name already, create otherwise
 		ItemType type = aliases.get(name);
 		if (type == null) {
 			type = new ItemType();
-			aliases.put(name, type);
+			aliases.put(forms.getFirst(), type); // Singular form
+			aliases.put(forms.getSecond(), type); // Plural form
 		}
 		
 		// Add item datas we got earlier to the type
