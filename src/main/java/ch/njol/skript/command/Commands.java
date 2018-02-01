@@ -298,7 +298,7 @@ public abstract class Commands {
 	}
 	
 	@SuppressWarnings("null")
-	private final static Pattern commandPattern = Pattern.compile("(?i)^command /?(\\S+)(\\s+(.+))?$"),
+	private final static Pattern commandPattern = Pattern.compile("(?i)^command /?(\\S+)(?:\\s+)?(\\s+(.+))?$"),
 			argumentPattern = Pattern.compile("<\\s*(?:(.+?)\\s*:\\s*)?(.+?)\\s*(?:=\\s*(" + SkriptParser.wildcard + "))?\\s*>");
 	
 	@Nullable
@@ -333,7 +333,7 @@ public abstract class Commands {
 		Matcher m = commandPattern.matcher(s);
 		final boolean a = m.matches();
 		assert a;
-		
+
 		final String command = "" + m.group(1).toLowerCase();
 		final ScriptCommand existingCommand = commands.get(command);
 		if (alsoRegister && existingCommand != null && existingCommand.getLabel().equals(command)) {
