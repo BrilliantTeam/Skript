@@ -46,10 +46,10 @@ import ch.njol.util.Kleenean;
 	"\tadd 2 stones to slot 0 of player",
 	"\tclear slot 1 of player"})
 @Since("2.2-dev24")
-public class ExprInventorySlot extends SimpleExpression<Slot>{
+public class ExprInventorySlot extends SimpleExpression<Slot> {
 	
 	static {
-		Skript.registerExpression(ExprInventorySlot.class, Slot.class, ExpressionType.COMBINED, "[the] slot[s] %numbers% of %inventory%","%inventory%['s] slot[s] %numbers%");
+		Skript.registerExpression(ExprInventorySlot.class, Slot.class, ExpressionType.COMBINED, "[the] slot[s] %numbers% of %inventory%","%inventory%'[s] slot[s] %numbers%");
 	}
 
 	@SuppressWarnings("null")
