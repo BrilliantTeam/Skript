@@ -298,7 +298,7 @@ public abstract class Commands {
 	}
 	
 	@SuppressWarnings("null")
-	private final static Pattern commandPattern = Pattern.compile("(?i)^command /?(\\S+)(?:\\s+)?(\\s+(.+))?$"),
+	private final static Pattern commandPattern = Pattern.compile("(?i)^command /?(\\S+)\\s*(\\s+(.+))?$"),
 			argumentPattern = Pattern.compile("<\\s*(?:(.+?)\\s*:\\s*)?(.+?)\\s*(?:=\\s*(" + SkriptParser.wildcard + "))?\\s*>");
 	
 	@Nullable
