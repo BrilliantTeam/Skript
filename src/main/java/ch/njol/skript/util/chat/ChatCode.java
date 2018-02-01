@@ -137,7 +137,14 @@ public enum ChatCode {
 			HoverEvent e = new HoverEvent(HoverEvent.Action.show_text, param);
 			component.hoverEvent = e;
 		}
-	};
+	},
+
+	// Other
+
+    insertion(true) {
+	    @Override
+        public void updateComponent(MessageComponent component, String param) { component.insertion = param; }
+    };
 	
 	public boolean hasParam;
 	
