@@ -22,6 +22,7 @@ package ch.njol.skript.bukkitutil;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Damageable;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -146,21 +147,16 @@ public abstract class HealthUtils {
 			heal(e, -d);
 			return;
 		}
+		EntityDamageEvent event = new EntityDamageEvent(e, DamageCause.CUSTOM, d*2);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) return;
+
 		if (supportsDoubles) {
-			EntityDamageEvent ede = new EntityDamageEvent(e, DamageCause.CUSTOM, d*2);
-			Bukkit.getPluginManager().callEvent(ede);
-			if (!ede.isCancelled()) {
-				e.damage(ede.getDamage());
-			}
+			e.damage(event.getDamage());
 			return;
 		}
 		try {
-
-			EntityDamageEvent ede = new EntityDamageEvent(e, DamageCause.CUSTOM, d*2);
-			Bukkit.getPluginManager().callEvent(ede);
-			if (!ede.isCancelled()) {
-				damage.invoke(e, (int) Math.round(ede.getDamage()));
-			}
+			damage.invoke(e, (int) Math.round(event.getDamage()));
 		} catch (final IllegalAccessException ex) {
 			Skript.exception(ex);
 		} catch (final IllegalArgumentException ex) {
