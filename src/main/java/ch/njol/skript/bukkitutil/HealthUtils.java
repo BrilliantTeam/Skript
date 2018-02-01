@@ -147,11 +147,20 @@ public abstract class HealthUtils {
 			return;
 		}
 		if (supportsDoubles) {
-			e.damage(d * 2);
+			EntityDamageEvent ede = new EntityDamageEvent(e, DamageCause.CUSTOM, d*2);
+			Bukkit.getPluginManager().callEvent(ede);
+			if (!ede.isCancelled()) {
+				e.damage(ede.getDamage());
+			}
 			return;
 		}
 		try {
-			damage.invoke(e, (int) Math.round(d * 2));
+
+			EntityDamageEvent ede = new EntityDamageEvent(e, DamageCause.CUSTOM, d*2);
+			Bukkit.getPluginManager().callEvent(ede);
+			if (!ede.isCancelled()) {
+				damage.invoke(e, (int) Math.round(ede.getDamage()));
+			}
 		} catch (final IllegalAccessException ex) {
 			Skript.exception(ex);
 		} catch (final IllegalArgumentException ex) {
@@ -160,7 +169,6 @@ public abstract class HealthUtils {
 			Skript.exception(ex);
 		}
 	}
-	
 	/**
 	 * @param e
 	 * @param h Amount of hearts to heal
