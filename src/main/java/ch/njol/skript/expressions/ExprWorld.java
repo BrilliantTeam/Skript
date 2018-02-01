@@ -55,7 +55,7 @@ import ch.njol.util.coll.CollectionUtils;
 public class ExprWorld extends PropertyExpression<Object, World> {
 
 	static {
-		Skript.registerExpression(ExprWorld.class, World.class, ExpressionType.PROPERTY, "[the] world [(of|from) %location/entity%]", "%location/entity%['s] world");
+		Skript.registerExpression(ExprWorld.class, World.class, ExpressionType.PROPERTY, "[the] world [of %locations/entities%]", "%locations/entities%'[s] world");
 	}
 	
 	@Override
@@ -110,14 +110,16 @@ public class ExprWorld extends PropertyExpression<Object, World> {
 	}
 	
 	@Override
-	public void change(Event e, Object[] delta, Changer.ChangeMode mode){
-		if (getExpr().getAll(e) instanceof Location[] && delta != null)
-			for (final Location loc : (Location[]) getExpr().getAll(e)) {
+	public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
+		if (!(getExpr().getAll(e) instanceof Location[] && delta != null)) return;
+
+		for (final Location loc : (Location[]) getExpr().getAll(e)) {
 				loc.setWorld((World) delta[0]);
-			}	
+		}	
 	}
 	
 	@Override
+	@Nullable
 	public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
 		if (mode == ChangeMode.SET)
 			return CollectionUtils.array(World.class);

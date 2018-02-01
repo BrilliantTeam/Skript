@@ -70,6 +70,8 @@ public abstract class Variables {
 	public final static short YGGDRASIL_VERSION = 1;
 	
 	public final static Yggdrasil yggdrasil = new Yggdrasil(YGGDRASIL_VERSION);
+
+	public static boolean caseInsensitiveVariables = true;
 	
 	private final static String configurationSerializablePrefix = "ConfigurationSerializable_";
 	static {
@@ -274,7 +276,7 @@ public abstract class Variables {
 	@Nullable
 	public final static Object getVariable(final String name, final @Nullable Event e, final boolean local) {
 		String n = name;
-        if (SkriptConfig.caseInsensitiveVariables.value()) {
+        if (caseInsensitiveVariables) {
             n = name.toLowerCase(Locale.ENGLISH);
         }
 	    if (local) {
@@ -300,7 +302,7 @@ public abstract class Variables {
 	 */
 	public final static void setVariable(final String name, @Nullable Object value, final @Nullable Event e, final boolean local) {
         String n = name;
-        if (SkriptConfig.caseInsensitiveVariables.value()) {
+        if (caseInsensitiveVariables) {
             n = name.toLowerCase(Locale.ENGLISH);
         }
 	    if (value != null) {
