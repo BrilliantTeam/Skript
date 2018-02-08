@@ -603,7 +603,11 @@ public class Variable<T> implements Expression<T> {
 	public boolean check(final Event e, final Checker<? super T> c) {
 		return SimpleExpression.check(getAll(e), c, false, getAnd());
 	}
-	
+
+	public VariableString getName() {
+		return name;
+	}
+
 	@Override
 	public boolean getAnd() {
 		return true;
