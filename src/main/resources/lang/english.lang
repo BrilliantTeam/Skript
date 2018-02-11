@@ -173,31 +173,28 @@ hooks:
 
 # -- Aliases --
 aliases:
-	# regexes
-	any: any
-	any-skp: any # the same as 'any', but as a Skript pattern
+	# regexes for Skript
+	any: any:
+	any-skp: any # same as 'any', but a Skript pattern
 	every: (?:every|all)
 	of every: of (?:every|all)
 	of: of(?: any)?
-	# messages
-	brackets error: Brackets have a special meaning in aliases and cannot be used as usual
-	invalid brackets: Invalid amount and/or placement of '%s' brackets in alias
-	empty alias: '%s' results in an empty alias (i.e. it doesn't map to any id/data), it will thus be ignored
-	unknown variation: The variation {%s} was never defined
-	starting with number: Aliases must not start with a number
-	missing aliases: There are no aliases defined for the following ids:
+	
+	# Errors and warnings
 	empty string: '' is not an item type
-	invalid item data: '%s' is not a valid item data
-	invalid id: There doesn't exist a material with id %s!
-	invalid block data: Blocks only have data values from 0 to 15
 	invalid item type: '%s' is not an item type
-	out of data range: Item datas must be between 0 and %s (inclusive)
-	invalid range: The first number of a data range must be smaller than the second
-	invalid section: Invalid section '%s'. If this is an alias section add it to 'aliases' so it will be loaded
-	section not found: Alias section '%s' not found!
-	not a section: Aliases have to be in sections, but '%s' is not a section!
-	unexpected non-variation section: Unexpected non-variation section
-	unexpected section: Unexpected section
+	brackets error: Curly brackets are reserved for variations in aliases and cannot be used for anything else
+	unknown variation: The variation {%s} has not been defined before
+	missing aliases: Following Minecraft ids do not have any aliases:
+	empty alias: Alias has no Minecraft id or tags defined
+	invalid minecraft id: Minecraft id %s is not valid
+	useless variation: Variation has no Minecraft id or tags specified, so it is useless
+	invalid tags: Specified tags are not defined in valid JSON
+	unexpected section: Sections are not allowed here
+	invalid variation section: A section should be variation section, but %s is not valid variation name
+	unknown directive: Unknown directive %s. Make sure you are not defining aliases outside of sections
+	
+	# Other messages
 	loaded x aliases from: Loaded %s english aliases from %s
 	loaded x aliases: Loaded a total of %s english aliases
 	anything: anything

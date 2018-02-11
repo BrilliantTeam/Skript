@@ -94,24 +94,9 @@ public abstract class Aliases {
 		everything.add(all);
 	}
 	
-	private final static Message m_brackets_error = new Message("aliases.brackets error");
-	private final static ArgsMessage m_invalid_brackets = new ArgsMessage("aliases.invalid brackets");
-	private final static ArgsMessage m_empty_alias = new ArgsMessage("aliases.empty alias");
-	private final static ArgsMessage m_unknown_variation = new ArgsMessage("aliases.unknown variation");
-	private final static Message m_starting_with_number = new Message("aliases.starting with number");
 	private final static Message m_missing_aliases = new Message("aliases.missing aliases");
 	private final static Message m_empty_string = new Message("aliases.empty string");
-	private final static ArgsMessage m_invalid_item_data = new ArgsMessage("aliases.invalid item data");
-	private final static ArgsMessage m_invalid_id = new ArgsMessage("aliases.invalid id");
-	private final static Message m_invalid_block_data = new Message("aliases.invalid block data");
 	private final static ArgsMessage m_invalid_item_type = new ArgsMessage("aliases.invalid item type");
-	private final static ArgsMessage m_out_of_data_range = new ArgsMessage("aliases.out of data range");
-	private final static Message m_invalid_range = new Message("aliases.invalid range");
-	private final static ArgsMessage m_invalid_section = new ArgsMessage("aliases.invalid section");
-	private final static ArgsMessage m_section_not_found = new ArgsMessage("aliases.section not found");
-	private final static ArgsMessage m_not_a_section = new ArgsMessage("aliases.not a section");
-	private final static Message m_unexpected_non_variation_section = new Message("aliases.unexpected non-variation section");
-	private final static Message m_unexpected_section = new Message("aliases.unexpected section");
 	private final static ArgsMessage m_loaded_x_aliases_from = new ArgsMessage("aliases.loaded x aliases from");
 	private final static ArgsMessage m_loaded_x_aliases = new ArgsMessage("aliases.loaded x aliases");
 	
@@ -402,7 +387,7 @@ public abstract class Aliases {
 	public static void load(Config config) {
 		for (Node n : config.getMainNode()) {
 			if (!(n instanceof SectionNode)) {
-				Skript.error("" + m_invalid_section);
+				// TODO error reporting
 				continue;
 			}
 			

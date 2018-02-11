@@ -136,9 +136,20 @@ public class AliasesProvider {
 	public void load(SectionNode root) {
 		Skript.debug("Loading aliases node: " + root.getKey() + " from " + root.getConfig().getFileName());
 		for (Node node : root) {
+			// Get key and make sure it exists
+			String key = node.getKey();
+			if (key == null) {
+				// TODO error reporting
+				continue;
+			}
+			
 			// Section nodes are for variations
 			if (node instanceof SectionNode) {
-				variations.put(node.getKey(), loadVariations((SectionNode) node));
+				Map<String, Variation> vars = loadVariations((SectionNode) node);
+				if (vars != null)
+					variations.put(node.getKey(), vars);
+				else
+					continue; // TODO error reporting
 				continue;
 			}
 			
@@ -148,12 +159,7 @@ public class AliasesProvider {
 				continue;
 			}
 			
-			// Get key and value from entry node
-			String key = node.getKey();
-			if (key == null) {
-				// TODO error reporting
-				continue;
-			}
+			// Get value (it always exists)
 			String value = ((EntryNode) node).getValue();
 			
 			loadAlias(key, value);
@@ -196,14 +202,17 @@ public class AliasesProvider {
 	 * @param root Root node for this variation.
 	 * @return Map of variations by their names.
 	 */
+	@Nullable
 	private Map<String, Variation> loadVariations(SectionNode root) {
+		String name = root.getKey();
+		assert name != null; // Better be so
+		if (!name.startsWith("{") && !name.endsWith("}")) {
+			// This is not a variation section!
+			return null;
+		}
+		
 		Map<String, Variation> vars = new HashMap<>();
 		for (Node node : root) {
-			// Sanity check
-			if (!(node instanceof EntryNode)) {
-				// TODO error reporting
-				continue;
-			}
 			
 			String pattern = node.getKey();
 			assert pattern != null;
