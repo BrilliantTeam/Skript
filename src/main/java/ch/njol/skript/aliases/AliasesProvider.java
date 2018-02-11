@@ -325,8 +325,8 @@ public class AliasesProvider {
 					continue;
 				}
 				
-				// Take variation name from between brackets
-				String varName = name.substring(i + 1, end);
+				// Take variation name, including the brackets
+				String varName = name.substring(i, end + 1);
 				// Get variations for that id and hope they exist
 				Map<String, Variation> vars = variations.get(varName);
 				if (vars == null) {
@@ -350,7 +350,10 @@ public class AliasesProvider {
 						variedId = id;
 					}
 					
-					loadVariedAlias(entry.getKey(), variedId, combinedTags);
+					String aliasName = name.replace(varName, entry.getKey());
+					assert aliasName != null;
+					assert variedId != null;
+					loadVariedAlias(aliasName, variedId, combinedTags);
 				}
 				
 				// Move to end of this variation

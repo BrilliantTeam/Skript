@@ -991,12 +991,16 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		fields.setFields(this);
 		
 		// Legacy data (before aliases rework) update
-		if (types.isEmpty() && types.get(0).getClass().equals(OldItemData.class)) { // Sorry generics :)
-			for (int i = 0; i < types.size(); i++) {
-				OldItemData old = (OldItemData) (Object) types.get(i); // Grab and hack together OldItemData
-				ItemData data = new ItemData(Material.values()[old.typeid]); // Create new ItemData based on it
-				types.set(i, data); // Replace old with new
-				// TODO support for data values
+		if (!types.isEmpty()) {
+			@SuppressWarnings("rawtypes")
+			ArrayList noGenerics = types;
+			if (noGenerics.get(0).getClass().equals(OldItemData.class)) { // Sorry generics :)
+				for (int i = 0; i < types.size(); i++) {
+					OldItemData old = (OldItemData) (Object) types.get(i); // Grab and hack together OldItemData
+					ItemData data = new ItemData(Material.values()[old.typeid]); // Create new ItemData based on it
+					types.set(i, data); // Replace old with new
+					// TODO support for data values
+				}
 			}
 		}
 	}

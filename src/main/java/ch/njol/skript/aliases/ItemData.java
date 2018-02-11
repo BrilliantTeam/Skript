@@ -19,6 +19,8 @@
  */
 package ch.njol.skript.aliases;
 
+import java.io.NotSerializableException;
+import java.io.StreamCorruptedException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,10 +46,12 @@ import ch.njol.skript.util.Utils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.SingleItemIterator;
+import ch.njol.yggdrasil.Fields;
 import ch.njol.yggdrasil.YggdrasilSerializable;
+import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 
 @SuppressWarnings("deprecation")
-public class ItemData implements Cloneable, YggdrasilSerializable {
+public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	
 	static {
 		Variables.yggdrasil.registerSingleClass(ItemData.class, "NewItemData");
@@ -149,12 +153,11 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		this(block.getState());
 	}
 	
-	public ItemData() {
-		this.type = Material.AIR; // Fake type, but we have a good reason to not allow null there
-		this.isAnything = true;
-		this.meta = itemFactory.getItemMeta(Material.AIR); // And same thing here: no nulls
-		this.stack = new ItemStack(Material.AIR);
-	}
+	/**
+	 * Only to be used for serialization.
+	 */
+	@SuppressWarnings("null") // Yeah, only for internal use
+	public ItemData() {}
 	
 	/**
 	 * Tests whether the given item is of this type.
@@ -268,6 +271,23 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 			assert stack != null;
 			blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 		}
+	}
+
+	@Override
+	public Fields serialize() throws NotSerializableException {
+		return new Fields(this); // ItemStack is transient, will be ignored
+	}
+
+	@Override
+	public void deserialize(Fields fields) throws StreamCorruptedException, NotSerializableException {
+		fields.setFields(this); // Everything but ItemStack
+		
+		// Initialize ItemStack
+		this.stack = new ItemStack(type);
+		stack.setItemMeta(meta); // Just set meta to it
+		
+		// Initialize block values with a terrible hack
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 	}
 	
 }

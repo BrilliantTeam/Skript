@@ -33,6 +33,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -1001,6 +1002,7 @@ public class BukkitClasses {
 				.since("2.0")
 				.changer(DefaultChangers.itemChanger));
 		
+		
 		Classes.registerClass(new ClassInfo<>(Biome.class, "biome")
 				.user("biomes?")
 				.name("Biome")
@@ -1304,6 +1306,43 @@ public class BukkitClasses {
 					public boolean mustSyncDeserialization() {
 						return false;
 					}
+				}));
+		
+		Material[] allMaterials = Material.values();
+		Classes.registerClass(new ClassInfo<>(Material.class, "material")
+				.name(ClassInfo.NO_DOC)
+				.since("aliases-rework")
+				.serializer(new Serializer<Material>() {
+
+					@Override
+					public Fields serialize(Material o) throws NotSerializableException {
+						Fields f = new Fields();
+						f.putObject("i", o.ordinal());
+						return f;
+					}
+
+					@Override
+					public void deserialize(Material o, Fields f) throws StreamCorruptedException, NotSerializableException {
+						assert false;
+					}
+					
+					@Override
+					public Material deserialize(Fields f) throws StreamCorruptedException {
+						Material mat = allMaterials[(int) f.getPrimitive("i")];
+						assert mat != null; // Hope server owner didn't mod too much...
+						return mat;
+					}
+
+					@Override
+					public boolean mustSyncDeserialization() {
+						return false;
+					}
+
+					@Override
+					protected boolean canBeInstantiated() {
+						return false; // It is an enum, come on
+					}
+					
 				}));
 	}
 }

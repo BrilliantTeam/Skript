@@ -89,7 +89,9 @@ public abstract class Aliases {
 	private final static ItemType everything = new ItemType();
 	static {
 		everything.setAll(true);
-		everything.add(new ItemData());
+		ItemData all = new ItemData(Material.AIR);
+		all.isAnything = true;
+		everything.add(all);
 	}
 	
 	private final static Message m_brackets_error = new Message("aliases.brackets error");
@@ -302,7 +304,7 @@ public abstract class Aliases {
 		ItemType i;
 		final String type = s;
 		if (type.isEmpty()) {
-			t.add(new ItemData());
+			t.add(new ItemData(Material.AIR));
 			return t;
 		} else if (type.matches("\\d+")) {
 			// TODO error: numeric ids are not supported anymore
