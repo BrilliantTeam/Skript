@@ -57,6 +57,8 @@ public class AliasesProvider {
 	private static final Message m_useless_variation = new Message("aliases.useless variation");
 	private static final Message m_brackets_error = new Message("aliases.brackets error");
 	private static final ArgsMessage m_unknown_variation = new ArgsMessage("aliases.unknown variation");
+	private static final ArgsMessage m_invalid_minecraft_id = new ArgsMessage("aliases.invalid minecraft id");
+	private static final Message m_empty_alias = new Message("aliases.empty alias");
 	
 	/**
 	 * All aliases that are currently loaded by this provider.
@@ -188,26 +190,29 @@ public class AliasesProvider {
 	
 	/**
 	 * Parses a single variation from a string.
-	 * @param raw Raw variation info.
+	 * @param item Raw variation info.
 	 * @return Variation instance.
 	 */
-	@Nullable
-	private Variation parseVariation(String raw) {
-		int firstSpace = raw.indexOf(' ');
-		String id = raw.substring(0, firstSpace);
+	private Variation parseVariation(String item) {
+		item = item.trim(); // These could mess up following check among other things
+		int firstSpace = item.indexOf(' ');
+		
+		String id; // Id or alias
+		Map<String, Object> tags;
+		if (firstSpace == -1) {
+			id = item;
+			tags = new HashMap<>();
+		} else {
+			id = item.substring(0, firstSpace);
+			tags = parseMojangson(item.substring(firstSpace + 1));
+		}
+		
+		// Variations don't always need an id
 		if (id.equals("-")) {
 			id = null;
 		}
 		
-		String tags = raw.substring(firstSpace + 1);
-		if (tags.isEmpty()) {
-			if (id == null) { // Useless variation, does not do anything
-				Skript.warning(m_useless_variation.toString());
-			}
-			return new Variation(id, new HashMap<>()); // No tags, but id
-		}
-		
-		return new Variation(id, parseMojangson(tags));
+		return new Variation(id, tags);
 	}
 	
 	/**
@@ -230,6 +235,10 @@ public class AliasesProvider {
 			assert pattern != null;
 			List<String> keys = parseKeyPattern(pattern);
 			Variation var = parseVariation(((EntryNode) node).getValue());
+			if (var.getId() == null && var.getTags().isEmpty()) {
+				// Useless variation, basically
+				Skript.warning(m_useless_variation.toString());
+			}
 			
 			// Put var there for all keys it matches with
 			for (String key : keys) {
@@ -301,23 +310,12 @@ public class AliasesProvider {
 		Skript.debug("Patterns: " + patterns);
 		
 		for (String item : data.split(",")) { // All aliases may be lists of items or just other aliases
-			item = item.trim(); // These could mess up following check among other things
-			int firstSpace = item.indexOf(' ');
-			
-			String id; // Id or alias
-			Map<String, Object> tags;
-			if (firstSpace == -1) {
-				id = item;
-				tags = null;
-			} else {
-				id = item.substring(0, firstSpace);
-				tags = parseMojangson(item.substring(firstSpace + 1));
-			}
-			assert id != null;
+			assert item != null;
+			Variation var = parseVariation(item); // Share parsing code with variations
 			
 			for (String p : patterns) {
 				assert p != null; // No nulls in this list
-				loadVariedAlias(p, id, tags);
+				loadVariedAlias(p, var.getId(), var.getTags());
 			}
 		}
 	}
@@ -329,7 +327,7 @@ public class AliasesProvider {
 	 * @param id Base id of material that this alias represents.
 	 * @param tags Base tags of material that this alias represents.
 	 */
-	private void loadVariedAlias(String name, String id, @Nullable Map<String, Object> tags) {
+	private void loadVariedAlias(String name, @Nullable String id, @Nullable Map<String, Object> tags) {
 		// Find {variations}
 		boolean hasVariations = false;
 		for (int i = 0; i < name.length(); i++) {
@@ -372,7 +370,6 @@ public class AliasesProvider {
 					
 					String aliasName = name.replace(varName, entry.getKey());
 					assert aliasName != null;
-					assert variedId != null;
 					loadVariedAlias(aliasName, variedId, combinedTags);
 				}
 				
@@ -383,7 +380,13 @@ public class AliasesProvider {
 		
 		// Enough recursion! No more variations, just alias
 		if (!hasVariations) {
-			loadReadyAlias(name, id, tags);
+			// For null ids, we just spit a warning
+			// They should have not gotten this far
+			if (id == null) {
+				Skript.warning(m_empty_alias.toString());
+			} else {
+				loadReadyAlias(name, id, tags);
+			}
 		}
 	}
 	
@@ -403,7 +406,12 @@ public class AliasesProvider {
 			datas = typeOfId.getTypes();
 		} else { // ... but quite often, we just got Vanilla id
 			// Prepare and modify ItemStack (using somewhat Unsafe methods)
-			ItemStack stack = new ItemStack(unsafe.getMaterialFromInternalName(id));
+			Material material = unsafe.getMaterialFromInternalName(id);
+			if (material == null || material == Material.AIR) { // If server doesn't recognize id, do not proceed
+				Skript.error(m_invalid_minecraft_id.toString(id));
+				return; // Apparently ItemStack constructor on 1.12 can throw NPE
+			}
+			ItemStack stack = new ItemStack(material);
 			if (tags != null) {
 				unsafe.modifyItemStack(stack, gson.toJson(tags));
 			}
