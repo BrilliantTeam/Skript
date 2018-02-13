@@ -50,7 +50,7 @@ import java.util.UUID;
         "\ttrigger:",
         "\t\tteleport player to {home::%player%}"
 })
-@Since("INSERT VERSION")
+@Since("2.2-dev33")
 public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
 
     static {

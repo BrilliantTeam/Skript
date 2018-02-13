@@ -63,6 +63,7 @@ import ch.njol.skript.util.Timeperiod;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.VisualEffect;
+import ch.njol.skript.util.VisualEffectDummy;
 import ch.njol.skript.util.WeatherType;
 import ch.njol.yggdrasil.Fields;
 
@@ -836,6 +837,8 @@ public class SkriptClasses {
 						}
 					})
 					.serializer(new YggdrasilSerializer<VisualEffect>()));
+		} else {
+			Classes.registerClass(new ClassInfo<>(VisualEffectDummy.class, "visualeffect"));
 		}
 	}
 	

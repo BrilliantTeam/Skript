@@ -60,6 +60,8 @@ public class EffPlaySound extends Effect {
 	@Nullable
 	private Expression<Player> players;
 
+	private boolean useCategory;
+
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
@@ -68,6 +70,7 @@ public class EffPlaySound extends Effect {
 		pitch = (Expression<Number>) exprs[2];
 		location = (Expression<Location>) exprs[3];
 		players = (Expression<Player>) exprs[4];
+		useCategory = Skript.classExists("org.bukkit.SoundCategory");
 
 		return true;
 	}
@@ -90,11 +93,19 @@ public class EffPlaySound extends Effect {
 			if (players != null) {
 				if (soundEnum == null) {
 					for (Player p : players.getAll(e)) {
-						p.playSound(l, s, SoundCategory.MASTER, vol, pi);
+						if (useCategory) {
+							p.playSound(l, s, SoundCategory.MASTER, vol, pi);
+						} else {
+							p.playSound(l, s, vol, pi);
+						}
 					}
 				} else {
 					for (Player p : players.getAll(e)) {
-						p.playSound(l, soundEnum, SoundCategory.MASTER, vol, pi);
+						if (useCategory) {
+							p.playSound(l, soundEnum, SoundCategory.MASTER, vol, pi);
+						} else {
+							p.playSound(l, soundEnum, vol, pi);
+						}
 					}
 				}
 			} else {

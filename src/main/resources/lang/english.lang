@@ -237,7 +237,9 @@ enchantments:
 		frost_walker: Frost Walker
 		vanishing_curse: Curse of Vanishing
 		binding_curse: Curse of Binding
+		# It's sweeping on 1.10 and below for some reason.
 		sweeping: Sweeping Edge
+		sweeping_edge: Sweeping Edge
 
 # -- Potion Effects --
 potions:
@@ -490,6 +492,7 @@ chat styles:
 	suggest_command: suggest command, sgt
 	change_page: change page
 	show_text: tooltip, show text, ttp
+	insertion: insertion, insert, ins
 
 # -- Directions --
 directions:
@@ -952,6 +955,7 @@ entities:
 damage causes:
 	contact: contact
 	entity_attack: attack, entity attack, an attack, an entity attack
+	entity_sweep_attack: sweep attack, sweeping
 	projectile: projectile, a projectile
 	suffocation: suffocation, suffocate
 	fall: fall, a fall
@@ -1177,7 +1181,7 @@ inventory types:
 	player: player inventory
 	creative: creative inventory
 	merchant: merchant inventory, villager inventory
-	endher_chest: ender chest inventory
+	ender_chest: ender chest inventory
 	anvil: anvil inventory
 	beacon: beacon inventory
 	hopper: hopper inventory
@@ -1228,6 +1232,7 @@ types:
 	damagecause: damage cause¦s @a
 	inventoryaction: inventory action¦s @a
 	clickaction: click actions¦s @a
+	vector: vector¦s @a
 	
 	# Skript
 	weathertype: weather type¦s @a
@@ -1247,6 +1252,7 @@ types:
 	experience.pattern: (e?xp|experience( points?)?)
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
+
 	
 	# Hooks
 	money: money
