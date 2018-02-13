@@ -41,6 +41,8 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.localization.ArgsMessage;
+import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.Noun;
 import ch.njol.util.NonNullPair;
 
@@ -48,6 +50,13 @@ import ch.njol.util.NonNullPair;
  * Provides aliases on Bukkit/Spigot platform.
  */
 public class AliasesProvider {
+	
+	private static final Message m_empty_name = new Message("aliases.empty name");
+	private static final ArgsMessage m_invalid_variation_section = new ArgsMessage("aliases.invalid variation section");
+	private static final Message m_unexpected_section = new Message("aliases.unexpected section");
+	private static final Message m_useless_variation = new Message("aliases.useless variation");
+	private static final Message m_brackets_error = new Message("aliases.brackets error");
+	private static final ArgsMessage m_unknown_variation = new ArgsMessage("aliases.unknown variation");
 	
 	/**
 	 * All aliases that are currently loaded by this provider.
@@ -139,23 +148,24 @@ public class AliasesProvider {
 			// Get key and make sure it exists
 			String key = node.getKey();
 			if (key == null) {
-				// TODO error reporting
+				Skript.error(m_empty_name.toString());
 				continue;
 			}
 			
 			// Section nodes are for variations
 			if (node instanceof SectionNode) {
 				Map<String, Variation> vars = loadVariations((SectionNode) node);
-				if (vars != null)
+				if (vars != null) {
 					variations.put(node.getKey(), vars);
-				else
-					continue; // TODO error reporting
+				} else {
+					Skript.error(m_invalid_variation_section.toString(key));
+				}
 				continue;
 			}
 			
 			// Sanity check
 			if (!(node instanceof EntryNode)) {
-				// TODO error reporting
+				Skript.error(m_unexpected_section.toString());
 				continue;
 			}
 			
@@ -185,13 +195,16 @@ public class AliasesProvider {
 	private Variation parseVariation(String raw) {
 		int firstSpace = raw.indexOf(' ');
 		String id = raw.substring(0, firstSpace);
-		if (id.equals("-"))
+		if (id.equals("-")) {
 			id = null;
+		}
 		
 		String tags = raw.substring(firstSpace + 1);
 		if (tags.isEmpty()) {
-			// TODO error reporting
-			return null;
+			if (id == null) { // Useless variation, does not do anything
+				Skript.warning(m_useless_variation.toString());
+			}
+			return new Variation(id, new HashMap<>()); // No tags, but id
 		}
 		
 		return new Variation(id, parseMojangson(tags));
@@ -213,7 +226,6 @@ public class AliasesProvider {
 		
 		Map<String, Variation> vars = new HashMap<>();
 		for (Node node : root) {
-			
 			String pattern = node.getKey();
 			assert pattern != null;
 			List<String> keys = parseKeyPattern(pattern);
@@ -265,8 +277,7 @@ public class AliasesProvider {
 					}
 				}
 				if (!hasParts) {
-					//Skript.error(m_brackets_error.toString());
-					// TODO error reporting
+					Skript.error(m_brackets_error.toString());
 					return versions;
 				}
 				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(last + 1, end), name.substring(end + 1))));
@@ -330,7 +341,7 @@ public class AliasesProvider {
 				
 				int end = name.indexOf('}', i);
 				if (end == -1) {
-					// TODO error reporting
+					Skript.error(m_brackets_error.toString());
 					continue;
 				}
 				
@@ -339,7 +350,7 @@ public class AliasesProvider {
 				// Get variations for that id and hope they exist
 				Map<String, Variation> vars = variations.get(varName);
 				if (vars == null) {
-					// TODO error reporting
+					Skript.error(m_unknown_variation.toString(varName));
 					continue;
 				}
 				

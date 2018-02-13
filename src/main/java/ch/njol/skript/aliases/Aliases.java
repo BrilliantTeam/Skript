@@ -55,16 +55,9 @@ import ch.njol.skript.util.Utils;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.Setter;
 
-/**
- * FIXME rename
- * 
- * @author Peter Güttinger
- */
 @SuppressWarnings("deprecation")
 public abstract class Aliases {
-	
-	private final static boolean newPotions = Skript.isRunningMinecraft(1, 9);
-	
+		
 	private final static AliasesProvider provider = new AliasesProvider();
 	private static AliasesProvider localProvider = new AliasesProvider();
 	

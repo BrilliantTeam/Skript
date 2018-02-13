@@ -183,8 +183,9 @@ aliases:
 	# Errors and warnings
 	empty string: '' is not an item type
 	invalid item type: '%s' is not an item type
-	brackets error: Curly brackets are reserved for variations in aliases and cannot be used for anything else
-	unknown variation: The variation {%s} has not been defined before
+	empty name: An alias must have name
+	brackets error: Invalid use of brackets
+	unknown variation: The variation %s has not been defined before
 	missing aliases: Following Minecraft ids do not have any aliases:
 	empty alias: Alias has no Minecraft id or tags defined
 	invalid minecraft id: Minecraft id %s is not valid
