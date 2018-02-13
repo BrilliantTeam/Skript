@@ -21,6 +21,7 @@
 
 package ch.njol.skript.util.chat;
 
+import ch.njol.skript.util.Utils;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.lang.VariableString;
@@ -108,7 +109,7 @@ public enum ChatCode {
 	run_command(true) {
 		@Override
 		public void updateComponent(MessageComponent component, String param) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.run_command, param);
+			ClickEvent e = new ClickEvent(ClickEvent.Action.run_command, Utils.replaceChatStyles(param));
 			component.clickEvent = e;
 		}
 	},
@@ -134,7 +135,7 @@ public enum ChatCode {
 	show_text(true) {
 		@Override
 		public void updateComponent(MessageComponent component, String param) {
-			HoverEvent e = new HoverEvent(HoverEvent.Action.show_text, param);
+			HoverEvent e = new HoverEvent(HoverEvent.Action.show_text, Utils.replaceChatStyles(param));
 			component.hoverEvent = e;
 		}
 	},
