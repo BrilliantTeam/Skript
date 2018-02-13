@@ -79,7 +79,7 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
         switch (mark) {
             case 0:
             case 1:
-                long ms = mark == 1
+                long ms = mark != 1
                         ? scriptCommand.getRemainingMilliseconds(uuid)
                         : scriptCommand.getElapsedMilliseconds(uuid);
                 return new Timespan[]{new Timespan(ms)};
