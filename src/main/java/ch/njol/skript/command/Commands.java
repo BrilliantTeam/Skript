@@ -37,6 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.util.StringMode;
 import ch.njol.skript.util.Timespan;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -467,7 +468,7 @@ public abstract class Commands {
 		String cooldownStorageString = ScriptLoader.replaceOptions(node.get("cooldown storage", ""));
 		VariableString cooldownStorage = null;
 		if (!cooldownStorageString.isEmpty()) {
-			cooldownStorage = VariableString.newInstance(cooldownStorageString);
+			cooldownStorage = VariableString.newInstance(cooldownStorageString, StringMode.VARIABLE_NAME);
 		}
 
 		if (Skript.debug() || node.debug())
