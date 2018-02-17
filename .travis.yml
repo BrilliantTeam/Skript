@@ -1,2 +1,5 @@
 language: java
 script: ./gradlew build test
+cache:
+  directories:
+    - $HOME/.gradle
