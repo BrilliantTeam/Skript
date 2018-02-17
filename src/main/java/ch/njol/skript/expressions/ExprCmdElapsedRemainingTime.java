@@ -21,6 +21,7 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.classes.Changer;
 import ch.njol.skript.command.ScriptCommand;
 import ch.njol.skript.command.ScriptCommandEvent;
 import ch.njol.skript.doc.Description;
@@ -130,5 +131,81 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
                 return "cooldown bypass permission";
         }
         return null;
+    }
+
+    @Nullable
+    @Override
+    public Class<?>[] acceptChange(Changer.ChangeMode mode) {
+        switch (mode) {
+            case ADD:
+            case REMOVE:
+            case REMOVE_ALL:
+            case RESET:
+            case SET:
+                // Remaining time or elapsed time
+                if (mark <= 1) {
+                    return new Class<?>[]{Timespan.class};
+                }
+        }
+        return null;
+    }
+
+    @Override
+    public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
+        if (!(e instanceof ScriptCommandEvent)) {
+            return;
+        }
+        ScriptCommandEvent commandEvent = (ScriptCommandEvent) e;
+        ScriptCommand command = commandEvent.getSkriptCommand();
+        Timespan cooldown = command.getCooldown();
+        CommandSender sender = commandEvent.getSender();
+        if (cooldown == null || !(sender instanceof Player)) {
+            return;
+        }
+        long cooldownMs = cooldown.getMilliSeconds();
+        UUID uuid = ((Player) sender).getUniqueId();
+        Timespan timespan = delta == null ? new Timespan(0) : (Timespan) delta[0];
+        switch (mode) {
+            case ADD:
+            case REMOVE:
+                long change = (mode == Changer.ChangeMode.ADD ? 1 : -1) * timespan.getMilliSeconds();
+                if (mark == 0) {
+                    // Remaining time
+                    long remaining = command.getRemainingMilliseconds(uuid);
+                    long changed = remaining + change;
+                    if (changed < 0) {
+                        changed = 0;
+                    }
+                    command.setRemainingMilliseconds(uuid, changed);
+                } else {
+                    // Elapsed time
+                    long elapsed = command.getElapsedMilliseconds(uuid);
+                    long changed = elapsed + change;
+                    if (changed > cooldownMs) {
+                        changed = cooldownMs;
+                    }
+                    command.setElapsedMilliSeconds(uuid, changed);
+                }
+                break;
+            case REMOVE_ALL:
+            case RESET:
+                if (mark == 0) {
+                    // Remaining time
+                    command.setRemainingMilliseconds(uuid, cooldownMs);
+                } else {
+                    // Elapsed time
+                    command.setElapsedMilliSeconds(uuid, 0);
+                }
+                break;
+            case SET:
+                if (mark == 0) {
+                    // Remaining time
+                    command.setRemainingMilliseconds(uuid, timespan.getMilliSeconds());
+                } else {
+                    // Elapsed time
+                    command.setElapsedMilliSeconds(uuid, timespan.getMilliSeconds());
+                }
+                break;
+        }
     }
 }

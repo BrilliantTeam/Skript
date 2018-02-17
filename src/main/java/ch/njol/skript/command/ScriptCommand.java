@@ -220,23 +220,28 @@ public class ScriptCommand implements CommandExecutor {
 						sender.sendMessage(cooldownMessage.getSingle(event));
 						return false;
 					}
-				} else {
-					lastUsageMap.put(uuid, new Date());
 				}
 			}
 		}
 
 		if (Bukkit.isPrimaryThread()) {
 			execute2(event, sender, commandLabel, rest);
+			if (sender instanceof Player && !event.isCooldownCancelled()) {
+				lastUsageMap.put(((Player) sender).getUniqueId(), new Date());
+			}
 		} else {
 			// must not wait for the command to complete as some plugins call commands in such a way that the server will deadlock
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
 				@Override
 				public void run() {
 					execute2(event, sender, commandLabel, rest);
+					if (sender instanceof Player && !event.isCooldownCancelled()) {
+						lastUsageMap.put(((Player) sender).getUniqueId(), new Date());
+					}
 				}
 			});
 		}
+
 		return true; // Skript prints its own error message anyway
 	}
 	
@@ -418,9 +423,25 @@ public class ScriptCommand implements CommandExecutor {
 		return remaining;
 	}
 
+	public void setRemainingMilliseconds(UUID uuid, long milliseconds) {
+		Timespan cooldown = this.cooldown;
+		assert cooldown != null;
+		long cooldownMs = cooldown.getMilliSeconds();
+		if (milliseconds > cooldownMs) {
+			throw new IllegalArgumentException("Remaining time may not be longer than the cooldown");
+		}
+		setElapsedMilliSeconds(uuid, cooldownMs - milliseconds);
+	}
+
 	public long getElapsedMilliseconds(UUID uuid) {
 		Date lastUsage = lastUsageMap.get(uuid);
 		return lastUsage == null ? 0 : new Date().getTimestamp() - lastUsage.getTimestamp();
+	}
+
+	public void setElapsedMilliSeconds(UUID uuid, long milliseconds) {
+		Date date = new Date();
+		date.subtract(new Timespan(milliseconds));
+		lastUsageMap.put(uuid, date);
 	}
 
 	public String getCooldownBypass() {
