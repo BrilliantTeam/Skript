@@ -33,6 +33,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
+import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 import org.bukkit.command.CommandSender;
@@ -42,8 +43,8 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import java.util.UUID;
 
-@Name("Cooldown Time/Remaining Time/Elapsed Time/Cooldown Bypass Permission")
-@Description({"Only usable in command events. Represents the cooldown time, the remaining time, or elapsed time (time since last execution), or the cooldown bypass permission."})
+@Name("Cooldown Time/Remaining Time/Elapsed Time/Last Usage Date/Cooldown Bypass Permission")
+@Description({"Only usable in command events. Represents the cooldown time, the remaining time, or the elapsed time, or the last usage date, or the cooldown bypass permission."})
 @Examples({
         "command /home:",
         "\tcooldown: 10 seconds",
@@ -52,11 +53,11 @@ import java.util.UUID;
         "\t\tteleport player to {home::%player%}"
 })
 @Since("2.2-dev33")
-public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
+public class ExprCmdCooldownInfo extends SimpleExpression<Object> {
 
     static {
-        Skript.registerExpression(ExprCmdElapsedRemainingTime.class, Object.class, ExpressionType.SIMPLE,
-                "[the] (0¦remaining|1¦elapsed|2¦cooldown|3¦cooldown bypass perm[ission]) [time][ ][span] [of] [the] [(cooldown|wait)] [((of|for)[the] [current] command)]");
+        Skript.registerExpression(ExprCmdCooldownInfo.class, Object.class, ExpressionType.SIMPLE,
+                "[the] (0¦remaining [time]|1¦elapsed [time]|2¦cooldown [time] [length]|3¦last usage [date]|4¦cooldown bypass perm[ission]) [of] [the] [(cooldown|wait)] [((of|for)[the] [current] command)]");
     }
 
     private int mark;
@@ -81,12 +82,14 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
             case 0:
             case 1:
                 long ms = mark != 1
-                        ? scriptCommand.getRemainingMilliseconds(uuid)
-                        : scriptCommand.getElapsedMilliseconds(uuid);
+                        ? scriptCommand.getRemainingMilliseconds(uuid, event)
+                        : scriptCommand.getElapsedMilliseconds(uuid, event);
                 return new Timespan[]{new Timespan(ms)};
             case 2:
                 return new Timespan[]{scriptCommand.getCooldown()};
             case 3:
+                return new Date[]{scriptCommand.getLastUsage(uuid, event)};
+            case 4:
                 return new String[]{scriptCommand.getCooldownBypass()};
         }
 
@@ -126,8 +129,10 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
             case 1:
                 return "elapsed time";
             case 2:
-                return "cooldown";
+                return "cooldown time";
             case 3:
+                return "last usage date";
+            case 4:
                 return "cooldown bypass permission";
         }
         return null;
@@ -139,12 +144,19 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
         switch (mode) {
             case ADD:
             case REMOVE:
+                if (mark <= 1) {
+                    // remaining or elapsed time
+                    return new Class<?>[]{Timespan.class};
+                }
             case REMOVE_ALL:
             case RESET:
             case SET:
-                // Remaining time or elapsed time
                 if (mark <= 1) {
+                    // remaining or elapsed time
                     return new Class<?>[]{Timespan.class};
+                } else if (mark == 3) {
+                    // last usage dtae
+                    return new Class<?>[]{Date.class};
                 }
         }
         return null;
@@ -164,48 +176,62 @@ public class ExprCmdElapsedRemainingTime extends SimpleExpression<Object> {
         }
         long cooldownMs = cooldown.getMilliSeconds();
         UUID uuid = ((Player) sender).getUniqueId();
-        Timespan timespan = delta == null ? new Timespan(0) : (Timespan) delta[0];
-        switch (mode) {
-            case ADD:
-            case REMOVE:
-                long change = (mode == Changer.ChangeMode.ADD ? 1 : -1) * timespan.getMilliSeconds();
-                if (mark == 0) {
-                    // Remaining time
-                    long remaining = command.getRemainingMilliseconds(uuid);
-                    long changed = remaining + change;
-                    if (changed < 0) {
-                        changed = 0;
+
+        if (mark <= 1) {
+            Timespan timespan = delta == null ? new Timespan(0) : (Timespan) delta[0];
+            switch (mode) {
+                case ADD:
+                case REMOVE:
+                    long change = (mode == Changer.ChangeMode.ADD ? 1 : -1) * timespan.getMilliSeconds();
+                    if (mark == 0) {
+                        // Remaining time
+                        long remaining = command.getRemainingMilliseconds(uuid, commandEvent);
+                        long changed = remaining + change;
+                        if (changed < 0) {
+                            changed = 0;
+                        }
+                        command.setRemainingMilliseconds(uuid, commandEvent, changed);
+                    } else {
+                        // Elapsed time
+                        long elapsed = command.getElapsedMilliseconds(uuid, commandEvent);
+                        long changed = elapsed + change;
+                        if (changed > cooldownMs) {
+                            changed = cooldownMs;
+                        }
+                        command.setElapsedMilliSeconds(uuid, commandEvent, changed);
                     }
-                    command.setRemainingMilliseconds(uuid, changed);
-                } else {
-                    // Elapsed time
-                    long elapsed = command.getElapsedMilliseconds(uuid);
-                    long changed = elapsed + change;
-                    if (changed > cooldownMs) {
-                        changed = cooldownMs;
+                    break;
+                case REMOVE_ALL:
+                case RESET:
+                    if (mark == 0) {
+                        // Remaining time
+                        command.setRemainingMilliseconds(uuid, commandEvent, cooldownMs);
+                    } else {
+                        // Elapsed time
+                        command.setElapsedMilliSeconds(uuid, commandEvent, 0);
                     }
-                    command.setElapsedMilliSeconds(uuid, changed);
-                }
-                break;
-            case REMOVE_ALL:
-            case RESET:
-                if (mark == 0) {
-                    // Remaining time
-                    command.setRemainingMilliseconds(uuid, cooldownMs);
-                } else {
-                    // Elapsed time
-                    command.setElapsedMilliSeconds(uuid, 0);
-                }
-                break;
-            case SET:
-                if (mark == 0) {
-                    // Remaining time
-                    command.setRemainingMilliseconds(uuid, timespan.getMilliSeconds());
-                } else {
-                    // Elapsed time
-                    command.setElapsedMilliSeconds(uuid, timespan.getMilliSeconds());
-                }
-                break;
+                    break;
+                case SET:
+                    if (mark == 0) {
+                        // Remaining time
+                        command.setRemainingMilliseconds(uuid, commandEvent, timespan.getMilliSeconds());
+                    } else {
+                        // Elapsed time
+                        command.setElapsedMilliSeconds(uuid, commandEvent, timespan.getMilliSeconds());
+                    }
+                    break;
+            }
+        } else if (mark == 3) {
+            switch (mode) {
+                case REMOVE_ALL:
+                case RESET:
+                    command.setLastUsage(uuid, commandEvent, null);
+                    break;
+                case SET:
+                    Date date = delta == null ? null : (Date) delta[0];
+                    command.setLastUsage(uuid, commandEvent, date);
+                    break;
+            }
         }
     }
 }
