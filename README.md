@@ -113,14 +113,14 @@ Or, if you use Maven:
 
 Then you alse need to add Skript as dependency.
 ```
-compile "ch.njol:Skript:2.2-RELEASE_TAG"
+compile "ch.njol:skript:2.2-RELEASE_TAG"
 ```
 
 Or, if you use Maven:
 ```
 <dependency>
     <groupId>ch.njol</groupId>
-    <artifactId>Skript</artifactId>
+    <artifactId>skript</artifactId>
     <version>2.2-RELEASE_TAG</version>
 </dependency>
 ```
