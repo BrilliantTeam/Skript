@@ -64,6 +64,11 @@ public class ExprNewInventory extends SimpleExpression<Inventory> {
     protected Inventory[] get(Event e) {
         String name = this.name != null ? this.name.getSingle(e) : "Chest";
         Number rows = this.rows != null ? this.rows.getSingle(e) : 3;
+
+        // Shouldn't be null at this point, but empty variables are a thing
+        rows = rows == null ? 3 : rows;
+        name = name == null ? "Chest" : name;
+
         int size = rows.intValue() * 9;
         if (size % 9 != 0) {
             size = 27;
