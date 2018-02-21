@@ -112,9 +112,8 @@ public enum WeatherType {
 			case DOWNFALL:
 				return RAIN;
 			case CLEAR:
-				return CLEAR;
 			default:
-				throw new RuntimeException("Unknown enum value: " + player.getPlayerWeather().name());
+				return CLEAR;
 		}
 	}
 

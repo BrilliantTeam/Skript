@@ -44,7 +44,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Since("2.2-dev34")
 public class ExprPlayerWeather extends SimplePropertyExpression<Player, WeatherType> {
 	static {
-		PropertyExpression.register(ExprPlayerWeather.class, WeatherType.class, "weather", "player");
+		PropertyExpression.register(ExprPlayerWeather.class, WeatherType.class, "weather", "players");
 	}
 
 	@Override
