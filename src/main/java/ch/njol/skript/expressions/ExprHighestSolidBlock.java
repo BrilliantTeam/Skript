@@ -14,6 +14,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
  *
+ *
+ * Copyright 2011-2018 Peter Güttinger and contributors
  */
 package ch.njol.skript.expressions;
 
@@ -22,6 +24,8 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.PropertyExpression;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -32,48 +36,28 @@ import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
-
 @Name("Highest Solid Block")
 @Description("Returns the highest solid block at the x and z coordinates of the world of given location")
 @Examples("highest block at location of arg-player")
 @Since("2.2-dev34")
-public class ExprHighestSolidBlock extends SimpleExpression<Block> {
+public class ExprHighestSolidBlock extends SimplePropertyExpression<Location, Block> {
 	static {
-		Skript.registerExpression(ExprHighestSolidBlock.class, Block.class, ExpressionType.SIMPLE, "highest [(solid|non-air)] block at %location%");
-	}
-
-	@Nullable
-	private Expression<Location> loc;
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		this.loc = (Expression<Location>) exprs[0];
-		return true;
-	}
-
-	@SuppressWarnings("null")
-	@Override
-	@Nullable
-	protected Block[] get(final Event e) {
-		if (loc == null) return null;
-		Location loc = this.loc.getSingle(e);
-		return new Block[]{loc.getWorld().getHighestBlockAt(loc)};
+		Skript.registerExpression(ExprHighestSolidBlock.class, Block.class, ExpressionType.PROPERTY,
+				"highest [(solid|non-air)] block at %location%");
 	}
 
 	@Override
-	public boolean isSingle() {
-		return true;
+	protected String getPropertyName() {
+		return "highest [(solid|non-air)] block";
+	}
+
+	@Override
+	public Block convert(Location location) {
+		return location.getWorld().getHighestBlockAt(location);
 	}
 
 	@Override
 	public Class<? extends Block> getReturnType() {
 		return Block.class;
-	}
-
-	@SuppressWarnings("null")
-	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		return "highest solid block at " + loc.getSingle(e).toString();
 	}
 }
