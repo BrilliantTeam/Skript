@@ -277,10 +277,10 @@ public final class Skript extends JavaPlugin implements Listener {
 						final File cf = new File(getDataFolder(), e.getName());
 						if (!cf.exists())
 							saveTo = cf;
-					} else if (e.getName().startsWith("aliases-") && e.getName().endsWith(".sk") && !e.getName().contains("/")) {
-						final File af = new File(getDataFolder(), e.getName());
-						if (!af.exists())
-							saveTo = af;
+//					} else if (e.getName().startsWith("aliases-") && e.getName().endsWith(".sk") && !e.getName().contains("/")) {
+//						final File af = new File(getDataFolder(), e.getName());
+//						if (!af.exists())
+//							saveTo = af;
 					} else if (e.getName().startsWith("features.sk")) {
 						final File af = new File(getDataFolder(), e.getName());
 						if (!af.exists())
