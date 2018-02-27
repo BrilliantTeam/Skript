@@ -208,21 +208,25 @@ public abstract class SkriptConfig {
 
 				@Override
 				public void set(String t) {
-					switch (t) {
-						case "false":
-						case "disabled":
-							ChatMessages.linkParseMode = LinkParseMode.DISABLED;
-							break;
-						case "true":
-						case "lenient":
-							ChatMessages.linkParseMode = LinkParseMode.LENIENT;
-							break;
-						case "strict":
-							ChatMessages.linkParseMode = LinkParseMode.STRICT;
-							break;
-						default:
-							ChatMessages.linkParseMode = LinkParseMode.DISABLED;
-							Skript.warning("Unknown link parse mode: " + t + ", please use disabled, strict or lenient");
+					try {
+						switch (t) {
+							case "false":
+							case "disabled":
+								ChatMessages.linkParseMode = LinkParseMode.DISABLED;
+								break;
+							case "true":
+							case "lenient":
+								ChatMessages.linkParseMode = LinkParseMode.LENIENT;
+								break;
+							case "strict":
+								ChatMessages.linkParseMode = LinkParseMode.STRICT;
+								break;
+							default:
+								ChatMessages.linkParseMode = LinkParseMode.DISABLED;
+								Skript.warning("Unknown link parse mode: " + t + ", please use disabled, strict or lenient");
+						}
+					} catch (Error e) {
+						// Ignore it, we're on unsupported server platform and class loading failed
 					}
 				}
 				
@@ -244,7 +248,11 @@ public abstract class SkriptConfig {
 
 				@Override
 				public void set(Boolean t) {
-					ChatMessages.colorResetCodes = t;
+					try {
+						ChatMessages.colorResetCodes = t;
+					} catch (Error e) {
+						// Ignore it, we're on unsupported server platform and class loading failed
+					}
 				}
 				
 			});

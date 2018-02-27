@@ -270,7 +270,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		version = new Version("" + getDescription().getVersion()); // Skript version
 		
-		ChatMessages.registerListeners();
 		Language.loadDefault(getAddonInstance());
 		
 		Workarounds.init();
@@ -365,6 +364,8 @@ public final class Skript extends JavaPlugin implements Listener {
 		new DefaultComparators();
 		new DefaultConverters();
 		new DefaultFunctions();
+		
+		ChatMessages.registerListeners();
 		
 		try {
 			getAddonInstance().loadClasses("ch.njol.skript", "conditions", "effects", "events", "expressions", "entity");
