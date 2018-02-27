@@ -192,18 +192,16 @@ public final class Skript extends JavaPlugin implements Listener {
 			m_finished_loading = new Message("skript.finished loading");
 	
 	public static ServerPlatform getServerPlatform() {
-		if (classExists("co.aikar.timings.Timings")) {
+		if (classExists("net.glowstone.GlowServer")) {
+			return ServerPlatform.BUKKIT_GLOWSTONE; // Glowstone has timings too, so must check for it first
+		} else if (classExists("co.aikar.timings.Timings")) {
 			return ServerPlatform.BUKKIT_PAPER; // Could be Sponge, but it doesn't work at all at the moment
 		} else if (classExists("org.spigotmc.SpigotConfig")) {
-			if (classExists("java.net.glowstone.GlowServer")) {
-				return ServerPlatform.BUKKIT_GLOWSTONE;
-			} else {
-				return ServerPlatform.BUKKIT_SPIGOT;
-			}
+			return ServerPlatform.BUKKIT_SPIGOT;
 		} else if (classExists("org.bukkit.craftbukkit.CraftServer") || classExists("org.bukkit.craftbukkit.Main")) {
 			// At some point, CraftServer got removed or moved
 			return ServerPlatform.BUKKIT_CRAFTBUKKIT;
-		} else {
+		} else { // Probably some ancient Bukkit implementation
 			return ServerPlatform.BUKKIT_UNKNOWN;
 		}
 	}
@@ -213,7 +211,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * Prints errors or warnings to console if something is wrong.
 	 * @return Whether Skript can continue loading at all.
 	 */
-	private boolean checkServerPlatform() {
+	private static boolean checkServerPlatform() {
 		String bukkitV = Bukkit.getBukkitVersion();
 		Matcher m = Pattern.compile("\\d+\\.\\d+(\\.\\d+)?").matcher(bukkitV);
 		if (!m.find()) {
