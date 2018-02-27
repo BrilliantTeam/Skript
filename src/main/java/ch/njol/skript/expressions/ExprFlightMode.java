@@ -29,7 +29,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
@@ -44,7 +43,8 @@ public class ExprFlightMode extends PropertyExpression<Player, Boolean> {
         PropertyExpression.register(ExprFlightMode.class, Boolean.class, "fl(y[ing]|ight) (mode|state)", "players");
     }
 
-    @Override
+    @SuppressWarnings({"null", "unchecked"})
+	@Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         setExpr((Expression<? extends Player>) exprs[0]);
         return true;
