@@ -37,6 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.util.StringMode;
 import ch.njol.skript.util.Timespan;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -141,6 +142,7 @@ public abstract class Commands {
 			.addEntry("cooldown", true)
 			.addEntry("cooldown message", true)
 			.addEntry("cooldown bypass", true)
+			.addEntry("cooldown storage", true)
 			.addEntry("aliases", true)
 			.addEntry("executable by", true)
 			.addSection("trigger", false);
@@ -463,6 +465,12 @@ public abstract class Commands {
 			Skript.warning("command /" + command + " has a cooldown message set, but not a cooldown");
 		}
 
+		String cooldownStorageString = ScriptLoader.replaceOptions(node.get("cooldown storage", ""));
+		VariableString cooldownStorage = null;
+		if (!cooldownStorageString.isEmpty()) {
+			cooldownStorage = VariableString.newInstance(cooldownStorageString, StringMode.VARIABLE_NAME);
+		}
+
 		if (Skript.debug() || node.debug())
 			Skript.debug("command " + desc + ":");
 		
@@ -476,8 +484,8 @@ public abstract class Commands {
 		final ScriptCommand c;
 		try {
 			c = new ScriptCommand(config, command, "" + pattern.toString(), currentArguments, description, usage,
-					aliases, permission, permissionMessage, cooldown, cooldownMessage, cooldownBypass, executableBy,
-					ScriptLoader.loadItems(trigger));
+					aliases, permission, permissionMessage, cooldown, cooldownMessage, cooldownBypass, cooldownStorage,
+					executableBy, ScriptLoader.loadItems(trigger));
 		} finally {
 			Commands.currentArguments = null;
 		}

@@ -248,7 +248,7 @@ public abstract class SkriptConfig {
 				}
 				
 			});
-	
+
 	public final static Option<Boolean> asyncLoaderEnabled = new Option<Boolean>("asynchronous script loading", false)
 			.setter(new Setter<Boolean>() {
 
@@ -262,7 +262,10 @@ public abstract class SkriptConfig {
 	
 	public final static Option<Boolean> allowUnsafePlatforms = new Option<Boolean>("allow unsafe platforms", false)
 			.optional(true);
-	
+
+	public final static Option<Boolean> keepLastUsageDates = new Option<Boolean>("keep command last usage dates", false)
+			.optional(true);
+
 	/**
 	 * This should only be used in special cases
 	 */
