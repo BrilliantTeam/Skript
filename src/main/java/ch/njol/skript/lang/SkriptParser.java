@@ -438,6 +438,7 @@ public class SkriptParser {
 						// Plural/singular sanity check
 						if (hasSingular && !var.isSingle()) {
 							Skript.error("'" + expr + "' can only accept a single value of any type, not more", ErrorQuality.SEMANTIC_ERROR);
+							return null;
 						}
 						
 						log.printLog();
@@ -463,6 +464,7 @@ public class SkriptParser {
 							// Plural/singular sanity check
 							if (!vi.isPlural[i] && !var.isSingle()) {
 								Skript.error("'" + expr + "' can only accept a single " + vi.classes[i].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
+								return null;
 							}
 							
 							log.printLog();
