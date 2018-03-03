@@ -21,6 +21,14 @@ package ch.njol.skript.aliases;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -347,40 +355,101 @@ public abstract class Aliases {
 		return null;
 	}
 	
+	/**
+	 * Clears aliases. Make sure to load them after this!
+	 */
 	public static void clear() {
 		provider.clearAliases();
 	}
 	
+	/**
+	 * Loads aliases from Skript's standard locations.
+	 * Exceptions will be logged, but not thrown.
+	 */
 	public static void load() {
-		File aliasesFolder = new File(Skript.getInstance().getDataFolder(), "aliases");
 		try {
-			loadDirectory(aliasesFolder);
+			loadInternal();
 		} catch (IOException e) {
 			Skript.exception(e);
 		}
 	}
 	
-	public static void loadDirectory(File dir) throws IOException {
-		File[] files = dir.listFiles();
-		if (files == null)
-			return; // listFiles returns null if there are no files (... why?)
-		for (File f : files) {
-			if (f.isDirectory())
-				loadDirectory(f);
-			else
-				load(f);
+	private static void loadInternal() throws IOException {
+		Path dataFolder = Skript.getInstance().getDataFolder().toPath();
+		
+		// Load aliases.zip OR aliases from jar (never both)
+		Path zipPath = dataFolder.resolve("aliases.zip");
+		if (Files.exists(zipPath)) { // Load if it exists
+			try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, Skript.class.getClassLoader())) {
+				assert zipFs != null; // It better not be...
+				Path aliasesPath = zipFs.getPath("/");
+				assert aliasesPath != null;
+				loadDirectory(aliasesPath);
+			}
+		} else { // Fall back to jar loading
+			try {
+				URI jarUri = Skript.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+				try (FileSystem zipFs = FileSystems.newFileSystem(Paths.get(jarUri), Skript.class.getClassLoader())) {
+					assert zipFs != null;
+					Path aliasesPath = zipFs.getPath("/", "aliases");
+					assert aliasesPath != null;
+					loadDirectory(aliasesPath);
+				}
+			} catch (URISyntaxException e) {
+				assert false;
+			}
+			
+		}
+		
+		// Load everything from aliases folder (user aliases)
+		Path aliasesFolder = dataFolder.resolve(dataFolder);
+		if (Files.exists(aliasesFolder)) {
+			assert aliasesFolder != null;
+			loadDirectory(aliasesFolder);
 		}
 	}
 	
-	public static void load(File f) throws IOException {
+	/**
+	 * Loads aliases from given directory.
+	 * @param dir Directory of aliases.
+	 * @throws IOException If something goes wrong with loading.
+	 */
+	public static void loadDirectory(Path dir) throws IOException {
+		try {
+			Files.list(dir).forEach((f) -> {
+				assert f != null;
+				try {
+					if (Files.isDirectory(f))
+						loadDirectory(f);
+					else
+						load(f);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			});
+		} catch (UncheckedIOException e) {
+			throw e.getCause();
+		}
+	}
+	
+	/**
+	 * Loads aliases from given path.
+	 * @param f Path of alias file.
+	 * @throws IOException If something goes wrong with loading.
+	 */
+	public static void load(Path f) throws IOException {
 		Config config = new Config(f, false, false, "=");
 		load(config);
 	}
 	
+	/**
+	 * Loads aliases from configuration.
+	 * @param config Configuration containing the aliases.
+	 */
 	public static void load(Config config) {
 		for (Node n : config.getMainNode()) {
 			if (!(n instanceof SectionNode)) {
-				// TODO error reporting
+				// TODO conditional aliases
 				continue;
 			}
 			

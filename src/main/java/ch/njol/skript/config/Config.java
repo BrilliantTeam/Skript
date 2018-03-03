@@ -27,6 +27,9 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -68,12 +71,13 @@ public class Config implements Comparable<Config> {
 	
 	String fileName;
 	@Nullable
-	File file = null;
+	Path file = null;
 	
 	public Config(final InputStream source, final String fileName, @Nullable final File file, final boolean simple, final boolean allowEmptySections, final String defaultSeparator) throws IOException {
 		try {
 			this.fileName = fileName;
-			this.file = file; // Might be null, but that is not an issue
+			if (file != null) // Must check for null before converting to path
+				this.file = file.toPath();
 			this.simple = simple;
 			this.allowEmptySections = allowEmptySections;
 			this.defaultSeparator = defaultSeparator;
@@ -106,6 +110,12 @@ public class Config implements Comparable<Config> {
 	@SuppressWarnings("resource")
 	public Config(final File file, final boolean simple, final boolean allowEmptySections, final String defaultSeparator) throws IOException {
 		this(new FileInputStream(file), "" + file.getName(), simple, allowEmptySections, defaultSeparator);
+		this.file = file.toPath();
+	}
+	
+	@SuppressWarnings("null")
+	public Config(final Path file, final boolean simple, final boolean allowEmptySections, final String defaultSeparator) throws IOException {
+		this(Channels.newInputStream(FileChannel.open(file)), "" + file.getFileName(), simple, allowEmptySections, defaultSeparator);
 		this.file = file;
 	}
 	
@@ -122,7 +132,7 @@ public class Config implements Comparable<Config> {
 	public Config(final String s, final String fileName, final boolean simple, final boolean allowEmptySections, final String defaultSeparator) throws IOException {
 		this(new ByteArrayInputStream(s.getBytes(ConfigReader.UTF_8)), fileName, simple, allowEmptySections, defaultSeparator);
 	}
-	
+
 	void setIndentation(final String indent) {
 		assert indent != null && indent.length() > 0 : indent;
 		indentation = indent;
@@ -180,6 +190,18 @@ public class Config implements Comparable<Config> {
 	
 	@Nullable
 	public File getFile() {
+		if (file != null) {
+			try {
+				return file.toFile();
+			} catch(Exception e) {
+				return null; // ZipPath, for example, throws undocumented exception
+			}
+		}
+		return null;
+	}
+	
+	@Nullable
+	public Path getPath() {
 		return file;
 	}
 	
