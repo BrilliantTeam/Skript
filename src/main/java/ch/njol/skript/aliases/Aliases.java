@@ -45,6 +45,8 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptCommand;
+import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
@@ -379,7 +381,9 @@ public abstract class Aliases {
 		
 		// Load aliases.zip OR aliases from jar (never both)
 		Path zipPath = dataFolder.resolve("aliases.zip");
-		if (Files.exists(zipPath)) { // Load if it exists
+		if (!SkriptConfig.loadDefaultAliases.value()) {
+			// Or do nothing, if user requested that default aliases are not loaded
+		} else if (Files.exists(zipPath)) { // Load if it exists
 			try (FileSystem zipFs = FileSystems.newFileSystem(zipPath, Skript.class.getClassLoader())) {
 				assert zipFs != null; // It better not be...
 				Path aliasesPath = zipFs.getPath("/");

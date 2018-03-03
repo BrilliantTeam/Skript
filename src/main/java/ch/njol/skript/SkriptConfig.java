@@ -273,6 +273,9 @@ public abstract class SkriptConfig {
 
 	public final static Option<Boolean> keepLastUsageDates = new Option<Boolean>("keep command last usage dates", false)
 			.optional(true);
+	
+	public final static Option<Boolean> loadDefaultAliases = new Option<Boolean>("load default aliases", true)
+			.optional(true);
 
 	/**
 	 * This should only be used in special cases
