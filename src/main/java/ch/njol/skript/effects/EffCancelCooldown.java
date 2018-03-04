@@ -48,7 +48,7 @@ import org.eclipse.jdt.annotation.Nullable;
         "\t\t\tstop",
         "\t\tset the player's display name to arg-1"
 })
-@Since("")
+@Since("INSERT VERSION")
 public class EffCancelCooldown extends Effect {
     static {
         Skript.registerEffect(EffCancelCooldown.class,
