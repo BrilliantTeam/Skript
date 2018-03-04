@@ -159,11 +159,6 @@ public class HTMLGenerator {
 				throw new NullPointerException();
 			}
 			
-			if (ClassInfo.NO_DOC.equals(o1.getDocName()))
-				return 1;
-			if (ClassInfo.NO_DOC.equals(o2.getDocName()))
-				return -1;
-			
 			String name1 = o1.getDocName();
 			if (name1 == null)
 				name1 = o1.getCodeName();
