@@ -62,13 +62,14 @@ import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.util.EnchantmentType;
 import ch.njol.skript.util.PotionEffectUtils;
 import ch.njol.skript.util.Utils;
+import ch.njol.skript.util.Version;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.Setter;
 
 @SuppressWarnings("deprecation")
 public abstract class Aliases {
 		
-	private final static AliasesProvider provider = new AliasesProvider();
+	private final static AliasesProvider provider = createProvider();
 	private static AliasesProvider localProvider = new AliasesProvider();
 	
 	@Nullable
@@ -79,6 +80,41 @@ public abstract class Aliases {
 		return provider.getAlias(s);
 	}
 	
+	/**
+	 * Creates an aliases provider and configures it a bit.
+	 * @return Aliases provider.
+	 */
+	private static AliasesProvider createProvider() {
+		AliasesProvider provider = new AliasesProvider();
+		
+		// Register standard conditions
+		provider.registerCondition("minecraft version", (str) -> {
+			int orNewer = str.indexOf("or newer"); // For example: 1.12 or newer
+			if (orNewer != -1) {
+				Version ver = new Version(str.substring(0, orNewer - 1));
+				return Skript.getMinecraftVersion().compareTo(ver) >= 0;
+			}
+			
+			int orOlder = str.indexOf("or older"); // For example: 1.11 or older
+			if (orOlder != -1) {
+				Version ver = new Version(str.substring(0, orOlder - 1));
+				return Skript.getMinecraftVersion().compareTo(ver) <= 0;
+			}
+			
+			int to = str.indexOf("to"); // For example: 1.11 to 1.12
+			if (to != -1) {
+				Version first = new Version(str.substring(0, to - 1));
+				Version second = new Version(str.substring(to + 3));
+				Version current = Skript.getMinecraftVersion();
+				return current.compareTo(first) >= 0 && current.compareTo(second) <= 0;
+			}
+			
+			return Skript.getMinecraftVersion().equals(new Version(str));
+		});
+		
+		return provider;
+	}
+
 	static String itemSingular = "item";
 	static String itemPlural = "items";
 	@Nullable
@@ -102,6 +138,7 @@ public abstract class Aliases {
 	private final static ArgsMessage m_invalid_item_type = new ArgsMessage("aliases.invalid item type");
 	private final static ArgsMessage m_loaded_x_aliases_from = new ArgsMessage("aliases.loaded x aliases from");
 	private final static ArgsMessage m_loaded_x_aliases = new ArgsMessage("aliases.loaded x aliases");
+	private final static Message m_outside_section = new Message("aliases.outside section");
 	
 	/**
 	 * Concatenates parts of an alias's name. This currently 'lowercases' the first character of any part if there's no space in front of it. It also replaces double spaces with a
@@ -406,7 +443,7 @@ public abstract class Aliases {
 		}
 		
 		// Load everything from aliases folder (user aliases)
-		Path aliasesFolder = dataFolder.resolve(dataFolder);
+		Path aliasesFolder = dataFolder.resolve("aliases");
 		if (Files.exists(aliasesFolder)) {
 			assert aliasesFolder != null;
 			loadDirectory(aliasesFolder);
@@ -453,7 +490,7 @@ public abstract class Aliases {
 	public static void load(Config config) {
 		for (Node n : config.getMainNode()) {
 			if (!(n instanceof SectionNode)) {
-				// TODO conditional aliases
+				Skript.error(m_outside_section.toString());
 				continue;
 			}
 			

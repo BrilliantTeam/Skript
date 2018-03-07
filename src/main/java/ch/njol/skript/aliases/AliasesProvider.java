@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
@@ -119,7 +120,15 @@ public class AliasesProvider {
 	 */
 	private Map<ItemData, Set<ItemData>> subtypes;
 	
+	/**
+	 * Maps item datas back to Minecraft ids.
+	 */
 	private Map<ItemData, String> minecraftIds;
+	
+	/**
+	 * Contains condition functions to determine when aliases should be loaded.
+	 */
+	private Map<String, Function<String,Boolean>> conditions;
 	
 	/**
 	 * Constructs a new aliases provider with no data.
@@ -130,6 +139,8 @@ public class AliasesProvider {
 		variations = new HashMap<>(500);
 		subtypes = new HashMap<>(1000);
 		minecraftIds = new HashMap<>(3000);
+		conditions = new HashMap<>();
+		
 		gson = new Gson();
 		
 		@SuppressWarnings("deprecation")
@@ -169,6 +180,16 @@ public class AliasesProvider {
 			if (!(node instanceof EntryNode)) {
 				Skript.error(m_unexpected_section.toString());
 				continue;
+			}
+			
+			// Check for conditions
+			if (conditions.containsKey(key)) {
+				boolean success = conditions.get(key).apply(((EntryNode) node).getValue());
+				if (!success) { // Failure causes ignoring rest in this section node
+					Skript.debug("Condition " + key + " was NOT met; not loading more");
+					return;
+				}
+				continue; // Do not interpret this as alias
 			}
 			
 			// Get value (it always exists)
@@ -478,5 +499,9 @@ public class AliasesProvider {
 	@Nullable
 	public Set<ItemData> getSubtypes(ItemData supertype) {
 		return subtypes.get(supertype);
+	}
+
+	public void registerCondition(String name, Function<String, Boolean> condition) {
+		conditions.put(name, condition);
 	}
 }

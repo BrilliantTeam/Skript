@@ -193,7 +193,7 @@ aliases:
 	invalid tags: Specified tags are not defined in valid JSON
 	unexpected section: Sections are not allowed here
 	invalid variation section: A section should be variation section, but %s is not valid variation name
-	unknown condition: Unknown condition %s. Make sure you are not defining aliases outside of sections
+	outside section: Aliases must be put in sections
 	
 	# Other messages
 	loaded x aliases from: Loaded %s english aliases from %s
