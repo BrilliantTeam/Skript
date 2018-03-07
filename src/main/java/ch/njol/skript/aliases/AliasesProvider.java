@@ -336,6 +336,7 @@ public class AliasesProvider {
 			Variation var = parseVariation(item); // Share parsing code with variations
 			
 			for (String p : patterns) {
+				p = p.trim();
 				assert p != null; // No nulls in this list
 				loadVariedAlias(p, var.getId(), var.getTags());
 			}
