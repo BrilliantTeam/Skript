@@ -331,6 +331,7 @@ public class AliasesProvider {
 		Skript.debug("Patterns: " + patterns);
 		
 		for (String item : data.split(",")) { // All aliases may be lists of items or just other aliases
+			item = item.trim();
 			assert item != null;
 			Variation var = parseVariation(item); // Share parsing code with variations
 			
