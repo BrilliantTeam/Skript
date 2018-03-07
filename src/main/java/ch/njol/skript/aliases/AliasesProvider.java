@@ -35,6 +35,7 @@ import org.bukkit.UnsafeValues;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.bekvon.bukkit.residence.commands.command;
 import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
@@ -330,16 +331,49 @@ public class AliasesProvider {
 		List<String> patterns = parseKeyPattern(name);
 		Skript.debug("Patterns: " + patterns);
 		
-		for (String item : data.split(",")) { // All aliases may be lists of items or just other aliases
-			item = item.trim();
-			assert item != null;
-			Variation var = parseVariation(item); // Share parsing code with variations
-			
-			for (String p : patterns) {
-				p = p.trim();
-				assert p != null; // No nulls in this list
-				loadVariedAlias(p, var.getId(), var.getTags());
+		// Complex list parsing to avoid commas inside tags
+		int start = 0; // Start of next substring
+		int indexStart = 0; // Start of next comma lookup
+		while (start - 1 != data.length()) {
+			int comma = data.indexOf(',', indexStart);
+			if (comma == -1) { // No more items than this
+				if (indexStart == 0) { // Nothing was loaded, so no commas at all
+					String item = data.trim();
+					assert item != null;
+					loadSingleAlias(patterns, item);
+					break;
+				} else {
+					comma = data.length();
+				}
 			}
+			
+			int bracketOpen = data.indexOf('{', indexStart);
+			int bracketClose = data.indexOf('}', bracketOpen);
+			if (comma < bracketClose && comma > bracketOpen) {
+				// Inside tags, comma lookup goes to end of tags
+				indexStart = bracketClose;
+				continue;
+			}
+			
+			// Not inside tags, so process the item
+			String item = data.substring(start, comma).trim();
+			assert item != null;
+			loadSingleAlias(patterns, item);
+			
+			// Set up for next item
+			start = comma + 1;
+			indexStart = start;
+		}
+	}
+	
+	private void loadSingleAlias(List<String> patterns, String item) {
+		System.out.println(item);
+		Variation var = parseVariation(item); // Share parsing code with variations
+		
+		for (String p : patterns) {
+			p = p.trim();
+			assert p != null; // No nulls in this list
+			loadVariedAlias(p, var.getId(), var.getTags());
 		}
 	}
 	

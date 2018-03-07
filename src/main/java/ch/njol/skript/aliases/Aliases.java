@@ -460,9 +460,10 @@ public abstract class Aliases {
 			Files.list(dir).forEach((f) -> {
 				assert f != null;
 				try {
-					if (Files.isDirectory(f))
+					String name = f.getFileName().toString();
+					if (Files.isDirectory(f) && !name.startsWith("."))
 						loadDirectory(f);
-					else
+					else if (name.endsWith(".sk"))
 						load(f);
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
