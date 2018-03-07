@@ -417,7 +417,7 @@ public abstract class Aliases {
 		Path dataFolder = Skript.getInstance().getDataFolder().toPath();
 		
 		// Load aliases.zip OR aliases from jar (never both)
-		Path zipPath = dataFolder.resolve("aliases.zip");
+		Path zipPath = dataFolder.resolve("aliases-english.zip");
 		if (!SkriptConfig.loadDefaultAliases.value()) {
 			// Or do nothing, if user requested that default aliases are not loaded
 		} else if (Files.exists(zipPath)) { // Load if it exists
@@ -432,7 +432,7 @@ public abstract class Aliases {
 				URI jarUri = Skript.class.getProtectionDomain().getCodeSource().getLocation().toURI();
 				try (FileSystem zipFs = FileSystems.newFileSystem(Paths.get(jarUri), Skript.class.getClassLoader())) {
 					assert zipFs != null;
-					Path aliasesPath = zipFs.getPath("/", "aliases");
+					Path aliasesPath = zipFs.getPath("/", "aliases-english");
 					assert aliasesPath != null;
 					loadDirectory(aliasesPath);
 				}
