@@ -38,13 +38,12 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Custom Chest Inventory")
 @Description("Returns a chest inventory with the given amount of rows and the name. Use the <a href=effects.html#EffOpenInventory>open inventory</a>effect to open it.")
 @Examples({"open chest inventory with 1 rows named \"test\"",
-           "set {_inv} to chest inventory with 1 row"})
+           "set {_inventory} to chest inventory with 1 row"})
 @Since("2.2-dev34")
-public class ExprNewInventory extends SimpleExpression<Inventory> {
+public class ExprInventoryChest extends SimpleExpression<Inventory> {
 
     static {
-        Skript.registerExpression(ExprNewInventory.class, Inventory.class, ExpressionType.COMBINED, "chest inventory (named|with name) %string% [with %-number% row[s]]"
-                                                                                                , "chest inventory with %number% row[s] [(named|with name) %-string%]");
+        Skript.registerExpression(ExprInventoryChest.class, Inventory.class, ExpressionType.COMBINED, "[a [new]] chest [inventory] (named|with name) %string% [with %-number% row[s]]", "chest [inventory] with %number% row[s] [(named|with name) %-string%]");
     }
 
     @Nullable
@@ -52,18 +51,18 @@ public class ExprNewInventory extends SimpleExpression<Inventory> {
     @Nullable
     private Expression<String> name;
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         name = (Expression<String>) exprs[matchedPattern];
         rows = (Expression<Number>) exprs[matchedPattern ^ 1];
         return true;
     }
 
-    @SuppressWarnings("null") //ECJ compiler...
     @Override
-    protected Inventory[] get(Event e) {
-        String name = this.name != null ? this.name.getSingle(e) : "Chest";
-        Number rows = this.rows != null ? this.rows.getSingle(e) : 3;
+    protected Inventory[] get(Event event) {
+        String name = this.name != null ? this.name.getSingle(event) : "Chest";
+        Number rows = this.rows != null ? this.rows.getSingle(event) : 3;
 
         // Shouldn't be null at this point, but empty variables are a thing
         rows = rows == null ? 3 : rows;

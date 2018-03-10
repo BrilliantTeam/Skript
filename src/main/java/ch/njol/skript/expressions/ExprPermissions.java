@@ -20,74 +20,67 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.PropertyExpression;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.WeatherType;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.eclipse.jdt.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@Name("All Permissions")
-@Description("Gets all permissions of players. Note that the modifications to resulting list do not actually change permissions.")
-@Examples("")
+@Name("Permissions")
+@Description("Returns all permissions of the defined player(s). Note that the modifications to resulting list do not actually change permissions.")
+@Examples("set {_permissions::*} to all permissions of the player")
 @Since("2.2-dev33")
-public class ExprPermissions extends SimpleExpression<String> {
+public class ExprPermissions extends PropertyExpression<Player, String> {
+	
+	static {
+		Skript.registerExpression(ExprPermissions.class, String.class, ExpressionType.PROPERTY, "[(all [[of] the]|the)] permissions of %players%", "%players%['s] permissions");
+	}
 
-    static {
-        Skript.registerExpression(ExprPermissions.class, String.class, ExpressionType.PROPERTY, "[(all [of]|[the])] permissions of %players%", "%players%'[s] permissions");
-    }
-
-    @SuppressWarnings("null")
-    private Expression<Player> player;
-
-    @Override
-    @SuppressWarnings({"unchecked", "null"})
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        player = (Expression<Player>) exprs[0];
-        return true;
-    }
-
-    @SuppressWarnings("null")
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
-    protected String[] get(Event e) {
-        Player[] players = player.getAll(e);
-        List<String> perms = new ArrayList<>();
-
-        for (Player player : players) {
-            for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
-                perms.add(permissionAttachmentInfo.getPermission());
-            }
-        }
-
-
-        return perms.toArray(new String[0]);
-    }
-
-    @Override
-    public boolean isSingle() {
-        return false;
-    }
-
-    @Override
-    public Class<? extends String> getReturnType() {
-        return String.class;
-    }
-
-    @Override
-    public String toString(final @Nullable Event event, boolean debug) {
-        return "all permissions of " + player.toString();
-    }
+	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
+		setExpr((Expression<? extends Player>) exprs[0]);
+		return true;
+	}
+	
+	@SuppressWarnings("null")
+	@Override
+	protected String[] get(final Event event, final Player[] source) {
+		final Set<String> permissions = new HashSet<>();
+		for (final Player player : getExpr().getArray(event)) 
+			for (final PermissionAttachmentInfo permission : player.getEffectivePermissions())
+				permissions.add(permission.getPermission());
+		return permissions.toArray(new String[permissions.size()]);
+	}
+	
+	@Override
+	public Class<String> getReturnType() {
+		return String.class;
+	}
+	
+	@Override
+	public String toString(final @Nullable Event e, final boolean debug) {
+		return "permissions" + (getExpr().isDefault() ? "" : " of " + getExpr().toString(e, debug));
+	}
 
 }

@@ -19,67 +19,70 @@
  */
 package ch.njol.skript.expressions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Events;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 
-@Name("Alphabetical Sort")
-@Description("Sorts given strings in alphabetical order.")
-@Examples({"set {_list::*} to alphabetically sorted {_list::*"})
-@Since("2.2-dev18b")
-public class ExprAlphabetList extends SimpleExpression<String>{
-	
-	static{
-		Skript.registerExpression(ExprAlphabetList.class, String.class, ExpressionType.COMBINED, "alphabetically sorted %strings%");
+@Name("Click slot")
+@Description("The clicked slot number of an inventory click event.")
+@Examples("clicked slot is 1")
+@Since("2.2-dev35")
+public class ExprClickSlot extends SimpleExpression<Number> {
+
+	static {
+		Skript.registerExpression(ExprClickSlot.class, Number.class, ExpressionType.SIMPLE, "[the] clicked [raw] slot");
 	}
 	
 	@SuppressWarnings("null")
-	private Expression<String> texts;
+	private Boolean raw;
 	
-	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		texts = (Expression<String>) exprs[0];
+		if (!ScriptLoader.isCurrentEvent(InventoryClickEvent.class)) {
+			Skript.error("The expression 'clicked slot' may only be used in the inventory click events", ErrorQuality.SEMANTIC_ERROR);
+			return false;
+		}
+		raw = parseResult.expr.contains("raw");
 		return true;
 	}
 	
 	@Override
 	@Nullable
-	protected String[] get(Event event) {
-		String[] sorted = texts.getAll(event).clone(); // Not yet sorted
-		Arrays.sort(sorted); // Now sorted
-		return sorted;
-	}
-	
-	@Override
-	public Class<? extends String> getReturnType() {
-		return String.class;
-	}
-	
-	@Override
-	public boolean isSingle() {
-		return false;
+	protected Number[] get(Event event) {
+		return CollectionUtils.array((raw) ? ((InventoryClickEvent)event).getRawSlot() : ((InventoryClickEvent)event).getSlot());
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "alphabetically sorted strings: " + texts.toString(event, debug);
+	public boolean isSingle() {
+		return true;
+	}
+
+	@Override
+	public Class<? extends Number> getReturnType() {
+		return Number.class;
+	}
+	
+	@Override
+	public String toString(final @Nullable Event event, final boolean debug) {
+		return "the click slot " + ((event != null) ? ": " + ((InventoryClickEvent)event).getSlot() : "");
 	}
 	
 }
