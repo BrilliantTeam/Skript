@@ -51,7 +51,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Since("1.0")
 public class ExprTime extends PropertyExpression<World, Time> {
 	static {
-		Skript.registerExpression(ExprTime.class, Time.class, ExpressionType.PROPERTY, "[the] time [(in|of) %worlds%]", "%worlds%'[s] time");
+		Skript.registerExpression(ExprTime.class, Time.class, ExpressionType.PROPERTY, "[the] time[s] [(in|of) %worlds%]", "%worlds%'[s] time[s]");
 	}
 	
 	@SuppressWarnings({"unchecked", "null"})
@@ -62,7 +62,7 @@ public class ExprTime extends PropertyExpression<World, Time> {
 	}
 	
 	@Override
-	protected Time[] get(final Event e, final World[] source) {
+	protected Time[] get(final Event event, final World[] source) {
 		return get(source, new Getter<Time, World>() {
 			@Override
 			public Time get(final World w) {
@@ -70,8 +70,7 @@ public class ExprTime extends PropertyExpression<World, Time> {
 			}
 		});
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@Override
 	@Nullable
 	public Class<?>[] acceptChange(final ChangeMode mode) {
@@ -90,8 +89,8 @@ public class ExprTime extends PropertyExpression<World, Time> {
 	}
 	
 	@Override
-	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) {
-		final World[] worlds = getExpr().getArray(e);
+	public void change(final Event event, final @Nullable Object[] delta, final ChangeMode mode) {
+		final World[] worlds = getExpr().getArray(event);
 		int mod = 1;
 		switch (mode) {
 			case SET:
@@ -124,10 +123,10 @@ public class ExprTime extends PropertyExpression<World, Time> {
 	}
 	
 	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		if (e == null)
-			return "the time in " + getExpr().toString(e, debug);
-		return Classes.getDebugMessage(getAll(e));
+	public String toString(final @Nullable Event event, final boolean debug) {
+		if (event == null)
+			return "the time in " + getExpr().toString(event, debug);
+		return Classes.getDebugMessage(getAll(event));
 	}
 	
 }

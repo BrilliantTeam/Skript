@@ -66,7 +66,7 @@ public class ExprChatRecipients extends SimpleExpression<Player> {
 		return Player.class;
 	}
 
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings("null")
 	@Override
 	public Class<?>[] acceptChange(final ChangeMode mode) {
 		if (mode == ChangeMode.ADD || mode == ChangeMode.SET || mode == ChangeMode.DELETE || mode == ChangeMode.REMOVE)
