@@ -95,13 +95,13 @@ public class EvtItem extends SkriptEvent {
 				.description("Called when clicking on inventory slot.")
 				.examples("")
 				.since("2.2-Fixes-V10");
-		Skript.registerEvent("Item Despawn", EvtItem.class, ItemDespawnEvent.class, "item[ ][stack] %itemtypes% (despawn[ing]|remove|delete)", "item[ ][stack] (despawn|remove|delete) [[of] %itemtypes%]")
+		Skript.registerEvent("Item Despawn", EvtItem.class, ItemDespawnEvent.class, "(item[ ][stack]|[item] %-itemtypes%) despawn[ing]", "[item[ ][stack]] despawn[ing] [[of] %-itemtypes%]")
 				.description("Called when a dropped item despawns.")
 				.examples("on item despawn of diamond:",
 					 	"	send \"Not my precious!\"",
 					 	"	cancel event")
 				.since("2.2-dev35");
-		Skript.registerEvent("Item Merge", EvtItem.class, ItemMergeEvent.class, "item[ ][stack] %itemtypes% merg(e|ing)", "item[ ][stack] merg(e|ing) [[of] %itemtypes%]")
+		Skript.registerEvent("Item Merge", EvtItem.class, ItemMergeEvent.class, "(item[ ][stack]|[item] %-itemtypes%) merg(e|ing)", "item[ ][stack] merg(e|ing) [[of] %-itemtypes%]")
 				.description("Called when dropped items merge into a single stack.")
 				.examples("on item merging of gold blocks:",
 					 	"	cancel event")

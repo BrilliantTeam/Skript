@@ -1,17 +1,17 @@
 # Skript [![Build Status](https://travis-ci.org/bensku/Skript.svg?branch=master)](https://travis-ci.org/bensku/Skript)
-Skript is a plugin for Bukkit/Spigot, which allows server owners and other users
+Skript is a plugin for Bukkit/Spigot, which allows server owners and other people
 to modify their servers without learning Java. It can also be useful if you
 *do* know Java; some tasks are quicker to do with Skript, and so it can be used
-for prototyping without having to restart/reload the server.
+for prototyping etc.
 
-This Github fork fork of Skript is based on Mirreski's improvements which was built
+This Github fork of Skript is based on Mirreski's improvements which was built
 on Njol's original Skript. It is supported for **Spigot** (not Bukkit) versions of
 Minecraft 1.9-1.12. Other versions might work, but no guarantees. **Paper** is
 recommended, but not mandatory - without it, timings of scripts will not work.
 
 ## Documentation
-Documentation is available [here](http://bensku.github.io/Skript/) for latest
-the version of Skript.
+Documentation is available [here](http://bensku.github.io/Skript/) for the
+latest version of Skript.
 
 ## Reporting Issues
 You should use Github [issue tracker](https://github.com/bensku/Skript/issues)
@@ -20,7 +20,7 @@ is a bug, please still report it.
 
 Please use the search to see if an issue has been reported already. Duplicates will be
 closed and ignored. If the issue is indeed not yet reported, please use
-common sense: "what might a Skript developer need to know to solve your issue?"
+common sense: what might a Skript developer need to know to solve your issue?
 
 If issue has been reported before, and is open, you can comment to it to ask if there
 has been progress or provide more information. If it has been closed, you can do
@@ -34,7 +34,7 @@ If your having an aliases issue please report that
 [here](https://github.com/tim740/skAliases/issues) instead.
 
 ## A Note About Addons
-Skript Developers cannot provide support for third-party addons of Skript. If you encounter issues
+Skript developers cannot provide support for third-party addons of Skript. If you encounter issues
 with them, contact the author of that addon. Also, when reporting issues which seem
 to be unrelated to addons, you may be asked to test without any addons
 (and you should do so to get your issue resolved).
@@ -87,7 +87,7 @@ So, you want to work with Skript's codebase? There are a few guidelines for you:
 * Not to alter Eclipse's nullness annotation settings; they affect even the compiler
 * Use tabs as indentation (provided Eclipse settings will do this)
 * Try to write code that looks similar to Skript's
-* **DO NOT** use NMS code (Net Minecraft Server reflection)
+* **DO NOT** use NMS code (Net Minecraft Server)
 
 Of course, these are just recommendations. However, not following them may get
 your pull requests rejected.
@@ -141,7 +141,7 @@ Current team behind Skript:
 
 * [bensku](https://github.com/bensku) (Skript maintainer/developer)
 * [Snow-Pyon](https://github.com/Snow-Pyon) (Skript developer)
-* [TheBentoBox](https://github.com/TheBentoBox) (Issue tracker manager)
+* [TheBentoBox](https://github.com/TheBentoBox) (issue tracker manager)
 
 Also, of course, we should thank [Njol](https://github.com/Njol) for creating
 Skript and [Mirreski](https://github.com/Mirreski) for maintaining it for a

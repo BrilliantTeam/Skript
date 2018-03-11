@@ -22,12 +22,17 @@ package ch.njol.skript.expressions;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
@@ -46,6 +51,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * @author Peter Güttinger
@@ -58,33 +64,94 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 @Events("click")
 public class ExprClicked extends SimpleExpression<Object> {
+
+	private static enum ClickableType {
+		
+		BLOCK_AND_ITEMS(1, Block.class, "clicked block/itemtype/entity", "(block|%-*itemtype/entitydata%)"),
+		SLOT(2, Number.class, "clicked slot", "[raw] slot"),
+		INVENTORY(3, Inventory.class, "clicked inventory", "inventory"),
+		TYPE(4, ClickType.class, "clicked action", "action"), //Clicked type = Clicked action (ClickType.class) in Skript.
+		ACTION(4, InventoryAction.class, "clicked inventory action", "inventory( |-)action"); //Clicked inventory action = InventoryAction.class.
+		
+		private String name, syntax;
+		private Class<?> clazz;
+		private int value;
+
+		private ClickableType(int value, Class<?> clazz, String name, String syntax) {
+			this.syntax = syntax;
+			this.value = value;
+			this.clazz = clazz;
+			this.name = name;
+		}
+		
+		public int getValue() {
+			return value;
+		}
+		
+		public Class<?> getClickableClass() {
+			return clazz;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public String getSyntax(Boolean last) {
+			return value + "¦" + syntax + (last ? "|" : "");
+		}
+		
+		public static ClickableType getClickable(int num) {
+			for (ClickableType clickable : ClickableType.values())
+				if (clickable.getValue() == num) return clickable;
+			return BLOCK_AND_ITEMS;
+		}
+	}
+	
 	static {
-		Skript.registerExpression(ExprClicked.class, Object.class, ExpressionType.SIMPLE, "[the] clicked (block|%-*itemtype/entitydata%)");
+		Skript.registerExpression(ExprClicked.class, Object.class, ExpressionType.SIMPLE, "[the] clicked ("
+					+ ClickableType.BLOCK_AND_ITEMS.getSyntax(false)
+					+ ClickableType.INVENTORY.getSyntax(false)
+					+ ClickableType.TYPE.getSyntax(false)
+					+ ClickableType.SLOT.getSyntax(true) + ")");
 	}
 	
 	@Nullable
-	private EntityData<?> entityType = null;
-	/**
-	 * null for any block
-	 */
+	private EntityData<?> entityType;
 	@Nullable
-	private ItemType itemType = null;
+	private ItemType itemType; //null results in any itemtype
+	private ClickableType clickable = ClickableType.BLOCK_AND_ITEMS;
+	private Boolean rawSlot = false;
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		final Object type = exprs[0] == null ? null : ((Literal<?>) exprs[0]).getSingle();
-		if (type instanceof EntityData) {
-			entityType = (EntityData<?>) type;
-			if (!ScriptLoader.isCurrentEvent(PlayerInteractEntityEvent.class) && !ScriptLoader.isCurrentEvent(PlayerInteractAtEntityEvent.class)) {
-				Skript.error("The expression 'clicked entity' can only be used in a click event", ErrorQuality.SEMANTIC_ERROR);
-				return false;
-			}
-		} else {
-			itemType = (ItemType) type;
-			if (!ScriptLoader.isCurrentEvent(PlayerInteractEvent.class)) {
-				Skript.error("The expression 'clicked block' can only be used in a click event", ErrorQuality.SEMANTIC_ERROR);
-				return false;
-			}
+		clickable = ClickableType.getClickable(parseResult.mark);
+		switch (clickable) {
+			case BLOCK_AND_ITEMS:
+				final Object type = exprs[0] == null ? null : ((Literal<?>) exprs[0]).getSingle();
+				if (type instanceof EntityData) {
+					entityType = (EntityData<?>) type;
+					if (!ScriptLoader.isCurrentEvent(PlayerInteractEntityEvent.class) && !ScriptLoader.isCurrentEvent(PlayerInteractAtEntityEvent.class)) {
+						Skript.error("The expression 'clicked entity' may only be used in a click event", ErrorQuality.SEMANTIC_ERROR);
+						return false;
+					}
+				} else {
+					itemType = (ItemType) type;
+					if (!ScriptLoader.isCurrentEvent(PlayerInteractEvent.class)) {
+						Skript.error("The expression 'clicked block' may only be used in a click event", ErrorQuality.SEMANTIC_ERROR);
+						return false;
+					}
+				}
+				break;
+			case INVENTORY:
+			case ACTION:
+			case TYPE:
+			case SLOT:
+				if (clickable == ClickableType.SLOT && parseResult.expr.contains("raw")) rawSlot = true;
+				if (!ScriptLoader.isCurrentEvent(InventoryClickEvent.class)) {
+					Skript.error("The expression '" + clickable.getName() + "' may only be used in an inventory click event", ErrorQuality.SEMANTIC_ERROR);
+					return false;
+				}
+				break;
 		}
 		return true;
 	}
@@ -96,44 +163,47 @@ public class ExprClicked extends SimpleExpression<Object> {
 	
 	@Override
 	public Class<? extends Object> getReturnType() {
-		return entityType != null ? entityType.getType() : Block.class;
+		return (clickable != ClickableType.BLOCK_AND_ITEMS) ? clickable.getClickableClass() : entityType != null ? entityType.getType() : Block.class;
 	}
 	
 	@SuppressWarnings("null")
 	@Override
 	@Nullable
-	protected Object[] get(final Event e) {
-		if (e instanceof PlayerInteractEvent) {
-			if (entityType != null)
-				return null;
-			final Block b = ((PlayerInteractEvent) e).getClickedBlock();
-			if (itemType == null || itemType.isOfType(b))
-				return new Block[] {b};
-			return null;
-		} else if (e instanceof PlayerInteractEntityEvent) {
-			if (entityType == null)
-				return null;
-			final Entity en;
-//			if (e instanceof PlayerInteractEntityEvent) {
-			en = ((PlayerInteractEntityEvent) e).getRightClicked();
-//			} else {
-//				if (!(((EntityDamageByEntityEvent) e).getDamager() instanceof Player))
-//					return null;
-//				en = ((EntityDamageByEntityEvent) e).getEntity();
-//			}
-			if (entityType.isInstance(en)) {
-				final Entity[] one = (Entity[]) Array.newInstance(entityType.getType(), 1);
-				one[0] = en;
-				return one;
-			}
-			return null;
+	protected Object[] get(final Event event) {
+		switch (clickable) {
+			case BLOCK_AND_ITEMS:
+				if (event instanceof PlayerInteractEvent) {
+					if (entityType != null) //This is suppose to be null as this event should be for blocks
+						return null;
+					final Block block = ((PlayerInteractEvent) event).getClickedBlock();
+					return (itemType == null || itemType.isOfType(block)) ? new Block[] {block} : null;
+				} else if (event instanceof PlayerInteractEntityEvent) {
+					if (entityType == null) //We're testing for the entity in this event
+						return null;
+					final Entity entity = ((PlayerInteractEntityEvent) event).getRightClicked();
+					if (entityType.isInstance(entity)) {
+						final Entity[] one = (Entity[]) Array.newInstance(entityType.getType(), 1);
+						one[0] = entity;
+						return one;
+					}
+					return null;
+				}
+				break;
+			case TYPE:
+				return new ClickType[] {((InventoryClickEvent) event).getClick()};
+			case ACTION:
+				return new InventoryAction[] {((InventoryClickEvent) event).getAction()};
+			case INVENTORY:
+				return new Inventory[] {((InventoryClickEvent) event).getClickedInventory()};
+			case SLOT:
+				return CollectionUtils.array((rawSlot) ? ((InventoryClickEvent) event).getRawSlot() : ((InventoryClickEvent) event).getSlot());
 		}
 		return null;
 	}
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "the clicked " + (entityType != null ? entityType : itemType != null ? itemType : "block");
+		return "the " + (clickable != ClickableType.BLOCK_AND_ITEMS ? clickable.getName() : "clicked " + (entityType != null ? entityType : itemType != null ? itemType : "block"));
 	}
 	
 }

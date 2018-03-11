@@ -38,13 +38,9 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 
-/**
- * @author Peter Güttinger
- */
 @Name("Offline players")
 @Description("All player that have ever joined the server.")
-@Examples({"loop all offline players:",
-		"	broadcast \"Player %loop-offlineplayer% has joined the server before!\""})
+@Examples({"send \"Size of all players who have joined the server: %size of all offline players%\""})
 @Since("2.2-dev35")
 public class ExprOfflinePlayers extends SimpleExpression<OfflinePlayer> {
 	

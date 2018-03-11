@@ -19,11 +19,10 @@
  */
 package ch.njol.skript.expressions;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
@@ -41,7 +40,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Description("How much time a player has left underwater before starting to drown.")
 @Examples({"player's remaining air is less than 3 seconds:",
 		"	send \"hurry, get to the surface!\" to the player"})
-@Since("<i>unknown</i> (before 2.1)")
+@Since("<i>unknown</i> (before 2.1), 2.2-dev35 (Changers and converted to SimplePropertyExpression)")
 public class ExprRemainingAir extends SimplePropertyExpression<LivingEntity, Timespan> {
 
 	static {
@@ -73,21 +72,24 @@ public class ExprRemainingAir extends SimplePropertyExpression<LivingEntity, Tim
 	@Override
 	public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
 		long ticks = ((Timespan)delta[0]).getTicks_i();
-		LivingEntity entity = getExpr().getSingle(event);
 		switch (mode) {
 			case ADD:
-				entity.setRemainingAir(entity.getRemainingAir() + (int) ticks);
+				for (LivingEntity entity : getExpr().getArray(event))
+					entity.setRemainingAir(entity.getRemainingAir() + (int) ticks);
 				break;
 			case REMOVE:
-				entity.setRemainingAir(entity.getRemainingAir() - (int) ticks);
+				for (LivingEntity entity : getExpr().getArray(event))
+					entity.setRemainingAir(entity.getRemainingAir() - (int) ticks);
 				break;
 			case SET:
-				entity.setRemainingAir((int) ticks);
+				for (LivingEntity entity : getExpr().getArray(event))
+					entity.setRemainingAir((int) ticks);
 				break;
 			case DELETE:
 			case REMOVE_ALL:
 			case RESET:
-				entity.setRemainingAir(0);
+				for (LivingEntity entity : getExpr().getArray(event))
+					entity.setRemainingAir(0);
 				break;
 		}
 	}

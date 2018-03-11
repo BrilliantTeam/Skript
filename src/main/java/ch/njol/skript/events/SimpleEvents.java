@@ -364,7 +364,7 @@ public class SimpleEvents {
 					.examples("")
 					.since("2.2-dev13b");
 		}
-		Skript.registerEvent("World Init", SimpleEvent.class, WorldInitEvent.class, "world init[ialise]")
+		Skript.registerEvent("World Init", SimpleEvent.class, WorldInitEvent.class, "world init[iali(se|zation)]")
 				.description("Called when a world is initialised. As all default worlds are initialised before any scripts are loaded, this event is only called for newly created worlds.",
 						"World management plugins might change the behaviour of this event though.")
 				.examples("")

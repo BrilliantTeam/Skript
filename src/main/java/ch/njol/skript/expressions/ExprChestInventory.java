@@ -40,10 +40,10 @@ import org.eclipse.jdt.annotation.Nullable;
 @Examples({"open chest inventory with 1 rows named \"test\"",
            "set {_inventory} to chest inventory with 1 row"})
 @Since("2.2-dev34")
-public class ExprInventoryChest extends SimpleExpression<Inventory> {
+public class ExprChestInventory extends SimpleExpression<Inventory> {
 
     static {
-        Skript.registerExpression(ExprInventoryChest.class, Inventory.class, ExpressionType.COMBINED, "[a [new]] chest [inventory] (named|with name) %string% [with %-number% row[s]]", "chest [inventory] with %number% row[s] [(named|with name) %-string%]");
+        Skript.registerExpression(ExprChestInventory.class, Inventory.class, ExpressionType.COMBINED, "[a [new]] chest [inventory] (named|with name) %string% [with %-number% row[s]]", "[a [new]] chest [inventory] with %number% row[s] [(named|with name) %-string%]");
     }
 
     @Nullable

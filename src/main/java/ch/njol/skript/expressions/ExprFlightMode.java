@@ -24,67 +24,53 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
-import ch.njol.util.Kleenean;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Flight Mode")
-@Description("Whether the player is allowed to fly. Use <a href=effects.html#EffMakeFly>Make Fly</a> effect to force a player fly.")
+@Description("Whether the player(s) are allowed to fly. Use <a href=effects.html#EffMakeFly>Make Fly</a> effect to force player(s) to fly.")
 @Examples({"set flight mode of player to true", "send \"%flying state of all players%\""})
 @Since("2.2-dev34")
-public class ExprFlightMode extends PropertyExpression<Player, Boolean> {
+public class ExprFlightMode extends SimplePropertyExpression<Player, Boolean> {
 
-    static {
-        PropertyExpression.register(ExprFlightMode.class, Boolean.class, "fl(y[ing]|ight) (mode|state)", "players");
-    }
-
-    @SuppressWarnings({"null", "unchecked"})
+	static {
+		register(ExprFlightMode.class, Boolean.class, "fl(y[ing]|ight) (mode|state)", "players");
+	}
+	
 	@Override
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        setExpr((Expression<? extends Player>) exprs[0]);
-        return true;
-    }
+	public Class<Boolean> getReturnType() {
+		return Boolean.class;
+	}
+	
+	@Override
+	protected String getPropertyName() {
+		return "fl(y[ing]|ight) (mode|state)";
+	}
+	
+	@Override
+	public Boolean convert(final Player player) {
+		return player.getAllowFlight();
+	}
 
-    @Override
-    protected Boolean[] get(Event e, Player[] source) {
-        return get(source, (player) -> player.getAllowFlight());
-    }
+	@Override
+	@Nullable
+	public Class<?>[] acceptChange(Changer.ChangeMode mode) {
+		if (mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.RESET) {
+			return CollectionUtils.array(Boolean.class);
+		}
+		return null;
+	}
 
-    @Override
-    public String toString(@Nullable Event e, boolean debug) {
-        return "flight mode of " + getExpr().toString(e, debug);
-    }
-
-    @Override
-    @Nullable
-    public Class<?>[] acceptChange(Changer.ChangeMode mode) {
-
-        if (mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.RESET) {
-            return CollectionUtils.array(Boolean.class);
-        }
-        return null;
-    }
-
-    @Override
-    @SuppressWarnings("null")
-    public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
-
-        Boolean state = mode == Changer.ChangeMode.RESET || delta[0] == null ? false : (Boolean) delta[0];
-
-        for (Player player : getExpr().getArray(e)) {
-            player.setAllowFlight(state);
-        }
-    }
-
-    @Override
-    public Class<? extends Boolean> getReturnType() {
-        return Boolean.class;
-    }
+	@Override
+	public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
+		Boolean state = mode == Changer.ChangeMode.RESET || delta == null ? false : (Boolean) delta[0];
+		for (Player player : getExpr().getArray(event)) {
+			player.setAllowFlight(state);
+		}
+	}
 
 
 }
