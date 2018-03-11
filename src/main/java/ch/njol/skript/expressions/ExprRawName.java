@@ -56,7 +56,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 @Name("Raw Name")
 @Description("Raw Minecraft material name for given item. Note that this is not guaranteed to give same results on all servers.")
 @Examples("raw name of tool of player")
-@Since("unknown (2.2) (Estimate Mirre's edit), 2.2-dev35 (Converted to SimplePropertyExpression)")
+@Since("unknown (2.2-Fixes-v10), 2.2-dev35")
 public class ExprRawName extends SimplePropertyExpression<ItemType, String[]> {
 	
 	static {

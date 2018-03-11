@@ -37,7 +37,7 @@ import java.util.Set;
 @Name("All Permissions")
 @Description("Returns all permissions of the defined player(s). Note that the modifications to resulting list do not actually change permissions.")
 @Examples("set {_permissions::*} to all permissions of the player")
-@Since("2.2-dev33, 2.2-dev35 (Converted to SimplePropertyExpression)")
+@Since("2.2-dev33, 2.2-dev35")
 public class ExprPermissions extends SimplePropertyExpression<Player, String[]> {
 	
 	static {

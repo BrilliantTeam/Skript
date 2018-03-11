@@ -38,7 +38,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 @Examples({"IP-ban the player # is equal to the next line",
 		"ban the IP-address of the player",
 		"broadcast \"Banned the IP %IP of player%\""})
-@Since("1.4, 2.2-dev35 (Converted to SimplePropertyExpression)")
+@Since("1.4, 2.2-dev35")
 public class ExprIP extends SimplePropertyExpression<Player, String> {
 	
 	static {
