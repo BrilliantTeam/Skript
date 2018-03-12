@@ -82,7 +82,6 @@ public class ExprWeather extends PropertyExpression<World, WeatherType> {
 		return "the weather in " + getExpr().toString(e, debug);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	@Nullable
 	public Class<?>[] acceptChange(final ChangeMode mode) {

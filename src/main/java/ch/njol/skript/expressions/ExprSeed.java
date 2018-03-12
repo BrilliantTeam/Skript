@@ -45,10 +45,10 @@ import ch.njol.util.coll.CollectionUtils;
 @Description("The seed of a world.")
 @Examples("broadcast \"Seed: %seed of player's world%\"")
 @Since("2.2-dev35")
-public class ExprSeed extends PropertyExpression<World, Number> {
+public class ExprSeed extends PropertyExpression<World, Long> {
 
 	static {
-		Skript.registerExpression(ExprSeed.class, Number.class, ExpressionType.PROPERTY, "[the] seed[s] [(in|of) %worlds%]", "%worlds%'[s] seed");
+		Skript.registerExpression(ExprSeed.class, Long.class, ExpressionType.PROPERTY, "[the] seed[s] [(from|of) %worlds%]", "%worlds%'[s] seed[s]");
 	}
 
 	@SuppressWarnings({"null", "unchecked"})
@@ -59,18 +59,18 @@ public class ExprSeed extends PropertyExpression<World, Number> {
 	}
 	
 	@Override
-	protected Number[] get(final Event event, final World[] source) {
-		return get(source, new Getter<Number, World>() {
+	protected Long[] get(final Event event, final World[] worlds) {
+		return get(worlds, new Getter<Long, World>() {
 			@Override
-			public Number get(final World world) {
+			public Long get(final World world) {
 				return world.getSeed();
 			}
 		});
 	}
 	
 	@Override
-	public Class<Number> getReturnType() {
-		return Number.class;
+	public Class<Long> getReturnType() {
+		return Long.class;
 	}
 	
 	@Override

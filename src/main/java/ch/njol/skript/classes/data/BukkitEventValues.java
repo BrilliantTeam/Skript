@@ -89,6 +89,8 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.event.vehicle.VehicleEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -894,6 +896,14 @@ public final class BukkitEventValues {
 			@Nullable
 			public ItemStack get(ItemMergeEvent e) {
 				return e.getEntity().getItemStack();
+			}
+		}, 0);
+		//PlayerTeleportEvent
+		EventValues.registerEventValue(PlayerTeleportEvent.class, TeleportCause.class, new Getter<TeleportCause, PlayerTeleportEvent>() {
+			@Override
+			@Nullable
+			public TeleportCause get(final PlayerTeleportEvent e) {
+				return e.getCause();
 			}
 		}, 0);
 	}

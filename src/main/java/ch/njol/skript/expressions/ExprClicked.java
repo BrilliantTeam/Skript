@@ -71,7 +71,8 @@ public class ExprClicked extends SimpleExpression<Object> {
 		SLOT(2, Number.class, "clicked slot", "[raw] slot"),
 		INVENTORY(3, Inventory.class, "clicked inventory", "inventory"),
 		TYPE(4, ClickType.class, "clicked action", "action"), //Clicked type = Clicked action (ClickType.class) in Skript.
-		ACTION(4, InventoryAction.class, "clicked inventory action", "inventory( |-)action"); //Clicked inventory action = InventoryAction.class.
+		ACTION(5, InventoryAction.class, "clicked inventory action", "inventory( |-)action"); //Clicked inventory action = InventoryAction.class.
+		//CURSOR(6, Itemstack.class, "clicked cursor", "cursor"); TODO this should be in a Skript slot type.
 		
 		private String name, syntax;
 		private Class<?> clazz;
@@ -110,9 +111,10 @@ public class ExprClicked extends SimpleExpression<Object> {
 	static {
 		Skript.registerExpression(ExprClicked.class, Object.class, ExpressionType.SIMPLE, "[the] clicked ("
 					+ ClickableType.BLOCK_AND_ITEMS.getSyntax(false)
+					+ ClickableType.SLOT.getSyntax(false)
 					+ ClickableType.INVENTORY.getSyntax(false)
 					+ ClickableType.TYPE.getSyntax(false)
-					+ ClickableType.SLOT.getSyntax(true) + ")");
+					+ ClickableType.ACTION.getSyntax(true) + ")");
 	}
 	
 	@Nullable

@@ -54,7 +54,7 @@ public class ExprInventoryInfo extends SimplePropertyExpression<Inventory, Objec
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		type = parseResult.mark;
-		return init(exprs, matchedPattern, isDelayed, parseResult);
+		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 	
 	@Override
