@@ -54,7 +54,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 /**
- * @author Peter Güttinger
+ * @author Peter Güttinger, LimeGlass
  */
 @Name("Clicked Block/Entity")
 @Description("The clicked block or entity - only useful in click events")
@@ -62,7 +62,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"clicked block is a chest:",
 		"	show the inventory of the clicked block to the player"})
 @Since("1.0")
-@Events("click")
+@Events({"click", "inventory click"})
 public class ExprClicked extends SimpleExpression<Object> {
 
 	private static enum ClickableType {

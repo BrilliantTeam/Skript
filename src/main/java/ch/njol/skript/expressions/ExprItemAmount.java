@@ -21,6 +21,7 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -37,7 +38,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Item Amount")
 @Description("The amount of an <a href='classes.html#itemstack'>item stack</a>.")
 @Examples("send \"You have got %item amount of player's tool% %player's tool% in your hand !\" to player")
-@Since("2.2-dev24, 2.2-dev35 (converted to SimplePropertyExpression)")
+@Since("2.2-dev24, 2.2-dev35")
 public class ExprItemAmount extends SimplePropertyExpression<ItemStack, Number>{
 	
     static {
@@ -61,7 +62,7 @@ public class ExprItemAmount extends SimplePropertyExpression<ItemStack, Number>{
 	
 	@Override
     public @Nullable Class<?>[] acceptChange(Changer.ChangeMode mode) {
-        return CollectionUtils.array(Number.class);
+        return (mode != ChangeMode.REMOVE_ALL) ? CollectionUtils.array(Number.class) : null;
     }
 
     @Override
@@ -80,9 +81,9 @@ public class ExprItemAmount extends SimplePropertyExpression<ItemStack, Number>{
             	for (ItemStack itemstack : getExpr().getArray(event))
             		itemstack.setAmount(itemstack.getAmount() - amount);
                 break;
+            case REMOVE_ALL:
             case RESET:
 			case DELETE:
-			case REMOVE_ALL:
 				for (ItemStack itemstack : getExpr().getArray(event))
             		itemstack.setAmount(1);
 				break;

@@ -48,12 +48,12 @@ import ch.njol.util.coll.CollectionUtils;
  */
 @Name("Saturation")
 @Description("The saturation of player.")
-@Examples("set saturation of player to 20 #Full hunger")
-@Since("2.2-Fixes-v10, 2.2-dev35 (Made 'saturation' work in player events & changers added)")
+@Examples("set saturation of player to 20")
+@Since("2.2-Fixes-v10, 2.2-dev35 ('saturation' work in player events & changers added)")
 public class ExprSaturation extends PropertyExpression<Player, Number> {
 
 	static {
-		Skript.registerExpression(ExprSaturation.class, Number.class, ExpressionType.PROPERTY, "[the] saturation [of %players%]", "%players%['s] saturation");
+		Skript.registerExpression(ExprSaturation.class, Number.class, ExpressionType.PROPERTY, "[the] saturation [of %players%]", "%players%'[s] saturation");
 	}
 	
 	@Override

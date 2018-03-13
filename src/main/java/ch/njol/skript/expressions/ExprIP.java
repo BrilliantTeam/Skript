@@ -47,7 +47,7 @@ import ch.njol.util.Kleenean;
 @Examples({"IP-ban the player # is equal to the next line",
 		"ban the IP-address of the player",
 		"broadcast \"Banned the IP %IP of player%\""})
-@Since("1.4, 2.2-dev35 (Converted to PropertyExpression)")
+@Since("1.4, 2.2-dev35")
 public class ExprIP extends PropertyExpression<Player, String> {
 	
 	static {
