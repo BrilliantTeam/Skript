@@ -59,8 +59,8 @@ public class ExprSeed extends PropertyExpression<World, Long> {
 	}
 	
 	@Override
-	protected Long[] get(final Event event, final World[] worlds) {
-		return get(worlds, new Getter<Long, World>() {
+	protected Long[] get(final Event event, final World[] source) {
+		return get(source, new Getter<Long, World>() {
 			@Override
 			public Long get(final World world) {
 				return world.getSeed();

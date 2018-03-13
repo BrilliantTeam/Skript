@@ -31,7 +31,12 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.ExpressionType;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
@@ -44,11 +49,11 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Saturation")
 @Description("The saturation of the player(s).")
 @Examples("set saturation of player to 20 #Full hunger")
-@Since("2.2-Fixes-v10, 2.2-dev35 (Converted to SimplePropertyExpression)")
-public class ExprSaturation extends SimplePropertyExpression<Player, Number> {
+@Since("2.2-Fixes-v10, 2.2-dev35")
+public class ExprSaturation extends PropertyExpression<Player, Number> {
 
 	static {
-		register(ExprSaturation.class, Number.class, "saturation", "players");
+		Skript.registerExpression(ExprSaturation.class, Number.class, ExpressionType.PROPERTY, "[the] saturation [of %players%]", "%players%['s] saturation");
 	}
 	
 	@Override
@@ -56,14 +61,21 @@ public class ExprSaturation extends SimplePropertyExpression<Player, Number> {
 		return Number.class;
 	}
 	
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
-	protected String getPropertyName() {
-		return "saturation";
+	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
+		setExpr((Expression<? extends Player>) exprs[0]);
+		return true;
 	}
 	
 	@Override
-	public Number convert(final Player player) {
-		return player.getSaturation();
+	protected Number[] get(final Event event, final Player[] source) {
+		return get(source, new Getter<Float, Player>() {
+			@Override
+			public Float get(final Player player) {
+				return player.getSaturation();
+			}
+		});
 	}
 	
 	@Nullable
@@ -96,6 +108,11 @@ public class ExprSaturation extends SimplePropertyExpression<Player, Number> {
 					player.setSaturation(0);
 				break;
 		}
+	}
+	
+	@Override
+	public String toString(final @Nullable Event event, final boolean debug) {
+		return "saturation" + (getExpr().isDefault() ? "" : " of " + getExpr().toString(event, debug));
 	}
 	
 }

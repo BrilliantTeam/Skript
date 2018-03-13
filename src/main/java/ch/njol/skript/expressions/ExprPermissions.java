@@ -20,11 +20,16 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.util.Kleenean;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -34,33 +39,41 @@ import org.eclipse.jdt.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Name("All Permissions")
+@Name("Permissions")
 @Description("Returns all permissions of the defined player(s). Note that the modifications to resulting list do not actually change permissions.")
 @Examples("set {_permissions::*} to all permissions of the player")
 @Since("2.2-dev33, 2.2-dev35")
-public class ExprPermissions extends SimplePropertyExpression<Player, String[]> {
+public class ExprPermissions extends PropertyExpression<Player, String> {
 	
 	static {
-		register(ExprPermissions.class, String[].class, "permissions", "players");
+		register(ExprPermissions.class, String.class, "permissions", "players");
 	}
 	
 	@Override
-	public Class<String[]> getReturnType() {
-		return String[].class;
+	public Class<String> getReturnType() {
+		return String.class;
 	}
 	
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
-	protected String getPropertyName() {
-		return "permissions";
+	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
+		setExpr((Expression<? extends Player>) exprs[0]);
+		return true;
 	}
-	
-	@Nullable
+
+	@SuppressWarnings("null")
 	@Override
-	public String[] convert(final Player player) {
+	protected String[] get(Event event, Player[] source) {
 		final Set<String> permissions = new HashSet<>();
-		for (final PermissionAttachmentInfo permission : player.getEffectivePermissions())
-			permissions.add(permission.getPermission());
+		for (Player player : source) 
+			for (final PermissionAttachmentInfo permission : player.getEffectivePermissions())
+				permissions.add(permission.getPermission());
 		return permissions.toArray(new String[permissions.size()]);
+	}
+	
+	@Override
+	public String toString(@Nullable Event event, boolean debug) {
+		return "permissions " + (getExpr().isDefault() ? "" : " of " + getExpr().toString(event, debug));
 	}
 
 }

@@ -49,7 +49,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Chat Recipients")
 @Description("Recipients of chat events where this is called.")
 @Examples("chat recipients")
-@Since("2.2-FIXES (unknown)")
+@Since("2.2-Fixes (unknown)")
 public class ExprChatRecipients extends SimpleExpression<Player> {
 
 	static {

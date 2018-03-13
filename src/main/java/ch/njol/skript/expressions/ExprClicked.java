@@ -98,7 +98,7 @@ public class ExprClicked extends SimpleExpression<Object> {
 		}
 		
 		public String getSyntax(Boolean last) {
-			return value + "¦" + syntax + (last ? "|" : "");
+			return value + "¦" + syntax + (!last ? "|" : "");
 		}
 		
 		public static ClickableType getClickable(int num) {
