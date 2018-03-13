@@ -49,7 +49,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Saturation")
 @Description("The saturation of player.")
 @Examples("set saturation of player to 20")
-@Since("2.2-Fixes-v10, 2.2-dev35 ('saturation' work in player events & changers added)")
+@Since("2.2-Fixes-v10, 2.2-dev35 (Just 'saturation' works in player events & changers added)")
 public class ExprSaturation extends PropertyExpression<Player, Number> {
 
 	static {
