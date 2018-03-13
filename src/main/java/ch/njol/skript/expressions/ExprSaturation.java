@@ -47,9 +47,9 @@ import ch.njol.util.coll.CollectionUtils;
  * Cleaned up by LimeGlass (2.2-dev35)
  */
 @Name("Saturation")
-@Description("The saturation of the player(s).")
+@Description("The saturation of player.")
 @Examples("set saturation of player to 20 #Full hunger")
-@Since("2.2-Fixes-v10, 2.2-dev35")
+@Since("2.2-Fixes-v10, 2.2-dev35 (Made 'saturation' work in player events & changers added)")
 public class ExprSaturation extends PropertyExpression<Player, Number> {
 
 	static {

@@ -33,7 +33,7 @@ import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ExpressionType;
 
 @Name("Teleport Cause")
-@Description("The <a href='../classes/#damagecause'>teleport cause</a> within a player teleport event.")
+@Description("The <a href='../classes/#teleportcause'>teleport cause</a> within a player teleport event.")
 @Examples("teleport cause is nether portal, end portal or end gateway")
 @Since("2.2-dev35")
 public class ExprTeleportCause extends EventValueExpression<TeleportCause> {

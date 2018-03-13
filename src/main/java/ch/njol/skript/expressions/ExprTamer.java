@@ -50,7 +50,7 @@ public class ExprTamer extends SimpleExpression<Player> {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		if (!ScriptLoader.isCurrentEvent(EntityTameEvent.class)) {
-			Skript.error("the expression `tamer` may only be used in the entity tame event.");
+			Skript.error("the expression 'tamer' may only be used in the entity tame event.");
 			return false;
 		}
 		return true;

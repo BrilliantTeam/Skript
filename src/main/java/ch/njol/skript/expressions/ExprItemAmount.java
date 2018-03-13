@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Item Amount")
 @Description("The amount of an <a href='classes.html#itemstack'>item stack</a>.")
 @Examples("send \"You have got %item amount of player's tool% %player's tool% in your hand !\" to player")
-@Since("2.2-dev24, 2.2-dev35")
+@Since("2.2-dev24, 2.2-dev35 (converted to SimplePropertyExpression)")
 public class ExprItemAmount extends SimplePropertyExpression<ItemStack, Number>{
 	
     static {

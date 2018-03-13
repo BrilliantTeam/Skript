@@ -22,24 +22,33 @@ package ch.njol.skript.expressions;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.util.Getter;
+import ch.njol.skript.util.Time;
+import ch.njol.util.Kleenean;
 
 @Name("IP")
 @Description("The IP address of player(s).")
 @Examples({"IP-ban the player # is equal to the next line",
 		"ban the IP-address of the player",
 		"broadcast \"Banned the IP %IP of player%\""})
-@Since("1.4, 2.2-dev35")
-public class ExprIP extends SimplePropertyExpression<Player, String> {
+@Since("1.4, 2.2-dev35 (Converted to PropertyExpression)")
+public class ExprIP extends PropertyExpression<Player, String> {
 	
 	static {
 		register(ExprIP.class, String.class, "IP[s][( |-)address[es]]", "players");
@@ -49,22 +58,34 @@ public class ExprIP extends SimplePropertyExpression<Player, String> {
 	public Class<String> getReturnType() {
 		return String.class;
 	}
-	
+
+	@SuppressWarnings({"null", "unchecked"})
 	@Override
-	protected String getPropertyName() {
-		return "IP[s][( |-)address[es]]";
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		setExpr((Expression<? extends Player>) exprs[0]);
+		return true;
+	}
+
+	@Override
+	protected String[] get(Event event, Player[] source) {
+		return get(source, new Getter<String, Player>() {
+			@SuppressWarnings("null")
+			@Override
+			public String get(final Player player) {
+				if (event instanceof PlayerLoginEvent && ((PlayerLoginEvent)event).getPlayer().equals(player))
+					return ((PlayerLoginEvent) event).getAddress().getHostAddress();
+				if (player.getAddress() == null)
+					return "unknown";
+				//player.getAddress() is the socket address
+				InetAddress address = player.getAddress().getAddress();
+				return (address == null) ? "unknown" : address.getHostAddress();
+			}
+		});
 	}
 	
-	@SuppressWarnings("null")
 	@Override
-	public String convert(final Player player) {
-		if (player.getAddress() == null)
-			return "unknown";
-		//player.getAddress() is the socket address
-		InetAddress address = player.getAddress().getAddress();
-		if (address == null)
-			return "unknown";
-		return address.getHostAddress();
+	public String toString(@Nullable Event event, boolean debug) {
+		return "IP address " + " of " + getExpr().toString(event, debug);
 	}
 	
 }
