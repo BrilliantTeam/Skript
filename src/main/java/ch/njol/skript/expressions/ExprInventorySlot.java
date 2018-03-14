@@ -20,9 +20,11 @@
 package ch.njol.skript.expressions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -74,16 +76,36 @@ public class ExprInventorySlot extends SimpleExpression<Slot> {
 	@Nullable
 	protected Slot[] get(Event event) {
 		Inventory inventory = invis.getSingle(event);
-		Number[] inventorySlots = slots.getAll(event);
-		if (inventorySlots == null || inventory == null || inventorySlots.length < 1)
+		if (inventory == null)
 			return null;
-		ArrayList<Slot> slots = new ArrayList<Slot>();
-		for (Number slot : inventorySlots)
+		List<Slot> inventorySlots = new ArrayList<>();
+		for (Number slot : slots.getArray(event))
 			if (slot.intValue() >= 0 && slot.intValue() < inventory.getSize())
-				slots.add(new InventorySlot(inventory, slot.intValue()));
-		if (slots == null || slots.isEmpty())
+				inventorySlots.add(new Slot() {
+					@SuppressWarnings("null")
+					@Override
+					public ItemStack getItem() {
+						return inventory.getItem(slot.intValue());
+					}
+	
+					@Override
+					public void setItem(@Nullable ItemStack itemStack) {
+						inventory.setItem(slot.intValue(), itemStack);
+					}
+	
+					@Override
+					protected String toString_i() {
+						return "slots " + slot.intValue() + "of " + inventory.getHolder();
+					}
+	
+					@Override
+					public boolean isSameSlot(Slot slot) {
+						return false;
+					}
+				});
+		if (inventorySlots.isEmpty())
 			return null;
-		return slots.toArray(new Slot[slots.size()]);
+		return inventorySlots.toArray(new Slot[inventorySlots.size()]);
 	}
 	
 	@Override
