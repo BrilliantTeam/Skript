@@ -95,7 +95,7 @@ public class ExprInventorySlot extends SimpleExpression<Slot> {
 	
 					@Override
 					protected String toString_i() {
-						return "slots " + slot.intValue() + "of " + inventory.getHolder();
+						return "slot " + slot.intValue() + "of " + inventory.getHolder();
 					}
 	
 					@Override
