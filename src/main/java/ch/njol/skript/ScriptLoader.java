@@ -19,35 +19,6 @@
  */
 package ch.njol.skript;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
-
-import org.bukkit.Bukkit;
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
-
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.ClassInfo;
@@ -60,6 +31,7 @@ import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.config.SimpleNode;
 import ch.njol.skript.effects.Delay;
+import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Conditional;
 import ch.njol.skript.lang.Expression;
@@ -98,6 +70,29 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
 
 /**
  * @author Peter Güttinger
@@ -111,7 +106,13 @@ final public class ScriptLoader {
 	
 	@Nullable
 	public static Config currentScript = null;
-	
+
+	/**
+	 * If true, a ScriptLoadEvent will be called
+	 * right before a script starts loading.
+	 */
+	public static boolean callPreLoadEvent;
+
 	/**
 	 * use {@link #setCurrentEvent(String, Class...)}
 	 */
@@ -452,7 +453,14 @@ final public class ScriptLoader {
 			currentAliases.clear();
 			currentOptions.clear();
 			currentScript = config;
-			
+
+			/*
+			 * If editing this class, please remember to put call this event
+			 * after currentScript has already been set the the provided Config
+			 */
+			if (callPreLoadEvent) {
+				Bukkit.getPluginManager().callEvent(new PreScriptLoadEvent());
+			}
 //			final SerializedScript script = new SerializedScript();
 			
 			final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
