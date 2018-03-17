@@ -458,9 +458,9 @@ final public class ScriptLoader {
 			 * If editing this class, please remember to put call this event
 			 * after currentScript has already been set the the provided Config
 			 */
-			if (callPreLoadEvent) {
+			if (callPreLoadEvent)
 				Bukkit.getPluginManager().callEvent(new PreScriptLoadEvent());
-			}
+
 //			final SerializedScript script = new SerializedScript();
 			
 			final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
