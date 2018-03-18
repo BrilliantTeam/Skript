@@ -497,6 +497,7 @@ final public class ScriptLoader {
 			/*
 			 * If editing this class, please remember to put call this event
 			 * after currentScript has already been set the the provided Config
+			 * but before the script actually starts parsing
 			 */
 			if (callPreLoadEvent)
 				Bukkit.getPluginManager().callEvent(new PreScriptLoadEvent());
