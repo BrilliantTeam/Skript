@@ -110,8 +110,10 @@ final public class ScriptLoader {
 	public static Config currentScript = null;
 
 	/**
-	 * If true, a ScriptLoadEvent will be called
-	 * right before a script starts loading.
+	 * If true, a {@link PreScriptLoadEvent} will be called
+	 * right before a script starts parsing, but after
+	 * {@link ScriptLoader#currentScript} has been set
+	 * to a non-null {@link Config}.
 	 */
 	private static boolean callPreLoadEvent;
 
