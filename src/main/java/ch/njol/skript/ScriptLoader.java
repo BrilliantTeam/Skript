@@ -497,8 +497,8 @@ final public class ScriptLoader {
 			currentScript = config;
 
 			/*
-			 * If editing this class, please remember to put call this event
-			 * after currentScript has already been set the the provided Config
+			 * If editing this class, please remember to call this event
+			 * after currentScript has already been set to the provided Config,
 			 * but before the script actually starts parsing
 			 */
 			if (callPreLoadEvent)
