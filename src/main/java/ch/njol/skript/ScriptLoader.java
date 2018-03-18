@@ -69,9 +69,11 @@ import ch.njol.util.Callback;
 import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
+import ch.njol.util.Validate;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import java.io.File;
@@ -111,7 +113,45 @@ final public class ScriptLoader {
 	 * If true, a ScriptLoadEvent will be called
 	 * right before a script starts loading.
 	 */
-	public static boolean callPreLoadEvent;
+	private static boolean callPreLoadEvent;
+
+	/**
+	 * A List of all the SkriptAddons that have called
+	 * {@link ScriptLoader#setCallPreloadEvent(boolean, SkriptAddon)}
+	 * with true.
+	 */
+	private static List<SkriptAddon> preloadListeners = new ArrayList<>();
+
+	/**
+	 * Sets {@link ScriptLoader#callPreLoadEvent} to the provided boolean,
+	 * and adds/removes the provided SkriptAddon from {@link ScriptLoader#preloadListeners}
+	 * depending on the provided boolean (true adds, false removes).
+	 * @param state The new value for {@link ScriptLoader#callPreLoadEvent}
+	 * @param addon A non-null SkriptAddon
+	 */
+	public static void setCallPreloadEvent(boolean state, @NonNull SkriptAddon addon) {
+		Validate.notNull(addon);
+		callPreLoadEvent = state;
+		if (state) {
+			if (!preloadListeners.contains(addon))
+				preloadListeners.add(addon);
+		} else {
+			preloadListeners.remove(addon);
+		}
+	}
+
+	public static boolean getCallPreloadEvent() {
+		return callPreLoadEvent;
+	}
+
+	/**
+	 * Returns an unmodifiable list of all the addons
+	 * that have called {@link ScriptLoader#setCallPreloadEvent(boolean, SkriptAddon)}
+	 * with true.
+	 */
+	public static List<SkriptAddon> getPreloadListeners() {
+		return Collections.unmodifiableList(preloadListeners);
+	}
 
 	/**
 	 * use {@link #setCurrentEvent(String, Class...)}
