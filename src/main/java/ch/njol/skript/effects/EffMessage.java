@@ -58,7 +58,13 @@ public class EffMessage extends Effect {
 
 	@Nullable
 	private Expression<String>[] messages;
-	
+
+	/**
+	 * Used for {@link EffMessage#toString(Event, boolean)}
+	 */
+	@Nullable
+	private Expression<String> messageExpr;
+
 	@SuppressWarnings("null")
 	private Expression<CommandSender> recipients;
 	
@@ -66,6 +72,7 @@ public class EffMessage extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		messages = (Expression<String>[]) (exprs[0] instanceof ExpressionList ? ((ExpressionList) exprs[0]).getExpressions() : new Expression[] {exprs[0]});
+		messageExpr = (Expression<String>) exprs[0];
 		recipients = (Expression<CommandSender>) exprs[1];
 		return true;
 	}
@@ -73,23 +80,23 @@ public class EffMessage extends Effect {
 	@SuppressWarnings("null")
 	@Override
 	protected void execute(final Event e) {
-		for (Expression<String> messageExpr : messages) {
+		for (Expression<String> message : messages) {
 			for (CommandSender sender : recipients.getArray(e)) {
-				if (messageExpr instanceof VariableString && sender instanceof Player) { // this could contain json formatting
-					List<MessageComponent> components = ((VariableString) messageExpr).getMessageComponents(e);
+				if (message instanceof VariableString && sender instanceof Player) { // this could contain json formatting
+					List<MessageComponent> components = ((VariableString) message).getMessageComponents(e);
 					((Player) sender).spigot().sendMessage(BungeeConverter.convert(components.toArray(new MessageComponent[components.size()])));
 				} else {
-					String message = messageExpr.getSingle(e);
-					if (message != null)
-						sender.sendMessage(message);
+					String string = message.getSingle(e);
+					if (string != null)
+						sender.sendMessage(string);
 				}
 			}
 		}
 	}
-	
+
+	@SuppressWarnings("null")
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		assert messages != null;
-		return "send " + "" + " to " + recipients.toString(e, debug);
+		return "send " + messageExpr.toString(e, debug) + " to " + recipients.toString(e, debug);
 	}
 }
