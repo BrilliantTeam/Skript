@@ -87,5 +87,5 @@ public class ExprGroup extends PropertyExpression<Player, String> {
     public String toString(Event e, boolean debug) {
         return "group" + (primary ? "" : "s") + " of " + getExpr().toString(e, debug);
     }
- 
+
 }
