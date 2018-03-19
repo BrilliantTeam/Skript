@@ -122,7 +122,7 @@ final public class ScriptLoader {
 	 * {@link ScriptLoader#setCallPreloadEvent(boolean, SkriptAddon)}
 	 * with true.
 	 */
-	private static List<SkriptAddon> preloadListeners = new ArrayList<>();
+	private static Set<SkriptAddon> preloadListeners = new HashSet<>();
 
 	/**
 	 * Sets {@link ScriptLoader#callPreLoadEvent} to the provided boolean,
@@ -134,12 +134,10 @@ final public class ScriptLoader {
 	public static void setCallPreloadEvent(boolean state, @NonNull SkriptAddon addon) {
 		Validate.notNull(addon);
 		callPreLoadEvent = state;
-		if (state) {
-			if (!preloadListeners.contains(addon))
-				preloadListeners.add(addon);
-		} else {
+		if (state)
+			preloadListeners.add(addon);
+		else
 			preloadListeners.remove(addon);
-		}
 	}
 
 	public static boolean getCallPreloadEvent() {
@@ -151,8 +149,8 @@ final public class ScriptLoader {
 	 * that have called {@link ScriptLoader#setCallPreloadEvent(boolean, SkriptAddon)}
 	 * with true.
 	 */
-	public static List<SkriptAddon> getPreloadListeners() {
-		return Collections.unmodifiableList(preloadListeners);
+	public static Set<SkriptAddon> getPreloadListeners() {
+		return Collections.unmodifiableSet(preloadListeners);
 	}
 
 	/**
