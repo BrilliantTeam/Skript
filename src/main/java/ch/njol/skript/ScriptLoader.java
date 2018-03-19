@@ -118,7 +118,7 @@ final public class ScriptLoader {
 	private static boolean callPreLoadEvent;
 
 	/**
-	 * A List of all the SkriptAddons that have called
+	 * A set of all the SkriptAddons that have called
 	 * {@link ScriptLoader#setCallPreloadEvent(boolean, SkriptAddon)}
 	 * with true.
 	 */
