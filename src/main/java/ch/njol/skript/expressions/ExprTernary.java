@@ -122,7 +122,7 @@ public class ExprTernary<T> extends SimpleExpression<T> {
 
     @Override
     public String toString(Event e, boolean debug) {
-        return ifTrue.toString(e, debug) + " if " + ifFalse.toString(e, debug);
+        return ifTrue.toString(e, debug) + " if " + condition + " otherwise " + ifFalse.toString(e, debug);
     }
 
 }
