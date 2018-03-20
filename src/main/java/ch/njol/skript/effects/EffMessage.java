@@ -24,6 +24,7 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -38,7 +39,6 @@ import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.util.chat.BungeeConverter;
 import ch.njol.skript.util.chat.MessageComponent;
 import ch.njol.util.Kleenean;
-import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Peter Güttinger
