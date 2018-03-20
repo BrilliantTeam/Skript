@@ -19,13 +19,6 @@
  */
 package ch.njol.skript.lang.util;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Iterator;
-
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
-
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
@@ -42,6 +35,11 @@ import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.ArrayIterator;
+import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
+
+import java.lang.reflect.Array;
+import java.util.Iterator;
 
 /**
  * An implementation of the {@link Expression} interface. You should usually extend this class to make a new expression.
@@ -199,11 +197,20 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 		assert !CollectionUtils.containsSuperclass(to, getReturnType());
 		return ConvertedExpression.newInstance(this, to);
 	}
-	
+
+	/**
+	 * Usually, you want to override {@link SimpleExpression#getConvertedExpr(Class[])}.
+	 * However, it may be useful to override this method if you have an expression with a return
+	 * type that is unknown until runtime (like variables). Usually, you'll be fine with just
+	 * the default implementation. This method is final on versions below INSERT VERSION.
+	 *
+	 * @param to The desired return type of the returned expression
+	 * @return The converted expression
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public final <R> Expression<? extends R> getConvertedExpression(final Class<R>... to) {
+	public <R> Expression<? extends R> getConvertedExpression(final Class<R>... to) {
 		if (CollectionUtils.containsSuperclass(to, getReturnType()))
 			return (Expression<? extends R>) this;
 		return this.getConvertedExpr(to);

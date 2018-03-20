@@ -19,12 +19,6 @@
  */
 package ch.njol.skript.expressions;
 
-import java.lang.reflect.Array;
-import java.util.Iterator;
-
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -34,8 +28,14 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.LiteralUtil;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
+
+import java.lang.reflect.Array;
+import java.util.Iterator;
 
 /**
  * @author Peter Güttinger
@@ -48,24 +48,29 @@ import ch.njol.util.coll.CollectionUtils;
 public class ExprElement extends SimpleExpression<Object> {
 	
 	static {
-		Skript.registerExpression(ExprElement.class, Object.class, ExpressionType.PROPERTY, "(-1¦[the] first|1¦[the] last|0¦[a] random) element [out] of %objects%");
+		Skript.registerExpression(ExprElement.class, Object.class, ExpressionType.PROPERTY, "(-1¦[the] first|1¦[the] last|0¦[a] random|2¦%-number%(st|nd|rd|th)) element [out] of %objects%");
 	}
 	
 	private int element;
 	
 	@SuppressWarnings("null")
 	private Expression<?> expr;
+
+	@Nullable
+	private Expression<Number> number;
 	
 	@SuppressWarnings("null")
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		expr = exprs[0];
+		expr = LiteralUtil.defendExpression(exprs[1]);
+		number = (Expression<Number>) exprs[0];
 		element = parseResult.mark;
-		return true;
+		return LiteralUtil.canInitSafely(expr);
 	}
 	
 	@Override
 	@Nullable
+	@SuppressWarnings("null")
 	protected Object[] get(final Event e) {
 		final Object o;
 		if (element == -1) {
@@ -78,6 +83,12 @@ public class ExprElement extends SimpleExpression<Object> {
 			if (os.length == 0)
 				return null;
 			o = os[os.length - 1];
+		} else if (element == 2) {
+			final Object[] os = expr.getArray(e);
+			final Number number = this.number.getSingle(e);
+			if (number == null || number.intValue() - 1 >= os.length || number.intValue() - 1 < 0)
+				return null;
+			o = os[number.intValue() - 1];
 		} else {
 			final Object[] os = expr.getArray(e);
 			if (os.length == 0)
