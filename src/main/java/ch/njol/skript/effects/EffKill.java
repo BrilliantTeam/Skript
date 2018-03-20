@@ -19,11 +19,6 @@
  */
 package ch.njol.skript.effects;
 
-import org.bukkit.GameMode;
-import org.bukkit.entity.*;
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.HealthUtils;
 import ch.njol.skript.doc.Description;
@@ -34,6 +29,13 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.EnderDragonPart;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Peter Güttinger
@@ -63,30 +65,29 @@ public class EffKill extends Effect {
 		entities = (Expression<Entity>) vars[0];
 		return true;
 	}
-	
+
 	@Override
 	protected void execute(final Event e) {
 		for (Entity entity : entities.getArray(e)) {
 
- 
 			if (entity instanceof EnderDragonPart) {
 				entity = ((EnderDragonPart) entity).getParent();
 			}
-			// Some entities cannot take damage but should be killable
-			if ((entity instanceof Vehicle && !(entity instanceof Pig || entity instanceof AbstractHorse)) 
-				|| entity instanceof ArmorStand || entity instanceof EnderDragon || !(entity instanceof Damageable)) {
-				entity.remove(); // Got complaints in issue tracker, so this is possible... Not sure if good idea, though!
-			} else if (entity instanceof Damageable) {
+
+			if (entity instanceof Damageable) {
 				final boolean creative = entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE;
 				if (creative) // Set player to survival before applying damage
 					((Player) entity).setGameMode(GameMode.SURVIVAL);
-				
-				assert entity != null;
+
 				HealthUtils.damage((Damageable) entity, HealthUtils.getMaxHealth((Damageable) entity) * 100); // just to make sure that it really dies >:)
-				
+
 				if (creative) // Set creative player back to creative
 					((Player) entity).setGameMode(GameMode.CREATIVE);
 			}
+
+			if (entity.isValid()) // if everything done so far has failed to kill this thing
+				entity.remove();
+
 		}
 	}
 	
