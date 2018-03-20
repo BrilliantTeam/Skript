@@ -40,7 +40,7 @@ import java.lang.reflect.Array;
 
 @Name("Ternary")
 @Description("A shorthand expression for returning something based on a condition.")
-@Examples({"broadcast "})
+@Examples({"set {points} to 500 if {admin::%player's uuid%} is set else 100"})
 @Since("INSERT VERSION")
 @SuppressWarnings("null")
 public class ExprTernary<T> extends SimpleExpression<T> {
