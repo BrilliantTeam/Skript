@@ -29,7 +29,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.util.LiteralUtil;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -78,15 +78,15 @@ public class ExprTernary<T> extends SimpleExpression<T> {
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        ifTrue = LiteralUtil.defendExpression(exprs[0]);
-        ifFalse = LiteralUtil.defendExpression(exprs[1]);
+        ifTrue = LiteralUtils.defendExpression(exprs[0]);
+        ifFalse = LiteralUtils.defendExpression(exprs[1]);
         if (ifFalse instanceof ExprTernary<?> || ifTrue instanceof ExprTernary<?>) {
             Skript.error("Ternary operators may not be nested!");
             return false;
         }
         String cond = parseResult.regexes.get(0).group();
         condition = Condition.parse(cond, "Can't understand this condition: " + cond);
-        return condition != null && LiteralUtil.canInitSafely(ifTrue, ifFalse);
+        return condition != null && LiteralUtils.canInitSafely(ifTrue, ifFalse);
     }
 
     @Override

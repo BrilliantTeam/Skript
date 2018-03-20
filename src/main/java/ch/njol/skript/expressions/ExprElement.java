@@ -28,7 +28,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.util.LiteralUtil;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -62,10 +62,10 @@ public class ExprElement extends SimpleExpression<Object> {
 	@SuppressWarnings("null")
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		expr = LiteralUtil.defendExpression(exprs[1]);
+		expr = LiteralUtils.defendExpression(exprs[1]);
 		number = (Expression<Number>) exprs[0];
 		element = parseResult.mark;
-		return LiteralUtil.canInitSafely(expr);
+		return LiteralUtils.canInitSafely(expr);
 	}
 	
 	@Override
