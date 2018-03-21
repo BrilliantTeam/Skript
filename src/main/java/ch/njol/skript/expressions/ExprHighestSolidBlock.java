@@ -24,16 +24,11 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.util.Kleenean;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Highest Solid Block")
@@ -41,9 +36,9 @@ import org.eclipse.jdt.annotation.Nullable;
 @Examples("highest block at location of arg-player")
 @Since("2.2-dev34")
 public class ExprHighestSolidBlock extends SimplePropertyExpression<Location, Block> {
+
 	static {
-		Skript.registerExpression(ExprHighestSolidBlock.class, Block.class, ExpressionType.PROPERTY,
-				"highest [(solid|non-air)] block at %locations%");
+		Skript.registerExpression(ExprHighestSolidBlock.class, Block.class, ExpressionType.PROPERTY, "highest [(solid|non-air)] block at %locations%");
 	}
 
 	@Override
@@ -51,6 +46,7 @@ public class ExprHighestSolidBlock extends SimplePropertyExpression<Location, Bl
 		return "highest [(solid|non-air)] block";
 	}
 
+	@Nullable
 	@Override
 	public Block convert(Location location) {
 		return location.getWorld().getHighestBlockAt(location);

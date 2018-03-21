@@ -326,10 +326,4 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	public boolean getAnd() {
 		return true;
 	}
-
-	/**
-	 * Parser instance which is being used or was used to parse this element.
-	 */
-	protected ParserInstance pi;
-	
 }

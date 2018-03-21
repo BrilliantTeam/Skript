@@ -71,7 +71,7 @@ public class ExprYawPitch extends SimplePropertyExpression<Location, Number> {
 		return yaw ? "yaw" : "pitch";
 	}
 	
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings({"null"})
 		@Override
 		public Class<?>[] acceptChange(final ChangeMode mode) {
 			if (mode == ChangeMode.SET || mode == ChangeMode.ADD || mode == ChangeMode.REMOVE)
