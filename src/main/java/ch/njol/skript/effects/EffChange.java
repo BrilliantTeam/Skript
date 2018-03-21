@@ -268,8 +268,7 @@ public class EffChange extends Effect {
 		final Object[] delta = changer == null ? null : changer.getArray(e);
 		if (delta != null && delta.length == 0)
 			return;
-		assert changer != null;
-		changed.change(e, changer.beforeChange(delta), mode); // Trigger beforeChanged hook
+		changed.change(e, changer == null ? null : changer.beforeChange(delta), mode); // Trigger beforeChanged hook
 		// REMIND use a random element out of delta if changed only supports changing a single instance
 //		changed.change(e, new Changer2<Object>() {
 //			@Override

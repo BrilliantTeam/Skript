@@ -72,17 +72,29 @@ public class ExprRemainingAir extends SimplePropertyExpression<LivingEntity, Tim
 	@SuppressWarnings("null")
 	@Override
 	public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
-		long ticks = ((Timespan)delta[0]).getTicks_i();
 		switch (mode) {
 			case ADD:
-				for (LivingEntity entity : getExpr().getArray(event))
-					entity.setRemainingAir(entity.getRemainingAir() + (int) ticks);
+				long ticks = ((Timespan)delta[0]).getTicks_i();
+				for (LivingEntity entity : getExpr().getArray(event)) {
+					int newTicks = entity.getRemainingAir() + (int) ticks;
+					
+					// Sanitize remaining air to avoid client hangs/crashes
+					if (newTicks > 20000) // 1000 seconds
+						newTicks = 20000;
+					entity.setRemainingAir(newTicks);
+				}
 				break;
 			case REMOVE:
+				ticks = ((Timespan)delta[0]).getTicks_i();
 				for (LivingEntity entity : getExpr().getArray(event))
 					entity.setRemainingAir(entity.getRemainingAir() - (int) ticks);
 				break;
 			case SET:
+				ticks = ((Timespan)delta[0]).getTicks_i();
+				// Sanitize remaining air to avoid client hangs/crashes
+				if (ticks > 20000) // 1000 seconds
+					ticks = 20000;
+				
 				for (LivingEntity entity : getExpr().getArray(event))
 					entity.setRemainingAir((int) ticks);
 				break;
