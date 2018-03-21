@@ -22,6 +22,7 @@ package ch.njol.skript.expressions;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -33,88 +34,58 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.Getter;
+import ch.njol.skript.util.Time;
 import ch.njol.util.Kleenean;
 
 @Name("IP")
-@Description("The IP address of a player.")
+@Description("The IP address of player(s).")
 @Examples({"IP-ban the player # is equal to the next line",
 		"ban the IP-address of the player",
 		"broadcast \"Banned the IP %IP of player%\""})
-@Since("1.4, 2.2-dev26 (when used in connect event)")
-public class ExprIP extends SimpleExpression<String> {
+@Since("1.4, 2.2-dev35")
+public class ExprIP extends PropertyExpression<Player, String> {
 	
 	static {
-		Skript.registerExpression(ExprIP.class, String.class, ExpressionType.PROPERTY, "IP[s][( |-)address[es]] of %players%",
-				"%players%'[s] IP[s][( |-)address[es]]");
+		register(ExprIP.class, String.class, "IP[s][( |-)address[es]]", "players");
 	}
-	
-	@SuppressWarnings("null")
-	private Expression<Player> players;
-	private boolean connectEvent;
-	
-	@SuppressWarnings({"null", "unchecked"})
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		players = (Expression<Player>) exprs[0];
-		connectEvent = ScriptLoader.isCurrentEvent(PlayerLoginEvent.class);
-		return true;
-	}
-	
-	@Override
-	@Nullable
-	protected String[] get(Event e) {
-		Player[] ps = players.getAll(e);
-		String[] ips = new String[ps.length];
-		for (int i = 0; i < ips.length; i++) {
-			Player p = ps[i];
-			InetAddress addr;
-			// Connect event: player has no ip yet, but event has it
-			if (connectEvent && ((PlayerLoginEvent) e).getPlayer().equals(p)) {
-				addr = ((PlayerLoginEvent) e).getAddress();
-			} else {
-				InetSocketAddress socketAddr = p.getAddress();
-				if (socketAddr == null) {
-					ips[i] = "unknown";
-					continue;
-				}
-				addr = socketAddr.getAddress();
-			}
-			
-			// Check if address is not available, just in case...
-			if (addr == null) {
-				ips[i] = "unknown";
-				continue;
-			}
-			
-			// Finally, place ip here to array...
-			ips[i] = addr.getHostAddress();
-		}
-		
-		return ips;
-	}
-	
-	@Override
+    
+    @Override
 	public Class<String> getReturnType() {
 		return String.class;
 	}
 
+	@SuppressWarnings({"null", "unchecked"})
 	@Override
-	public boolean isSingle() {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		setExpr((Expression<? extends Player>) exprs[0]);
 		return true;
 	}
 
-
 	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		if (e != null)
-			return "ip of " + players.toString(e, debug);
-		else
-			return "ip";
+	protected String[] get(Event event, Player[] source) {
+		return get(source, new Getter<String, Player>() {
+			@SuppressWarnings("null")
+			@Override
+			public String get(final Player player) {
+				if (event instanceof PlayerLoginEvent && ((PlayerLoginEvent)event).getPlayer().equals(player))
+					return ((PlayerLoginEvent) event).getAddress().getHostAddress();
+				if (player.getAddress() == null)
+					return "unknown";
+				//player.getAddress() is the socket address
+				InetAddress address = player.getAddress().getAddress();
+				return (address == null) ? "unknown" : address.getHostAddress();
+			}
+		});
+	}
+	
+	@Override
+	public String toString(@Nullable Event event, boolean debug) {
+		return "IP address " + " of " + getExpr().toString(event, debug);
 	}
 	
 }

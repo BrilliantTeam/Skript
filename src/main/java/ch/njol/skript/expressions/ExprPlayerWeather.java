@@ -43,8 +43,9 @@ import org.eclipse.jdt.annotation.Nullable;
 		"if arg-player's weather is rainy"})
 @Since("2.2-dev34")
 public class ExprPlayerWeather extends SimplePropertyExpression<Player, WeatherType> {
+
 	static {
-		PropertyExpression.register(ExprPlayerWeather.class, WeatherType.class, "weather", "players");
+		register(ExprPlayerWeather.class, WeatherType.class, "weather", "players");
 	}
 
 	@Override
@@ -56,8 +57,12 @@ public class ExprPlayerWeather extends SimplePropertyExpression<Player, WeatherT
 	public WeatherType convert(Player player) {
 		return WeatherType.fromPlayer(player);
 	}
+	
+	@Override
+	public Class<WeatherType> getReturnType() {
+		return WeatherType.class;
+	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	@Nullable
 	public Class<?>[] acceptChange(final ChangeMode mode) {
@@ -66,16 +71,13 @@ public class ExprPlayerWeather extends SimplePropertyExpression<Player, WeatherT
 		return null;
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) {
-		final WeatherType t = delta == null ? WeatherType.CLEAR : (WeatherType) delta[0];
-		for (final Player p : getExpr().getArray(e)) {
-			t.setWeather(p);
+	public void change(final Event event, final @Nullable Object[] delta, final ChangeMode mode) {
+		final WeatherType type = delta == null ? WeatherType.CLEAR : (WeatherType) delta[0];
+		for (final Player player : getExpr().getArray(event)) {
+			type.setWeather(player);
 		}
 	}
 
-	@Override
-	public Class<WeatherType> getReturnType() {
-		return WeatherType.class;
-	}
 }

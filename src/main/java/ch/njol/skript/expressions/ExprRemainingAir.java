@@ -20,13 +20,19 @@
 package ch.njol.skript.expressions;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.classes.Changer;
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * @author Peter Güttinger
@@ -35,8 +41,9 @@ import ch.njol.skript.util.Timespan;
 @Description("How much time a player has left underwater before starting to drown.")
 @Examples({"player's remaining air is less than 3 seconds:",
 		"	send \"hurry, get to the surface!\" to the player"})
-@Since("<i>unknown</i> (before 2.1)")
+@Since("<i>unknown</i> (before 2.1), 2.2-dev35 (Changers and converted to SimplePropertyExpression)")
 public class ExprRemainingAir extends SimplePropertyExpression<LivingEntity, Timespan> {
+
 	static {
 		register(ExprRemainingAir.class, Timespan.class, "remaining air", "livingentities");
 	}
@@ -52,8 +59,40 @@ public class ExprRemainingAir extends SimplePropertyExpression<LivingEntity, Tim
 	}
 	
 	@Override
-	public Timespan convert(final LivingEntity e) {
-		return Timespan.fromTicks(e.getRemainingAir());
+	public Timespan convert(final LivingEntity entity) {
+		return Timespan.fromTicks_i(entity.getRemainingAir());
+	}
+	
+	@Nullable
+	@Override
+	public Class<?>[] acceptChange(Changer.ChangeMode mode) {
+		return (mode != ChangeMode.REMOVE_ALL) ? CollectionUtils.array(Timespan.class) : null;
+	}
+	
+	@SuppressWarnings("null")
+	@Override
+	public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
+		long ticks = ((Timespan)delta[0]).getTicks_i();
+		switch (mode) {
+			case ADD:
+				for (LivingEntity entity : getExpr().getArray(event))
+					entity.setRemainingAir(entity.getRemainingAir() + (int) ticks);
+				break;
+			case REMOVE:
+				for (LivingEntity entity : getExpr().getArray(event))
+					entity.setRemainingAir(entity.getRemainingAir() - (int) ticks);
+				break;
+			case SET:
+				for (LivingEntity entity : getExpr().getArray(event))
+					entity.setRemainingAir((int) ticks);
+				break;
+			case DELETE:
+			case REMOVE_ALL:
+			case RESET:
+				for (LivingEntity entity : getExpr().getArray(event))
+					entity.setRemainingAir(20);
+				break;
+		}
 	}
 	
 }

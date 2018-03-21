@@ -39,8 +39,9 @@ import ch.njol.skript.lang.ExpressionType;
 @Examples("damage cause is lava, fire or burning")
 @Since("2.0")
 public class ExprDamageCause extends EventValueExpression<DamageCause> {
+	
 	static {
-		Skript.registerExpression(ExprDamageCause.class, DamageCause.class, ExpressionType.SIMPLE, "[the] damage (cause|type)");
+		Skript.registerExpression(ExprDamageCause.class, DamageCause.class, ExpressionType.SIMPLE, "[the] damage (cause|reason|type)");
 	}
 	
 	public ExprDamageCause() {

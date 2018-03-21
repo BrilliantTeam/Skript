@@ -22,6 +22,7 @@ package ch.njol.skript.expressions.base;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -70,8 +71,8 @@ public abstract class PropertyExpression<F, T> extends SimpleExpression<T> {
 	}
 	
 	@Override
-	protected final T[] get(final Event e) {
-		return get(e, expr.getArray(e));
+	protected final T[] get(final Event event) {
+		return get(event, expr.getArray(event));
 	}
 	
 	@Override
