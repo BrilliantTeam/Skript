@@ -90,14 +90,15 @@ public class ExprChatRecipients extends SimpleExpression<Player> {
 
 	@Override
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
-		assert delta != null;
 		final Player[] recipients = (Player[]) delta;
 		switch (mode) {
 			case REMOVE:
+				assert recipients != null;
 				for (Player player : recipients)
 					((AsyncPlayerChatEvent) event).getRecipients().remove(player);
 				break;
 			case ADD:
+				assert recipients != null;
 				for (Player player : recipients)
 					((AsyncPlayerChatEvent) event).getRecipients().add(player);
 				break;
