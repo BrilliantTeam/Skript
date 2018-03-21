@@ -74,6 +74,12 @@ public class ExprChestInventory extends SimpleExpression<Inventory> {
         if (size % 9 != 0) {
             size = 27;
         }
+        
+        // Sanitize inventory size
+        if (size < 0) // Negative sizes go and crash stuff deep in NMS code
+        	size = 0;
+        if (size > 255) // Too big values cause visual weirdness
+        	size = 255 * 9; // Plus, REALLY big values will HANG the server
         return CollectionUtils.array(Bukkit.createInventory(null, size, name));
     }
 
