@@ -33,6 +33,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
@@ -200,7 +201,26 @@ public class ExprClicked extends SimpleExpression<Object> {
 				return CollectionUtils.array(new InventorySlot(((InventoryClickEvent) e).getClickedInventory(), ((InventoryClickEvent) e).getSlot()));
 		}
 		return null;
-	} 
+	}
+	
+	@Override
+	@Nullable
+	public Object[] beforeChange(@Nullable Object[] delta) {
+		if (delta == null) // Nothing to nothing
+			return null;
+		Object first = delta[0];
+		if (first == null) // ConvertedExpression might cause this
+			return null;
+		
+		// Slots must be transformed to item stacks
+		// Documentation by Njol states so, plus it is convenient
+		if (first instanceof Slot) {
+			return new ItemStack[] {((Slot) first).getItem()};
+		}
+		
+		// Everything else (inventories, actions, etc.) does not need special handling
+		return delta;
+	}
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
