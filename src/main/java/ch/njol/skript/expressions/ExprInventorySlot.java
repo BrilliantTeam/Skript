@@ -51,7 +51,7 @@ import ch.njol.util.Kleenean;
 public class ExprInventorySlot extends SimpleExpression<Slot> {
 	
 	static {
-		Skript.registerExpression(ExprInventorySlot.class, Slot.class, ExpressionType.COMBINED, "[the] slot[s] %numbers% of %inventory%","%inventory%'[s] slot[s] %numbers%");
+		Skript.registerExpression(ExprInventorySlot.class, Slot.class, ExpressionType.COMBINED, "[the] slot[s] %number% of %inventory%","%inventory%'[s] slot[s] %number%");
 	}
 
 	@SuppressWarnings("null")
@@ -81,28 +81,7 @@ public class ExprInventorySlot extends SimpleExpression<Slot> {
 		List<Slot> inventorySlots = new ArrayList<>();
 		for (Number slot : slots.getArray(event))
 			if (slot.intValue() >= 0 && slot.intValue() < inventory.getSize())
-				inventorySlots.add(new Slot() {
-					@SuppressWarnings("null")
-					@Override
-					public ItemStack getItem() {
-						return inventory.getItem(slot.intValue());
-					}
-	
-					@Override
-					public void setItem(@Nullable ItemStack itemStack) {
-						inventory.setItem(slot.intValue(), itemStack);
-					}
-	
-					@Override
-					protected String toString_i() {
-						return "slot " + slot.intValue() + "of " + inventory.getHolder();
-					}
-	
-					@Override
-					public boolean isSameSlot(Slot slot) {
-						return false;
-					}
-				});
+				inventorySlots.add(new InventorySlot(inventory, slot.intValue()));
 		if (inventorySlots.isEmpty())
 			return null;
 		return inventorySlots.toArray(new Slot[inventorySlots.size()]);
@@ -116,6 +95,24 @@ public class ExprInventorySlot extends SimpleExpression<Slot> {
 	@Override
 	public Class<? extends Slot> getReturnType() {
 		return Slot.class;
+	}
+	
+	@Override
+	@Nullable
+	public Object[] beforeChange(@Nullable Object[] delta) {
+		if (delta == null) // Nothing to nothing
+			return null;
+		Object first = delta[0];
+		if (first == null) // ConvertedExpression might cause this
+			return null;
+		
+		// Slots must be transformed to item stacks
+		// Documentation by Njol states so, plus it is convenient
+		if (first instanceof Slot) {
+			return new ItemStack[] {((Slot) first).getItem()};
+		}
+		
+		return delta;
 	}
 	
 	@Override
