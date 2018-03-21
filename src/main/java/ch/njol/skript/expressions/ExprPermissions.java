@@ -39,10 +39,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Name("Permissions")
+@Name("All Permissions")
 @Description("Returns all permissions of the defined player(s). Note that the modifications to resulting list do not actually change permissions.")
 @Examples("set {_permissions::*} to all permissions of the player")
-@Since("2.2-dev33, 2.2-dev35")
+@Since("2.2-dev33")
 public class ExprPermissions extends PropertyExpression<Player, String> {
 	
 	static {
