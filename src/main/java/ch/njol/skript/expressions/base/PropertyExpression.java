@@ -71,8 +71,8 @@ public abstract class PropertyExpression<F, T> extends SimpleExpression<T> {
 	}
 	
 	@Override
-	protected final T[] get(final Event event) {
-		return get(event, expr.getArray(event));
+	protected final T[] get(final Event e) {
+		return get(e, expr.getArray(e));
 	}
 	
 	@Override

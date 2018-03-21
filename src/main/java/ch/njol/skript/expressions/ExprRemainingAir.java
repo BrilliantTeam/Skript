@@ -41,7 +41,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Description("How much time a player has left underwater before starting to drown.")
 @Examples({"player's remaining air is less than 3 seconds:",
 		"	send \"hurry, get to the surface!\" to the player"})
-@Since("<i>unknown</i> (before 2.1), 2.2-dev35 (Changers and converted to SimplePropertyExpression)")
+@Since("<i>unknown</i> (before 2.1)")
 public class ExprRemainingAir extends SimplePropertyExpression<LivingEntity, Timespan> {
 
 	static {

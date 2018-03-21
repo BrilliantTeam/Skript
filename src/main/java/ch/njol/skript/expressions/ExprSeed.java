@@ -41,14 +41,14 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-@Name("Seed")
-@Description("The seed of a world.")
+@Name("World Seed")
+@Description("The seed of given world. Note that it will be returned as Minecraft internally treats seeds, not as you specified it in world configuration.")
 @Examples("broadcast \"Seed: %seed of player's world%\"")
 @Since("2.2-dev35")
 public class ExprSeed extends PropertyExpression<World, Long> {
 
 	static {
-		Skript.registerExpression(ExprSeed.class, Long.class, ExpressionType.PROPERTY, "[the] seed[s] [(from|of) %worlds%]", "%worlds%'[s] seed[s]");
+		Skript.registerExpression(ExprSeed.class, Long.class, ExpressionType.PROPERTY, "[the] seed[s] (from|of) %worlds%", "%worlds%'[s] seed[s]");
 	}
 
 	@SuppressWarnings({"null", "unchecked"})
@@ -76,7 +76,7 @@ public class ExprSeed extends PropertyExpression<World, Long> {
 	@Override
 	public String toString(final @Nullable Event event, final boolean debug) {
 		if (event == null)
-			return "the seed from " + getExpr().toString(event, debug);
+			return "the seed of " + getExpr().toString(event, debug);
 		return Classes.getDebugMessage(getAll(event));
 	}
 	

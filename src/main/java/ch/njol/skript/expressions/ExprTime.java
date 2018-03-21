@@ -62,7 +62,7 @@ public class ExprTime extends PropertyExpression<World, Time> {
 	}
 	
 	@Override
-	protected Time[] get(final Event event, final World[] source) {
+	protected Time[] get(final Event e, final World[] source) {
 		return get(source, new Getter<Time, World>() {
 			@Override
 			public Time get(final World w) {
@@ -89,8 +89,8 @@ public class ExprTime extends PropertyExpression<World, Time> {
 	}
 	
 	@Override
-	public void change(final Event event, final @Nullable Object[] delta, final ChangeMode mode) {
-		final World[] worlds = getExpr().getArray(event);
+	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) {
+		final World[] worlds = getExpr().getArray(e);
 		int mod = 1;
 		switch (mode) {
 			case SET:

@@ -40,16 +40,10 @@ import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-/**
- * Used to set saturation of players. Number is used in case something changes in future...
- * @author bensku
- * 
- * Cleaned up by LimeGlass (2.2-dev35)
- */
 @Name("Saturation")
-@Description("The saturation of player.")
+@Description("The saturation of a player. If used in a player event, it can be omitted and will default to event-player.")
 @Examples("set saturation of player to 20")
-@Since("2.2-Fixes-v10, 2.2-dev35 (Just 'saturation' works in player events & changers added)")
+@Since("2.2-Fixes-v10, 2.2-dev35 (fully modifiable)")
 public class ExprSaturation extends PropertyExpression<Player, Number> {
 
 	static {
@@ -61,7 +55,7 @@ public class ExprSaturation extends PropertyExpression<Player, Number> {
 		return Number.class;
 	}
 	
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		setExpr((Expression<? extends Player>) exprs[0]);
@@ -69,7 +63,7 @@ public class ExprSaturation extends PropertyExpression<Player, Number> {
 	}
 	
 	@Override
-	protected Number[] get(final Event event, final Player[] source) {
+	protected Number[] get(final Event e, final Player[] source) {
 		return get(source, new Getter<Float, Player>() {
 			@Override
 			public Float get(final Player player) {
@@ -86,25 +80,25 @@ public class ExprSaturation extends PropertyExpression<Player, Number> {
 	
 	@SuppressWarnings("null")
 	@Override
-	public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
+	public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
 		float value = ((Number)delta[0]).floatValue();
 		switch (mode) {
 			case ADD:
-				for (Player player : getExpr().getArray(event))
+				for (Player player : getExpr().getArray(e))
 					player.setSaturation(player.getSaturation() + value);
 				break;
 			case REMOVE:
-				for (Player player : getExpr().getArray(event))
+				for (Player player : getExpr().getArray(e))
 					player.setSaturation(player.getSaturation() - value);
 				break;
 			case SET:
-				for (Player player : getExpr().getArray(event))
+				for (Player player : getExpr().getArray(e))
 					player.setSaturation(value);
 				break;
 			case DELETE:
 			case REMOVE_ALL:
 			case RESET:
-				for (Player player : getExpr().getArray(event))
+				for (Player player : getExpr().getArray(e))
 					player.setSaturation(0);
 				break;
 		}
