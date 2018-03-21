@@ -62,9 +62,9 @@ public class ExprChestInventory extends SimpleExpression<Inventory> {
     }
 
     @Override
-    protected Inventory[] get(Event event) {
-        String name = this.name != null ? this.name.getSingle(event) : "Chest";
-        Number rows = this.rows != null ? this.rows.getSingle(event) : 3;
+    protected Inventory[] get(Event e) {
+        String name = this.name != null ? this.name.getSingle(e) : "Chest";
+        Number rows = this.rows != null ? this.rows.getSingle(e) : 3;
 
         // Shouldn't be null at this point, but empty variables are a thing
         rows = rows == null ? 3 : rows;

@@ -1167,7 +1167,7 @@ inventory actions:
 	unknown: unknown, unsupported, custom
 	
 # -- Inventory Click Types --
-click actions:
+click types:
 	left: left mouse button, left mouse, LMB
 	shift_left: left mouse button with shift, left mouse with shift, Shift+RMB
 	right: right mouse button, right mouse, RMB

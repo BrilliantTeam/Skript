@@ -49,39 +49,37 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.InventorySlot;
+import ch.njol.skript.util.Slot;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-/**
- * @author Peter Güttinger, LimeGlass
- */
-@Name("Clicked Block/Entity")
-@Description("The clicked block or entity - only useful in click events")
+@Name("Clicked Block/Entity/Inventory/Slot")
+@Description("The clicked block, entity, inventory slot, inventory, type or action.")
 @Examples({"message \"You clicked on a %type of clicked entity%!\"",
 		"clicked block is a chest:",
 		"	show the inventory of the clicked block to the player"})
-@Since("1.0")
+@Since("1.0, 2.2-dev35 (more clickable things)")
 @Events({"click", "inventory click"})
 public class ExprClicked extends SimpleExpression<Object> {
 
 	private static enum ClickableType {
 		
-		BLOCK_AND_ITEMS(1, Block.class, "clicked block/itemtype/entity", "(block|%-*itemtype/entitydata%)"),
-		SLOT(2, Number.class, "clicked slot", "[raw] slot"),
-		INVENTORY(3, Inventory.class, "clicked inventory", "inventory"),
-		TYPE(4, ClickType.class, "clicked action", "action"), //Clicked type = Clicked action (ClickType.class) in Skript.
-		ACTION(5, InventoryAction.class, "clicked inventory action", "inventory( |-)action"); //Clicked inventory action = InventoryAction.class.
-		//CURSOR(6, Itemstack.class, "clicked cursor", "cursor"); TODO this should be in a Skript slot type.
+		BLOCK_AND_ITEMS(1, Block.class, "clicked block/itemtype/entity", " clicked (block|%-*itemtype/entitydata%)"),
+		SLOT(2, Slot.class, "clicked slot", "clicked slot"),
+		INVENTORY(3, Inventory.class, "clicked inventory", "clicked inventory"),
+		TYPE(4, ClickType.class, "click type", "click (type|action)"),
+		ACTION(5, InventoryAction.class, "inventory action", "inventory action");
 		
 		private String name, syntax;
-		private Class<?> clazz;
+		private Class<?> c;
 		private int value;
 
-		private ClickableType(int value, Class<?> clazz, String name, String syntax) {
+		private ClickableType(int value, Class<?> c, String name, String syntax) {
 			this.syntax = syntax;
 			this.value = value;
-			this.clazz = clazz;
+			this.c = c;
 			this.name = name;
 		}
 		
@@ -90,7 +88,7 @@ public class ExprClicked extends SimpleExpression<Object> {
 		}
 		
 		public Class<?> getClickableClass() {
-			return clazz;
+			return c;
 		}
 		
 		public String getName() {
@@ -109,7 +107,7 @@ public class ExprClicked extends SimpleExpression<Object> {
 	}
 	
 	static {
-		Skript.registerExpression(ExprClicked.class, Object.class, ExpressionType.SIMPLE, "[the] clicked ("
+		Skript.registerExpression(ExprClicked.class, Object.class, ExpressionType.SIMPLE, "[the] ("
 					+ ClickableType.BLOCK_AND_ITEMS.getSyntax(false)
 					+ ClickableType.SLOT.getSyntax(false)
 					+ ClickableType.INVENTORY.getSyntax(false)
@@ -148,7 +146,6 @@ public class ExprClicked extends SimpleExpression<Object> {
 			case ACTION:
 			case TYPE:
 			case SLOT:
-				if (clickable == ClickableType.SLOT && parseResult.expr.contains("raw")) rawSlot = true;
 				if (!ScriptLoader.isCurrentEvent(InventoryClickEvent.class)) {
 					Skript.error("The expression '" + clickable.getName() + "' may only be used in an inventory click event", ErrorQuality.SEMANTIC_ERROR);
 					return false;
@@ -198,10 +195,12 @@ public class ExprClicked extends SimpleExpression<Object> {
 			case INVENTORY:
 				return new Inventory[] {((InventoryClickEvent) e).getClickedInventory()};
 			case SLOT:
-				return CollectionUtils.array((rawSlot) ? ((InventoryClickEvent) e).getRawSlot() : ((InventoryClickEvent) e).getSlot());
+				// Slots are specific to inventories, so refering to wrong one is impossible
+				// (as opposed to using the numbers directly)
+				return CollectionUtils.array(new InventorySlot(((InventoryClickEvent) e).getClickedInventory(), ((InventoryClickEvent) e).getSlot()));
 		}
 		return null;
-	}
+	} 
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
