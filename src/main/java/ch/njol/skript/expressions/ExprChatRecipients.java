@@ -41,14 +41,10 @@ import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-/**
-* @author Mirreducki, Eugenio GuzmÃ¡n, LimeGlass
-* 
-*/
 @Name("Chat Recipients")
 @Description("Recipients of chat events where this is called.")
 @Examples("chat recipients")
-@Since("2.2-Fixes-v7")
+@Since("2.2-Fixes-v7, 2.2-dev35 (clearing recipients)")
 public class ExprChatRecipients extends SimpleExpression<Player> {
 
 	static {

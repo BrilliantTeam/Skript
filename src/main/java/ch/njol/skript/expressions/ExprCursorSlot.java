@@ -39,7 +39,6 @@ import ch.njol.util.Kleenean;
 /**
  * Cursor item slot is not actually an inventory slot, but an item which the player
  * has in their cursor when any inventory is open for them.
- * @author bensku
  */
 @Name("Cursor Slot")
 @Description("The item which player has on their cursor. This slot is always empty if player has no inventories open.")

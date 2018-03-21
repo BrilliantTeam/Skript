@@ -240,8 +240,8 @@ public class SimpleEvents {
 						"as this event is intended to support changing the hatched mob and its chance to hatch, but Skript does not yet support that.")
 				.examples("")
 				.since("1.0");
-		//TODO improve - on fish [of %entitydata%] (and/or itemtype), on reel, etc.
-		//Note: Should be something like RandomSK "[on] fishing state of %fishingstate%"
+		// TODO improve - on fish [of %entitydata%] (and/or itemtype), on reel, etc.
+		// Maybe something like RandomSK "[on] fishing state of %fishingstate%"
 		Skript.registerEvent("Fishing", SimpleEvent.class, PlayerFishEvent.class, "[player] fish[ing]")
 				.description("Called when a player fishes something. This is not of much use yet.")
 				.examples("")
@@ -364,7 +364,7 @@ public class SimpleEvents {
 					.examples("")
 					.since("2.2-dev13b");
 		}
-		Skript.registerEvent("World Init", SimpleEvent.class, WorldInitEvent.class, "world init[iali(se|zation)]")
+		Skript.registerEvent("World Init", SimpleEvent.class, WorldInitEvent.class, "world init[zation)]")
 				.description("Called when a world is initialised. As all default worlds are initialised before any scripts are loaded, this event is only called for newly created worlds.",
 						"World management plugins might change the behaviour of this event though.")
 				.examples("")
@@ -387,7 +387,7 @@ public class SimpleEvents {
 					.examples("on toggling gliding:",
 							"	cancel the event # bad idea, but you CAN do it!")
 					.since("2.2-dev21");
-			Skript.registerEvent("AoE Cloud Effect", SimpleEvent.class, AreaEffectCloudApplyEvent.class, "area [cloud] effect")
+			Skript.registerEvent("AoE Cloud Effect", SimpleEvent.class, AreaEffectCloudApplyEvent.class, "(area|AoE) [cloud] effect")
 					.description("Called when area effect cloud applies it's potion effect. This happens every 5 ticks by default.")
 					.examples("")
 					.since("2.2-dev21");
@@ -404,12 +404,12 @@ public class SimpleEvents {
 				.description("Called when player's currently viewed inventory is closed.")
 				.examples("")
 				.since("2.2-dev21");
-		Skript.registerEvent("Slime Split", SimpleEvent.class, SlimeSplitEvent.class, "slime split[ing]")
+		Skript.registerEvent("Slime Split", SimpleEvent.class, SlimeSplitEvent.class, "slime split[ting]")
 				.description("Called when a slime splits. Usually this happens when a big slime dies.")
 				.examples("")
 				.since("2.2-dev26");
 		if (Skript.classExists("org.bukkit.event.entity.EntityResurrectEvent")) {
-			Skript.registerEvent("Resurrect Attempt", SimpleEvent.class, EntityResurrectEvent.class, "[entity] resurrect [attempt]")
+			Skript.registerEvent("Resurrect Attempt", SimpleEvent.class, EntityResurrectEvent.class, "[entity] resurrect[ion] [attempt]")
 					.description("Called when an entity dies, always. If they are not holding a totem, this is calcelled - you can, however, uncancel it.")
 					.examples("on resurrect attempt:",
 							"	entity is player",

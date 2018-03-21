@@ -66,7 +66,7 @@ public class ExprFlightMode extends SimplePropertyExpression<Player, Boolean> {
 
 	@Override
 	public void change(Event event, @Nullable Object[] delta, Changer.ChangeMode mode) {
-		Boolean state = mode == Changer.ChangeMode.RESET || delta == null ? false : (Boolean) delta[0];
+		boolean state = mode == Changer.ChangeMode.RESET || delta == null ? false : (boolean) delta[0];
 		for (Player player : getExpr().getArray(event)) {
 			player.setAllowFlight(state);
 		}

@@ -42,9 +42,6 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.util.Checker;
 
-/**
- * @author Peter Güttinger
- */
 @SuppressWarnings("deprecation")
 public class EvtItem extends SkriptEvent {
 	
@@ -96,14 +93,14 @@ public class EvtItem extends SkriptEvent {
 				.examples("")
 				.since("2.2-Fixes-V10");
 		Skript.registerEvent("Item Despawn", EvtItem.class, ItemDespawnEvent.class, "(item[ ][stack]|[item] %-itemtypes%) despawn[ing]", "[item[ ][stack]] despawn[ing] [[of] %-itemtypes%]")
-				.description("Called when a dropped item despawns.")
+				.description("Called when an item is about to be despawned from the world, usually 5 minutes after it was dropped.")
 				.examples("on item despawn of diamond:",
 					 	"	send \"Not my precious!\"",
 					 	"	cancel event")
 				.since("2.2-dev35");
 		Skript.registerEvent("Item Merge", EvtItem.class, ItemMergeEvent.class, "(item[ ][stack]|[item] %-itemtypes%) merg(e|ing)", "item[ ][stack] merg(e|ing) [[of] %-itemtypes%]")
 				.description("Called when dropped items merge into a single stack.")
-				.examples("on item merging of gold blocks:",
+				.examples("on item merge of gold blocks:",
 					 	"	cancel event")
 				.since("2.2-dev35");
 	}

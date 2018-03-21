@@ -42,8 +42,8 @@ public class ExprAltitude extends SimplePropertyExpression<Location, Double> {
 	}
 
 	@Override
-	public Double convert(final Location location) {
-		return location.getY();
+	public Double convert(final Location l) {
+		return l.getY();
 	}
 	
 	@Override

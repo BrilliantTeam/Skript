@@ -97,7 +97,7 @@ public class ExprClicked extends SimpleExpression<Object> {
 			return name;
 		}
 		
-		public String getSyntax(Boolean last) {
+		public String getSyntax(boolean last) {
 			return value + "¦" + syntax + (!last ? "|" : "");
 		}
 		
@@ -122,7 +122,7 @@ public class ExprClicked extends SimpleExpression<Object> {
 	@Nullable
 	private ItemType itemType; //null results in any itemtype
 	private ClickableType clickable = ClickableType.BLOCK_AND_ITEMS;
-	private Boolean rawSlot = false;
+	private boolean rawSlot = false;
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
@@ -171,18 +171,18 @@ public class ExprClicked extends SimpleExpression<Object> {
 	@SuppressWarnings("null")
 	@Override
 	@Nullable
-	protected Object[] get(final Event event) {
+	protected Object[] get(final Event e) {
 		switch (clickable) {
 			case BLOCK_AND_ITEMS:
-				if (event instanceof PlayerInteractEvent) {
+				if (e instanceof PlayerInteractEvent) {
 					if (entityType != null) //This is suppose to be null as this event should be for blocks
 						return null;
-					final Block block = ((PlayerInteractEvent) event).getClickedBlock();
+					final Block block = ((PlayerInteractEvent) e).getClickedBlock();
 					return (itemType == null || itemType.isOfType(block)) ? new Block[] {block} : null;
-				} else if (event instanceof PlayerInteractEntityEvent) {
+				} else if (e instanceof PlayerInteractEntityEvent) {
 					if (entityType == null) //We're testing for the entity in this event
 						return null;
-					final Entity entity = ((PlayerInteractEntityEvent) event).getRightClicked();
+					final Entity entity = ((PlayerInteractEntityEvent) e).getRightClicked();
 					if (entityType.isInstance(entity)) {
 						final Entity[] one = (Entity[]) Array.newInstance(entityType.getType(), 1);
 						one[0] = entity;
@@ -192,13 +192,13 @@ public class ExprClicked extends SimpleExpression<Object> {
 				}
 				break;
 			case TYPE:
-				return new ClickType[] {((InventoryClickEvent) event).getClick()};
+				return new ClickType[] {((InventoryClickEvent) e).getClick()};
 			case ACTION:
-				return new InventoryAction[] {((InventoryClickEvent) event).getAction()};
+				return new InventoryAction[] {((InventoryClickEvent) e).getAction()};
 			case INVENTORY:
-				return new Inventory[] {((InventoryClickEvent) event).getClickedInventory()};
+				return new Inventory[] {((InventoryClickEvent) e).getClickedInventory()};
 			case SLOT:
-				return CollectionUtils.array((rawSlot) ? ((InventoryClickEvent) event).getRawSlot() : ((InventoryClickEvent) event).getSlot());
+				return CollectionUtils.array((rawSlot) ? ((InventoryClickEvent) e).getRawSlot() : ((InventoryClickEvent) e).getSlot());
 		}
 		return null;
 	}
