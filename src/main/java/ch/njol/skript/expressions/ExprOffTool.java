@@ -36,10 +36,10 @@ import ch.njol.skript.doc.NoDoc;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.effects.Delay;
 import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.util.EquipmentSlot;
 import ch.njol.skript.util.Getter;
-import ch.njol.skript.util.InventorySlot;
-import ch.njol.skript.util.Slot;
+import ch.njol.skript.util.slot.EquipmentSlot;
+import ch.njol.skript.util.slot.InventorySlot;
+import ch.njol.skript.util.slot.Slot;
 
 @NoDoc
 public class ExprOffTool extends ExprTool {

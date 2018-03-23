@@ -66,18 +66,16 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.PotionEffectUtils;
-import ch.njol.skript.util.Slot;
 import ch.njol.skript.util.StructureType;
 import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Timeperiod;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.slot.Slot;
+import ch.njol.skript.util.slot.SlotWithIndex;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.CollectionUtils;
 
-/**
- * @author Peter Güttinger
- */
-@SuppressWarnings({"rawtypes", "deprecation"})
+@SuppressWarnings({"rawtypes"})
 public class DefaultComparators {
 	
 	public DefaultComparators() {}
@@ -115,9 +113,28 @@ public class DefaultComparators {
 
 			@Override
 			public Relation compare(Slot o1, Slot o2) {
-				//Skript.info("Comparing " + o1.getClass() + " and " + o2.getClass());
 				if (o1.isSameSlot(o2))
 					return Relation.EQUAL;
+				return Relation.NOT_EQUAL;
+			}
+
+			@Override
+			public boolean supportsOrdering() {
+				return false;
+			}
+			
+		});
+		
+		// Slot - Integer
+		Comparators.registerComparator(Slot.class, Integer.class, new Comparator<Slot, Integer>() {
+
+			@Override
+			public Relation compare(Slot o1, Integer o2) {
+				if (o1 instanceof SlotWithIndex) {
+					boolean same = ((SlotWithIndex) o1).getIndex() == o2;
+					if (same) // Slot has index and the index is same with number
+						return Relation.EQUAL;
+				}
 				return Relation.NOT_EQUAL;
 			}
 

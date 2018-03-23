@@ -17,7 +17,7 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.util;
+package ch.njol.skript.util.slot;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

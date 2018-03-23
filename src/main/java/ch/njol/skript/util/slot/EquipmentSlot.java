@@ -17,7 +17,7 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.util;
+package ch.njol.skript.util.slot;
 
 import java.util.Locale;
 
@@ -33,13 +33,9 @@ import ch.njol.skript.bukkitutil.PlayerUtils;
 import ch.njol.skript.registrations.Classes;
 
 /**
- * @author Peter Güttinger
+ * Represents equipment slot of an entity.
  */
-public class EquipmentSlot extends Slot {
-	
-	// according to mcstats there are only 2 servers running 1.2.5 or 1.3.1 respectively
-//	public final static Version EQUIPMENT_VERSION = new Version(1,4,5);
-//	public final static boolean SUPPORTS_EQUIPMENT = Skript.isRunningMinecraft(EQUIPMENT_VERSION);
+public class EquipmentSlot extends SlotWithIndex {
 	
 	public static enum EquipSlot {
 		TOOL {
@@ -184,16 +180,10 @@ public class EquipmentSlot extends Slot {
 	public EquipSlot getEquipSlot() {
 		return slot;
 	}
-	
+
 	@Override
-	public boolean isSameSlot(Slot o) {
-		if (o instanceof InventorySlot) {
-			if (slot == EquipSlot.TOOL)
-				return false; // TODO maybe fix this
-			return this.slot.slotNumber == ((InventorySlot) o).getIndex();
-		}
-		
-		return this.slot == ((EquipmentSlot) o).getEquipSlot();
+	public int getIndex() {
+		return slot.slotNumber;
 	}
 	
 }
