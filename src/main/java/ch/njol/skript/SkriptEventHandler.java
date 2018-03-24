@@ -46,7 +46,6 @@ import ch.njol.skript.lang.SelfRegisteringSkriptEvent;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.timings.SkriptTimings;
-import ch.njol.skript.variables.Variables;
 
 /**
  * @author Peter Güttinger
@@ -149,8 +148,7 @@ public abstract class SkriptEventHandler {
 			logTriggerStart(t);
 			Object timing = SkriptTimings.start(t.getDebugLabel());
 			
-			t.execute(e); // Execute the trigger
-			Variables.clearLocal(e); // Clear local variables of event
+			t.execute(e);
 			
 			SkriptTimings.stop(timing);
 			logTriggerEnd(t);
