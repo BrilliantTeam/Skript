@@ -306,7 +306,7 @@ public class VariableString implements Expression<String> {
 				((ExpressionInfo) string.get(0)).expr.getReturnType() == String.class &&
 				((ExpressionInfo) string.get(0)).expr.isSingle()) {
 			String expr = ((ExpressionInfo) string.get(0)).expr.toString(null, false);
-			Skript.warning(expr + " is already a text, so you should not put it in one (e.g. " + expr + " instead of " + "\"%" + expr + "%\")");
+			Skript.warning(expr + " is already a text, so you should not put it in one (e.g. " + expr + " instead of " + "\"%" + expr.replace("\"", "\"\"") + "%\")");
 		}
 		return new VariableString(orig, sa, mode);
 	}
