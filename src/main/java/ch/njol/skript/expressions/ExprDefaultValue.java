@@ -44,76 +44,76 @@ import java.lang.reflect.Array;
 @SuppressWarnings("null")
 public class ExprDefaultValue<T> extends SimpleExpression<T> {
 
-    static {
-        Skript.registerExpression(ExprDefaultValue.class, Object.class, ExpressionType.COMBINED,
-                "%objects% (otherwise|?|or else) %objects%");
-    }
+	static {
+		Skript.registerExpression(ExprDefaultValue.class, Object.class, ExpressionType.COMBINED,
+				"%objects% (otherwise|?|or else) %objects%");
+	}
 
-    private final ExprDefaultValue<?> source;
-    private final Class<T> superType;
-    @Nullable
-    private Expression<Object> first;
-    @Nullable
-    private Expression<Object> second;
+	private final ExprDefaultValue<?> source;
+	private final Class<T> superType;
+	@Nullable
+	private Expression<Object> first;
+	@Nullable
+	private Expression<Object> second;
 
-    @SuppressWarnings("unchecked")
-    public ExprDefaultValue() {
-        this(null, (Class<? extends T>) Object.class);
-    }
+	@SuppressWarnings("unchecked")
+	public ExprDefaultValue() {
+		this(null, (Class<? extends T>) Object.class);
+	}
 
-    @SuppressWarnings("unchecked")
-    private ExprDefaultValue(ExprDefaultValue<?> source, Class<? extends T>... types) {
-        this.source = source;
-        if (source != null) {
-            this.first = source.first;
-            this.second = source.second;
-        }
-        this.superType = (Class<T>) Utils.getSuperType(types);
-    }
+	@SuppressWarnings("unchecked")
+	private ExprDefaultValue(ExprDefaultValue<?> source, Class<? extends T>... types) {
+		this.source = source;
+		if (source != null) {
+			this.first = source.first;
+			this.second = source.second;
+		}
+		this.superType = (Class<T>) Utils.getSuperType(types);
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        first = LiteralUtils.defendExpression(exprs[0]);
-        second = LiteralUtils.defendExpression(exprs[1]);
-        return LiteralUtils.canInitSafely(first, second);
-    }
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+		first = LiteralUtils.defendExpression(exprs[0]);
+		second = LiteralUtils.defendExpression(exprs[1]);
+		return LiteralUtils.canInitSafely(first, second);
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected T[] get(Event e) {
-        Object[] first = this.first.getArray(e);
-        Object values[] = first.length != 0 ? first : second.getArray(e);
-        try {
-            return CollectionUtils.convertArray(values, superType);
-        } catch (ClassCastException e1) {
-            return (T[]) Array.newInstance(superType, 0);
-        }
-    }
+	@Override
+	@SuppressWarnings("unchecked")
+	protected T[] get(Event e) {
+		Object[] first = this.first.getArray(e);
+		Object values[] = first.length != 0 ? first : second.getArray(e);
+		try {
+			return CollectionUtils.convertArray(values, superType);
+		} catch (ClassCastException e1) {
+			return (T[]) Array.newInstance(superType, 0);
+		}
+	}
 
-    @Override
-    public <R> Expression<? extends R> getConvertedExpression(Class<R>... to) {
-        return new ExprDefaultValue<>(this, to);
-    }
+	@Override
+	public <R> Expression<? extends R> getConvertedExpression(Class<R>... to) {
+		return new ExprDefaultValue<>(this, to);
+	}
 
-    @Override
-    public Expression<?> getSource() {
-        return source == null ? this : source;
-    }
+	@Override
+	public Expression<?> getSource() {
+		return source == null ? this : source;
+	}
 
-    @Override
-    public Class<? extends T> getReturnType() {
-        return superType;
-    }
+	@Override
+	public Class<? extends T> getReturnType() {
+		return superType;
+	}
 
-    @Override
-    public boolean isSingle() {
-        return first.isSingle() && second.isSingle();
-    }
+	@Override
+	public boolean isSingle() {
+		return first.isSingle() && second.isSingle();
+	}
 
-    @Override
-    public String toString(Event e, boolean debug) {
-        return first.toString(e, debug) + " or else " + second.toString(e, debug);
-    }
+	@Override
+	public String toString(Event e, boolean debug) {
+		return first.toString(e, debug) + " or else " + second.toString(e, debug);
+	}
 
 }
