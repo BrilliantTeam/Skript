@@ -20,6 +20,7 @@
 package ch.njol.skript.aliases;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.bekvon.bukkit.residence.commands.command;
@@ -437,6 +439,27 @@ public class AliasesProvider {
 	}
 	
 	/**
+	 * Applies given tags to an item stack.
+	 * @param stack Item stack.
+	 * @param tags Tags.
+	 */
+	public ItemStack applyTags(ItemStack stack, Map<String, Object> tags) {
+		Object damage = tags.get("Damage");
+		if (damage instanceof Number) { // Set durability manually, not NBT tag before 1.13
+			stack = new ItemStack(stack.getType(), 1, ((Number) damage).shortValue());
+			tags.remove("Damage");
+			// TODO 1.13 support
+		}
+		
+		// Apply random tags using JSON
+		String json = gson.toJson(tags);
+		assert json != null;
+		BukkitUnsafe.modifyItemStack(stack, json);
+		
+		return stack;
+	}
+	
+	/**
 	 * Loads an alias which does not have variations.
 	 * @param name Name of alias without any patterns or variation blocks.
 	 * @param id Id of material.
@@ -451,16 +474,14 @@ public class AliasesProvider {
 			datas = typeOfId.getTypes();
 		} else { // ... but quite often, we just got Vanilla id
 			// Prepare and modify ItemStack (using somewhat Unsafe methods)
-			Material material = BukkitUnsafe.getMaterialFromMinecraftId(name);
+			Material material = BukkitUnsafe.getMaterialFromMinecraftId(id);
 			if (material == null || material == Material.AIR) { // If server doesn't recognize id, do not proceed
 				Skript.error(m_invalid_minecraft_id.toString(id));
 				return; // Apparently ItemStack constructor on 1.12 can throw NPE
 			}
 			ItemStack stack = new ItemStack(material);
 			if (tags != null) {
-				String json = gson.toJson(tags);
-				assert json != null;
-				BukkitUnsafe.modifyItemStack(stack, json);
+				stack = applyTags(stack, new HashMap<>(tags));
 			}
 			
 			datas = Collections.singletonList(new ItemData(stack));
