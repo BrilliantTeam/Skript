@@ -31,7 +31,6 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.UnsafeValues;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -39,6 +38,7 @@ import com.bekvon.bukkit.residence.commands.command;
 import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
@@ -71,14 +71,6 @@ public class AliasesProvider {
 	 * Material names for aliases this provider has.
 	 */
 	private Map<ItemData, MaterialName> materialNames;
-	
-	/**
-	 * Bukkit's UnsafeValues allows us to do stuff that would otherwise
-	 * require NMS. It has existed for a long time, too, so 1.9 support is
-	 * not particularly hard to achieve.
-	 */
-	@SuppressWarnings("deprecation")
-	private UnsafeValues unsafe;
 	
 	/**
 	 * Tags are in JSON format. We may need GSON when merging tags
@@ -143,13 +135,6 @@ public class AliasesProvider {
 		conditions = new HashMap<>();
 		
 		gson = new Gson();
-		
-		@SuppressWarnings("deprecation")
-		UnsafeValues values = Bukkit.getUnsafe();
-		if (values == null) {
-			throw new RuntimeException("unsafe values are not available; cannot initialize this aliases provider");
-		}
-		unsafe = values;
 	}
 	
 	/**
@@ -216,7 +201,9 @@ public class AliasesProvider {
 	 * @return Variation instance.
 	 */
 	private Variation parseVariation(String item) {
-		item = item.trim(); // These could mess up following check among other things
+		String trimmed = item.trim();
+		assert trimmed != null;
+		item = trimmed; // These could mess up following check among other things
 		int firstSpace = item.indexOf(' ');
 		
 		String id; // Id or alias
@@ -226,7 +213,9 @@ public class AliasesProvider {
 			tags = new HashMap<>();
 		} else {
 			id = item.substring(0, firstSpace);
-			tags = parseMojangson(item.substring(firstSpace + 1));
+			String json = item.substring(firstSpace + 1);
+			assert json != null;
+			tags = parseMojangson(json);
 		}
 		
 		// Variations don't always need an id
@@ -453,7 +442,6 @@ public class AliasesProvider {
 	 * @param id Id of material.
 	 * @param tags Tags for material.
 	 */
-	@SuppressWarnings("deprecation")
 	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags) {
 		// First, try to find if aliases already has a type with this id
 		// (so that aliases can refer to each other)
@@ -463,14 +451,16 @@ public class AliasesProvider {
 			datas = typeOfId.getTypes();
 		} else { // ... but quite often, we just got Vanilla id
 			// Prepare and modify ItemStack (using somewhat Unsafe methods)
-			Material material = unsafe.getMaterialFromInternalName(id);
+			Material material = BukkitUnsafe.getMaterialFromMinecraftId(name);
 			if (material == null || material == Material.AIR) { // If server doesn't recognize id, do not proceed
 				Skript.error(m_invalid_minecraft_id.toString(id));
 				return; // Apparently ItemStack constructor on 1.12 can throw NPE
 			}
 			ItemStack stack = new ItemStack(material);
 			if (tags != null) {
-				unsafe.modifyItemStack(stack, gson.toJson(tags));
+				String json = gson.toJson(tags);
+				assert json != null;
+				BukkitUnsafe.modifyItemStack(stack, json);
 			}
 			
 			datas = Collections.singletonList(new ItemData(stack));
