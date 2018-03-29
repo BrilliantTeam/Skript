@@ -56,7 +56,6 @@ import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.EnchantmentType;
 import ch.njol.skript.util.Experience;
-import ch.njol.skript.util.Slot;
 import ch.njol.skript.util.StructureType;
 import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Timeperiod;
@@ -65,6 +64,7 @@ import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.VisualEffect;
 import ch.njol.skript.util.VisualEffectDummy;
 import ch.njol.skript.util.WeatherType;
+import ch.njol.skript.util.slot.Slot;
 import ch.njol.yggdrasil.Fields;
 
 /**

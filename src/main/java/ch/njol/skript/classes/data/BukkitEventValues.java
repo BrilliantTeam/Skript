@@ -59,6 +59,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
+import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -87,6 +89,8 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.event.vehicle.VehicleEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -111,8 +115,8 @@ import ch.njol.skript.util.BlockUtils;
 import ch.njol.skript.util.DelayedChangeBlock;
 import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.Getter;
-import ch.njol.skript.util.InventorySlot;
-import ch.njol.skript.util.Slot;
+import ch.njol.skript.util.slot.InventorySlot;
+import ch.njol.skript.util.slot.Slot;
 
 /**
  * @author Peter Güttinger
@@ -863,6 +867,44 @@ public final class BukkitEventValues {
 				return book;
 			}
 		}, 0);
-		
+		//ItemDespawnEvent
+		EventValues.registerEventValue(ItemDespawnEvent.class, Item.class, new Getter<Item, ItemDespawnEvent>() {
+			@Override
+			@Nullable
+			public Item get(ItemDespawnEvent e) {
+				return e.getEntity();
+			}
+		}, 0);
+		EventValues.registerEventValue(ItemDespawnEvent.class, ItemStack.class, new Getter<ItemStack, ItemDespawnEvent>() {
+			@Override
+			@Nullable
+			public ItemStack get(ItemDespawnEvent e) {
+				return e.getEntity().getItemStack();
+			}
+		}, 0);
+		//ItemMergeEvent
+		//TODO there is also e.getTarget() two entities involved in this event, currently can be worked around currently with `on item merge of (insert target itemtype)`
+		EventValues.registerEventValue(ItemMergeEvent.class, Item.class, new Getter<Item, ItemMergeEvent>() {
+			@Override
+			@Nullable
+			public Item get(ItemMergeEvent e) {
+				return e.getEntity();
+			}
+		}, 0);
+		EventValues.registerEventValue(ItemMergeEvent.class, ItemStack.class, new Getter<ItemStack, ItemMergeEvent>() {
+			@Override
+			@Nullable
+			public ItemStack get(ItemMergeEvent e) {
+				return e.getEntity().getItemStack();
+			}
+		}, 0);
+		//PlayerTeleportEvent
+		EventValues.registerEventValue(PlayerTeleportEvent.class, TeleportCause.class, new Getter<TeleportCause, PlayerTeleportEvent>() {
+			@Override
+			@Nullable
+			public TeleportCause get(final PlayerTeleportEvent e) {
+				return e.getCause();
+			}
+		}, 0);
 	}
 }

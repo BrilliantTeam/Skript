@@ -17,7 +17,7 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.util;
+package ch.njol.skript.util.slot;
 
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
@@ -27,9 +27,8 @@ import ch.njol.skript.lang.Debuggable;
 import ch.njol.skript.registrations.Classes;
 
 /**
- * Represents a container for a single item. This can e.g. be an inventory slot or an item frame. // TODO actually make an item frame slot
- * 
- * @author Peter Güttinger
+ * Represents a container for a single item. It could be an ordinary inventory
+ * slot or perhaps an item frame.
  */
 public abstract class Slot implements Debuggable {
 	

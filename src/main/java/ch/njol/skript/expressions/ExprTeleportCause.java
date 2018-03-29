@@ -19,40 +19,36 @@
  */
 package ch.njol.skript.expressions;
 
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.event.Event;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.expressions.base.EventValueExpression;
+import ch.njol.skript.lang.ExpressionType;
 
-@Name("Open Inventory")
-@Description({"Return the open inventory of a player.",
-	"If no inventory is open, it returns the own player's crafting inventory."})
-@Examples({"set slot 1 of open inventory of player to diamond sword"})
-@Since("2.2-dev24")
-public class ExprOpenInventory extends SimplePropertyExpression<Player, Inventory>{
+@Name("Teleport Cause")
+@Description("The <a href='../classes/#teleportcause'>teleport cause</a> within a player teleport event.")
+@Examples("teleport cause is nether portal, end portal or end gateway")
+@Since("2.2-dev35")
+public class ExprTeleportCause extends EventValueExpression<TeleportCause> {
+	
 	static {
-		register(ExprOpenInventory.class, Inventory.class, "(current|open|top) inventory", "player");
+		Skript.registerExpression(ExprTeleportCause.class, TeleportCause.class, ExpressionType.SIMPLE, "[the] teleport (cause|reason|type)");
 	}
-
-	@Override
-	public Class<? extends Inventory> getReturnType() {
-		return Inventory.class;
+	
+	public ExprTeleportCause() {
+		super(TeleportCause.class);
 	}
-
+	
 	@Override
-	protected String getPropertyName() {
-		return "open inventory";
-	}
-
-	@Override
-	@Nullable
-	public Inventory convert(Player p) {
-		return p.getOpenInventory() != null ? p.getOpenInventory().getTopInventory() : null;
+	public String toString(final @Nullable Event e, final boolean debug) {
+		return "the teleport cause";
 	}
 	
 }
