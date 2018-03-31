@@ -500,7 +500,7 @@ final public class ScriptLoader {
 			 * but before the script actually starts parsing
 			 */
 			if (callPreLoadEvent)
-				Bukkit.getPluginManager().callEvent(new PreScriptLoadEvent());
+				Bukkit.getPluginManager().callEvent(new PreScriptLoadEvent(config));
 
 //			final SerializedScript script = new SerializedScript();
 			

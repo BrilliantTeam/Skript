@@ -21,6 +21,7 @@ package ch.njol.skript.events.bukkit;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.config.Config;
+import ch.njol.util.Validate;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -32,6 +33,13 @@ import org.bukkit.event.HandlerList;
  */
 public class PreScriptLoadEvent extends Event {
 
+    private Config script;
+
+    public PreScriptLoadEvent(Config script) {
+        Validate.notNull(script);
+        this.script = script;
+    }
+
     private static HandlerList handlers = new HandlerList();
 
     @Override
@@ -41,6 +49,15 @@ public class PreScriptLoadEvent extends Event {
 
     public static HandlerList getHandlerList() {
         return handlers;
+    }
+
+    /**
+     * This is usually, but may not be, the same
+     * as {@link ScriptLoader#currentScript}
+     * @return The {@link Config} of the loading script
+     */
+    public Config getScript() {
+        return script;
     }
 
 }
