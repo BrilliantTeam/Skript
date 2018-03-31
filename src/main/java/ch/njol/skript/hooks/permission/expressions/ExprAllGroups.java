@@ -36,6 +36,10 @@ public class ExprAllGroups extends SimpleExpression<String> {
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+        if (!VaultHook.permission.hasGroupSupport()) {
+            Skript.error(VaultHook.NO_GROUP_SUPPORT);
+            return false;
+        }
         return true;
     }
 

@@ -32,7 +32,9 @@ import java.io.IOException;
  * @author Peter Güttinger
  */
 public class VaultHook extends Hook<Vault> {
-	
+
+	public static final String NO_GROUP_SUPPORT = "The permissions plugin you are using does not support groups.";
+
 	public VaultHook() throws IOException {}
 	
 	@SuppressWarnings("null")

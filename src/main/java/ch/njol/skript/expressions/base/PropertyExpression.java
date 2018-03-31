@@ -102,13 +102,8 @@ public abstract class PropertyExpression<F, T> extends SimpleExpression<T> {
 		return Converters.convertUnsafe(source, getReturnType(), converter);
 	}
 
-	/**
-	 * If overriding this method, don't forget to return super.isSingle(), too
-	 * (e.x. return super.isSingle() && yourCondition)
-	 * This method is only non-final on INSERT VERSION+
-	 */
 	@Override
-	public boolean isSingle() {
+	public final boolean isSingle() {
 		return expr.isSingle();
 	}
 	
