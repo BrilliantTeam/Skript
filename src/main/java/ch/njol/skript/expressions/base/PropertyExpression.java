@@ -19,6 +19,8 @@
  */
 package ch.njol.skript.expressions.base;
 
+import org.bukkit.event.Event;
+
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.lang.Expression;
@@ -28,7 +30,6 @@ import ch.njol.skript.lang.SyntaxElement;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.util.Kleenean;
-import org.bukkit.event.Event;
 
 /**
  * Represents an expression which represents a property of another one. Remember to set the expression with {@link #setExpr(Expression)} in
@@ -101,7 +102,7 @@ public abstract class PropertyExpression<F, T> extends SimpleExpression<T> {
 		assert converter != null;
 		return Converters.convertUnsafe(source, getReturnType(), converter);
 	}
-
+	
 	@Override
 	public final boolean isSingle() {
 		return expr.isSingle();
