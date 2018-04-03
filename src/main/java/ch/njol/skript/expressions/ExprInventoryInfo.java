@@ -81,7 +81,7 @@ public class ExprInventoryInfo extends PropertyExpression<Inventory, Object> {
 				}
 				return viewers.toArray(new HumanEntity[viewers.size()]);
 			default:
-				return null;
+				return new Object[0];
 		}
 
 	}
