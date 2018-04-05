@@ -102,7 +102,7 @@ public abstract class PropertyExpression<F, T> extends SimpleExpression<T> {
 		assert converter != null;
 		return Converters.convertUnsafe(source, getReturnType(), converter);
 	}
-	
+
 	@Override
 	public final boolean isSingle() {
 		return expr.isSingle();
