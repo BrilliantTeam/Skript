@@ -21,46 +21,40 @@
 
 package ch.njol.skript.expressions;
 
+import org.bukkit.entity.ItemFrame;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.util.slot.Slot;
-import ch.njol.skript.util.slot.SlotWithIndex;
+import ch.njol.skript.util.slot.ItemFrameSlot;
 
-@Name("Slot Index")
-@Description("Index of an an inventory slot. Other types of slots may or may "
-		+ "not have indices. Note that comparing slots with numbers is also "
-		+ "possible; if index of slot is same as the number, comparison"
-		+ "succeeds. This expression is mainly for the cases where you must "
-		+ "for some reason save the slot numbers.")
+@Name("Contained Slot (Item Frame)")
+@Description("A slot where the item in item frame is.")
 @Examples("")
 @Since("2.2-dev35")
-public class ExprSlotIndex extends SimplePropertyExpression<Slot, Integer> {
+public class ExprItemFrameSlot extends SimplePropertyExpression<ItemFrame, ItemFrameSlot> {
 	
 	static {
-		register(ExprSlotIndex.class, Integer.class, "(index|indices)", "slots");
+		register(ExprItemFrameSlot.class, ItemFrameSlot.class, "contained slot", "entities");
 	}
 	
 	@Override
 	@Nullable
-	public Integer convert(Slot f) {
-		if (f instanceof SlotWithIndex)
-			return ((SlotWithIndex) f).getIndex();
-		
-		return 0; // Slot does not have index. At all
+	public ItemFrameSlot convert(ItemFrame f) {
+		return new ItemFrameSlot(f);
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return "slot";
+		return "contained slot";
 	}
 	
 	@Override
-	public Class<? extends Integer> getReturnType() {
-		return Integer.class;
+	public Class<? extends ItemFrameSlot> getReturnType() {
+		return ItemFrameSlot.class;
 	}
 }
