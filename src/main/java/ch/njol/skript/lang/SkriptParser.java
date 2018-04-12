@@ -819,8 +819,8 @@ public class SkriptParser {
 			log.clear();
 			
 			// Check if list parsing is allowed (if it isn't, must stop here)
-			if (vi.classes.length == 1) {
-				log.printError("List cannot be used in place of a single value.", ErrorQuality.SEMANTIC_ERROR);
+			if (vi.isPlural[0] == false) {
+				log.printError("List cannot be used in place of a single value here.", ErrorQuality.SEMANTIC_ERROR);
 				return null;
 			}
 			
