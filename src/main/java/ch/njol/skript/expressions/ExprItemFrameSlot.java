@@ -30,14 +30,14 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.slot.ItemFrameSlot;
 
-@Name("Contained Slot (Item Frame)")
-@Description("A slot where the item in item frame is.")
+@Name("Item in Item Frame")
+@Description("An item inside an item frame entity.")
 @Examples("")
 @Since("2.2-dev35")
 public class ExprItemFrameSlot extends SimplePropertyExpression<ItemFrame, ItemFrameSlot> {
 	
 	static {
-		register(ExprItemFrameSlot.class, ItemFrameSlot.class, "contained slot", "entities");
+		register(ExprItemFrameSlot.class, ItemFrameSlot.class, "item", "entities");
 	}
 	
 	@Override
@@ -48,7 +48,7 @@ public class ExprItemFrameSlot extends SimplePropertyExpression<ItemFrame, ItemF
 
 	@Override
 	protected String getPropertyName() {
-		return "contained slot";
+		return "item frame slot";
 	}
 	
 	@Override
