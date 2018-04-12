@@ -108,7 +108,7 @@ public enum SkriptChatCode implements ChatCode {
 	run_command(true) {
 		@Override
 		public void updateComponent(MessageComponent component, String param) {
-			ClickEvent e = new ClickEvent(ClickEvent.Action.run_command, Utils.replaceChatStyles(param));
+			ClickEvent e = new ClickEvent(ClickEvent.Action.run_command, param);
 			component.clickEvent = e;
 		}
 	},
@@ -134,6 +134,8 @@ public enum SkriptChatCode implements ChatCode {
 	show_text(true) {
 		@Override
 		public void updateComponent(MessageComponent component, String param) {
+			// TODO component based codes must be supported
+			// Especially since 1.13 might break the old ones completely...
 			HoverEvent e = new HoverEvent(HoverEvent.Action.show_text, Utils.replaceChatStyles(param));
 			component.hoverEvent = e;
 		}
