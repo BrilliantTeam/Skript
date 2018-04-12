@@ -109,19 +109,24 @@ public class ChatMessages {
 					
 					// Register color char
 					if (code.colorChar != 0) {
-						colorChars[code.colorChar] = code;
+						addColorChar(code.colorChar, code);
 					}
 				}
 				
 				// Add formatting chars
-				colorChars['k'] = ChatCode.obfuscated;
-				colorChars['l'] = ChatCode.bold;
-				colorChars['m'] = ChatCode.strikethrough;
-				colorChars['n'] = ChatCode.underlined;
-				colorChars['o'] = ChatCode.italic;
-				colorChars['r'] = ChatCode.reset;
+				addColorChar('k', ChatCode.obfuscated);
+				addColorChar('l', ChatCode.bold);
+				addColorChar('m', ChatCode.strikethrough);
+				addColorChar('n', ChatCode.underlined);
+				addColorChar('o', ChatCode.italic);
+				addColorChar('r', ChatCode.reset);
 			}
 		});
+	}
+	
+	static void addColorChar(char code, ChatCode data) {
+		colorChars[code] = data;
+		colorChars[Character.toUpperCase(code)] = data;
 	}
 	
 	static {
@@ -217,10 +222,12 @@ public class ChatMessages {
 						
 						components.add(current);
 						
-						if (code.colorCode != null) // Just update color code
+						if (code.colorCode != null) { // Just update color code
 							current.color = code.colorCode;
-						else
+						} else {
+							assert param != null;
 							code.updateComponent(current, param); // Call ChatCode update
+						}
 						
 						// Copy styles from old to current if needed
 						copyStyles(old, current);
