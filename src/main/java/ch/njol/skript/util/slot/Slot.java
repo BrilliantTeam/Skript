@@ -41,17 +41,8 @@ public abstract class Slot implements Debuggable {
 	
 	@Override
 	public final String toString() {
-		return Classes.toString(getItem());
+		return toString(null, false);
 	}
-	
-	@Override
-	public final String toString(final @Nullable Event e, final boolean debug) {
-		if (!debug)
-			Classes.toString(getItem());
-		return toString_i();
-	}
-	
-	protected abstract String toString_i();
 	
 	/**
 	 * Checks if given slot is in same position with this.

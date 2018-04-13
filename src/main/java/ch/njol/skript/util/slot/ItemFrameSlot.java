@@ -22,6 +22,7 @@ package ch.njol.skript.util.slot;
 import java.util.Locale;
 
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -48,17 +49,17 @@ public class ItemFrameSlot extends Slot {
 	public void setItem(@Nullable ItemStack item) {
 		frame.setItem(item);
 	}
-
-	@Override
-	protected String toString_i() {
-		return "frame slot of " + Classes.toString(frame);
-	}
-
+	
 	@Override
 	public boolean isSameSlot(Slot o) {
 		if (o instanceof ItemFrameSlot) // Same item frame
 			return ((ItemFrameSlot) o).frame.equals(frame);
 		return false;
+	}
+
+	@Override
+	public String toString(@Nullable Event e, boolean debug) {
+		return "frame item of " + Classes.toString(frame);
 	}
 	
 }
