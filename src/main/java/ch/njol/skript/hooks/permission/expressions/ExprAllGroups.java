@@ -27,6 +27,7 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
 
 public class ExprAllGroups extends SimpleExpression<String> {
 
@@ -44,6 +45,7 @@ public class ExprAllGroups extends SimpleExpression<String> {
     }
 
     @Override
+    @Nullable
     protected String[] get(Event e) {
         return VaultHook.permission.getGroups();
     }
@@ -58,9 +60,8 @@ public class ExprAllGroups extends SimpleExpression<String> {
         return false;
     }
 
-    @SuppressWarnings("null")
     @Override
-    public String toString(Event e, boolean debug) {
+    public String toString(@Nullable Event e, boolean debug) {
         return "all groups";
     }
 
