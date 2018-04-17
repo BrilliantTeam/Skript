@@ -19,14 +19,15 @@
  */
 package ch.njol.skript.hooks;
 
-import ch.njol.skript.Skript;
+import java.io.IOException;
+
 import net.milkbowl.vault.Vault;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 
-import java.io.IOException;
+import ch.njol.skript.Skript;
 
 /**
  * @author Peter Güttinger
