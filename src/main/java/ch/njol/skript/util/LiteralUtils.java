@@ -16,32 +16,6 @@
  *
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
- *
- * This file incorporates work covered by the following copyright and
- * permission notice:
- *
- * MIT License
- *
- * Copyright (c) 2016 Bryan Terce
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
  */
 package ch.njol.skript.util;
 
@@ -52,6 +26,7 @@ import ch.njol.skript.lang.UnparsedLiteral;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * A class that contains methods based around
@@ -67,18 +42,15 @@ public class LiteralUtils {
      * @param expr The expression to check for {@link UnparsedLiteral} objects
      * @param <T>  {@code expr}'s type
      * @return {@code expr} without {@link UnparsedLiteral} objects
-     * @author Bryan Terce
      */
     @SuppressWarnings("unchecked")
     public static <T> Expression<T> defendExpression(Expression<?> expr) {
-        if (expr instanceof UnparsedLiteral) {
-            Literal<?> parsed = ((UnparsedLiteral) expr).getConvertedExpression(Object.class);
-            return (Expression<T>) (parsed == null ? expr : parsed);
-        } else if (expr instanceof ExpressionList) {
-            Expression[] exprs = ((ExpressionList) expr).getExpressions();
-            for (int i = 0; i < exprs.length; i++) {
-                exprs[i] = defendExpression(exprs[i]);
-            }
+        if (expr instanceof ExpressionList) {
+            Stream.of(((ExpressionList) expr).getExpressions())
+                    .forEach(LiteralUtils::defendExpression);
+        } else if (expr instanceof UnparsedLiteral) {
+            Literal<?> parsedLiteral = ((UnparsedLiteral) expr).getConvertedExpression(Object.class);
+            return (Expression<T>) (parsedLiteral == null ? expr : parsedLiteral);
         }
         return (Expression<T>) expr;
     }
@@ -89,13 +61,15 @@ public class LiteralUtils {
      *
      * @param expr The Expression to check for {@link UnparsedLiteral} objects
      * @return Whether or not {@code expr} contains {@link UnparsedLiteral} objects
-     * @author Bryan Terce
      */
     public static boolean hasUnparsedLiteral(Expression<?> expr) {
-        return expr instanceof UnparsedLiteral ||
-                (expr instanceof ExpressionList &&
-                        Arrays.stream(((ExpressionList) expr).getExpressions())
-                                .anyMatch(UnparsedLiteral.class::isInstance));
+        if (expr instanceof UnparsedLiteral) {
+            return true;
+        } else if (expr instanceof ExpressionList) {
+            return Stream.of(((ExpressionList) expr).getExpressions())
+                    .anyMatch(e -> e instanceof UnparsedLiteral);
+        }
+        return false;
     }
 
     /**
@@ -104,12 +78,14 @@ public class LiteralUtils {
      *
      * @param expressions The expressions to check for {@link UnparsedLiteral} objects
      * @return Whether or not the passed expressions contain {@link UnparsedLiteral} objects
-     * @author Bryan Terce
      */
     public static boolean canInitSafely(Expression<?>... expressions) {
-        return Arrays.stream(expressions)
-                .filter(Objects::nonNull)
-                .noneMatch(LiteralUtils::hasUnparsedLiteral);
+        for (int i = 0; i < expressions.length; i++) {
+            if (expressions[i] == null || hasUnparsedLiteral(expressions[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
