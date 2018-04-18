@@ -254,7 +254,6 @@ public class CondCompare extends Condition {
 	 */
 	@Override
 	public boolean check(final Event e) {
-		Skript.info("Checking " + first.getClass());
 		final Expression<?> third = this.third;
 		return first.check(e, new Checker<Object>() {
 			@Override
