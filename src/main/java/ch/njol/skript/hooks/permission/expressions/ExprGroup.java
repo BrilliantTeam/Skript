@@ -47,7 +47,7 @@ import java.util.List;
 @Examples({"on join:",
 			"broadcast \"%group of player%\" # this is the player's primary group",
 			"broadcast \"%groups of player%\" # this is all of the player's groups"})
-@Since("INSERT VERSION")
+@Since("2.2-dev35")
 public class ExprGroup extends SimpleExpression<String> {
 
 	static {
@@ -58,7 +58,7 @@ public class ExprGroup extends SimpleExpression<String> {
 	@Nullable
 	private Expression<OfflinePlayer> players;
 
-	@SuppressWarnings({"null", "unchecked"})
+	@SuppressWarnings({"unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		if (!VaultHook.permission.hasGroupSupport()) {

@@ -20,6 +20,7 @@
 package ch.njol.skript.hooks.permission.expressions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.NoDoc;
 import ch.njol.skript.hooks.VaultHook;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -29,6 +30,7 @@ import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
+@NoDoc
 public class ExprAllGroups extends SimpleExpression<String> {
 
     static {
