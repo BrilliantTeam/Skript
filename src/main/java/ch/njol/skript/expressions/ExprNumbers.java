@@ -102,7 +102,8 @@ public class ExprNumbers extends SimpleExpression<Number> {
 		Number s = start.getSingle(event), f = end.getSingle(event);
 		if (s == null || f == null)
 			return null;
-		if (s.doubleValue() > f.doubleValue()) {
+		final boolean reverse = s.doubleValue() > f.doubleValue();
+		if (reverse) {
 			Number temp = s;
 			s = f;
 			f = temp;
@@ -122,9 +123,9 @@ public class ExprNumbers extends SimpleExpression<Number> {
 				if (!hasNext())
 					throw new NoSuchElementException();
 				if (integer)
-					return Long.valueOf((long) i++);
+					return Long.valueOf((long) (reverse ? max-- : i++));
 				else
-					return Double.valueOf(i++);
+					return Double.valueOf(reverse ? max-- : i++);
 			}
 			
 			@Override
