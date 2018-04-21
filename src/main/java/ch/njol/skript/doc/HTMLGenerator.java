@@ -42,6 +42,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Effect;
@@ -107,10 +108,14 @@ public class HTMLGenerator {
 			else if (o2.c.getAnnotation(NoDoc.class) != null)
 				return -1;
 			
-			String name1 = o1.c.getAnnotation(Name.class).value();
-			String name2 = o2.c.getAnnotation(Name.class).value();
+			Name name1 = o1.c.getAnnotation(Name.class);
+			Name name2 = o2.c.getAnnotation(Name.class);
+			if (name1 == null)
+				throw new SkriptAPIException("Name annotation expected: " + o1.c);
+			if (name2 == null)
+				throw new SkriptAPIException("Name annotation expected: " + o2.c);
 			
-			return name1.compareTo(name2);
+			return name1.value().compareTo(name2.value());
 		}
 		
 	}

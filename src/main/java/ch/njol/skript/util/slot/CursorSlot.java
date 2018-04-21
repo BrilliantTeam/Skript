@@ -20,6 +20,7 @@
 package ch.njol.skript.util.slot;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -54,15 +55,15 @@ public class CursorSlot extends Slot {
 	}
 
 	@Override
-	protected String toString_i() {
-		return "cursor slot of inventory of " + Classes.toString(player);
-	}
-
-	@Override
 	public boolean isSameSlot(Slot o) {
 		if (!(o instanceof CursorSlot))
 			return false;
 		return ((CursorSlot) o).getPlayer().equals(this.player);
+	}
+
+	@Override
+	public String toString(@Nullable Event e, boolean debug) {
+		return "cursor slot of " + Classes.toString(player);
 	}
 	
 }

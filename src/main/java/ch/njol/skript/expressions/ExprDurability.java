@@ -70,7 +70,6 @@ public class ExprDurability extends SimplePropertyExpression<Object, Short> {
 		return Short.class;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	@Nullable
 	public Class<?>[] acceptChange(final ChangeMode mode) {
