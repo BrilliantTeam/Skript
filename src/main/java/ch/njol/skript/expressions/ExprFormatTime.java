@@ -52,9 +52,11 @@ public class ExprFormatTime extends PropertyExpression<Date, String> {
 		Skript.registerExpression(ExprFormatTime.class, String.class, ExpressionType.PROPERTY, "%dates% formatted [human-readable] [(with|as) %-string%]");
 	}
 
+	@SuppressWarnings("null")
 	private SimpleDateFormat format;
 
 	@Override
+	@SuppressWarnings("null")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		setExpr((Expression<? extends Date>) exprs[0]);
 		if (exprs[1] != null) {
@@ -75,7 +77,6 @@ public class ExprFormatTime extends PropertyExpression<Date, String> {
 
 
 	@Override
-	@Nullable
 	protected String[] get(Event e, Date[] source) {
 		return get(source, new Getter<String, Date>() {
 			@Override
