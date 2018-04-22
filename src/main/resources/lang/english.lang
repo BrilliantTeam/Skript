@@ -75,10 +75,6 @@ skript command:
 			check: Checks for a new version
 			changes: Lists all changes since the current version
 			download: Download the newest version
-		timings:
-			description: Starts or stops Skript's timings
-			start: Starts timings
-			stop: Stops timings and parses results
 	
 	invalid script: Can't find the script <grey>'<gold>%s<grey>'<red> in the scripts folder!
 	invalid folder: Can't find the folder <grey>'<gold>%s<grey>'<red> in the scripts folder!
@@ -1277,11 +1273,4 @@ types:
 io exceptions:
 	unknownhostexception: Cannot connect to %s
 	accessdeniedexception: Access denied for %s
-# -- Timings Reports --
-timings:
-	start: Skript timings for %s seconds:
-	events: Event times: used time (percents)
-	triggers: Trigger times: used time (percents)
-	start message: Timings started
-	stop message: Timings stopped and results parsed
 
