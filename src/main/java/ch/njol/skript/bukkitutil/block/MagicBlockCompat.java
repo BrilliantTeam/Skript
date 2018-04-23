@@ -92,6 +92,32 @@ public class MagicBlockCompat implements BlockCompat {
 		state.setRawData(entity.getBlockData());
 		return state;
 	}
+
+	private Map<String,String> parseState(String state) {
+		Map<String,String> parsed = new HashMap<>();
+		
+		int comma;
+		int pos = 0;
+		while (pos != -1) { // Loop until we don't have more key=value pairs
+			comma = state.indexOf(',', pos); // Find where next key starts
+			
+			// Get key=value as string
+			String pair;
+			if (comma == -1) {
+				pair = state.substring(pos);
+				pos = -1;
+			} else {
+				pair = state.substring(pos, comma);
+				pos = comma + 1;
+			}
+			
+			// Split pair to parts, add them to map
+			String[] parts = pair.split("=");
+			parsed.put(parts[0], parts[1]);
+		}
+		
+		return parsed;
+	}
 	
 	@Nullable
 	@Override
