@@ -91,10 +91,13 @@ public class AliasesProvider {
 		@Nullable
 		private String id;
 		private Map<String, Object> tags;
+		@Nullable
+		private String state;
 		
-		public Variation(@Nullable String id, Map<String, Object> tags) {
+		public Variation(@Nullable String id, Map<String, Object> tags, @Nullable String state) {
 			this.id = id;
 			this.tags = tags;
+			this.state = state;
 		}
 		
 		@Nullable
@@ -104,6 +107,11 @@ public class AliasesProvider {
 		
 		public Map<String, Object> getTags() {
 			return tags;
+		}
+
+		@Nullable
+		public String getBlockState() {
+			return state;
 		}
 	}
 	
@@ -222,12 +230,23 @@ public class AliasesProvider {
 			tags = parseMojangson(json);
 		}
 		
+		// Separate block state from id
+		String typeName;
+		String blockState = null; // Not all aliases have block state
+		int stateIndex = id.indexOf('[');
+		if (stateIndex != -1) {
+			typeName = id.substring(0, stateIndex); // Id comes before block state
+			blockState = id.substring(stateIndex, id.length() - 1);
+		} else { // No block state, just the id
+			typeName = id;
+		}
+		
 		// Variations don't always need an id
 		if (id.equals("-")) {
 			id = null;
 		}
 		
-		return new Variation(id, tags);
+		return new Variation(typeName, tags, blockState);
 	}
 	
 	/**
@@ -360,13 +379,12 @@ public class AliasesProvider {
 	}
 	
 	private void loadSingleAlias(List<String> patterns, String item) {
-		System.out.println(item);
 		Variation var = parseVariation(item); // Share parsing code with variations
 		
 		for (String p : patterns) {
 			p = p.trim();
 			assert p != null; // No nulls in this list
-			loadVariedAlias(p, var.getId(), var.getTags());
+			loadVariedAlias(p, var.getId(), var.getTags(), var.getBlockState());
 		}
 	}
 	
@@ -376,8 +394,9 @@ public class AliasesProvider {
 	 * variation blocks.
 	 * @param id Base id of material that this alias represents.
 	 * @param tags Base tags of material that this alias represents.
+	 * @param blockState Block state.
 	 */
-	private void loadVariedAlias(String name, @Nullable String id, @Nullable Map<String, Object> tags) {
+	private void loadVariedAlias(String name, @Nullable String id, @Nullable Map<String, Object> tags, @Nullable String blockState) {
 		// Find {variations}
 		boolean hasVariations = false;
 		for (int i = 0; i < name.length(); i++) {
@@ -404,6 +423,7 @@ public class AliasesProvider {
 				
 				// Iterate over variations
 				for (Entry<String, Variation> entry : vars.entrySet()) {
+					// Combine the tags
 					Map<String, Object> combinedTags;
 					if (tags != null) {
 						combinedTags = new HashMap<>(tags.size() + entry.getValue().getTags().size());
@@ -413,14 +433,18 @@ public class AliasesProvider {
 						combinedTags = entry.getValue().getTags();
 					}
 					
+					// If variations are used, id is just not the same
 					String variedId = entry.getValue().getId();
 					if (variedId == null) {
 						variedId = id;
 					}
 					
+					// TODO block state combinations
+					// If we want them, that is
+					
 					String aliasName = name.replace(varName, entry.getKey());
 					assert aliasName != null;
-					loadVariedAlias(aliasName, variedId, combinedTags);
+					loadVariedAlias(aliasName, variedId, combinedTags, blockState);
 				}
 				
 				// Move to end of this variation
@@ -435,7 +459,7 @@ public class AliasesProvider {
 			if (id == null) {
 				Skript.warning(m_empty_alias.toString());
 			} else {
-				loadReadyAlias(name, id, tags);
+				loadReadyAlias(name, id, tags, blockState);
 			}
 		}
 	}
@@ -466,10 +490,9 @@ public class AliasesProvider {
 	 * @param name Name of alias without any patterns or variation blocks.
 	 * @param id Id of material.
 	 * @param tags Tags for material.
+	 * @param blockState Block state.
 	 */
-	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags) {
-		String typeName = null; // In case id contains block state specifications
-		
+	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags, @Nullable String blockState) {
 		// First, try to find if aliases already has a type with this id
 		// (so that aliases can refer to each other)
 		ItemType typeOfId = aliases.get(id);
@@ -477,25 +500,17 @@ public class AliasesProvider {
 		if (typeOfId != null) { // If it exists, use datas from it
 			datas = typeOfId.getTypes();
 		} else { // ... but quite often, we just got Vanilla id
-			// Separate block state from id
-			int stateIndex = id.indexOf('[');
-			if (stateIndex != -1) {
-				typeName = id.substring(0, stateIndex); // Id comes before block state
-			} else { // No block state, just the id
-				typeName = id;
-			}
-			
 			// Prepare and modify ItemStack (using somewhat Unsafe methods)
-			Material material = BukkitUnsafe.getMaterialFromMinecraftId(typeName);
+			Material material = BukkitUnsafe.getMaterialFromMinecraftId(id);
 			if (material == null || material == Material.AIR) { // If server doesn't recognize id, do not proceed
-				Skript.error(m_invalid_minecraft_id.toString(typeName));
+				Skript.error(m_invalid_minecraft_id.toString(id));
 				return; // Apparently ItemStack constructor on 1.12 can throw NPE
 			}
 			
 			// Parse block state to block values
 			BlockValues blockValues = null;
-			if (stateIndex != -1) {
-				blockValues = BlockCompat.INSTANCE.createBlockValues(material, id.substring(stateIndex, id.length() - 1));
+			if (blockState != null) {
+				blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockState);
 				// TODO error reporting if we get null
 			}
 			
@@ -536,8 +551,8 @@ public class AliasesProvider {
 			}
 			subs.addAll(datas); // Add all datas (the ones we have here)
 			
-			if (typeName != null) // Only when it is Minecraft id, not an alias reference
-				minecraftIds.put(data, typeName); // Register Minecraft id for the data, too
+			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
+				minecraftIds.put(data, id); // Register Minecraft id for the data, too
 		}
 
 		// TODO fill material name
