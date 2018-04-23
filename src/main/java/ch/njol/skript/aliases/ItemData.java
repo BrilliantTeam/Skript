@@ -39,6 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
+import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.localization.Message;
@@ -67,11 +68,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		public short dataMin = -1;
 		public short dataMax = -1;
 	}
-	
-	@SuppressWarnings("null")
-	private static final UnsafeValues unsafe = Bukkit.getUnsafe();
-	
-	private static final Gson gson = new Gson();
+
 	@SuppressWarnings("null")
 	static final ItemFactory itemFactory = Bukkit.getServer().getItemFactory();
 	
@@ -108,7 +105,8 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.type = type;
 		
 		this.stack = new ItemStack(type);
-		unsafe.modifyItemStack(stack, tags);
+		if (tags != null)
+			BukkitUnsafe.modifyItemStack(stack, tags);
 		assert stack != null; // Yeah nope; modifyItemStack is not THAT Unsafe
 		
 		// Initialize block values with a terrible hack
