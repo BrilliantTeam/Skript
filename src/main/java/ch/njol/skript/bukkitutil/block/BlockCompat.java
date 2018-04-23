@@ -24,6 +24,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Methods which operate with blocks but are not compatible across some
@@ -73,4 +74,13 @@ public interface BlockCompat {
 	default BlockValues getBlockValues(FallingBlock entity) {
 		return getBlockValues(fallingBlockToState(entity));
 	}
+
+	/**
+	 * Creates new block values for given material and state.
+	 * @param type Block material.
+	 * @param state Block state, as used in /setblock command in Minecraft.
+	 * @return Block values, or null if given state was invalid.
+	 */
+	@Nullable
+	BlockValues createBlockValues(Material type, String state);
 }

@@ -41,6 +41,8 @@ import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.block.BlockCompat;
+import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
@@ -466,6 +468,8 @@ public class AliasesProvider {
 	 * @param tags Tags for material.
 	 */
 	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags) {
+		String typeName = null; // In case id contains block state specifications
+		
 		// First, try to find if aliases already has a type with this id
 		// (so that aliases can refer to each other)
 		ItemType typeOfId = aliases.get(id);
@@ -473,18 +477,38 @@ public class AliasesProvider {
 		if (typeOfId != null) { // If it exists, use datas from it
 			datas = typeOfId.getTypes();
 		} else { // ... but quite often, we just got Vanilla id
+			// Separate block state from id
+			int stateIndex = id.indexOf('[');
+			if (stateIndex != -1) {
+				typeName = id.substring(0, stateIndex); // Id comes before block state
+			} else { // No block state, just the id
+				typeName = id;
+			}
+			
 			// Prepare and modify ItemStack (using somewhat Unsafe methods)
-			Material material = BukkitUnsafe.getMaterialFromMinecraftId(id);
+			Material material = BukkitUnsafe.getMaterialFromMinecraftId(typeName);
 			if (material == null || material == Material.AIR) { // If server doesn't recognize id, do not proceed
-				Skript.error(m_invalid_minecraft_id.toString(id));
+				Skript.error(m_invalid_minecraft_id.toString(typeName));
 				return; // Apparently ItemStack constructor on 1.12 can throw NPE
 			}
+			
+			// Parse block state to block values
+			BlockValues blockValues = null;
+			if (stateIndex != -1) {
+				blockValues = BlockCompat.INSTANCE.createBlockValues(material, id.substring(stateIndex, id.length() - 1));
+				// TODO error reporting if we get null
+			}
+			
+			// Apply (NBT) tags to item stack
 			ItemStack stack = new ItemStack(material);
 			if (tags != null) {
 				stack = applyTags(stack, new HashMap<>(tags));
 			}
 			
-			datas = Collections.singletonList(new ItemData(stack));
+			if (blockValues == null)
+				datas = Collections.singletonList(new ItemData(stack));
+			else
+				datas = Collections.singletonList(new ItemData(stack, blockValues));
 		}
 		
 		// Create plural form of the alias (warning: I don't understand it either)
@@ -512,7 +536,8 @@ public class AliasesProvider {
 			}
 			subs.addAll(datas); // Add all datas (the ones we have here)
 			
-			minecraftIds.put(data, id); // Register Minecraft id for the data, too
+			if (typeName != null) // Only when it is Minecraft id, not an alias reference
+				minecraftIds.put(data, typeName); // Register Minecraft id for the data, too
 		}
 
 		// TODO fill material name

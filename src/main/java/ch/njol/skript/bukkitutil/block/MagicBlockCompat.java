@@ -24,6 +24,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Block compatibility implemented with magic numbers. No other choice until
@@ -87,6 +88,13 @@ public class MagicBlockCompat implements BlockCompat {
 		state.setType(entity.getMaterial());
 		state.setRawData(entity.getBlockData());
 		return state;
+	}
+
+	@Nullable
+	@Override
+	public BlockValues createBlockValues(Material type, String state) {
+		// TODO implementing this will take some effort
+		return null;
 	}
 	
 }
