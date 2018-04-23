@@ -30,6 +30,8 @@ import java.util.concurrent.locks.LockSupport;
 
 import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.VariableString;
+import ch.njol.skript.lang.function.Function;
+
 import org.bukkit.event.EventPriority;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -276,6 +278,17 @@ public abstract class SkriptConfig {
 	
 	public final static Option<Boolean> loadDefaultAliases = new Option<Boolean>("load default aliases", true)
 			.optional(true);
+
+	public final static Option<Boolean> executeFunctionsWithMissingParams = new Option<Boolean>("execute functions with missing parameters", true)
+			.optional(true)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					Function.executeWithNulls = t;
+				}
+				
+			});
 
 	/**
 	 * This should only be used in special cases

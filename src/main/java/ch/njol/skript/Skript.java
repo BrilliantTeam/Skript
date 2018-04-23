@@ -582,6 +582,13 @@ public final class Skript extends JavaPlugin implements Listener {
 						return "" + SkriptConfig.colorResetCodes.value();
 					}
 				});
+				metrics.addCustomChart(new Metrics.SimplePie("functionsWithNulls") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.executeFunctionsWithMissingParams.value();
+					}
+				});
 				
 				Skript.metrics = metrics;
 				

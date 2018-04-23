@@ -17,33 +17,42 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.conditions;
+package ch.njol.skript.expressions;
 
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
+import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.conditions.base.PropertyCondition;
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.util.slot.ItemFrameSlot;
 
-@Name("Is on Ground")
-@Description("Checks if entities are on ground or not.")
-@Examples("player is not on ground")
-@Since("2.2-dev26")
-public class CondIsOnGround extends PropertyCondition<Entity> {
-
+@Name("Item in Item Frame")
+@Description("An item inside an item frame entity.")
+@Examples("")
+@Since("2.2-dev35")
+public class ExprItemFrameSlot extends SimplePropertyExpression<ItemFrame, ItemFrameSlot> {
+	
 	static {
-		PropertyCondition.register(CondIsOnGround.class, "on ground", "entities");
+		register(ExprItemFrameSlot.class, ItemFrameSlot.class, "item", "entities");
 	}
-
+	
 	@Override
-	public boolean check(Entity entity) {
-		return entity.isOnGround();
+	@Nullable
+	public ItemFrameSlot convert(ItemFrame f) {
+		return new ItemFrameSlot(f);
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return "on ground";
+		return "item frame slot";
+	}
+	
+	@Override
+	public Class<? extends ItemFrameSlot> getReturnType() {
+		return ItemFrameSlot.class;
 	}
 }

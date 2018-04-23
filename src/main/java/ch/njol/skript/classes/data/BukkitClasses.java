@@ -885,7 +885,8 @@ public class BukkitClasses {
 		
 		Classes.registerClass(new ClassInfo<>(InventoryHolder.class, "inventoryholder")
 				.name(ClassInfo.NO_DOC)
-				.defaultExpression(new EventValueExpression<>(InventoryHolder.class)));
+				.defaultExpression(new EventValueExpression<>(InventoryHolder.class))
+				.after("entity"));
 		
 		Classes.registerClass(new ClassInfo<>(GameMode.class, "gamemode")
 				.user("game ?modes?")

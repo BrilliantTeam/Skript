@@ -42,7 +42,6 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.localization.Language;
-import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.log.BlockingLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
@@ -303,6 +302,12 @@ public class VariableString implements Expression<String> {
 		
 		final Object[] sa = string.toArray();
 		assert sa != null;
+		if (string.size() == 1 && string.get(0) instanceof ExpressionInfo &&
+				((ExpressionInfo) string.get(0)).expr.getReturnType() == String.class &&
+				((ExpressionInfo) string.get(0)).expr.isSingle()) {
+			String expr = ((ExpressionInfo) string.get(0)).expr.toString(null, false);
+			Skript.warning(expr + " is already a text, so you should not put it in one (e.g. " + expr + " instead of " + "\"%" + expr.replace("\"", "\"\"") + "%\")");
+		}
 		return new VariableString(orig, sa, mode);
 	}
 	

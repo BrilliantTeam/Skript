@@ -17,33 +17,11 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.conditions;
+/**
+ * @author Peter Güttinger
+ */
+@NonNullByDefault
+package ch.njol.skript.hooks.permission.expressions;
 
-import org.bukkit.entity.Entity;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
-import ch.njol.skript.conditions.base.PropertyCondition;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
-
-@Name("Is on Ground")
-@Description("Checks if entities are on ground or not.")
-@Examples("player is not on ground")
-@Since("2.2-dev26")
-public class CondIsOnGround extends PropertyCondition<Entity> {
-
-	static {
-		PropertyCondition.register(CondIsOnGround.class, "on ground", "entities");
-	}
-
-	@Override
-	public boolean check(Entity entity) {
-		return entity.isOnGround();
-	}
-
-	@Override
-	protected String getPropertyName() {
-		return "on ground";
-	}
-}

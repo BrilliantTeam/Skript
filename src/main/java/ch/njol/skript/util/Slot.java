@@ -17,38 +17,25 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.util.slot;
+package ch.njol.skript.util;
 
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.bekvon.bukkit.residence.commands.check;
+
+import ch.njol.skript.Skript;
+import ch.njol.skript.classes.ClassInfo;
+import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.Debuggable;
 import ch.njol.skript.registrations.Classes;
 
 /**
- * Represents a container for a single item. It could be an ordinary inventory
- * slot or perhaps an item frame.
+ * Preserved for addon compatibility for a limited amount of time.
+ * Please, do use {@link ch.njol.skript.util.slot.Slot} instead!
+ * @deprecated Slot stuff got its own package.
  */
-public abstract class Slot implements Debuggable {
-	
-	protected Slot() {}
-	
-	@Nullable
-	public abstract ItemStack getItem();
-	
-	public abstract void setItem(final @Nullable ItemStack item);
-	
-	@Override
-	public final String toString() {
-		return toString(null, false);
-	}
-	
-	/**
-	 * Checks if given slot is in same position with this.
-	 * Ignores slot contents.
-	 * @param o Another slot
-	 * @return True if positions equal, false otherwise.
-	 */
-	public abstract boolean isSameSlot(Slot o);
+@Deprecated
+public abstract class Slot extends ch.njol.skript.util.slot.Slot {
 }

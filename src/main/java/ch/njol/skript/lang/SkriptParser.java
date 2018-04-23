@@ -809,12 +809,21 @@ public class SkriptParser {
 				}
 			}
 			//Mirre
+			
+			// Attempt to parse a single expression
 			final Expression<?> r = parseSingleExpr(false, null, vi);
 			if (r != null) {
 				log.printLog();
 				return r;
 			}
 			log.clear();
+			
+			// Check if list parsing is allowed (if it isn't, must stop here)
+			if (vi.isPlural[0] == false) {
+				// List cannot be used in place of a single value here
+				log.printError();
+				return null;
+			}
 			
 			final List<Expression<?>> ts = new ArrayList<>();
 			Kleenean and = Kleenean.UNKNOWN;
@@ -944,8 +953,9 @@ public class SkriptParser {
 			
 			log.printLog();
 			
-			if (ts.size() == 1)
+			if (ts.size() == 1) {
 				return ts.get(0);
+			}
 			
 			if (and.isUnknown() && !suppressMissingAndOrWarnings)
 				Skript.warning(MISSING_AND_OR + ": " + expr);
@@ -1092,6 +1102,7 @@ public class SkriptParser {
 				log.printLog();
 				return null;
 			}
+			
 			if ((flags & PARSE_EXPRESSIONS) == 0) {
 				Skript.error("Functions cannot be used here.");
 				log.printError();
@@ -1138,6 +1149,7 @@ public class SkriptParser {
 //				}
 //			}
 //			@SuppressWarnings("null")
+			
 			final FunctionReference<T> e = new FunctionReference<>(functionName, SkriptLogger.getNode(), ScriptLoader.currentScript != null ? ScriptLoader.currentScript.getFile() : null, types, params);//.toArray(new Expression[params.size()]));
 			if (!e.validateFunction(true)) {
 				log.printError();
