@@ -84,7 +84,8 @@ public class ScriptCommand implements CommandExecutor {
 	private final String label;
 	private final List<String> aliases;
 	private List<String> activeAliases;
-	private final String permission, permissionMessage;
+	private String permission;
+	private final Expression<String> permissionMessage;
 	private final String description;
 	@Nullable
 	private final Timespan cooldown;
@@ -119,14 +120,16 @@ public class ScriptCommand implements CommandExecutor {
 	 */
 	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments,
 						 final String description, final String usage, final ArrayList<String> aliases,
-						 final String permission, final String permissionMessage, @Nullable final Timespan cooldown,
+						 final String permission, @Nullable final Expression<String> permissionMessage, @Nullable final Timespan cooldown,
 						 @Nullable final VariableString cooldownMessage, final String cooldownBypass,
 						 final int executableBy, final List<TriggerItem> items) {
 		Validate.notNull(name, pattern, arguments, description, usage, aliases, items);
 		this.name = name;
 		label = "" + name.toLowerCase();
 		this.permission = permission;
-		this.permissionMessage = permissionMessage.isEmpty() ? Language.get("commands.no permission message") : Utils.replaceEnglishChatStyles(permissionMessage);
+		this.permissionMessage = permissionMessage == null ?
+				new SimpleLiteral<>(Language.get("commands.no permission message"), false)
+				: permissionMessage;
 
 		this.cooldown = cooldown;
 		this.cooldownMessage = cooldownMessage == null
@@ -164,7 +167,9 @@ public class ScriptCommand implements CommandExecutor {
 			bukkitCommand.setDescription(description);
 			bukkitCommand.setLabel(label);
 			bukkitCommand.setPermission(permission);
-			bukkitCommand.setPermissionMessage(permissionMessage);
+			// We can only set the message if it's not a variablestring
+			if (permissionMessage instanceof SimpleLiteral)
+				bukkitCommand.setPermissionMessage(((SimpleLiteral<String>) permissionMessage).getSingle());
 			bukkitCommand.setUsage(usage);
 			bukkitCommand.setExecutor(this);
 			return bukkitCommand;
@@ -194,13 +199,13 @@ public class ScriptCommand implements CommandExecutor {
 				return false;
 			}
 		}
-		
-		if (!permission.isEmpty() && !sender.hasPermission(permission)) {
-			sender.sendMessage(permissionMessage);
-			return false;
-		}
 
 		final ScriptCommandEvent event = new ScriptCommandEvent(ScriptCommand.this, sender);
+
+		if (!permission.isEmpty() && !sender.hasPermission(permission)) {
+			sender.sendMessage(permissionMessage.getSingle(event));
+			return false;
+		}
 
 		cooldownCheck : {
 			if (sender instanceof Player && cooldown != null) {
