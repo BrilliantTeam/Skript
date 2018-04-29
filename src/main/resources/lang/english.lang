@@ -75,10 +75,6 @@ skript command:
 			check: Checks for a new version
 			changes: Lists all changes since the current version
 			download: Download the newest version
-		timings:
-			description: Starts or stops Skript's timings
-			start: Starts timings
-			stop: Stops timings and parses results
 	
 	invalid script: Can't find the script <grey>'<gold>%s<grey>'<red> in the scripts folder!
 	invalid folder: Can't find the folder <grey>'<gold>%s<grey>'<red> in the scripts folder!
@@ -983,6 +979,18 @@ damage causes:
 	cramming: cramming
 	custom: unknown, custom, plugin, a plugin
 
+# -- Teleport Causes --
+teleport causes:
+	chorus_fruit: chorus, chorus fruit
+	command: command
+	end_gateway: gateway, end gateway, ender gateway
+	end_portal: end portal, ender portal
+	ender_pearl: ender pearl
+	nether_portal: nether portal
+	plugin: plugin
+	spectate: spectate, spectator
+	unknown: unknown
+
 # -- Game Modes --
 game modes:
 	survival: survival
@@ -1155,7 +1163,7 @@ inventory actions:
 	unknown: unknown, unsupported, custom
 	
 # -- Inventory Click Types --
-click actions:
+click types:
 	left: left mouse button, left mouse, LMB
 	shift_left: left mouse button with shift, left mouse with shift, Shift+RMB
 	right: right mouse button, right mouse, RMB
@@ -1232,6 +1240,7 @@ types:
 	potioneffecttype: potion¦s @a
 	enchantment: enchantment¦s @an
 	damagecause: damage cause¦s @a
+	teleportcause: teleport cause¦s @a
 	inventoryaction: inventory action¦s @a
 	clickaction: click actions¦s @a
 	vector: vector¦s @a
@@ -1264,11 +1273,4 @@ types:
 io exceptions:
 	unknownhostexception: Cannot connect to %s
 	accessdeniedexception: Access denied for %s
-# -- Timings Reports --
-timings:
-	start: Skript timings for %s seconds:
-	events: Event times: used time (percents)
-	triggers: Trigger times: used time (percents)
-	start message: Timings started
-	stop message: Timings stopped and results parsed
 

@@ -438,6 +438,7 @@ public class SkriptParser {
 						// Plural/singular sanity check
 						if (hasSingular && !var.isSingle()) {
 							Skript.error("'" + expr + "' can only accept a single value of any type, not more", ErrorQuality.SEMANTIC_ERROR);
+							return null;
 						}
 						
 						log.printLog();
@@ -463,6 +464,7 @@ public class SkriptParser {
 							// Plural/singular sanity check
 							if (!vi.isPlural[i] && !var.isSingle()) {
 								Skript.error("'" + expr + "' can only accept a single " + vi.classes[i].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
+								return null;
 							}
 							
 							log.printLog();
@@ -807,6 +809,8 @@ public class SkriptParser {
 				}
 			}
 			//Mirre
+			
+			// Attempt to parse a single expression
 			final Expression<?> r = parseSingleExpr(false, null, vi);
 			if (r != null) {
 				log.printLog();
@@ -892,6 +896,15 @@ public class SkriptParser {
 				return null;
 			}
 			
+			// Check if multiple values are accepted
+			// If not, only 'or' lists are allowed
+			// (both 'and' and potentially 'and' lists will not be accepted)
+			if (vi.isPlural[0] == false && !and.isFalse()) {
+				// List cannot be used in place of a single value here
+				log.printError();
+				return null;
+			}
+			
 //			String lastExpr = expr;
 //			int end = expr.length();
 //			int expectedEnd = -1;
@@ -942,8 +955,9 @@ public class SkriptParser {
 			
 			log.printLog();
 			
-			if (ts.size() == 1)
+			if (ts.size() == 1) {
 				return ts.get(0);
+			}
 			
 			if (and.isUnknown() && !suppressMissingAndOrWarnings)
 				Skript.warning(MISSING_AND_OR + ": " + expr);
@@ -1090,6 +1104,7 @@ public class SkriptParser {
 				log.printLog();
 				return null;
 			}
+			
 			if ((flags & PARSE_EXPRESSIONS) == 0) {
 				Skript.error("Functions cannot be used here.");
 				log.printError();
@@ -1136,6 +1151,7 @@ public class SkriptParser {
 //				}
 //			}
 //			@SuppressWarnings("null")
+			
 			final FunctionReference<T> e = new FunctionReference<>(functionName, SkriptLogger.getNode(), ScriptLoader.currentScript != null ? ScriptLoader.currentScript.getFile() : null, types, params);//.toArray(new Expression[params.size()]));
 			if (!e.validateFunction(true)) {
 				log.printError();

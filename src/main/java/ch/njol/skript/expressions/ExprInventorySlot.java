@@ -20,9 +20,14 @@
 package ch.njol.skript.expressions;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -34,8 +39,9 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.util.InventorySlot;
-import ch.njol.skript.util.Slot;
+import ch.njol.skript.util.slot.EquipmentSlot;
+import ch.njol.skript.util.slot.InventorySlot;
+import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
 
 @Name("Inventory Slot")
@@ -49,7 +55,8 @@ import ch.njol.util.Kleenean;
 public class ExprInventorySlot extends SimpleExpression<Slot> {
 	
 	static {
-		Skript.registerExpression(ExprInventorySlot.class, Slot.class, ExpressionType.COMBINED, "[the] slot[s] %numbers% of %inventory%","%inventory%'[s] slot[s] %numbers%");
+		Skript.registerExpression(ExprInventorySlot.class, Slot.class, ExpressionType.COMBINED,
+				"[the] slot[s] %numbers% of %inventory%", "%inventory%'[s] slot[s] %numbers%");
 	}
 
 	@SuppressWarnings("null")
@@ -73,17 +80,28 @@ public class ExprInventorySlot extends SimpleExpression<Slot> {
 	@Override
 	@Nullable
 	protected Slot[] get(Event event) {
-		Inventory inventory = invis.getSingle(event);
-		Number[] inventorySlots = slots.getAll(event);
-		if (inventorySlots == null || inventory == null || inventorySlots.length < 1)
+		Inventory invi = invis.getSingle(event);
+		if (invi == null)
 			return null;
-		ArrayList<Slot> slots = new ArrayList<Slot>();
-		for (Number slot : inventorySlots)
-			if (slot.intValue() >= 0 && slot.intValue() < inventory.getSize())
-				slots.add(new InventorySlot(inventory, slot.intValue()));
-		if (slots == null || slots.isEmpty())
+		
+		List<Slot> inventorySlots = new ArrayList<>();
+		for (Number slot : slots.getArray(event)) {
+			if (slot.intValue() >= 0 && slot.intValue() < invi.getSize()) {
+				int slotIndex = slot.intValue();
+				// Not all indices point to inventory slots. Equipment, for example
+				if (invi instanceof PlayerInventory && slotIndex >= 36) {
+					HumanEntity holder = ((PlayerInventory) invi).getHolder();
+					assert holder != null;
+					inventorySlots.add(new EquipmentSlot(holder, slotIndex));
+				} else {
+					inventorySlots.add(new InventorySlot(invi, slot.intValue()));
+				}
+			}
+		}
+		
+		if (inventorySlots.isEmpty())
 			return null;
-		return slots.toArray(new Slot[slots.size()]);
+		return inventorySlots.toArray(new Slot[inventorySlots.size()]);
 	}
 	
 	@Override
@@ -94,6 +112,24 @@ public class ExprInventorySlot extends SimpleExpression<Slot> {
 	@Override
 	public Class<? extends Slot> getReturnType() {
 		return Slot.class;
+	}
+	
+	@Override
+	@Nullable
+	public Object[] beforeChange(@Nullable Object[] delta) {
+		if (delta == null) // Nothing to nothing
+			return null;
+		Object first = delta[0];
+		if (first == null) // ConvertedExpression might cause this
+			return null;
+		
+		// Slots must be transformed to item stacks
+		// Documentation by Njol states so, plus it is convenient
+		if (first instanceof Slot) {
+			return new ItemStack[] {((Slot) first).getItem()};
+		}
+		
+		return delta;
 	}
 	
 	@Override
