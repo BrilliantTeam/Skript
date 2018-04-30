@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.util.Date;
@@ -167,9 +168,9 @@ public class ScriptCommand implements CommandExecutor {
 			bukkitCommand.setDescription(description);
 			bukkitCommand.setLabel(label);
 			bukkitCommand.setPermission(permission);
-			// We can only set the message if it's not a variablestring
-			if (permissionMessage instanceof SimpleLiteral)
-				bukkitCommand.setPermissionMessage(((SimpleLiteral<String>) permissionMessage).getSingle());
+			// We can only set the message if it's available at parse time (aka a literal)
+			if (permissionMessage instanceof Literal)
+				bukkitCommand.setPermissionMessage(((Literal<String>) permissionMessage).getSingle());
 			bukkitCommand.setUsage(usage);
 			bukkitCommand.setExecutor(this);
 			return bukkitCommand;
