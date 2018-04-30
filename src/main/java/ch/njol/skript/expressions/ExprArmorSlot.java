@@ -32,9 +32,9 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.EquipmentSlot;
-import ch.njol.skript.util.EquipmentSlot.EquipSlot;
-import ch.njol.skript.util.Slot;
+import ch.njol.skript.util.slot.EquipmentSlot;
+import ch.njol.skript.util.slot.Slot;
+import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import ch.njol.util.Kleenean;
 
 /**
@@ -47,11 +47,12 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class ExprArmorSlot extends SimplePropertyExpression<LivingEntity, Slot> {
 	static {
-		register(ExprArmorSlot.class, Slot.class, "(0¦boot[s]|0¦shoe[s]|1¦leg[ging][s]|2¦chestplate[s]|3¦helm[et][s]) [slot]", "livingentities");
+		register(ExprArmorSlot.class, Slot.class, "(0¦boot[s]|0¦shoe[s]|1¦leg[ging][s]|2¦chestplate[s]|3¦helm[et][s]) [(0¦item|4¦slot)]", "livingentities");
 	}
 	
 	@SuppressWarnings("null")
 	private EquipSlot slot;
+	private boolean explicitSlot;
 	
 	private final static EquipSlot[] slots = {EquipSlot.BOOTS, EquipSlot.LEGGINGS, EquipSlot.CHESTPLATE, EquipSlot.HELMET};
 	
@@ -59,7 +60,8 @@ public class ExprArmorSlot extends SimplePropertyExpression<LivingEntity, Slot> 
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		super.init(exprs, matchedPattern, isDelayed, parseResult);
-		slot = slots[parseResult.mark];
+		slot = slots[parseResult.mark & 3]; // 3 least significant bits determine armor type
+		explicitSlot = (parseResult.mark >>> 2) == 1; // User explicitly asked for SLOT, not item
 		return true;
 	}
 	
@@ -69,7 +71,7 @@ public class ExprArmorSlot extends SimplePropertyExpression<LivingEntity, Slot> 
 		final EntityEquipment eq = e.getEquipment();
 		if (eq == null)
 			return null;
-		return new EquipmentSlot(eq, slot);
+		return new EquipmentSlot(eq, slot, explicitSlot);
 	}
 	
 	@Override

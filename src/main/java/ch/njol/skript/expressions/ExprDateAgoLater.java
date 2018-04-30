@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Date Ago/Later")
 @Description("A date the specified timespan before/after another date.")
 @Examples({"set {_yesterday} to 1 day ago"})
-@Since("INSERT VERSION")
+@Since("2.2-dev33")
 public class ExprDateAgoLater extends SimpleExpression<Date> {
 
     static {
