@@ -818,13 +818,6 @@ public class SkriptParser {
 			}
 			log.clear();
 			
-			// Check if list parsing is allowed (if it isn't, must stop here)
-			if (vi.isPlural[0] == false) {
-				// List cannot be used in place of a single value here
-				log.printError();
-				return null;
-			}
-			
 			final List<Expression<?>> ts = new ArrayList<>();
 			Kleenean and = Kleenean.UNKNOWN;
 			boolean isLiteralList = true;
@@ -899,6 +892,15 @@ public class SkriptParser {
 						continue outer;
 					}
 				}
+				log.printError();
+				return null;
+			}
+			
+			// Check if multiple values are accepted
+			// If not, only 'or' lists are allowed
+			// (both 'and' and potentially 'and' lists will not be accepted)
+			if (vi.isPlural[0] == false && !and.isFalse()) {
+				// List cannot be used in place of a single value here
 				log.printError();
 				return null;
 			}

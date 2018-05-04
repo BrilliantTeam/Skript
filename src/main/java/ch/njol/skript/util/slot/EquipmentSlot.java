@@ -153,10 +153,16 @@ public class EquipmentSlot extends SlotWithIndex {
 	
 	private final EntityEquipment e;
 	private final EquipSlot slot;
+	private final boolean slotToString;
 	
-	public EquipmentSlot(final EntityEquipment e, final EquipSlot slot) {
+	public EquipmentSlot(final EntityEquipment e, final EquipSlot slot, final boolean slotToString) {
 		this.e = e;
 		this.slot = slot;
+		this.slotToString = slotToString;
+	}
+	
+	public EquipmentSlot(final EntityEquipment e, final EquipSlot slot) {
+		this(e, slot, false);
 	}
 	
 	@SuppressWarnings("null")
@@ -164,6 +170,7 @@ public class EquipmentSlot extends SlotWithIndex {
 		this.e = holder.getEquipment();
 		this.slot = values[41 - index]; // 6 entries in EquipSlot, indices descending
 		// So this math trick gets us the EquipSlot from inventory slot index
+		this.slotToString = true; // Referring to numeric slot id, right?
 	}
 
 	@Override
@@ -194,7 +201,10 @@ public class EquipmentSlot extends SlotWithIndex {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + slot.name().toLowerCase(Locale.ENGLISH) + " of " + Classes.toString(e.getHolder()); // TODO localise?
+		if (slotToString) // Slot to string
+			return "the " + slot.name().toLowerCase(Locale.ENGLISH) + " of " + Classes.toString(e.getHolder()); // TODO localise?
+		else // Contents of slot to string
+			return Classes.toString(getItem());
 	}
 	
 }

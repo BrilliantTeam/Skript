@@ -109,7 +109,7 @@ public class ExprTool extends PropertyExpression<LivingEntity, Slot> {
 				return new EquipmentSlot(e, EquipmentSlot.EquipSlot.TOOL) {
 					@Override
 					public String toString(@Nullable Event event, boolean debug) {
-						return "the " + (getTime() == 1 ? "future " : getTime() == -1 ? "former " : "") + Classes.toString(getItem());
+						return (getTime() == 1 ? "future " : getTime() == -1 ? "former " : "") + Classes.toString(getItem());
 					}
 				};
 			}
