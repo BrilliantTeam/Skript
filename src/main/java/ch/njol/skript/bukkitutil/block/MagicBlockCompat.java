@@ -50,6 +50,11 @@ public class MagicBlockCompat implements BlockCompat {
 			this.id = stack.getType();
 			this.data = stack.getData().getData(); // And terrible hack again
 		}
+		
+		public MagicBlockValues(Material id, byte data) {
+			this.id = id;
+			this.data = data;
+		}
 
 		@Override
 		public void setBlock(Block block, boolean applyPhysics) {
@@ -122,8 +127,141 @@ public class MagicBlockCompat implements BlockCompat {
 	@Nullable
 	@Override
 	public BlockValues createBlockValues(Material type, String state) {
-		// TODO implementing this will take some effort
-		return null;
+		Map<String, String> states = parseState(state);
+		int data = 0;
+		
+		for (Map.Entry<String, String> entry : states.entrySet()) {
+			String value = entry.getValue();
+			switch (entry.getKey()) {
+				case "damage": // Anvil
+					int damage = Integer.parseInt(value);
+					if (damage == 1) {
+						data |= 4;
+					} else if (damage == 2) {
+						data |= 8;
+					}
+					break;
+				case "facing": // 4 to 8 possible rotations
+					int facing = 0;
+					
+					switch (type) {
+						case ANVIL: // 4 directions
+						case BED_BLOCK:
+							switch (value) {
+								case "south":
+									// No changes
+									break;
+								case "west":
+									facing = 1;
+									break;
+								case "north":
+									facing = 2;
+									break;
+								case "east":
+									facing = 3;
+									break;
+							}
+							
+							data |= facing;
+							break;
+						case WOOD_BUTTON: // 6 directions
+						case STONE_BUTTON:
+							switch (value) {
+								case "bottom":
+									// No changes
+									break;
+								case "east":
+									facing = 1;
+									break;
+								case "west":
+									facing = 2;
+									break;
+								case "south":
+									facing = 3;
+									break;
+								case "north":
+									facing = 4;
+									break;
+								case "up":
+									facing = 5;
+									break;
+							}
+							
+							data |= facing;
+							break;
+						//$CASES-OMITTED$
+						default:
+							break;
+					}
+					break;
+				case "rotation": // 16 possible rotations
+					int rotation = Integer.parseInt(value);
+					data |= rotation; // No way going to write lookup table for THAT
+					break;
+				case "occupied":
+					if (value.equals("true")) {
+						data |= 4;
+					}
+					break;
+				case "part": // Beds, doors, some plants
+					switch (type) {
+						case BED: // Bed foot or head
+							if (value.equals("head")) {
+								data |= 8;
+							}
+							break;
+						//$CASES-OMITTED$
+						default:
+							break;
+					}
+					break;
+				case "age": // Age of plants or frosted ice
+					int age = Integer.parseInt(value);
+					data |= age;
+					break;
+				case "axis": // 3 possible rotations
+					// TODO investigate/reverse-engineer
+					break;
+				case "bites": // Cake bites eaten
+					int bites = Integer.parseInt(value);
+					data |= bites;
+					break;
+				case "level": // Lava/water level, includes cauldron
+					int level = Integer.parseInt(value);
+					data |= level;
+					break;
+				case "north": // Block rotations in some cases
+					// TODO investigate/reverse engineer
+					break;
+				case "south":
+					break;
+				case "east":
+					break;
+				case "west":
+					break;
+				case "up":
+					break;
+				case "down":
+					break;
+				case "conditional": // Command block mode
+					// TODO
+					break;
+				case "snowy": // Snow on dirt
+					break;
+				case "in_wall": // Fence gate is lowered a bit
+					break;
+				case "open": // Fence gates, doors
+					break;
+				case "powered": // Block gets redstone power
+					break;
+				case "check_decay": // Leaf decay check
+					break;
+				case "decayable": // Leaf decay possibility
+					break;
+			}
+		}
+		
+		return new MagicBlockValues(type, (byte) data);
 	}
 	
 }
