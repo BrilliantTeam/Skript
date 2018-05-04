@@ -169,7 +169,8 @@ public class FunctionReference<T> {
 		return true;
 	}
 
-	public @Nullable Function<? extends T> getFunction() {
+	@Nullable
+	public Function<? extends T> getFunction() {
 		return function;
 	}
 

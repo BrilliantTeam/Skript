@@ -20,7 +20,6 @@
 package ch.njol.skript.lang.function;
 
 import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.lang.Expression;
