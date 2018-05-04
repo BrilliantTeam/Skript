@@ -20,7 +20,10 @@
 package ch.njol.skript.hooks.permission.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.NoDoc;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.hooks.VaultHook;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -30,41 +33,47 @@ import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
-@NoDoc
+@Name("All Groups")
+@Description("All the groups a player can have. This expression requires Vault and a compatible permissions plugin to be installed.")
+@Examples({"command /group <text>:",
+		"   trigger:",
+		"       if argument is \"list\":",
+		"           send \"%all groups%\""})
+@Since("2.2-dev35")
 public class ExprAllGroups extends SimpleExpression<String> {
 
-    static {
-        Skript.registerExpression(ExprAllGroups.class, String.class, ExpressionType.SIMPLE, "all groups");
-    }
+	static {
+		Skript.registerExpression(ExprAllGroups.class, String.class, ExpressionType.SIMPLE, "all groups");
+	}
 
-    @Override
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        if (!VaultHook.permission.hasGroupSupport()) {
-            Skript.error(VaultHook.NO_GROUP_SUPPORT);
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+		if (!VaultHook.permission.hasGroupSupport()) {
+			Skript.error(VaultHook.NO_GROUP_SUPPORT);
+			return false;
+		}
+		return true;
+	}
 
-    @Override
-    @Nullable
-    protected String[] get(Event e) {
-        return VaultHook.permission.getGroups();
-    }
+	@Override
+	@Nullable
+	protected String[] get(Event e) {
+		return VaultHook.permission.getGroups();
+	}
 
-    @Override
-    public Class<? extends String> getReturnType() {
-        return String.class;
-    }
+	@Override
+	public Class<? extends String> getReturnType() {
+		return String.class;
+	}
 
-    @Override
-    public boolean isSingle() {
-        return false;
-    }
+	@Override
+	public boolean isSingle() {
+		return false;
+	}
 
-    @Override
-    public String toString(@Nullable Event e, boolean debug) {
-        return "all groups";
-    }
+	@Override
+	public String toString(@Nullable Event e, boolean debug) {
+		return "all groups";
+	}
 
 }
