@@ -54,6 +54,7 @@ public class MagicBlockCompat implements BlockCompat {
 		public MagicBlockValues(Material id, byte data) {
 			this.id = id;
 			this.data = data;
+			System.out.println(this);
 		}
 
 		@Override

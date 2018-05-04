@@ -236,7 +236,7 @@ public class AliasesProvider {
 		int stateIndex = id.indexOf('[');
 		if (stateIndex != -1) {
 			typeName = id.substring(0, stateIndex); // Id comes before block state
-			blockState = id.substring(stateIndex, id.length() - 1);
+			blockState = id.substring(stateIndex + 1, id.length() - 1);
 		} else { // No block state, just the id
 			typeName = id;
 		}

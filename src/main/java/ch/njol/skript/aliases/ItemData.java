@@ -129,8 +129,12 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this(type, 1);
 	}
 	
+	@SuppressWarnings("null") // clone() always returns stuff
 	public ItemData(ItemData data) {
-		this(data.stack);
+		this.stack = data.stack.clone();
+		this.type = data.type;
+		this.blockValues = data.blockValues;
+		this.meta = data.meta;
 	}
 	
 	public ItemData(ItemStack stack, BlockValues values) {
