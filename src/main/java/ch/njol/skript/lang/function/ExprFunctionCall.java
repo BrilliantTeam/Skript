@@ -31,7 +31,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 public class ExprFunctionCall<T> extends SimpleExpression<T> {
-	
+
 	private final FunctionReference<T> function;
 	
 	public ExprFunctionCall(final FunctionReference<T> function) {
@@ -41,7 +41,9 @@ public class ExprFunctionCall<T> extends SimpleExpression<T> {
 	@Override
 	@Nullable
 	protected T[] get(final Event e) {
-		return function.execute(e);
+		T[] returnValue = function.execute(e);
+		function.resetReturnValue();
+		return returnValue;
 	}
 	
 	@Override
