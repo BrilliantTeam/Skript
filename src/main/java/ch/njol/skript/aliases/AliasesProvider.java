@@ -216,16 +216,16 @@ public class AliasesProvider {
 		String trimmed = item.trim();
 		assert trimmed != null;
 		item = trimmed; // These could mess up following check among other things
-		int firstSpace = item.indexOf(' ');
+		int firstBracket = item.indexOf('{');
 		
 		String id; // Id or alias
 		Map<String, Object> tags;
-		if (firstSpace == -1) {
+		if (firstBracket == -1) {
 			id = item;
 			tags = new HashMap<>();
 		} else {
-			id = item.substring(0, firstSpace);
-			String json = item.substring(firstSpace + 1);
+			id = item.substring(0, firstBracket - 1);
+			String json = item.substring(firstBracket);
 			assert json != null;
 			tags = parseMojangson(json);
 		}
@@ -258,7 +258,7 @@ public class AliasesProvider {
 	private Map<String, Variation> loadVariations(SectionNode root) {
 		String name = root.getKey();
 		assert name != null; // Better be so
-		if (!name.startsWith("{") && !name.endsWith("}")) {
+		if (!name.startsWith("{") || !name.endsWith("}")) {
 			// This is not a variation section!
 			return null;
 		}

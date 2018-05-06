@@ -55,8 +55,38 @@ public class BukkitUnsafe {
 			// On 1.13 (according to preview API), Vanilla and Spigot names are same
 			return Material.getMaterial(id);
 		} else {
-			return unsafe.getMaterialFromInternalName(id);
+			Material type = unsafe.getMaterialFromInternalName(id);
+			if (type == null || type == Material.AIR) { // If there is no item form, UnsafeValues won't work
+				type = checkForBuggedType(id);
+			}
+			return type;
 		}
+	}
+	
+	@Nullable
+	private static Material checkForBuggedType(String id) {
+		// Lookup tables, again?
+		switch (id) {
+			case "minecraft:powered_repeater":
+				return Material.DIODE_BLOCK_OFF;
+			case "minecraft:unpowered_repeater":
+				return Material.DIODE_BLOCK_ON;
+			case "minecraft:piston_head":
+				return Material.PISTON_EXTENSION;
+			case "minecraft:piston_extension":
+				return Material.PISTON_MOVING_PIECE;
+			case "minecraft:lit_redstone_lamp":
+				return Material.REDSTONE_LAMP_ON;
+			case "minecraft:daylight_detector":
+				return Material.DAYLIGHT_DETECTOR;
+			case "minecraft:daylight_detector_inverted":
+				return Material.DAYLIGHT_DETECTOR_INVERTED;
+			case "minecraft:redstone_wire":
+				return Material.REDSTONE_WIRE;
+			case "minecraft:unlit_redstone_torch":
+				return Material.REDSTONE_TORCH_OFF;
+		}
+		return null;
 	}
 	
 	public static void modifyItemStack(ItemStack stack, String arguments) {
