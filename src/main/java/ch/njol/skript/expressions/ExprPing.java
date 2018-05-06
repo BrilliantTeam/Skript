@@ -32,7 +32,7 @@ import org.bukkit.entity.Player;
 
 @Name("Ping")
 @Description("Returns a player's ping. This expression is only supported on some server software.")
-@Examples({"command ping <player=%player%>:",
+@Examples({"command /ping <player=%player%>:",
 			"\ttrigger:",
 			"\t\tsend \"%arg-1%'s ping is %arg-1's ping%\""})
 @Since("INSERT VERSION")
