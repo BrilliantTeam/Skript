@@ -20,12 +20,21 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.Player;
 
+@Name("Ping")
+@Description("Returns a player's ping. This expression is only supported on some server software.")
+@Examples({"on join",
+			"\tbroadcast \"%player's ping\""})
+@Since("INSERT VERSION")
 public class ExprPing extends SimplePropertyExpression<Player, Number> {
 
 	private static final boolean SUPPORTED = Skript.methodExists(Player.Spigot.class, "getPing");
