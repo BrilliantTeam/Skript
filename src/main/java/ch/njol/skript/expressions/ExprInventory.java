@@ -112,7 +112,7 @@ public class ExprInventory extends SimpleExpression<Object> {
 							return true;
 						}
 					}
-			}, 0, Kleenean.FALSE,  new SkriptParser.ParseResult(new SkriptParser(""), ""));
+			}, 0, Kleenean.FALSE, null);
 			return expr.get(e);
 		}
 		return invArray;
