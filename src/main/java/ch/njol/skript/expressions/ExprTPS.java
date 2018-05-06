@@ -20,6 +20,10 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -31,6 +35,11 @@ import org.bukkit.Server;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
+@Name("TPS (ticks per second)")
+@Description("Returns the 3 most recent TPS readings, like the /tps command. " +
+			"This expression is only supported on some server software.")
+@Examples("broadcast \"%tps%\"")
+@Since("INSERT VERSION")
 public class ExprTPS extends SimpleExpression<Double> {
 
 	private static final boolean SUPPORTED = Skript.methodExists(Server.class, "getTPS");
