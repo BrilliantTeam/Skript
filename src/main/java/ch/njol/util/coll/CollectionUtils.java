@@ -19,6 +19,12 @@
  */
 package ch.njol.util.coll;
 
+import ch.njol.skript.registrations.Converters;
+import ch.njol.util.Pair;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,11 +34,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
-import ch.njol.util.Pair;
 
 /**
  * Utils for collections and arrays. All methods will not print any errors for <tt>null</tt> collections/arrays, but will return false/-1/etc.
@@ -418,6 +419,30 @@ public abstract class CollectionUtils {
 			return Arrays.copyOfRange(r, 0, i);
 		}
 		return r;
+	}
+
+	/**
+	 * Converts an array to a non-null array of the specified class.
+	 * Uses registered {@link ch.njol.skript.registrations.Converters} to convert.
+	 * Throws a {@link ClassCastException} if one of {@code original}'s
+	 * elements is a not an instance of {@code to}
+	 *
+	 * @param original The array to convert
+	 * @param to       What to convert {@code original} to
+	 * @return {@code original} converted to an array of {@code to}
+	 */
+	@SuppressWarnings("unchecked")
+	public final static <T> T[] convertArray(Object[] original, Class<T> to) throws ClassCastException {
+		T[] end = (T[]) Array.newInstance(to, original.length);
+		for (int i = 0; i < original.length; i++) {
+			T converted = Converters.convert(original[i], to);
+			if (converted != null) {
+				end[i] = converted;
+			} else {
+				throw new ClassCastException();
+			}
+		}
+		return end;
 	}
 	
 	public final static float[] toFloats(final @Nullable double[] doubles) {
