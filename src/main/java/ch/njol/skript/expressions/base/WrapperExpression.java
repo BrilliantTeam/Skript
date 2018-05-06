@@ -146,8 +146,8 @@ public abstract class WrapperExpression<T> extends SimpleExpression<T> {
 	
 	@Override
 	@Nullable
-	public Object[] beforeChange(@Nullable Object[] delta) {
-		return expr.beforeChange(delta); // Forward to what we're wrapping
+	public Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
+		return expr.beforeChange(changed, delta); // Forward to what we're wrapping
 	}
 	
 }

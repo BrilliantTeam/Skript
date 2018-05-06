@@ -48,6 +48,7 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.slot.Slot;
@@ -121,7 +122,6 @@ public class ExprClicked extends SimpleExpression<Object> {
 	@Nullable
 	private ItemType itemType; //null results in any itemtype
 	private ClickableType clickable = ClickableType.BLOCK_AND_ITEMS;
-	private boolean rawSlot = false;
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
@@ -205,16 +205,16 @@ public class ExprClicked extends SimpleExpression<Object> {
 	
 	@Override
 	@Nullable
-	public Object[] beforeChange(@Nullable Object[] delta) {
+	public Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
 		if (delta == null) // Nothing to nothing
 			return null;
 		Object first = delta[0];
 		if (first == null) // ConvertedExpression might cause this
 			return null;
 		
-		// Slots must be transformed to item stacks
+		// Slots must be transformed to item stacks when writing to variables
 		// Documentation by Njol states so, plus it is convenient
-		if (first instanceof Slot) {
+		if (changed instanceof Variable && first instanceof Slot) {
 			return new ItemStack[] {((Slot) first).getItem()};
 		}
 		
