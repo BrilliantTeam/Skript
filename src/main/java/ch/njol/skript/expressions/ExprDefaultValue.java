@@ -46,7 +46,7 @@ public class ExprDefaultValue<T> extends SimpleExpression<T> {
 
 	static {
 		Skript.registerExpression(ExprDefaultValue.class, Object.class, ExpressionType.COMBINED,
-				"%objects% (otherwise|?|or else) %objects%");
+				"%objects% (otherwise|?) %objects%");
 	}
 
 	private final ExprDefaultValue<?> source;
