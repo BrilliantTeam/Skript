@@ -44,7 +44,7 @@ public class ExprTPS extends SimpleExpression<Double> {
 
 	private static final boolean SUPPORTED = Skript.methodExists(Server.class, "getTPS");
 	private int index;
-	private String expr;
+	private String expr = "tps";
 
 	static {
 		Skript.registerExpression(ExprTPS.class, Double.class, ExpressionType.SIMPLE,
