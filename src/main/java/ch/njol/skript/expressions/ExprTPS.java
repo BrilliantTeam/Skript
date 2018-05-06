@@ -43,9 +43,15 @@ import org.eclipse.jdt.annotation.Nullable;
 public class ExprTPS extends SimpleExpression<Double> {
 
 	private static final boolean SUPPORTED = Skript.methodExists(Server.class, "getTPS");
+	private int index;
+	private String expr;
 
 	static {
-		Skript.registerExpression(ExprTPS.class, Double.class, ExpressionType.SIMPLE, "[the] [server] tps");
+		Skript.registerExpression(ExprTPS.class, Double.class, ExpressionType.SIMPLE,
+				"tps from [the] last ([1] minute|1[ ]m[inute])",
+				"tps from [the] last 5[ ]m[inutes]",
+				"tps from [the] last 15[ ]m[inutes]",
+				"[the] tps");
 	}
 
 	@Override
@@ -54,12 +60,19 @@ public class ExprTPS extends SimpleExpression<Double> {
 			Skript.error("The TPS expression is not supported on this server software");
 			return false;
 		}
+		expr = parseResult.expr;
+		index = matchedPattern;
 		return true;
 	}
 
 	@Override
 	protected Double[] get(Event e) {
-		return CollectionUtils.wrap(Bukkit.getServer().getTPS());
+		double[] tps = Bukkit.getServer().getTPS();
+		if (index != 3) {
+			return new Double[] { tps[index] };
+		} else {
+			return CollectionUtils.wrap(tps);
+		}
 	}
 
 	@Override
@@ -69,12 +82,12 @@ public class ExprTPS extends SimpleExpression<Double> {
 
 	@Override
 	public boolean isSingle() {
-		return false;
+		return index != 3;
 	}
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "the tps";
+		return expr;
 	}
 
 }
