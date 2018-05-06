@@ -428,5 +428,13 @@ public abstract class CollectionUtils {
 			floats[i] = (float) doubles[i];
 		return floats;
 	}
+
+	public static Double[] wrap(double[] primitive) {
+		Double[] wrapped = new Double[primitive.length];
+		for (int i = 0; i < primitive.length; i++) {
+			wrapped[i] = primitive[i];
+		}
+		return wrapped;
+	}
 	
 }
