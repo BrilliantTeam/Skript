@@ -62,7 +62,7 @@ public class ExprInventory extends SimpleExpression<Object> {
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		// if we're dealing with a loop of just this expression
 		Node n = SkriptLogger.getNode();
