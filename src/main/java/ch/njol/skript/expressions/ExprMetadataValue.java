@@ -100,7 +100,7 @@ public class ExprMetadataValue<T> extends SimpleExpression<T> {
 		}
 		try {
 			return Converters.convertStrictly(values.toArray(), superType);
-		} catch (ClassCastException | IndexOutOfBoundsException e1) {
+		} catch (ClassCastException e1) {
 			return (T[]) Array.newInstance(superType, 0);
 		}
 	}
