@@ -58,9 +58,9 @@ public class CondHasMetadata extends Condition {
 		String[] values = this.values.getArray(e);
 		if (values == null || values.length == 0)
 			return false;
-		return holders.check(e, m -> {
+		return holders.check(e, h -> {
 			for (String value : values) {
-				if (!m.hasMetadata(value))
+				if (!h.hasMetadata(value))
 					return false;
 			}
 			return true;
