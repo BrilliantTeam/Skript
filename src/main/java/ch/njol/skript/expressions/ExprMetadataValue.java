@@ -1,19 +1,19 @@
 /**
- *   This file is part of Skript.
+ * This file is part of Skript.
  *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Skript is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Skript is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * You should have received a copy of the GNU General Public License
+ * along with Skript.  If not, see <http://www.gnu.org/licenses/>.
+ * 
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
@@ -21,13 +21,10 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
-import ch.njol.skript.classes.Converter;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
-import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -36,7 +33,6 @@ import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
-import net.sf.antcontrib.net.Prop;
 import org.bukkit.event.Event;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -44,25 +40,17 @@ import org.bukkit.metadata.Metadatable;
 import org.eclipse.jdt.annotation.Nullable;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
 
 @Name("Metadata")
 @Description("Metadata is a way to store temporary data on entities, blocks and more that" +
-			"disappears after a server restart.")
+		"disappears after a server restart.")
 @Examples({"set metadata value \"healer\" of player to true",
-			"broadcast \"%metadata value \"\"healer\"\" of player%\"",
-			"clear metadata value \"healer\" of player"})
+		"broadcast \"%metadata value \"\"healer\"\" of player%\"",
+		"clear metadata value \"healer\" of player"})
 @Since("INSERT VERSION")
 @SuppressWarnings({"unchecked", "null"})
 public class ExprMetadataValue<T> extends SimpleExpression<T> {
-
-	private ExprMetadataValue<?> source;
-	@Nullable
-	private Expression<String> value;
-	@Nullable
-	private Expression<Metadatable> holder;
-	private Class<T> superType;
 
 	static {
 		Skript.registerExpression(ExprMetadataValue.class, Object.class, ExpressionType.PROPERTY,
@@ -70,6 +58,13 @@ public class ExprMetadataValue<T> extends SimpleExpression<T> {
 				"%metadataholder%'[s] metadata (value|tag) %string%"
 		);
 	}
+
+	private ExprMetadataValue<?> source;
+	@Nullable
+	private Expression<String> value;
+	@Nullable
+	private Expression<Metadatable> holder;
+	private Class<T> superType;
 
 	public ExprMetadataValue() {
 		this(null, (Class<? extends T>) Object.class);
@@ -101,7 +96,7 @@ public class ExprMetadataValue<T> extends SimpleExpression<T> {
 		}
 		List<MetadataValue> values = holder.getMetadata(value);
 		try {
-			return Converters.convertStrictly(new Object[] {values.get(0).value()}, superType);
+			return Converters.convertStrictly(new Object[]{values.get(0).value()}, superType);
 		} catch (ClassCastException | IndexOutOfBoundsException e1) {
 			return (T[]) Array.newInstance(superType, 0);
 		}
