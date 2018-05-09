@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
@@ -40,6 +40,7 @@ import org.bukkit.metadata.Metadatable;
 import org.eclipse.jdt.annotation.Nullable;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 @Name("Metadata")
@@ -54,16 +55,16 @@ public class ExprMetadataValue<T> extends SimpleExpression<T> {
 
 	static {
 		Skript.registerExpression(ExprMetadataValue.class, Object.class, ExpressionType.PROPERTY,
-				"metadata (value|tag) %string% of %metadataholder%",
-				"%metadataholder%'[s] metadata (value|tag) %string%"
+				"metadata (value|tag)[s] %strings% of %metadataholders%",
+				"%metadataholders%'[s] metadata (value|tag)[s] %string%"
 		);
 	}
 
 	private ExprMetadataValue<?> source;
 	@Nullable
-	private Expression<String> value;
+	private Expression<String> values;
 	@Nullable
-	private Expression<Metadatable> holder;
+	private Expression<Metadatable> holders;
 	private Class<T> superType;
 
 	public ExprMetadataValue() {
@@ -73,30 +74,32 @@ public class ExprMetadataValue<T> extends SimpleExpression<T> {
 	private ExprMetadataValue(ExprMetadataValue<?> source, Class<? extends T>... types) {
 		this.source = source;
 		if (source != null) {
-			this.value = source.value;
-			this.holder = source.holder;
+			this.values = source.values;
+			this.holders = source.holders;
 		}
 		this.superType = (Class<T>) Utils.getSuperType(types);
 	}
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-		holder = (Expression<Metadatable>) exprs[matchedPattern ^ 1];
-		value = (Expression<String>) exprs[matchedPattern];
+		holders = (Expression<Metadatable>) exprs[matchedPattern ^ 1];
+		values = (Expression<String>) exprs[matchedPattern];
 		return true;
 	}
 
 	@Override
 	@Nullable
 	protected T[] get(Event e) {
-		Metadatable holder = this.holder.getSingle(e);
-		String value = this.value.getSingle(e);
-		if (holder == null || value == null) {
-			return (T[]) Array.newInstance(superType, 0);
+		List<Object> values = new ArrayList<>();
+		for (String value : this.values.getArray(e)) {
+			for (Metadatable holder : holders.getArray(e)) {
+				List<MetadataValue> metadata = holder.getMetadata(value);
+				if (!metadata.isEmpty())
+					values.add(metadata.get(metadata.size() - 1).value()); // adds the most recent metadata value
+			}
 		}
-		List<MetadataValue> values = holder.getMetadata(value);
 		try {
-			return Converters.convertStrictly(new Object[]{values.get(0).value()}, superType);
+			return Converters.convertStrictly(values.toArray(), superType);
 		} catch (ClassCastException | IndexOutOfBoundsException e1) {
 			return (T[]) Array.newInstance(superType, 0);
 		}
@@ -112,22 +115,22 @@ public class ExprMetadataValue<T> extends SimpleExpression<T> {
 
 	@Override
 	public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
-		Metadatable holder = this.holder.getSingle(e);
-		String value = this.value.getSingle(e);
-		if (value == null || holder == null)
-			return;
-		switch (mode) {
-			case SET:
-				holder.setMetadata(value, new FixedMetadataValue(Skript.getInstance(), delta[0]));
-				break;
-			case DELETE:
-				holder.removeMetadata(value, Skript.getInstance());
+		for (String value : values.getArray(e)) {
+			for (Metadatable holder : holders.getArray(e)) {
+				switch (mode) {
+					case SET:
+						holder.setMetadata(value, new FixedMetadataValue(Skript.getInstance(), delta[0]));
+						break;
+					case DELETE:
+						holder.removeMetadata(value, Skript.getInstance());
+				}
+			}
 		}
 	}
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return holders.isSingle() && values.isSingle();
 	}
 
 	@Override
@@ -147,7 +150,7 @@ public class ExprMetadataValue<T> extends SimpleExpression<T> {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "metadata value " + value.toString(e, debug) + " of " + holder.toString(e, debug);
+		return "metadata values " + values.toString(e, debug) + " of " + holders.toString(e, debug);
 	}
 
 }
