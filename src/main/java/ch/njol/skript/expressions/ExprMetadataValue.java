@@ -22,6 +22,10 @@ package ch.njol.skript.expressions;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Converter;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
@@ -43,6 +47,13 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
+@Name("Metadata")
+@Description("Metadata is a way to store temporary data on entities, blocks and more that" +
+			"disappears after a server restart.")
+@Examples({"set metadata value \"healer\" of player to true",
+			"broadcast \"%metadata value \"\"healer\"\" of player%\"",
+			"clear metadata value \"healer\" of player"})
+@Since("INSERT VERSION")
 @SuppressWarnings({"unchecked", "null"})
 public class ExprMetadataValue<T> extends SimpleExpression<T> {
 
