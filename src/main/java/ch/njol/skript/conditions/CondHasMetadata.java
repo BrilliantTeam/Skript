@@ -20,15 +20,22 @@
 package ch.njol.skript.conditions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.bukkit.metadata.Metadatable;
 import org.eclipse.jdt.annotation.Nullable;
 
+@Name("Has Metadata")
+@Description("Checks whether a metadata holder has a metadata tag.")
+@Examples("if player has metadata value \"healer\":")
+@Since("INSERT VERSION")
 @SuppressWarnings("null")
 public class CondHasMetadata extends Condition {
 
