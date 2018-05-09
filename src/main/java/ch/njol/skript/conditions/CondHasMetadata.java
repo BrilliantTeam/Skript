@@ -47,7 +47,7 @@ public class CondHasMetadata extends Condition {
 	static {
 		Skript.registerCondition(CondHasMetadata.class,
 				"%metadataholders% (has|have) metadata (value|tag) %strings%",
-				"%metadataholders% (doesn't|does not|do not) have metadata (value|tag) %strings%"
+				"%metadataholders% (doesn't|does not|do not|don't) have metadata (value|tag) %strings%"
 		);
 	}
 
