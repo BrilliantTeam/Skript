@@ -420,30 +420,6 @@ public abstract class CollectionUtils {
 		}
 		return r;
 	}
-
-	/**
-	 * Converts an array to a non-null array of the specified class.
-	 * Uses registered {@link ch.njol.skript.registrations.Converters} to convert.
-	 * Throws a {@link ClassCastException} if one of {@code original}'s
-	 * elements is a not an instance of {@code to}
-	 *
-	 * @param original The array to convert
-	 * @param to       What to convert {@code original} to
-	 * @return {@code original} converted to an array of {@code to}
-	 */
-	@SuppressWarnings("unchecked")
-	public final static <T> T[] convertArray(Object[] original, Class<T> to) throws ClassCastException {
-		T[] end = (T[]) Array.newInstance(to, original.length);
-		for (int i = 0; i < original.length; i++) {
-			T converted = Converters.convert(original[i], to);
-			if (converted != null) {
-				end[i] = converted;
-			} else {
-				throw new ClassCastException();
-			}
-		}
-		return end;
-	}
 	
 	public final static float[] toFloats(final @Nullable double[] doubles) {
 		if (doubles == null)
