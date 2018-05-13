@@ -51,27 +51,27 @@ import java.util.List;
 		"clear metadata value \"healer\" of player"})
 @Since("INSERT VERSION")
 @SuppressWarnings({"unchecked", "null"})
-public class ExprMetadataValue<T> extends SimpleExpression<T> {
+public class ExprMetadata<T> extends SimpleExpression<T> {
 
 	static {
-		Skript.registerExpression(ExprMetadataValue.class, Object.class, ExpressionType.PROPERTY,
-				"metadata (value|tag)[s] %strings% of %metadataholders%",
-				"%metadataholders%'[s] metadata (value|tag)[s] %string%"
+		Skript.registerExpression(ExprMetadata.class, Object.class, ExpressionType.PROPERTY,
+				"metadata [(value|tag)[s]] %strings% of %metadataholders%",
+				"%metadataholders%'[s] metadata [(value|tag)[s]] %string%"
 		);
 	}
 
-	private ExprMetadataValue<?> source;
+	private ExprMetadata<?> source;
 	@Nullable
 	private Expression<String> values;
 	@Nullable
 	private Expression<Metadatable> holders;
 	private Class<T> superType;
 
-	public ExprMetadataValue() {
+	public ExprMetadata() {
 		this(null, (Class<? extends T>) Object.class);
 	}
 
-	private ExprMetadataValue(ExprMetadataValue<?> source, Class<? extends T>... types) {
+	private ExprMetadata(ExprMetadata<?> source, Class<? extends T>... types) {
 		this.source = source;
 		if (source != null) {
 			this.values = source.values;
@@ -140,7 +140,7 @@ public class ExprMetadataValue<T> extends SimpleExpression<T> {
 
 	@Override
 	public <R> Expression<? extends R> getConvertedExpression(Class<R>... to) {
-		return new ExprMetadataValue<>(this, to);
+		return new ExprMetadata<>(this, to);
 	}
 
 	@Override
