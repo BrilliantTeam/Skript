@@ -31,7 +31,7 @@ import ch.njol.skript.doc.Since;
  * @author Peter Güttinger
  */
 @Name("Is Flying")
-@Description("Checks whether a player is flying")
+@Description("Checks whether a player is flying.")
 @Examples("player is not flying")
 @Since("1.4.4")
 public class CondIsFlying extends PropertyCondition<Player> {

@@ -27,8 +27,8 @@ import ch.njol.skript.doc.Since;
 import org.bukkit.inventory.ItemStack;
 
 @Name("Is Flammable")
-@Description("Checks whether an item is flammable")
-@Examples({"if wood is flammable: # true", "if player's tool is flammable:"})
+@Description("Checks whether an item is flammable.")
+@Examples({"wood is flammable", "player's tool is flammable"})
 @Since("INSERT VERSION")
 public class CondIsFlammable extends PropertyCondition<ItemStack> {
 
