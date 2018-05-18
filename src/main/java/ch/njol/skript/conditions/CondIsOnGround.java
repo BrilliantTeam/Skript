@@ -28,7 +28,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 
 @Name("Is on Ground")
-@Description("Checks if entities are on ground or not.")
+@Description("Checks whether an entity is on ground.")
 @Examples("player is not on ground")
 @Since("2.2-dev26")
 public class CondIsOnGround extends PropertyCondition<Entity> {

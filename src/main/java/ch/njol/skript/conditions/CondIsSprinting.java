@@ -31,7 +31,7 @@ import ch.njol.skript.doc.Since;
  * @author Peter Güttinger
  */
 @Name("Is Sprinting")
-@Description("Checks whether a player is sprinting")
+@Description("Checks whether a player is sprinting.")
 @Examples("player is not sprinting")
 @Since("1.4.4")
 public class CondIsSprinting extends PropertyCondition<Player> {

@@ -30,8 +30,8 @@ import ch.njol.util.Kleenean;
 import org.bukkit.inventory.ItemStack;
 
 @Name("Is Edible")
-@Description("Checks whether an item is edible")
-@Examples({"if steak is edible: # true", "if player's tool is edible:"})
+@Description("Checks whether an item is edible.")
+@Examples({"steak is edible", "player's tool is edible"})
 @Since("INSERT VERSION")
 public class CondIsEdible extends PropertyCondition<ItemStack> {
 

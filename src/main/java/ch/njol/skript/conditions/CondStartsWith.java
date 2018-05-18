@@ -34,7 +34,7 @@ import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 
 @Name("Starts/Ends With")
-@Description("Checks if a text starts or ends with another")
+@Description("Checks if a text starts or ends with another.")
 @Examples({"if the argument starts with \"test\":",
 		"	send \"Stop!\""})
 @Since("INSERT VERSION")

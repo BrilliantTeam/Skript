@@ -30,8 +30,8 @@ import ch.njol.util.Kleenean;
 import org.bukkit.inventory.ItemStack;
 
 @Name("Is Transparent")
-@Description("Checks whether an item is transparent")
-@Examples({"if glass is transparent: # true", "if player's tool is transparent:"})
+@Description("Checks whether an item is transparent.")
+@Examples({"glass is transparent", "player's tool is transparent."})
 @Since("INSERT VERSION")
 public class CondIsTransparent extends PropertyCondition<ItemStack> {
 

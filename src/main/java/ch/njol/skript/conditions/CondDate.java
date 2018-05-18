@@ -39,13 +39,13 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("Time")
-@Description("Tests whether a given <a href='../classes/#date'>real time</a> was more or less than some <a href='../classes/#timespan'>time span</a> ago.")
-@Examples({"command /command_with_cooldown:",
+@Description("Tests whether a given <a href='classes.html#date'>real time</a> was more or less than some <a href='classes.html#timespan'>time span</a> ago.")
+@Examples({"command /command-with-cooldown:",
 		"	trigger:",
-		"		{command.%player%.lastused} was less than a minute ago:",
+		"		{command::%player's uuid%::last-usage} was less than a minute ago:",
 		"			message \"Please wait a minute between uses of this command.\"",
 		"			stop",
-		"		set {command.%player%.lastused} to now",
+		"		set {command::%player's uuid%::last-usage} to now",
 		"		# ... actual command trigger here ..."})
 @Since("2.0")
 public class CondDate extends Condition {

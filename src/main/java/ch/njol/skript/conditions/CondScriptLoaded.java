@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import java.io.File;
 
 @Name("Is Script Loaded")
-@Description("Check if the current script or another script, is current loaded")
+@Description("Check if the current script or another script, is current loaded.")
 @Examples({"script is loaded","script \"example.sk\" is loaded"})
 @Since("2.2-dev31")
 public class CondScriptLoaded extends Condition {
