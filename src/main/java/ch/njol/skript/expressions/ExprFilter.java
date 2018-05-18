@@ -1,20 +1,20 @@
 /**
- * This file is part of Skript.
- * <p>
- * Skript is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * Skript is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * <p>
- * <p>
+ *   This file is part of Skript.
+ *
+ *  Skript is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Skript is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
 package ch.njol.skript.expressions;
@@ -31,15 +31,16 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.LiteralUtils;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
-import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Name("Filter")
 @Description("Filters a list based on a condition. " +
@@ -75,7 +76,8 @@ public class ExprFilter<T> extends SimpleExpression<T> {
 			this.condition = source.condition;
 			this.rawCond = source.rawCond;
 			this.objects = source.objects;
-			for (ExprInput<?> child : source.children) {
+			this.children = source.children;
+			for (ExprInput<?> child : children) {
 				child.setParent(this);
 			}
 		}
@@ -90,10 +92,6 @@ public class ExprFilter<T> extends SimpleExpression<T> {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		parsing = this;
 		objects = LiteralUtils.defendExpression(exprs[0]);
-		if (objects instanceof ExprFilter) {
-			Skript.error("Filters may not be nested");
-			return false;
-		}
 		rawCond = parseResult.regexes.get(0).group();
 		condition = Condition.parse(rawCond, "Can't understand this condition: " + rawCond);
 		parsing = null;
@@ -111,7 +109,7 @@ public class ExprFilter<T> extends SimpleExpression<T> {
 		}
 		current = null;
 		try {
-			return CollectionUtils.convertArray(filtered.toArray(), superType);
+			return Converters.convertStrictly(filtered.toArray(), superType);
 		} catch (ClassCastException e1) {
 			return null;
 		}
@@ -148,6 +146,20 @@ public class ExprFilter<T> extends SimpleExpression<T> {
 	@Override
 	public String toString(Event e, boolean debug) {
 		return String.format("%s where [%s]", objects.toString(e, debug), rawCond);
+	}
+
+	@Override
+	public boolean isLoopOf(String s) {
+		for (ExprInput<?> child : children) { // if they used player input, let's assume loop-player is valid
+			if (child.getClassInfo() == null)
+				continue;
+			for (Pattern pattern : child.getClassInfo().getUserInputPatterns()) {
+				if (pattern.matcher(s).matches()) {
+					return true;
+				}
+			}
+		}
+		return objects.isLoopOf(s); // nothing matched, so we'll rely on the object expression's logic
 	}
 
 	@Name("Filter Input")
@@ -201,7 +213,7 @@ public class ExprFilter<T> extends SimpleExpression<T> {
 				return null;
 			}
 			try {
-				return CollectionUtils.convertArray(new Object[]{current}, superType);
+				return Converters.convertStrictly(new Object[]{current}, superType);
 			} catch (ClassCastException e1) {
 				return (T[]) Array.newInstance(superType, 0);
 			}
@@ -224,6 +236,10 @@ public class ExprFilter<T> extends SimpleExpression<T> {
 		@Override
 		public Class<? extends T> getReturnType() {
 			return superType;
+		}
+
+		public ClassInfo<?> getClassInfo() {
+			return inputType == null ? null : inputType.getSingle();
 		}
 
 		@Override
