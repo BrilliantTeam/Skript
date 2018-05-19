@@ -101,13 +101,16 @@ public class ExprFilter<T> extends SimpleExpression<T> {
 	@Override
 	protected T[] get(Event e) {
 		List<Object> filtered = new ArrayList<>();
-		for (Object object : objects.getArray(e)) {
-			current = object;
-			if (condition.check(e)) {
-				filtered.add(object);
+		try {
+			for (Object object : objects.getArray(e)) {
+				current = object;
+				if (condition.check(e)) {
+					filtered.add(object);
+				}
 			}
+		} finally {
+			current = null;
 		}
-		current = null;
 		try {
 			return Converters.convertStrictly(filtered.toArray(), superType);
 		} catch (ClassCastException e1) {
