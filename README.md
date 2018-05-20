@@ -10,7 +10,7 @@ Minecraft 1.9-1.12. Other versions might work, but no guarantees. **Paper** is
 recommended, but not mandatory - without it, timings of scripts will not work.
 
 ## Documentation
-Documentation is available [here](http://bensku.github.io/Skript/) for the
+Documentation is available [here](http://skriptlang.github.io/Skript/) for the
 latest version of Skript.
 
 ## Reporting Issues
