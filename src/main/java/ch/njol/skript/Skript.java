@@ -1326,7 +1326,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			checkedPlugins = true; // No need to do this next time
 		}
 		
-		String issuesUrl = "https://github.com/bensku/Skript/issues";
+		String issuesUrl = "https://github.com/SkriptLang/Skript/issues";
 		
 		logEx();
 		logEx("[Skript] Severe Error:");

@@ -62,7 +62,7 @@ import ch.njol.skript.util.Version;
  */
 public class Updater {
 	
-	public static final String RELEASES_URL  = "https://api.github.com/repos/bensku/Skript/releases";
+	public static final String RELEASES_URL  = "https://api.github.com/repos/SkriptLang/Skript/releases";
 	
 	@Nullable
 	private static Gson gson;
