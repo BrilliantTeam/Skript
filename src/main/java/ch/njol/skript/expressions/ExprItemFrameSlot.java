@@ -19,6 +19,8 @@
  */
 package ch.njol.skript.expressions;
 
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -28,31 +30,38 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.util.slot.DroppedItemSlot;
 import ch.njol.skript.util.slot.ItemFrameSlot;
+import ch.njol.skript.util.slot.Slot;
 
-@Name("Item in Item Frame")
-@Description("An item inside an item frame entity.")
+@Name("Item of an Entity")
+@Description("An item associated with an entity. For dropped item entities, it gets, obviously, the item that was dropped. "
+		+ "For item frames, the item inside the frame is returned. Other entities do not have items associated with them.")
 @Examples("")
-@Since("2.2-dev35")
-public class ExprItemFrameSlot extends SimplePropertyExpression<ItemFrame, ItemFrameSlot> {
+@Since("2.2-dev35, INSERT VERSION (improved)")
+public class ExprItemFrameSlot extends SimplePropertyExpression<Entity, Slot> {
 	
 	static {
-		register(ExprItemFrameSlot.class, ItemFrameSlot.class, "item", "entities");
+		register(ExprItemFrameSlot.class, Slot.class, "item", "entities");
 	}
 	
 	@Override
 	@Nullable
-	public ItemFrameSlot convert(ItemFrame f) {
-		return new ItemFrameSlot(f);
+	public Slot convert(Entity e) {
+		if (e instanceof ItemFrame)
+			return new ItemFrameSlot((ItemFrame) e);
+		else if (e instanceof Item)
+			return new DroppedItemSlot((Item) e);
+		return null; // Other entities don't have associated items
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return "item frame slot";
+		return "item of entity";
 	}
 	
 	@Override
-	public Class<? extends ItemFrameSlot> getReturnType() {
-		return ItemFrameSlot.class;
+	public Class<? extends Slot> getReturnType() {
+		return Slot.class;
 	}
 }

@@ -19,9 +19,7 @@
  */
 package ch.njol.skript.util.slot;
 
-import java.util.Locale;
-
-import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
@@ -29,34 +27,32 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.registrations.Classes;
 
 /**
- * Represents contents of an item frame.
+ * Represents an entity of dropped entity entity.
  */
-public class ItemFrameSlot extends Slot {
-	
-	private ItemFrame frame;
-	
-	public ItemFrameSlot(ItemFrame frame) {
-		this.frame = frame;
-	}
+public class DroppedItemSlot extends Slot {
 
+	private Item entity;
+	
+	public DroppedItemSlot(Item item) {
+		this.entity = item;
+	}
+	
 	@Override
 	@Nullable
 	public ItemStack getItem() {
-		return frame.getItem();
+		return entity.getItemStack();
 	}
 
 	@Override
 	public void setItem(@Nullable ItemStack item) {
-		frame.setItem(item);
-	}
-	
-	@Override
-	public boolean isSameSlot(Slot o) {
-		if (o instanceof ItemFrameSlot) // Same item frame
-			return ((ItemFrameSlot) o).frame.equals(frame);
-		return false;
+		entity.setItemStack(item);
 	}
 
+	@Override
+	public boolean isSameSlot(Slot o) {
+		return o instanceof DroppedItemSlot && ((DroppedItemSlot) o).entity.equals(entity);
+	}
+	
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
 		return Classes.toString(getItem());
