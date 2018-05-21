@@ -27,7 +27,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.registrations.Classes;
 
 /**
- * Represents an entity of dropped entity entity.
+ * Represents an item of dropped item entity.
  */
 public class DroppedItemSlot extends Slot {
 
