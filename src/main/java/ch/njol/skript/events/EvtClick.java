@@ -25,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -72,13 +73,28 @@ public class EvtClick extends SkriptEvent {
 	private final static int HOLDING = 4;
 	
 	static {
-		Class<? extends PlayerEvent> clickEvent;
-		if (twoHanded) // Armor stand support!
-			clickEvent = PlayerInteractAtEntityEvent.class;
+		/*
+		 * On 1.9 and above, handling entity click events is a mess, because
+		 * just listening for one event is enough.
+		 * 
+		 * PlayerInteractEntityEvent
+		 * Good: when it is fired, you can cancel it
+		 * Bad: not fired for armor stands, at all
+		 * 
+		 * PlayerInteractAtEntityEvent
+		 * Good: catches clicks on armor stands
+		 * Bad: cannot be cancelled if entity is item frame or villager (!)
+		 * 
+		 * Just use both? Well, not so simple, as in many cases both are
+		 * called. To make matters worse, handling both events sometimes
+		 * causes PlayerInteractAtEntityEvent to be called TWICE.
+		 */
+		Class<? extends PlayerEvent>[] eventTypes;
+		if (twoHanded)
+			eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractAtEntityEvent.class, PlayerInteractEntityEvent.class);
 		else
-			clickEvent = PlayerInteractEntityEvent.class;
+			eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class);
 		
-		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, clickEvent);
 		Skript.registerEvent("Click", EvtClick.class, eventTypes,
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] [on %-entitydata/itemtype%] [(with|using|" + HOLDING + "¦holding) %itemtype%]",
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] (with|using|" + HOLDING + "¦holding) %itemtype% on %entitydata/itemtype%")
@@ -100,10 +116,12 @@ public class EvtClick extends SkriptEvent {
 	private int click = ANY;
 	boolean isHolding = false;
 	
+	// Entity event spaghetti handling
+	@Nullable
+	private Object lastInteractAtEvent;
+	
 	@Override
 	public boolean init(final Literal<?>[] args, final int matchedPattern, final ParseResult parser) {
-		//Skript.info("matchedPattern is " + matchedPattern);
-		//Skript.info("args is " + Arrays.toString(args));
 		click = parser.mark == 0 ? ANY : parser.mark;
 		types = args[matchedPattern];
 		if (types != null && !ItemType.class.isAssignableFrom(types.getReturnType())) {
@@ -126,6 +144,21 @@ public class EvtClick extends SkriptEvent {
 		
 		if (e instanceof PlayerInteractEntityEvent) {
 			PlayerInteractEntityEvent clickEvent = ((PlayerInteractEntityEvent) e);
+			
+			// Usually, don't handle these events
+			if (clickEvent instanceof PlayerInteractAtEntityEvent) {
+				// But armor stands are an exception
+				// Later, there may be more exceptions...
+				Entity clicked = clickEvent.getRightClicked();
+				if (!(clicked instanceof ArmorStand))
+					return false;
+			}
+			
+			// Guard against PlayerInteractAtEvent being called twice
+			if (lastInteractAtEvent == e) // Intentional identity comparison
+				return false; // Don't handle same event twice
+			lastInteractAtEvent = e; // We're first event, second must not pass
+			
 			if (twoHanded) {
 				//ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
 				//ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
