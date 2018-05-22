@@ -166,22 +166,30 @@ public class ExprClicked extends SimpleExpression<Object> {
 		return (clickable != ClickableType.BLOCK_AND_ITEMS) ? clickable.getClickableClass() : entityType != null ? entityType.getType() : Block.class;
 	}
 	
-	@SuppressWarnings("null")
 	@Override
 	@Nullable
 	protected Object[] get(final Event e) {
 		switch (clickable) {
 			case BLOCK_AND_ITEMS:
 				if (e instanceof PlayerInteractEvent) {
-					if (entityType != null) //This is suppose to be null as this event should be for blocks
+					if (entityType != null) // This is supposed to be null as this event should be for blocks
 						return null;
 					final Block block = ((PlayerInteractEvent) e).getClickedBlock();
-					return (itemType == null || itemType.isOfType(block)) ? new Block[] {block} : null;
+					
+					if (itemType == null)
+						return new Block[] {block};
+					assert itemType != null;
+					if (itemType.isOfType(block))
+						return new Block[] {block};
+					return null;
 				} else if (e instanceof PlayerInteractEntityEvent) {
 					if (entityType == null) //We're testing for the entity in this event
 						return null;
 					final Entity entity = ((PlayerInteractEntityEvent) e).getRightClicked();
+					
+					assert entityType != null;
 					if (entityType.isInstance(entity)) {
+						assert entityType != null;
 						final Entity[] one = (Entity[]) Array.newInstance(entityType.getType(), 1);
 						one[0] = entity;
 						return one;
@@ -198,7 +206,10 @@ public class ExprClicked extends SimpleExpression<Object> {
 			case SLOT:
 				// Slots are specific to inventories, so refering to wrong one is impossible
 				// (as opposed to using the numbers directly)
-				return CollectionUtils.array(new InventorySlot(((InventoryClickEvent) e).getClickedInventory(), ((InventoryClickEvent) e).getSlot()));
+				Inventory invi = ((InventoryClickEvent) e).getClickedInventory();
+				if (invi != null) // Inventory is technically not guaranteed to exist...
+					return CollectionUtils.array(new InventorySlot(invi, ((InventoryClickEvent) e).getSlot()));
+				return null;
 		}
 		return null;
 	}
