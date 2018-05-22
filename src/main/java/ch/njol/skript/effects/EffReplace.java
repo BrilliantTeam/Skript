@@ -98,7 +98,6 @@ public class EffReplace extends Effect {
 					assert n != null;
 					haystack[x] = StringUtils.replace((String)haystack[x], (String)n, Matcher.quoteReplacement((String)replacement), SkriptConfig.caseSensitive.value());
 				}
-			System.out.println(this.haystack.getClass());
 			this.haystack.change(e, haystack, ChangeMode.SET);
 		} else {
 			for (Inventory inv : (Inventory[])haystack)
