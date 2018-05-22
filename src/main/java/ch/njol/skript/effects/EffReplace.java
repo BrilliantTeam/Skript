@@ -19,6 +19,7 @@
  */
 package ch.njol.skript.effects;
 
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -97,6 +98,7 @@ public class EffReplace extends Effect {
 					assert n != null;
 					haystack[x] = StringUtils.replace((String)haystack[x], (String)n, Matcher.quoteReplacement((String)replacement), SkriptConfig.caseSensitive.value());
 				}
+			System.out.println(this.haystack.getClass());
 			this.haystack.change(e, haystack, ChangeMode.SET);
 		} else {
 			for (Inventory inv : (Inventory[])haystack)

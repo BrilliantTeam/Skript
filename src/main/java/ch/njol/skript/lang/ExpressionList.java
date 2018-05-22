@@ -227,7 +227,7 @@ public class ExpressionList<T> implements Expression<T> {
 		Class<?>[] l = expressions[0].acceptChange(mode);
 		if (l == null)
 			return null;
-		final ArrayList<Class<?>> r = new ArrayList<Class<?>>(Arrays.asList(l));
+		final ArrayList<Class<?>> r = new ArrayList<>(Arrays.asList(l));
 		for (int i = 1; i < expressions.length; i++) {
 			l = expressions[i].acceptChange(mode);
 			if (l == null)
@@ -241,8 +241,15 @@ public class ExpressionList<T> implements Expression<T> {
 	
 	@Override
 	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) throws UnsupportedOperationException {
-		for (final Expression<?> expr : expressions) {
-			expr.change(e, delta, mode);
+		if (delta == null || delta.length < expressions.length) {
+			for (Expression<?> expr : expressions) {
+				expr.change(e, delta, mode);
+			}
+		} else {
+			for (int i = 0; i < expressions.length; i++) {
+				Expression<?> expr = expressions[i];
+				expr.change(e, new Object[] {delta[i]}, mode);
+			}
 		}
 	}
 	
