@@ -1106,7 +1106,7 @@ public class SkriptParser {
 			}
 			
 			if ((flags & PARSE_EXPRESSIONS) == 0) {
-				Skript.error("Functions cannot be used here.");
+				Skript.error("Functions cannot be used here (or there is a problem with your arguments).");
 				log.printError();
 				return null;
 			}
