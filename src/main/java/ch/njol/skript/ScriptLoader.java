@@ -933,7 +933,7 @@ final public class ScriptLoader {
 	}
 
 	/**
-	 * Replaces options in a string. May return null, but only if the input is null.
+	 * Replaces options in a string.
 	 */
 	public final static String replaceOptions(final String s) {
 		final String r = StringUtils.replaceAll(s, "\\{@(.+?)\\}", new Callback<String, Matcher>() {
