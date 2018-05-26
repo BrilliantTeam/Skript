@@ -43,8 +43,8 @@ public class CondCancelled extends Condition {
 
 	static {
 		Skript.registerCondition(CondCancelled.class,
-				"[the] event is cancelled",
-				"[the] event (is not|isn't) cancelled"
+				"[the] event is cancel[l]ed",
+				"[the] event (is not|isn't) cancel[l]ed"
 		);
 	}
 
