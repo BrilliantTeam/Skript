@@ -91,6 +91,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.event.vehicle.VehicleEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -918,5 +919,14 @@ public final class BukkitEventValues {
 				return e.getCause();
 			}
 		}, 0);
+
+		//PlayerToggleFlightEvent
+		EventValues.registerEventValue(PlayerToggleFlightEvent.class, Player.class, new Getter<Player, PlayerToggleFlightEvent>() {
+			@Override
+			public Player get(PlayerToggleFlightEvent e) {
+				return e.getPlayer();
+			}
+		}, 0);
+
 	}
 }
