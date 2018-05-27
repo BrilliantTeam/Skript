@@ -20,14 +20,12 @@
 package ch.njol.skript.events;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.lang.Literal;
-import ch.njol.skript.lang.SkriptEvent;
-import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.util.SimpleEvent;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.eclipse.jdt.annotation.Nullable;
 
-public class EvtToggleFlight extends SkriptEvent {
+public class EvtToggleFlight extends SimpleEvent {
 
 	static {
 		Skript.registerEvent("Flight Toggle", EvtToggleFlight.class, PlayerToggleFlightEvent.class,
@@ -35,16 +33,6 @@ public class EvtToggleFlight extends SkriptEvent {
 				.description("Called when a player stops/starts flying")
 				.examples("on flight toggle")
 				.since("INSERT VERSION");
-	}
-
-	@Override
-	public boolean init(Literal<?>[] args, int matchedPattern, SkriptParser.ParseResult parseResult) {
-		return true;
-	}
-
-	@Override
-	public boolean check(Event e) {
-		return true;
 	}
 
 	@Override
