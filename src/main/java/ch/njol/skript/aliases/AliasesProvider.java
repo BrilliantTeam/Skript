@@ -242,8 +242,8 @@ public class AliasesProvider {
 		}
 		
 		// Variations don't always need an id
-		if (id.equals("-")) {
-			id = null;
+		if (typeName.equals("-")) {
+			typeName = null;
 		}
 		
 		return new Variation(typeName, tags, blockState);
@@ -269,7 +269,7 @@ public class AliasesProvider {
 			assert pattern != null;
 			List<String> keys = parseKeyPattern(pattern);
 			Variation var = parseVariation(((EntryNode) node).getValue());
-			if (var.getId() == null && var.getTags().isEmpty()) {
+			if (var.getId() == null && var.getTags().isEmpty() && var.getBlockState() == null) {
 				// Useless variation, basically
 				Skript.warning(m_useless_variation.toString());
 			}
