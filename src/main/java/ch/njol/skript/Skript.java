@@ -52,7 +52,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import ch.njol.skript.lang.Trigger;
-import ch.njol.skript.lang.util.SimpleEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -1147,7 +1146,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		events.add(r);
 		return r;
 	}
-
 	
 	/**
 	 * Registers an event.
