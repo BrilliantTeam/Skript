@@ -20,10 +20,18 @@
 package ch.njol.skript.conditions;
 
 import ch.njol.skript.conditions.base.PropertyCondition;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
+@Name("Is Loaded")
+@Description("Checks whether or not a chunk/world is loaded")
+@Examples("if chunk at {home::%player's uuid%} is loaded:")
+@Since("INSERT VERSION")
 public class CondIsLoaded extends PropertyCondition<Object> {
 
 	static {
