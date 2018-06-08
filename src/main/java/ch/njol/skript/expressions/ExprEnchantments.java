@@ -39,6 +39,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.EnchantmentType;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -47,29 +48,36 @@ import ch.njol.util.coll.CollectionUtils;
 @Description("All the enchantments an <a href='classes.html#itemtype>item type</a> has.")
 @Examples("clear enchantments of event-item")
 @Since("INSERT VERSION")
-public class ExprEnchantments extends PropertyExpression<ItemType, EnchantmentType> {
+public class ExprEnchantments extends SimpleExpression<EnchantmentType> {
 
 	static {
 		PropertyExpression.register(ExprEnchantments.class, EnchantmentType.class, "enchantments", "itemtypes");
 	}
 
+	private Expression<ItemType> items;
+
 	@SuppressWarnings({"null","unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-		setExpr((Expression<ItemType>) exprs[0]);
+		items = (Expression<ItemType>) exprs[0];
 		return true;
 	}
 
 	@Override
-	protected EnchantmentType[] get(Event e, ItemType[] source) {
+	public boolean isSingle() {
+		return false;
+	}
+
+	@Override
+	protected EnchantmentType[] get(Event e) {
 		List<EnchantmentType> enchantments = new ArrayList<>();
-		for (ItemType item : source) {
+		for (ItemType item : items.getArray(e)) {
 			Map<Enchantment, Integer> enchants = item.getEnchantments();
 			if (enchants == null)
-				enchants = new HashMap<>();
-			for (Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
+				continue;
+			for (Entry<Enchantment, Integer> enchant : enchants.entrySet())
 					enchantments.add(new EnchantmentType(enchant.getKey(), enchant.getValue()));
-			}
+
 		}
 		return enchantments.toArray(new EnchantmentType[enchantments.size()]);
 	}
@@ -84,7 +92,7 @@ public class ExprEnchantments extends PropertyExpression<ItemType, EnchantmentTy
 	// TODO: improve changer once aliases rework is done
 	@Override
 	public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
-		ItemType[] items = getExpr().getArray(e);
+		ItemType[] source = items.getArray(e);
 		Map<Enchantment, Integer> enchantments = new HashMap<>();
 		if (mode != Changer.ChangeMode.DELETE || mode != Changer.ChangeMode.RESET) {
 			assert delta != null;
@@ -104,7 +112,7 @@ public class ExprEnchantments extends PropertyExpression<ItemType, EnchantmentTy
 			case ADD:
 				changeEnchantments(item -> {
 					item.addEnchantments(enchantments);
-				}, items);
+				}, source);
 				break;
 			case REMOVE:
 			case REMOVE_ALL:
@@ -119,17 +127,17 @@ public class ExprEnchantments extends PropertyExpression<ItemType, EnchantmentTy
 					});
 					item.clearEnchantments();
 					item.addEnchantments(enchants);
-				}, items);
+				}, source);
 				break;
 			case SET:
 				changeEnchantments(item -> {
 					item.clearEnchantments();
 					item.addEnchantments(enchantments);
-				}, items);
+				}, source);
 				break;
 			case DELETE:
 			case RESET:
-				changeEnchantments(ItemType::clearEnchantments, items);
+				changeEnchantments(ItemType::clearEnchantments, source);
 		}
 	}
 
@@ -140,7 +148,7 @@ public class ExprEnchantments extends PropertyExpression<ItemType, EnchantmentTy
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "enchantments of " + getExpr().toString(e, debug);
+		return String.format("the enchantments of %s", items.toString(e, debug));
 	}
 
 	private static void changeEnchantments(Consumer<ItemType> consumer, ItemType... items) {
