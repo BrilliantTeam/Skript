@@ -36,11 +36,11 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 @Since("INSERT VERSION")
 public class ExprLanguage extends SimplePropertyExpression<Player, String> {
 
-	private static final boolean PLAYER_METHOD = Skript.methodExists(Player.class, "getLocale");
-	private static final boolean PLAYER_SPIGOT_METHOD = Skript.methodExists(Player.Spigot.class, "getLocale");
+	private static final boolean PLAYER_METHOD_EXISTS = Skript.methodExists(Player.class, "getLocale");
+	private static final boolean PLAYER_SPIGOT_METHOD_EXISTS = Skript.methodExists(Player.Spigot.class, "getLocale");
 	
 	static {
-		if (PLAYER_METHOD || PLAYER_SPIGOT_METHOD) {
+		if (PLAYER_METHOD_EXISTS || PLAYER_SPIGOT_METHOD_EXISTS) {
 			register(ExprLanguage.class, String.class, "[([currently] selected|current)] [game] (language|locale) [setting]", "players");
 		}
 	}
@@ -48,9 +48,9 @@ public class ExprLanguage extends SimplePropertyExpression<Player, String> {
 	@Override
 	@Nullable
 	public String convert(Player p) {
-		if (PLAYER_METHOD) {
+		if (PLAYER_METHOD_EXISTS) {
 			return p.getLocale();
-		} else if (PLAYER_SPIGOT_METHOD) {
+		} else if (PLAYER_SPIGOT_METHOD_EXISTS) {
 			return p.spigot().getLocale();
 		}
 		return null;
