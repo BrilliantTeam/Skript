@@ -427,7 +427,8 @@ public class SimpleEvents {
 				.since("INSERT VERSION");
 		if (Skript.classExists("org.bukkit.event.player.PlayerLocaleChangeEvent")) {
 			Skript.registerEvent("Language Change", SimpleEvent.class, PlayerLocaleChangeEvent.class, "[player] (language|locale) chang(e|ing)", "[player] chang(e|ing) (language|locale)")
-					.description("Called when a player changes their language in the game settings. You can use the <a href='expressions.html#ExprLanguage'>language</a> expression to get the current language of the player.")
+					.description("Called after a player changed their language in the game settings. You can use the <a href='expressions.html#ExprLanguage'>language</a> expression to get the current language of the player.",
+						"This event requires Minecraft 1.12+.")
 					.examples("on language change:",
 							"	if player's language starts with \"en\":",
 							"		send \"Hello!\"")

@@ -20,8 +20,8 @@
 package ch.njol.skript.expressions;
 
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Player.Spigot;
 import org.eclipse.jdt.annotation.Nullable;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -31,15 +31,16 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
 @Name("Language")
 @Description({"Currently selected game language of a player. The value of the language is not defined properly.",
-			"The vanilla Minecraft client will use lowercase language / country pairs separated by an underscore, but custom resource packs may use any format they wish.",
-			"This expression is Minecraft 1.12+."})
-@Examples({"message \"%player's current hotbar slot%\"",
-            "set player's selected hotbar slot to slot 4 of player"})
+			"The vanilla Minecraft client will use lowercase language / country pairs separated by an underscore, but custom resource packs may use any format they wish."})
+@Examples({"message player's current language"})
 @Since("INSERT VERSION")
 public class ExprLanguage extends SimplePropertyExpression<Player, String> {
 
+	private static final boolean PLAYER_METHOD = Skript.methodExists(Player.class, "getLocale");
+	private static final boolean PLAYER_SPIGOT_METHOD = Skript.methodExists(Player.Spigot.class, "getLocale");
+	
 	static {
-		if (Skript.methodExists(Player.class, "getLocale")) {
+		if (PLAYER_METHOD || PLAYER_SPIGOT_METHOD) {
 			register(ExprLanguage.class, String.class, "[([currently] selected|current)] [game] (language|locale) [setting]", "players");
 		}
 	}
@@ -47,7 +48,12 @@ public class ExprLanguage extends SimplePropertyExpression<Player, String> {
 	@Override
 	@Nullable
 	public String convert(Player p) {
-		return p.getLocale();
+		if (PLAYER_METHOD) {
+			return p.getLocale();
+		} else if (PLAYER_SPIGOT_METHOD) {
+			return p.spigot().getLocale();
+		}
+		return null;
 	}
 	
 	@Override
