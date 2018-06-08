@@ -31,14 +31,17 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
 @Name("Language")
 @Description({"Currently selected game language of a player. The value of the language is not defined properly.",
-			"The vanilla Minecraft client will use lowercase language / country pairs separated by an underscore, but custom resource packs may use any format they wish."})
+			"The vanilla Minecraft client will use lowercase language / country pairs separated by an underscore, but custom resource packs may use any format they wish.",
+			"This expression is Minecraft 1.12+."})
 @Examples({"message \"%player's current hotbar slot%\"",
             "set player's selected hotbar slot to slot 4 of player"})
 @Since("INSERT VERSION")
 public class ExprLanguage extends SimplePropertyExpression<Player, String> {
 
 	static {
-		register(ExprLanguage.class, String.class, "[([currently] selected|current)] [game] (language|locale) [setting]", "players");
+		if (Skript.methodExists(Player.class, "getLocale")) {
+			register(ExprLanguage.class, String.class, "[([currently] selected|current)] [game] (language|locale) [setting]", "players");
+		}
 	}
 	
 	@Override
