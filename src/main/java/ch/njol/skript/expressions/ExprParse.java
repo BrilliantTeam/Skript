@@ -21,9 +21,6 @@ package ch.njol.skript.expressions;
 
 import java.lang.reflect.Array;
 
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
@@ -46,6 +43,8 @@ import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
+import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Peter Güttinger
@@ -123,6 +122,10 @@ public class ExprParse extends SimpleExpression<Object> {
 			plurals = p.getSecond();
 		} else {
 			c = ((Literal<ClassInfo<?>>) exprs[1]).getSingle();
+			if (c.getC() == String.class) {
+				Skript.error("Parsing as text is useless as only things that are already text may be parsed");
+				return false;
+			}
 			final Parser<?> p = c.getParser();
 			if (p == null || !p.canParse(ParseContext.COMMAND)) { // TODO special parse context?
 				Skript.error("Text cannot be parsed as " + c.getName().withIndefiniteArticle(), ErrorQuality.SEMANTIC_ERROR);
