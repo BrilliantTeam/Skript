@@ -47,13 +47,14 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Item Enchantments")
 @Description("All the enchantments an <a href='classes.html#itemtype>item type</a> has.")
 @Examples("clear enchantments of event-item")
-@Since("INSERT VERSION")
+@Since("2.2-dev36")
 public class ExprEnchantments extends SimpleExpression<EnchantmentType> {
 
 	static {
 		PropertyExpression.register(ExprEnchantments.class, EnchantmentType.class, "enchantments", "itemtypes");
 	}
 
+	@SuppressWarnings("null")
 	private Expression<ItemType> items;
 
 	@SuppressWarnings({"null","unchecked"})
@@ -69,6 +70,7 @@ public class ExprEnchantments extends SimpleExpression<EnchantmentType> {
 	}
 
 	@Override
+	@Nullable
 	protected EnchantmentType[] get(Event e) {
 		List<EnchantmentType> enchantments = new ArrayList<>();
 		for (ItemType item : items.getArray(e)) {
