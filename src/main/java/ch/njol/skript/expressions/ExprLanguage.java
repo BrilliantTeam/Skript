@@ -19,9 +19,8 @@
  */
 package ch.njol.skript.expressions;
 
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Player.Spigot;
 import org.eclipse.jdt.annotation.Nullable;
+import org.bukkit.entity.Player;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -36,34 +35,30 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 @Since("INSERT VERSION")
 public class ExprLanguage extends SimplePropertyExpression<Player, String> {
 
-	private static final boolean PLAYER_METHOD_EXISTS = Skript.methodExists(Player.class, "getLocale");
-	private static final boolean PLAYER_SPIGOT_METHOD_EXISTS = Skript.methodExists(Player.Spigot.class, "getLocale");
-	
+	private static final boolean USE_DEPRECATED_METHOD = !Skript.methodExists(Player.class, "getLocale");
+
 	static {
-		if (PLAYER_METHOD_EXISTS || PLAYER_SPIGOT_METHOD_EXISTS) {
-			register(ExprLanguage.class, String.class, "[([currently] selected|current)] [game] (language|locale) [setting]", "players");
-		}
+		register(ExprLanguage.class, String.class, "[([currently] selected|current)] [game] (language|locale) [setting]", "players");
 	}
-	
+
 	@Override
 	@Nullable
 	public String convert(Player p) {
-		if (PLAYER_METHOD_EXISTS) {
-			return p.getLocale();
-		} else if (PLAYER_SPIGOT_METHOD_EXISTS) {
+		if (USE_DEPRECATED_METHOD) {
 			return p.spigot().getLocale();
+		} else {
+			return p.getLocale();
 		}
-		return null;
 	}
-	
+
 	@Override
 	protected String getPropertyName() {
 		return "language";
 	}
-	
+
 	@Override
 	public Class<? extends String> getReturnType() {
 		return String.class;
 	}
-	
+
 }
