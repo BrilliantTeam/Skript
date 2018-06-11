@@ -74,7 +74,8 @@ public class ExprBurnCookTime extends PropertyExpression<Block, Timespan> {
 			Skript.error("Cannot use 'burning time' outside a fuel burn event.");
 			return false;
 		}
-		setExpr((Expression<? extends Block>) exprs[0]);
+		if (!isEvent)
+			setExpr((Expression<? extends Block>) exprs[0]);
 		return true;
 	}
 
@@ -144,7 +145,7 @@ public class ExprBurnCookTime extends PropertyExpression<Block, Timespan> {
 		}
 
 		for (Block block : getExpr().getArray(e)) {
-			if (block.getType() != Material.FURNACE)
+			if (block.getType() != Material.FURNACE || block.getType() != Material.BURNING_FURNACE)
 				continue;
 			Furnace furnace = (Furnace) block.getState();
 			long time = value.apply(Timespan.fromTicks_i(cookTime ? furnace.getCookTime() : furnace.getBurnTime())).getTicks_i();

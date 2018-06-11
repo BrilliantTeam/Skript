@@ -86,7 +86,8 @@ public class ExprFurnaceSlot extends PropertyExpression<Block, Slot> {
 			Skript.error("Cannot use 'fuel slot' outside a fuel burn event.");
 			return false;
 		}
-		setExpr((Expression<Block>) exprs[0]);
+		if (!isEvent)
+			setExpr((Expression<Block>) exprs[0]);
 		return true;
 	}
 	
