@@ -88,11 +88,10 @@ public final class SkriptAddon {
 	 */
 	public SkriptAddon loadClasses(String basePackage, final String... subPackages) throws IOException {
 		assert subPackages != null;
-		final JarFile jar = new JarFile(getFile());
 		for (int i = 0; i < subPackages.length; i++)
 			subPackages[i] = subPackages[i].replace('.', '/') + "/";
 		basePackage = basePackage.replace('.', '/') + "/";
-		try {
+		try (JarFile jar = new JarFile(getFile())) {
 			for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
 				if (e.getName().startsWith(basePackage) && e.getName().endsWith(".class")) {
 					boolean load = subPackages.length == 0;
@@ -115,10 +114,13 @@ public final class SkriptAddon {
 					}
 				}
 			}
+<<<<<<< HEAD
 		} finally {
 			try {
 				jar.close();
 			} catch (final IOException e) {}
+=======
+>>>>>>> 743bf7b... Replace 'try finally' with 'try with resources' where applicable
 		}
 		return this;
 	}

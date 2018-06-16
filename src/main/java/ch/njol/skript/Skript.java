@@ -280,11 +280,9 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		final File scripts = new File(getDataFolder(), SCRIPTSFOLDER);
 		if (!scripts.isDirectory()) {
-			ZipFile f = null;
-			try {
+			try (ZipFile f = new ZipFile(getFile())) {
 				if (!scripts.mkdirs())
 					throw new IOException("Could not create the directory " + scripts);
-				f = new ZipFile(getFile());
 				for (final ZipEntry e : new EnumerationIterable<ZipEntry>(f.entries())) {
 					if (e.isDirectory())
 						continue;
@@ -306,24 +304,23 @@ public final class Skript extends JavaPlugin implements Listener {
 							saveTo = af;
 					}
 					if (saveTo != null) {
-						final InputStream in = f.getInputStream(e);
-						try {
-							assert in != null;
+						try (InputStream in = f.getInputStream(e)) {
 							FileUtils.save(in, saveTo);
-						} finally {
-							in.close();
 						}
 					}
 				}
 				info("Successfully generated the config, the example scripts and the aliases files.");
 			} catch (final ZipException e) {} catch (final IOException e) {
 				error("Error generating the default files: " + ExceptionUtils.toString(e));
+<<<<<<< HEAD
 			} finally {
 				if (f != null) {
 					try {
 						f.close();
 					} catch (final IOException e) {}
 				}
+=======
+>>>>>>> 743bf7b... Replace 'try finally' with 'try with resources' where applicable
 			}
 		}
 		
@@ -397,8 +394,7 @@ public final class Skript extends JavaPlugin implements Listener {
 				
 				// load hooks
 				try {
-					final JarFile jar = new JarFile(getFile());
-					try {
+					try (JarFile jar = new JarFile(getFile())) {
 						for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
 							if (e.getName().startsWith("ch/njol/skript/hooks/") && e.getName().endsWith("Hook.class") && StringUtils.count("" + e.getName(), '/') <= 5) {
 								final String c = e.getName().replace('/', '.').substring(0, e.getName().length() - ".class".length());
@@ -416,10 +412,13 @@ public final class Skript extends JavaPlugin implements Listener {
 								continue;
 							}
 						}
+<<<<<<< HEAD
 					} finally {
 						try {
 							jar.close();
 						} catch (final IOException e) {}
+=======
+>>>>>>> 743bf7b... Replace 'try finally' with 'try with resources' where applicable
 					}
 				} catch (final Exception e) {
 					error("Error while loading plugin hooks" + (e.getLocalizedMessage() == null ? "" : ": " + e.getLocalizedMessage()));
@@ -856,8 +855,7 @@ public final class Skript extends JavaPlugin implements Listener {
 				try {
 					final Field modifiers = Field.class.getDeclaredField("modifiers");
 					modifiers.setAccessible(true);
-					final JarFile jar = new JarFile(getFile());
-					try {
+					try (JarFile jar = new JarFile(getFile())) {
 						for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
 							if (e.getName().endsWith(".class")) {
 								try {
@@ -877,8 +875,6 @@ public final class Skript extends JavaPlugin implements Listener {
 								}
 							}
 						}
-					} finally {
-						jar.close();
 					}
 				} catch (final Throwable ex) {
 					if (testing())
