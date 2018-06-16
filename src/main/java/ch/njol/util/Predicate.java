@@ -22,10 +22,11 @@ package ch.njol.util;
 import javax.annotation.Nullable;
 
 /**
- * @author Peter Güttinger
+ * @author Peter Gï¿½ttinger
  *
  */
-public abstract interface Predicate<T> {
-  public abstract boolean test(@Nullable T paramT);
+public interface Predicate<T> {
+	
+	boolean test(@Nullable T paramT);
 }
 
