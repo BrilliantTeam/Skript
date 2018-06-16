@@ -74,7 +74,7 @@ public abstract class Aliases {
 	private final static AliasesParser parser = createParser(provider);
 	
 	@Nullable
-	private final static ItemType getAlias_i(final String s) {
+	private static ItemType getAlias_i(final String s) {
 		final ItemType t = ScriptLoader.getScriptAliases().get(s);
 		if (t != null)
 			return t;
@@ -159,7 +159,7 @@ public abstract class Aliases {
 	 * 
 	 * @param parts
 	 */
-	final static String concatenate(final String... parts) {
+	static String concatenate(final String... parts) {
 		assert parts.length >= 2;
 		final StringBuilder b = new StringBuilder();
 		for (int i = 0; i < parts.length; i++) {
@@ -190,14 +190,6 @@ public abstract class Aliases {
 		return name.toString(plural);
 	}
 	
-	public final static String getDebugMaterialName(ItemData type, boolean plural) {
-		final MaterialName n = provider.getMaterialName(type);
-		if (n == null) {
-			return "" + type.type;
-		}
-		return n.getDebugName(plural);
-	}
-	
 	/**
 	 * @return The ietm's gender or -1 if no name is found
 	 */
@@ -211,7 +203,7 @@ public abstract class Aliases {
 	/**
 	 * @return how many ids are missing an alias, including the 'any id' (-1)
 	 */
-	final static int addMissingMaterialNames() {
+	static int addMissingMaterialNames() {
 		int r = 0;
 		StringBuilder missing = new StringBuilder(m_missing_aliases + " ");
 		for (final Material m : Material.values()) {
@@ -338,7 +330,7 @@ public abstract class Aliases {
 	 * @return The given item type or null if the input couldn't be parsed.
 	 */
 	@Nullable
-	private final static ItemType parseType(final String s, final ItemType t, final boolean isAlias) {
+	private static ItemType parseType(final String s, final ItemType t, final boolean isAlias) {
 		ItemType i;
 		final String type = s;
 		if (type.isEmpty()) {
@@ -366,7 +358,7 @@ public abstract class Aliases {
 	 * @return A copy of the ItemType represented by the given alias or null if no such alias exists.
 	 */
 	@Nullable
-	private final static ItemType getAlias(final String s) {
+	private static ItemType getAlias(final String s) {
 		ItemType i;
 		String lc = "" + s.toLowerCase();
 		final Matcher m = p_any.matcher(lc);

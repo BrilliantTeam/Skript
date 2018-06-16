@@ -80,9 +80,6 @@ public class Delay extends Effect {
 		final long start = Skript.debug() ? System.nanoTime() : 0;
 		final TriggerItem next = getNext();
 		if (next != null) {
-			// Back up local variables
-			Object localVars = Variables.removeLocals(e);
-			
 			delayed.add(e);
 			final Timespan d = duration.getSingle(e);
 			if (d == null)
@@ -121,7 +118,7 @@ public class Delay extends Effect {
 	@SuppressWarnings("null")
 	protected final static Set<Event> delayed = Collections.newSetFromMap(new WeakHashMap<Event, Boolean>());
 
-	public final static boolean isDelayed(final Event e) {
+	public static boolean isDelayed(final Event e) {
 		return delayed.contains(e);
 	}
 
