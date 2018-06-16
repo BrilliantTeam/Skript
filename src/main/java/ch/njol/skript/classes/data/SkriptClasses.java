@@ -913,7 +913,7 @@ public class SkriptClasses {
 							return ".*";
 						}
 					})
-					.serializer(new YggdrasilSerializer<VisualEffect>()));
+					.serializer(new YggdrasilSerializer<>()));
 		} else {
 			Classes.registerClass(new ClassInfo<>(VisualEffectDummy.class, "visualeffect"));
 		}
