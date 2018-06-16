@@ -863,8 +863,6 @@ final public class ScriptLoader {
 						final Signature<?> func = Functions.loadSignature(config.getFileName(), node);
 						
 						deleteCurrentEvent();
-						
-						continue;
 					}
 				}
 				
