@@ -423,6 +423,6 @@ public class SimpleEvents {
 				.examples("on flight toggle:",
 						"	if {game::%player%::playing} exists:",
 						"		cancel event")
-				.since("INSERT VERSION");
+				.since("2.2-dev36");
 	}
 }
