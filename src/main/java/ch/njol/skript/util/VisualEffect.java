@@ -303,8 +303,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		});
 	}
 
-	@NonNull
-	private static String getOriginPath(Class c){
+	static String getOriginPath(Class<VisualEffect> c){
 		String path = c.getName();
 		if (path != null){
 			return path;
