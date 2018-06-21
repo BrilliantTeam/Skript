@@ -38,7 +38,7 @@ import ch.njol.skript.util.slot.Slot;
 @Description("An item associated with an entity. For dropped item entities, it gets, obviously, the item that was dropped. "
 		+ "For item frames, the item inside the frame is returned. Other entities do not have items associated with them.")
 @Examples("")
-@Since("2.2-dev35, INSERT VERSION (improved)")
+@Since("2.2-dev35, 2.2-dev36 (improved)")
 public class ExprItemFrameSlot extends SimplePropertyExpression<Entity, Slot> {
 	
 	static {
