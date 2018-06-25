@@ -140,10 +140,9 @@ publishing {
 	}
 }
 
-/**
- * Set compile encoding to UTF-8
- * Fixes issue #850
- *
+/*
+  Set compile encoding to UTF-8
+  Fixes issue #850
  */
 compileJava.options.encoding = 'UTF-8'
 
