@@ -242,8 +242,9 @@ public abstract class Variables {
 	 * must be locked with {@link #variablesLock}.
 	 */
 	final static VariablesMap variables = new VariablesMap();
+
 	/**
-	 * Not accessed concurrently
+	 * Not to be accessed outside of Bukkit's main thread!
 	 */
 	private final static Map<Event, VariablesMap> localVariables = new HashMap<>();
 	
