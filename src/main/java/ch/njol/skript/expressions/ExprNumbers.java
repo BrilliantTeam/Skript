@@ -19,7 +19,10 @@
  */
 package ch.njol.skript.expressions;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.bukkit.event.Event;
@@ -70,29 +73,44 @@ public class ExprNumbers extends SimpleExpression<Number> {
 	
 	@Override
 	@Nullable
-	protected Number[] get(final Event e) {
-		final Number s = start.getSingle(e), f = end.getSingle(e);
-		if (s == null || f == null || s.doubleValue() > f.doubleValue())
+	protected Number[] get(final Event event) {
+		Number s = start.getSingle(event), f = end.getSingle(event);
+		if (s == null || f == null)
 			return null;
-		final Number[] array = integer ? new Long[(int) (Math.floor(f.doubleValue()) - Math.ceil(s.doubleValue()) + 1)] : new Double[(int) Math.floor(f.doubleValue() - s.doubleValue() + 1)];
-		final double low = integer ? Math.ceil(s.doubleValue()) : s.doubleValue();
-		for (int i = 0; i < array.length; i++) {
-			if (integer)
-				array[i] = Long.valueOf((long) low + i);
-			else
-				array[i] = Double.valueOf(low + i);
+		final boolean reverse = s.doubleValue() > f.doubleValue();
+		if (reverse) {
+			Number temp = s;
+			s = f;
+			f = temp;
 		}
-		return array;
+		final double amount = integer ? Math.floor(f.doubleValue()) - Math.ceil(s.doubleValue()) + 1 : Math.floor(f.doubleValue() - s.doubleValue() + 1);
+		final List<Number> list = new ArrayList<>();
+		final double low = integer ? Math.ceil(s.doubleValue()) : s.doubleValue();
+		for (int i = 0; i < amount; i++) {
+			if (integer)
+				list.add(Long.valueOf((long) low + i));
+			else
+				list.add(Double.valueOf(low + i));
+		}
+		if (reverse) Collections.reverse(list);
+		return list.toArray(new Number[list.size()]);
 	}
 	
 	@Override
 	@Nullable
-	public Iterator<Number> iterator(final Event e) {
-		final Number s = start.getSingle(e), f = end.getSingle(e);
-		if (s == null || f == null || s.doubleValue() > f.doubleValue())
+	public Iterator<Number> iterator(final Event event) {
+		Number s = start.getSingle(event), f = end.getSingle(event);
+		if (s == null || f == null)
 			return null;
+		final boolean reverse = s.doubleValue() > f.doubleValue();
+		if (reverse) {
+			Number temp = s;
+			s = f;
+			f = temp;
+		}
+		final Number starting = s, finish = f;
 		return new Iterator<Number>() {
-			double i = integer ? Math.ceil(s.doubleValue()) : s.doubleValue(), max = integer ? Math.floor(f.doubleValue()) : f.doubleValue();
+			double i = integer ? Math.ceil(starting.doubleValue()) : starting.doubleValue(), max = integer ? Math.floor(finish.doubleValue()) : finish.doubleValue();
 			
 			@Override
 			public boolean hasNext() {
@@ -105,9 +123,9 @@ public class ExprNumbers extends SimpleExpression<Number> {
 				if (!hasNext())
 					throw new NoSuchElementException();
 				if (integer)
-					return Long.valueOf((long) i++);
+					return Long.valueOf((long) (reverse ? max-- : i++));
 				else
-					return Double.valueOf(i++);
+					return Double.valueOf(reverse ? max-- : i++);
 			}
 			
 			@Override
@@ -136,5 +154,4 @@ public class ExprNumbers extends SimpleExpression<Number> {
 	public Class<? extends Number> getReturnType() {
 		return integer ? Long.class : Double.class;
 	}
-	
 }

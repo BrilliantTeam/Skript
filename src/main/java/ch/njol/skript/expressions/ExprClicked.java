@@ -48,6 +48,7 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.slot.Slot;
@@ -121,7 +122,6 @@ public class ExprClicked extends SimpleExpression<Object> {
 	@Nullable
 	private ItemType itemType; //null results in any itemtype
 	private ClickableType clickable = ClickableType.BLOCK_AND_ITEMS;
-	private boolean rawSlot = false;
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
@@ -166,22 +166,30 @@ public class ExprClicked extends SimpleExpression<Object> {
 		return (clickable != ClickableType.BLOCK_AND_ITEMS) ? clickable.getClickableClass() : entityType != null ? entityType.getType() : Block.class;
 	}
 	
-	@SuppressWarnings("null")
 	@Override
 	@Nullable
 	protected Object[] get(final Event e) {
 		switch (clickable) {
 			case BLOCK_AND_ITEMS:
 				if (e instanceof PlayerInteractEvent) {
-					if (entityType != null) //This is suppose to be null as this event should be for blocks
+					if (entityType != null) // This is supposed to be null as this event should be for blocks
 						return null;
 					final Block block = ((PlayerInteractEvent) e).getClickedBlock();
-					return (itemType == null || itemType.isOfType(block)) ? new Block[] {block} : null;
+					
+					if (itemType == null)
+						return new Block[] {block};
+					assert itemType != null;
+					if (itemType.isOfType(block))
+						return new Block[] {block};
+					return null;
 				} else if (e instanceof PlayerInteractEntityEvent) {
 					if (entityType == null) //We're testing for the entity in this event
 						return null;
 					final Entity entity = ((PlayerInteractEntityEvent) e).getRightClicked();
+					
+					assert entityType != null;
 					if (entityType.isInstance(entity)) {
+						assert entityType != null;
 						final Entity[] one = (Entity[]) Array.newInstance(entityType.getType(), 1);
 						one[0] = entity;
 						return one;
@@ -198,23 +206,26 @@ public class ExprClicked extends SimpleExpression<Object> {
 			case SLOT:
 				// Slots are specific to inventories, so refering to wrong one is impossible
 				// (as opposed to using the numbers directly)
-				return CollectionUtils.array(new InventorySlot(((InventoryClickEvent) e).getClickedInventory(), ((InventoryClickEvent) e).getSlot()));
+				Inventory invi = ((InventoryClickEvent) e).getClickedInventory();
+				if (invi != null) // Inventory is technically not guaranteed to exist...
+					return CollectionUtils.array(new InventorySlot(invi, ((InventoryClickEvent) e).getSlot()));
+				return null;
 		}
 		return null;
 	}
 	
 	@Override
 	@Nullable
-	public Object[] beforeChange(@Nullable Object[] delta) {
+	public Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
 		if (delta == null) // Nothing to nothing
 			return null;
 		Object first = delta[0];
 		if (first == null) // ConvertedExpression might cause this
 			return null;
 		
-		// Slots must be transformed to item stacks
+		// Slots must be transformed to item stacks when writing to variables
 		// Documentation by Njol states so, plus it is convenient
-		if (first instanceof Slot) {
+		if (changed instanceof Variable && first instanceof Slot) {
 			return new ItemStack[] {((Slot) first).getItem()};
 		}
 		

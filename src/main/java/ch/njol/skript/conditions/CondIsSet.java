@@ -38,7 +38,7 @@ import ch.njol.util.Kleenean;
  */
 @Name("Exists/Is Set")
 @Description("Checks whether a given expression or variable is set.")
-@Examples({"{teamscript.%player%.preferred team} is not set",
+@Examples({"{teams::%player's uuid%::preferred-team} is not set",
 		"on damage:",
 		"	projectile exists",
 		"	broadcast \"%attacker% used a %projectile% to attack %victim%!\""})

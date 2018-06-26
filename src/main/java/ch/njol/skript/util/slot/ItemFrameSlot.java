@@ -59,7 +59,7 @@ public class ItemFrameSlot extends Slot {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "frame item of " + Classes.toString(frame);
+		return Classes.toString(getItem());
 	}
 	
 }

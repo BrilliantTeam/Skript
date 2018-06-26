@@ -93,12 +93,14 @@ public class EffDrop extends Effect {
 		}
 		for (final Location l : locations.getArray(e)) {
 			final Location itemDropLoc = l.clone().subtract(0.5, 0.5, 0.5); // dropItemNaturally adds 0.15 to 0.85 randomly to all coordinates
-			for (final Object o : os) {
+			for (Object o : os) {
 				if (o instanceof Experience) {
 					final ExperienceOrb orb = l.getWorld().spawn(l, ExperienceOrb.class);
 					orb.setExperience(((Experience) o).getXP());
 					EffSpawn.lastSpawned = orb;
 				} else {
+					if (o instanceof ItemStack)
+						o = new ItemType((ItemStack) o);
 					for (final ItemStack is : ((ItemType) o).getItem().getAll()) {
 						if (is.getType() != Material.AIR) {
 							if (useVelocity) {

@@ -19,6 +19,7 @@
  */
 package ch.njol.skript.effects;
 
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;

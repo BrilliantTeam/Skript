@@ -91,10 +91,14 @@ public class ScriptFunction<T> extends Function<T> {
 		
 		assert trigger != null;
 		trigger.execute(e);
-		returnValueSet = false;
-		T[] returnedValue = returnValue;
-		returnValue = null;
-		return returnedValue;
+		return returnValue;
 	}
-	
+
+	@Override
+	public boolean resetReturnValue() {
+		returnValue = null;
+		returnValueSet = false;
+		return true;
+	}
+
 }

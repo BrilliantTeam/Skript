@@ -931,7 +931,10 @@ final public class ScriptLoader {
 		
 		return new ScriptInfo(); // Return that we unloaded literally nothing
 	}
-	
+
+	/**
+	 * Replaces options in a string.
+	 */
 	public final static String replaceOptions(final String s) {
 		final String r = StringUtils.replaceAll(s, "\\{@(.+?)\\}", new Callback<String, Matcher>() {
 			@Override

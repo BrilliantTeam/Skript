@@ -93,5 +93,10 @@ public abstract class JavaFunction<T> extends Function<T> {
 	public String getSince() {
 		return since;
 	}
-	
+
+	@Override
+	public boolean resetReturnValue() {
+		return true;
+	}
+
 }

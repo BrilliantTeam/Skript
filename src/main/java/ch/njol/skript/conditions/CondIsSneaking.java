@@ -31,7 +31,7 @@ import ch.njol.skript.doc.Since;
  * @author Peter Güttinger
  */
 @Name("Is Sneaking")
-@Description("Checks whether a player is sneaking")
+@Description("Checks whether a player is sneaking.")
 @Examples({"# prevent mobs from seeing sneaking players if they are at least 4 meters apart",
 		"on target:",
 		"	target is sneaking",

@@ -264,11 +264,12 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 	 * version of initial delta array or create a new one altogether
 	 * <p>
 	 * Default implementation will just return the parameter array.
+	 * @param changed What is about to be set.
 	 * @param delta Initial delta array.
 	 * @return Delta array to use for change.
 	 */
 	@Nullable
-	default Object[] beforeChange(@Nullable Object[] delta) {
+	default Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
 		return delta;
 	}
 	

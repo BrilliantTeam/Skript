@@ -52,6 +52,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.Metadatable;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -1345,5 +1346,15 @@ public class BukkitClasses {
 					}
 					
 				}));
+
+		Classes.registerClass(new ClassInfo<>(Metadatable.class, "metadataholder")
+				.user("metadata holders?")
+				.name("Metadata Holder")
+				.description("Something that can hold metadata (e.g. an entity or block)")
+				.examples("set metadata value \"super cool\" of player to true")
+				.since("2.2-dev36")
+		);
+
 	}
+
 }

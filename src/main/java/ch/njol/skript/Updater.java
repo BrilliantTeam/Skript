@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -64,7 +62,7 @@ import ch.njol.skript.util.Version;
  */
 public class Updater {
 	
-	public static final String RELEASES_URL  = "https://api.github.com/repos/bensku/Skript/releases";
+	public static final String RELEASES_URL  = "https://api.github.com/repos/SkriptLang/Skript/releases";
 	
 	@Nullable
 	private static Gson gson;
@@ -191,12 +189,6 @@ public class Updater {
 		assert responses != null;
 		
 		return responses;
-	}
-	
-	@SuppressWarnings("null")
-	public static Calendar parseReleaseTime(String date) {
-		assert date != null : "Cannot parse null date!";
-		return DatatypeConverter.parseDateTime(date);
 	}
 	
 	public static class CheckerTask extends Task {

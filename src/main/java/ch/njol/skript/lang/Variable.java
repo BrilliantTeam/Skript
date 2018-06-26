@@ -460,7 +460,12 @@ public class Variable<T> implements Expression<T> {
 						for (final Object d : delta) {
 							for (final Entry<String, Object> i : o.entrySet()) {
 								if (Relation.EQUAL.is(Comparators.compare(i.getValue(), d))) {
-									rem.add(i.getKey());
+									String key = i.getKey();
+									if (key == null)
+										continue; // This is NOT a part of list variable
+									
+									// Otherwise, we'll mark that key to be set to null
+									rem.add(key);
 									break;
 								}
 							}

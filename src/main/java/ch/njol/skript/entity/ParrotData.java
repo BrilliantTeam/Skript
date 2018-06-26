@@ -88,7 +88,7 @@ public class ParrotData extends EntityData<Parrot> {
 
 	@Override
 	protected boolean match(Parrot entity) {
-		return entity.getVariant() == variants[variant];
+		return variant == -1 || entity.getVariant() == variants[variant];
 	}
 
 	@Override

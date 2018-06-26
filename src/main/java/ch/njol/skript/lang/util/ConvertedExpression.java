@@ -261,8 +261,8 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 	
 	@Override
 	@Nullable
-	public Object[] beforeChange(@Nullable Object[] delta) {
-		return source.beforeChange(delta); // Forward to source
+	public Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
+		return source.beforeChange(changed, delta); // Forward to source
 		// TODO this is not entirely safe, even though probably works well enough
 	}
 	

@@ -19,6 +19,7 @@
  */
 package ch.njol.skript.util.chat;
 
+import ch.njol.skript.Skript;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -30,7 +31,9 @@ import net.md_5.bungee.api.chat.TextComponent;
  * supports, too.
  */
 public class BungeeConverter {
-	
+
+	private static boolean HAS_INSERTION_SUPPORT = Skript.methodExists(BaseComponent.class, "setInsertion");
+
 	@SuppressWarnings("null")
 	public static BaseComponent convert(MessageComponent origin) {
 		BaseComponent base = new TextComponent(origin.text);
@@ -42,7 +45,14 @@ public class BungeeConverter {
 		base.setObfuscated(origin.obfuscated);
 		if (origin.color != null) // TODO this is crappy way to copy *color* over...
 			base.setColor(ChatColor.getByChar(SkriptChatCode.valueOf(origin.color).getColorChar()));
-		base.setInsertion(origin.insertion);
+		/*
+		 * This method doesn't exist on normal spigot 1.8
+		 * and it's not worth working around since people affected
+		 * can just use paper 1.8 and it will work fine
+		 */
+		if (HAS_INSERTION_SUPPORT) {
+			base.setInsertion(origin.insertion);
+		}
 		
 		if (origin.clickEvent != null)
 			base.setClickEvent(new ClickEvent(ClickEvent.Action.valueOf(origin.clickEvent.action.spigotName), origin.clickEvent.value));

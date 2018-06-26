@@ -1,4 +1,4 @@
-# Skript [![Build Status](https://travis-ci.org/bensku/Skript.svg?branch=master)](https://travis-ci.org/bensku/Skript)
+# Skript [![Build Status](https://travis-ci.org/SkriptLang/Skript.svg?branch=master)](https://travis-ci.org/SkriptLang/Skript)
 Skript is a plugin for Bukkit/Spigot, which allows server owners and other people
 to modify their servers without learning Java. It can also be useful if you
 *do* know Java; some tasks are quicker to do with Skript, and so it can be used
@@ -7,10 +7,11 @@ for prototyping etc.
 This Github fork of Skript is based on Mirreski's improvements which was built
 on Njol's original Skript. It is supported for **Spigot** (not Bukkit) versions of
 Minecraft 1.9-1.12. Other versions might work, but no guarantees. **Paper** is
-recommended, but not mandatory - without it, timings of scripts will not work.
+recommended, but not mandatory - without it, some features such as timings
+will be not available.
 
 ## Documentation
-Documentation is available [here](http://bensku.github.io/Skript/) for the
+Documentation is available [here](http://skriptlang.github.io/Skript/) for the
 latest version of Skript.
 
 ## Reporting Issues
@@ -92,11 +93,13 @@ So, you want to work with Skript's codebase? There are a few guidelines for you:
 Of course, these are just recommendations. However, not following them may get
 your pull requests rejected.
 
+More clear code style guidelines are probably coming in future.
+
 ### Maven repository
 If you use Skript as (soft) dependency for your plugin, and use maven or Gradle,
 this is for you.
 
-First, you need the repository. Skript is not in Maven Central.
+First, you need the repository. Skript is not available in Maven Central.
 ```
 maven {
     url "https://raw.githubusercontent.com/bensku/mvn-repo/master"
@@ -131,7 +134,7 @@ Note that these repositories are provided as-is, for now. I cannot currently spe
 * [SkUnity Forums](https://forums.skunity.com/)
 * [Original Skript at BukkitDev](https://dev.bukkit.org/bukkit-plugins/skript/) (inactive)
 * [Addon Releases @SkUnity](https://forums.skunity.com/forums/addon-releases/)
-* [Skript Chat Discord invite](https://discord.gg/0lx4QhQvwelCZbEX)
+* [Skript Chat Discord Invite](https://discord.gg/0lx4QhQvwelCZbEX)
 * [Skript Hub](https://skripthub.net/)
 
 Note that these resources are not maintained by me. If you notice something wrong with them, do not contact me.
@@ -141,6 +144,7 @@ Current team behind Skript:
 
 * [bensku](https://github.com/bensku) (Skript maintainer/developer)
 * [Snow-Pyon](https://github.com/Snow-Pyon) (Skript developer)
+* [Pikachu920](https://github.com/Pikachu920) (Skript developer)
 * [TheBentoBox](https://github.com/TheBentoBox) (issue tracker manager)
 
 Also, of course, we should thank [Njol](https://github.com/Njol) for creating

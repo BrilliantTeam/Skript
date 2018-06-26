@@ -22,6 +22,7 @@ package ch.njol.skript.lang;
 import java.util.Locale;
 
 import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.SkriptAPIException;
@@ -48,19 +49,26 @@ public final class SkriptEventInfo<E extends SkriptEvent> extends SyntaxElementI
 	 * @param name Capitalised name of the event without leading "On" which is added automatically (Start the name with an asterisk to prevent this).
 	 * @param patterns
 	 * @param c The SkriptEvent's class
+	 * @param originClassPath The class path for the origin of this event.
 	 * @param events The Bukkit-Events this SkriptEvent listens to
 	 */
-	public SkriptEventInfo(String name, final String[] patterns, final Class<E> c, final Class<? extends Event>[] events) {
-		super(patterns, c);
+	public SkriptEventInfo(String name, final String[] patterns, final Class<E> c, final String originClassPath, final Class<? extends Event>[] events) {
+		super(patterns, c, originClassPath);
 		assert name != null;
 		assert patterns != null && patterns.length > 0;
 		assert c != null;
+		assert originClassPath != null;
 		assert events != null && events.length > 0;
 		
 		for (int i = 0; i < events.length; i++) {
 			for (int j = i + 1; j < events.length; j++) {
-				if (events[i].isAssignableFrom(events[j]) || events[j].isAssignableFrom(events[i]))
+				if (events[i].isAssignableFrom(events[j]) || events[j].isAssignableFrom(events[i])) {
+					if (events[i].equals(PlayerInteractAtEntityEvent.class)
+							|| events[j].equals(PlayerInteractAtEntityEvent.class))
+						continue; // Spigot seems to have an exception for those two events...
+					
 					throw new SkriptAPIException("The event " + name + " (" + c.getName() + ") registers with super/subclasses " + events[i].getName() + " and " + events[j].getName());
+				}
 			}
 		}
 		
@@ -144,6 +152,7 @@ public final class SkriptEventInfo<E extends SkriptEvent> extends SyntaxElementI
 		this.requiredPlugins = pluginNames;
 		return this;
 	}
+
 	
 	public String getId() {
 		return id;

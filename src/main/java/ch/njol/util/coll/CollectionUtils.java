@@ -19,6 +19,12 @@
  */
 package ch.njol.util.coll;
 
+import ch.njol.skript.registrations.Converters;
+import ch.njol.util.Pair;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,11 +34,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
-import ch.njol.util.Pair;
 
 /**
  * Utils for collections and arrays. All methods will not print any errors for <tt>null</tt> collections/arrays, but will return false/-1/etc.
@@ -427,6 +428,14 @@ public abstract class CollectionUtils {
 		for (int i = 0; i < floats.length; i++)
 			floats[i] = (float) doubles[i];
 		return floats;
+	}
+
+	public static Double[] wrap(double[] primitive) {
+		Double[] wrapped = new Double[primitive.length];
+		for (int i = 0; i < primitive.length; i++) {
+			wrapped[i] = primitive[i];
+		}
+		return wrapped;
 	}
 	
 }
