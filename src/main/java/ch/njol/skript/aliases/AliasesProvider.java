@@ -442,7 +442,12 @@ public class AliasesProvider {
 					// TODO block state combinations
 					// If we want them, that is
 					
-					String aliasName = name.replace(varName, entry.getKey());
+					// Figure out the key of alias
+					String currentVar = entry.getKey();
+					if ("{default}".equals(currentVar)) {
+						currentVar = ""; // Nothing provided -> default variation
+					}
+					String aliasName = name.replace(varName, currentVar);
 					assert aliasName != null;
 					loadVariedAlias(aliasName, variedId, combinedTags, blockState);
 				}
