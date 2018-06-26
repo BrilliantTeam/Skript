@@ -395,8 +395,17 @@ public class AliasesProvider {
 	 * @param id Base id of material that this alias represents.
 	 * @param tags Base tags of material that this alias represents.
 	 * @param blockState Block state.
+	 * @param replacement Is id replacement to be used in variations.
 	 */
 	private void loadVariedAlias(String name, @Nullable String id, @Nullable Map<String, Object> tags, @Nullable String blockState) {
+		// Material part replacements for variations
+		// -stuff + minecraft:item_- -> minecraft:item_stuff
+		boolean replacement = false;
+		if (id != null && id.charAt(0) == '-' && id.length() != 1) {
+			id = id.substring(1);
+			replacement = true;
+		}
+		
 		// Find {variations}
 		boolean hasVariations = false;
 		for (int i = 0; i < name.length(); i++) {
@@ -437,6 +446,8 @@ public class AliasesProvider {
 					String variedId = entry.getValue().getId();
 					if (variedId == null) {
 						variedId = id;
+					} else if (replacement) { // Inject alias id to variation's id
+						variedId = variedId.replaceAll("-", id);
 					}
 					
 					// TODO block state combinations
