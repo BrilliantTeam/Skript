@@ -169,8 +169,12 @@ public class Variable<T> implements Expression<T> {
 				}
 				
 				// Hint exists and does NOT match any types requested
-				Skript.warning("Type of a local variable '" + name + "' is not " + Classes.toString(types, false)
-						+ " at this place.");
+				ClassInfo<?>[] infos = new ClassInfo[types.length];
+				for (int i = 0; i < types.length; i++) {
+					infos[i] = Classes.getExactClassInfo(types[i]);
+				}
+				Skript.warning("Local variable '" + name + "' is " + Classes.toString(Classes.getExactClassInfo(hint))
+						+ ", not " + Classes.toString(infos, false));
 				// Fall back to not having any type hints
 			}
 		}
