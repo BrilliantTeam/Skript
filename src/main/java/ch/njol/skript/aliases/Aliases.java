@@ -171,7 +171,6 @@ public abstract class Aliases {
 	
 	public static final String getMaterialName(ItemData type, boolean plural) {
 		MaterialName name = provider.getMaterialName(type);
-		System.out.println(type.hashCode());
 		if (name == null) {
 			return "" + type.type;
 		}
