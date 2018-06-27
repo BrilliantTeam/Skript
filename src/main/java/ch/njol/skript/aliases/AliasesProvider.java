@@ -401,7 +401,7 @@ public class AliasesProvider {
 		// Material part replacements for variations
 		// -stuff + minecraft:item_- -> minecraft:item_stuff
 		boolean replacement = false;
-		if (id != null && id.charAt(0) == '-' && id.length() != 1) {
+		if (id != null && !id.isEmpty() && id.charAt(0) == '-' && id.length() != 1) {
 			id = id.substring(1);
 			replacement = true;
 		}
