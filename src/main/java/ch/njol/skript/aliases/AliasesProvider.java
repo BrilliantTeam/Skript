@@ -569,9 +569,10 @@ public class AliasesProvider {
 			
 			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
 				minecraftIds.put(data, id); // Register Minecraft id for the data, too
+			
+			materialNames.put(data, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), 0));
+			// TODO gender
 		}
-
-		// TODO fill material name
 	}
 
 	@Nullable
