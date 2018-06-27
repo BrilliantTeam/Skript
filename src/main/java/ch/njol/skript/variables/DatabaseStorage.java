@@ -243,9 +243,8 @@ public class DatabaseStorage extends VariablesStorage {
 				if (hasOldTable) {
 					if (!hadNewTable) {
 						Skript.info("[2.1] Updating the database '" + databaseName + "' to the new format...");
-						long stamp = 0;
 						try {
-							stamp = Variables.readLock();
+							Variables.getReadLock().lock();
 							for (final Entry<String, Object> v : Variables.getVariablesHashMap().entrySet()) {
 								if (accept(v.getKey())) {// only one database was possible, so only checking this database is correct
 									@SuppressWarnings("null")
@@ -256,7 +255,7 @@ public class DatabaseStorage extends VariablesStorage {
 							}
 							Skript.info("Updated and transferred " + Variables.getVariablesHashMap().size() + " variables to the new table.");
 						} finally {
-							Variables.unlockRead(stamp);
+							Variables.getReadLock().unlock();
 						}
 					}
 					db.query("DELETE FROM " + OLD_TABLE_NAME + " WHERE value IS NULL");

@@ -33,7 +33,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.StampedLock;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
@@ -236,7 +235,7 @@ public abstract class Variables {
 		return variableNameSplitPattern.split(name);
 	}
 	
-	private final static StampedLock variablesLock = new StampedLock();
+	private final static ReadWriteLock variablesLock = new ReentrantReadWriteLock(true);
 	/**
 	 * must be locked with {@link #variablesLock}.
 	 */
@@ -248,7 +247,7 @@ public abstract class Variables {
 	private final static Map<Event, VariablesMap> localVariables = new HashMap<>();
 	
 	/**
-	 * Remember to lock with {@link #readLock()} and to not make any changes!
+	 * Remember to lock with {@link #getReadLock()} and to not make any changes!
 	 */
 	static TreeMap<String, Object> getVariables() {
 		return variables.treeMap;
@@ -276,11 +275,16 @@ public abstract class Variables {
 	}
 	
 	/**
-	 * Remember to lock with {@link #readLock()}!
+	 * Remember to lock with {@link #getReadLock()}!
 	 */
 	@SuppressWarnings("null")
 	static Map<String, Object> getVariablesHashMap() {
 		return Collections.unmodifiableMap(variables.hashMap);
+	}
+	
+	@SuppressWarnings("null")
+	static Lock getReadLock() {
+		return variablesLock.readLock();
 	}
 	
 	/**
@@ -303,12 +307,11 @@ public abstract class Variables {
 				return null;
 			return map.getVariable(n);
 		} else {
-			long stamp = 0;
 			try {
-				stamp = variablesLock.readLock();
+				variablesLock.readLock().lock();
 				return variables.getVariable(n);
 			} finally {
-				variablesLock.unlockRead(stamp);
+				variablesLock.readLock().unlock();
 			}
 		}
 	}
@@ -345,12 +348,11 @@ public abstract class Variables {
 	}
 	
 	final static void setVariable(final String name, @Nullable final Object value) {
-		long stamp = 0;
 		try {
-			stamp = variablesLock.writeLock();
+			variablesLock.writeLock().lock();
 			variables.setVariable(name, value);
 		} finally {
-			variablesLock.unlockWrite(stamp);
+			variablesLock.writeLock().unlock();
 		}
 		saveVariableChange(name, value);
 	}
@@ -399,11 +401,11 @@ public abstract class Variables {
 			}
 		}
 		
-		long stamp = variablesLock.writeLock();
+		variablesLock.writeLock().lock();
 		try {
 			variables.setVariable(name, value);
 		} finally {
-			variablesLock.unlockWrite(stamp);
+			variablesLock.writeLock().unlock();
 		}
 		
 		for (final VariablesStorage s : storages) {
@@ -431,12 +433,11 @@ public abstract class Variables {
 			Skript.warning("A total of " + loadConflicts + " variables were loaded more than once from different databases");
 		Skript.debug("Databases loaded, setting variables...");
 		
-		long stamp;
 		synchronized (tempVars) {
 			final Map<String, NonNullPair<Object, VariablesStorage>> tvs = tempVars.get();
 			tempVars.set(null);
 			assert tvs != null;
-			stamp = variablesLock.writeLock();
+			variablesLock.writeLock().lock();
 			try {
 				int n = 0;
 				for (final Entry<String, NonNullPair<Object, VariablesStorage>> tv : tvs.entrySet()) {
@@ -451,7 +452,7 @@ public abstract class Variables {
 				
 				return n;
 			} finally {
-				variablesLock.unlockWrite(stamp);
+				variablesLock.writeLock().unlock();
 			}
 		}
 	}
@@ -504,21 +505,12 @@ public abstract class Variables {
 	}
 	
 	public static int numVariables() {
-		long stamp = 0;
 		try {
-			stamp = variablesLock.readLock();
+			variablesLock.readLock().lock();
 			return variables.hashMap.size();
 		} finally {
-			variablesLock.unlockRead(stamp);
+			variablesLock.readLock().unlock();
 		}
-	}
-
-	static long readLock() {
-		return variablesLock.readLock();
-	}
-	
-	static void unlockRead(long stamp) {
-		variablesLock.unlockRead(stamp);
 	}
 	
 }

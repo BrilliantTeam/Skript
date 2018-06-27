@@ -189,7 +189,7 @@ public abstract class VariablesStorage implements Closeable {
 	protected abstract File getFile(String file);
 	
 	/**
-	 * Must be locked after {@link Variables#readLock()} (if that lock is used at all)
+	 * Must be locked after {@link Variables#getReadLock()} (if that lock is used at all)
 	 */
 	protected final Object connectionLock = new Object();
 	

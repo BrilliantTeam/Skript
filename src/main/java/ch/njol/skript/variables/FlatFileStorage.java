@@ -63,7 +63,7 @@ public class FlatFileStorage extends VariablesStorage {
 	public final static Charset UTF_8 = Charset.forName("UTF-8");
 	
 	/**
-	 * A Lock on this object must be acquired after connectionLock (if that lock is used) (and thus also after {@link Variables#readLock()}).
+	 * A Lock on this object must be acquired after connectionLock (if that lock is used) (and thus also after {@link Variables#getReadLock()}).
 	 */
 	private final NotifyingReference<PrintWriter> changesWriter = new NotifyingReference<PrintWriter>();
 	
@@ -197,13 +197,12 @@ public class FlatFileStorage extends VariablesStorage {
 			@Override
 			public void run() {
 				if (changes.get() >= REQUIRED_CHANGES_FOR_RESAVE) {
-					long stamp = 0;
 					try {
-						Variables.readLock();
+						Variables.getReadLock().lock();
 						saveVariables(false);
 						changes.set(0);
 					} finally {
-						Variables.unlockRead(stamp);
+						Variables.getReadLock().unlock();
 					}
 				}
 			}
@@ -364,10 +363,8 @@ public class FlatFileStorage extends VariablesStorage {
 			if (bt != null)
 				bt.cancel();
 		}
-		
-		long stamp = 0;
 		try {
-			stamp = Variables.readLock();
+			Variables.getReadLock().lock();
 			synchronized (connectionLock) {
 				try {
 					final File f = file;
@@ -414,7 +411,7 @@ public class FlatFileStorage extends VariablesStorage {
 				}
 			}
 		} finally {
-			Variables.unlockRead(stamp);
+			Variables.getReadLock().unlock();
 		}
 	}
 	
