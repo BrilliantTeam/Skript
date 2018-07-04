@@ -26,9 +26,18 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.classes.Changer;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 
+@Name("Spectator Target")
+@Description("The entity a player is currently spectating. This can be set and cleared when" +
+		"the given player is in spectator mode.")
+@Examples("set spectator target of player to last spawned creeper")
+@Since("INSERT VERSION")
 public class ExprSpectatorTarget extends SimplePropertyExpression<Player, Entity> {
 
 	static {

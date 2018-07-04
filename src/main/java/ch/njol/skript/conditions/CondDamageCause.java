@@ -49,7 +49,7 @@ import ch.njol.util.Kleenean;
 		"	apply fire resistance to the victim for 30 seconds",
 		"	remove 1 potion of fire resistance from the victim",
 		"# prevent mobs from dropping items under certain circumstances",
-		"on death;",
+		"on death:",
 		"	entity is not a player",
 		"	damage wasn't caused by a block explosion, an attack, a projectile, a potion, fire, burning, thorns or poison",
 		"	clear drops"})
