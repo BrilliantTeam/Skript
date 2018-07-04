@@ -20,6 +20,7 @@
 package ch.njol.skript.expressions;
 
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
@@ -33,6 +34,8 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
 
@@ -47,13 +50,13 @@ import ch.njol.util.StringUtils;
 public class ExprJoinSplit extends SimpleExpression<String> {
 	static {
 		Skript.registerExpression(ExprJoinSplit.class, String.class, ExpressionType.COMBINED,
-				"(concat[enate]|join) %strings% [(with|using|by) [[the] delimiter] %-string%]",
+				"(concat[enate]|join) %objects% [(with|using|by) [[the] delimiter] %-string%]",
 				"split %string% (at|using|by) [[the] delimiter] %string%", "%string% split (at|using|by) [[the] delimiter] %string%");
 	}
 	
 	private boolean join;
 	@SuppressWarnings("null")
-	private Expression<String> strings;
+	private Expression<String> things;
 	@Nullable
 	private Expression<String> delimiter;
 	
@@ -61,22 +64,27 @@ public class ExprJoinSplit extends SimpleExpression<String> {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		join = matchedPattern == 0;
-		strings = (Expression<String>) exprs[0];
+		things = LiteralUtils.defendExpression(exprs[0]);
 		delimiter = (Expression<String>) exprs[1];
-		return true;
+		return LiteralUtils.canInitSafely(things);
 	}
 	
 	@Override
 	@Nullable
 	protected String[] get(final Event e) {
-		final String[] s = strings.getArray(e);
+		final Object[] t = things.getArray(e);
 		final String d = delimiter != null ? delimiter.getSingle(e) : "";
-		if (s.length == 0 || d == null)
+		if (t.length == 0 || d == null)
 			return new String[0];
 		if (join) {
-			return new String[] {StringUtils.join(s, d)};
+			return new String[] {
+					StringUtils.join(
+							Stream.of(t).map(Classes::toString).toArray(String[]::new),
+							d
+					)
+			};
 		} else {
-			return s[0].split(Pattern.quote(d), -1);
+			return ((String) t[0]).split(Pattern.quote(d), -1);
 		}
 	}
 	
@@ -92,7 +100,7 @@ public class ExprJoinSplit extends SimpleExpression<String> {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return join ? "join " + strings.toString(e, debug) + (delimiter != null ? " with " + delimiter.toString(e, debug) : "") : "split " + strings.toString(e, debug) + (delimiter != null ? " at " + delimiter.toString(e, debug) : "");
+		return join ? "join " + things.toString(e, debug) + (delimiter != null ? " with " + delimiter.toString(e, debug) : "") : "split " + things.toString(e, debug) + (delimiter != null ? " at " + delimiter.toString(e, debug) : "");
 	}
 	
 }
