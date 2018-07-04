@@ -46,7 +46,8 @@ public class ExprIndexes extends SimpleExpression<String> {
 
 	static {
 		Skript.registerExpression(ExprIndexes.class, String.class, ExpressionType.COMBINED,
-				"[all] indexes of %objects%"
+				"[the] indexes of %objects%",
+				"(all of the|all the|all) indexes of %objects%"
 		);
 	}
 
