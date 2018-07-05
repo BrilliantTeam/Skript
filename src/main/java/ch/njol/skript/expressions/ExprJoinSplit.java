@@ -19,6 +19,7 @@
  */
 package ch.njol.skript.expressions;
 
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -77,12 +78,11 @@ public class ExprJoinSplit extends SimpleExpression<String> {
 		if (t.length == 0 || d == null)
 			return new String[0];
 		if (join) {
-			return new String[] {
-					StringUtils.join(
-							Stream.of(t).map(Classes::toString).toArray(String[]::new),
-							d
-					)
-			};
+			StringJoiner joiner = new StringJoiner(d);
+			for (Object thing : t) {
+				joiner.add(Classes.toString(thing));
+			}
+			return new String[] { joiner.toString() };
 		} else {
 			return ((String) t[0]).split(Pattern.quote(d), -1);
 		}

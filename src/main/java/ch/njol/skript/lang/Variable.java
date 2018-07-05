@@ -221,9 +221,13 @@ public class Variable<T> implements Expression<T> {
 	public <R> Variable<R> getConvertedExpression(final Class<R>... to) {
 		return new Variable<>(name, to, local, list, this);
 	}
-	
+
 	/**
 	 * Gets the value of this variable as stored in the variables map.
+	 *
+	 * This is mostly for internal usage, if you want to get the value(s)
+	 * the variable holds then use {@link Variable#getArray(Event)},
+	 * {@link Variable#getAll(Event)} or {@link Variable#getSingle(Event)}
 	 */
 	@Nullable
 	public Object getRaw(final Event e) {

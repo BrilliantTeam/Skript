@@ -44,18 +44,12 @@ import ch.njol.util.Kleenean;
 @Since("INSERT VERSION")
 public class EffSendBlockChange extends Effect {
 
-	private static final boolean SUPPORTED =
-			Skript.methodExists(
-					Player.class,
-					"sendBlockChange",
-					Location.class,
-					Material.class,
-					byte.class
-			);
+	private static final boolean SUPPORTED = Skript.methodExists(Player.class, "sendBlockChange", Location.class,
+					Material.class, byte.class);
 
 	static {
 		Skript.registerEffect(EffSendBlockChange.class,
-				"make %players% see %blocks% as %itemstack%"
+				"make %players% see %blocks% as %itemtype%"
 		);
 	}
 
@@ -66,11 +60,14 @@ public class EffSendBlockChange extends Effect {
 	private Expression<Block> blocks;
 
 	@SuppressWarnings("null")
-	private Expression<ItemStack> as;
+	private Expression<ItemType> as;
 
 	@Override
 	protected void execute(Event e) {
-		ItemStack as = this.as.getSingle(e);
+		ItemType type = this.as.getSingle(e);
+		if (type == null)
+			return;
+		ItemStack as = type.getRandom();
 		if (as == null)
 			return;
 		for (Player player : players.getArray(e)) {
@@ -102,7 +99,7 @@ public class EffSendBlockChange extends Effect {
 		}
 		players = (Expression<Player>) exprs[0];
 		blocks = (Expression<Block>) exprs[1];
-		as = (Expression<ItemStack>) exprs[2];
+		as = (Expression<ItemType>) exprs[2];
 		return true;
 	}
 }

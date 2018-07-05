@@ -29,6 +29,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -45,9 +46,9 @@ import ch.njol.util.Kleenean;
 public class ExprIndexes extends SimpleExpression<String> {
 
 	static {
-		Skript.registerExpression(ExprIndexes.class, String.class, ExpressionType.COMBINED,
-				"[the] indexes of %objects%",
-				"(all of the|all the|all) indexes of %objects%"
+		Skript.registerExpression(ExprIndexes.class, String.class, ExpressionType.PROPERTY,
+				"[(all [[of] the]|the)] indexes of %objects%",
+				"%objects%'s indexes"
 		);
 	}
 
@@ -78,7 +79,7 @@ public class ExprIndexes extends SimpleExpression<String> {
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
 		// we need to provide a null event otherwise the string value is what's held in the var
-		return String.format("all indexes of %s", list.toString(null, debug));
+		return "all indexes of " + list.toString(null, debug);
 	}
 
 	@Override
