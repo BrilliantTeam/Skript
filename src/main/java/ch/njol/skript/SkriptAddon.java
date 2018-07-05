@@ -113,13 +113,6 @@ public final class SkriptAddon {
 					}
 				}
 			}
-<<<<<<< HEAD
-		} finally {
-			try {
-				jar.close();
-			} catch (final IOException e) {}
-=======
->>>>>>> 743bf7b... Replace 'try finally' with 'try with resources' where applicable
 		}
 		return this;
 	}

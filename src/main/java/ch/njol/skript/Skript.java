@@ -312,15 +312,6 @@ public final class Skript extends JavaPlugin implements Listener {
 				info("Successfully generated the config, the example scripts and the aliases files.");
 			} catch (final ZipException e) {} catch (final IOException e) {
 				error("Error generating the default files: " + ExceptionUtils.toString(e));
-<<<<<<< HEAD
-			} finally {
-				if (f != null) {
-					try {
-						f.close();
-					} catch (final IOException e) {}
-				}
-=======
->>>>>>> 743bf7b... Replace 'try finally' with 'try with resources' where applicable
 			}
 		}
 		
@@ -411,13 +402,6 @@ public final class Skript extends JavaPlugin implements Listener {
 								}
 							}
 						}
-<<<<<<< HEAD
-					} finally {
-						try {
-							jar.close();
-						} catch (final IOException e) {}
-=======
->>>>>>> 743bf7b... Replace 'try finally' with 'try with resources' where applicable
 					}
 				} catch (final Exception e) {
 					error("Error while loading plugin hooks" + (e.getLocalizedMessage() == null ? "" : ": " + e.getLocalizedMessage()));
