@@ -97,8 +97,11 @@ public class EffVisualEffect extends Effect {
 				Skript.warning("Entity effects are visible to all players");
 			if (!hasLocationEffect && !direction.isDefault())
 				Skript.warning("Entity effects are always played on an entity");
-			if (hasEntityEffect && !Entity.class.isAssignableFrom(where.getReturnType()))
+			if (hasEntityEffect
+					&& (!Entity.class.isAssignableFrom(where.getReturnType())
+						|| where.getReturnType() == Object.class)) { // variables and similar
 				Skript.warning("Entity effects can only be played on entities");
+			}
 		}
 		return true;
 	}
