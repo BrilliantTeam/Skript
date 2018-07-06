@@ -19,8 +19,17 @@
  */
 package ch.njol.skript.expressions;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.NonNull;
+
+import com.google.common.collect.Iterators;
 import ch.njol.skript.Skript;
-import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -32,18 +41,11 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.util.LiteralUtils;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
+import ch.njol.util.coll.iterator.ArrayIterator;
 
 @Name("Filter")
 @Description("Filters a list based on a condition. " +
@@ -85,21 +87,31 @@ public class ExprFilter extends SimpleExpression<Object> {
 		return condition != null && LiteralUtils.canInitSafely(objects);
 	}
 
+	/*
+	 * using an iterator improves performance in loops
+	 * because if i ran loop 1, 2 and 3 where [input is less than 3]:
+	 * in a non iterator implementation, i would loop through 5 things
+	 * in total (1, 2, 3 and then 1 and 2) where as an iterator implementation
+	 * would only iterate over 3 things (1, 2 and 3) with only filtered
+	 * elements being actually looped in the script
+	 */
+	@NonNull
 	@Override
-	protected Object[] get(Event e) {
-		List<Object> filtered = new ArrayList<>();
+	public Iterator<?> iterator(Event e) {
 		try {
-			for (Object object : objects.getArray(e)) {
+			return Iterators.filter(new ArrayIterator<>(this.objects.getArray(e)), object -> {
 				current = object;
-				if (condition.check(e)) {
-					filtered.add(object);
-				}
-			}
+				return condition.check(e);
+			});
 		} finally {
 			current = null;
 		}
+	}
+
+	@Override
+	protected Object[] get(Event e) {
 		try {
-			return Converters.convertStrictly(filtered.toArray(), objects.getReturnType());
+			return Converters.convertStrictly(Iterators.toArray(iterator(e), Object.class), getReturnType());
 		} catch (ClassCastException e1) {
 			return null;
 		}
@@ -111,6 +123,10 @@ public class ExprFilter extends SimpleExpression<Object> {
 
 	private void addChild(ExprInput<?> child) {
 		children.add(child);
+	}
+
+	private void removeChild(ExprInput<?> child) {
+		children.remove(child);
 	}
 
 	@Override
@@ -144,22 +160,24 @@ public class ExprFilter extends SimpleExpression<Object> {
 
 	@Name("Filter Input")
 	@Description("Represents the input in a filter expression. " +
-			"For example, if you ran 'broadcast \"something\" and \"something else\" where [string input is \"something\"]" +
+			"For example, if you ran 'broadcast \"something\" and \"something else\" where [input is \"something\"]" +
 			"the condition would be checked twice, using \"something\" and \"something else\" as the inputs.")
-	@Examples("send \"congrats on being staff!\" to all players where [player input has permission \"staff\"]")
+	@Examples("send \"congrats on being staff!\" to all players where [input has permission \"staff\"]")
 	@Since("2.2-dev36")
 	@SuppressWarnings({"null", "unchecked"})
 	public static class ExprInput<T> extends SimpleExpression<T> {
 
 		static {
 			Skript.registerExpression(ExprInput.class, Object.class, ExpressionType.COMBINED,
-					"[%-classinfo%] input");
+					"input",
+					"%*classinfo% input"
+			);
 		}
 
 		private ExprInput<?> source;
 		private Class<T> superType;
 		private ExprFilter parent;
-		private Literal<ClassInfo<?>> inputType;
+		private ClassInfo<?> inputType;
 
 		public ExprInput() {
 			this(null, (Class<? extends T>) Object.class);
@@ -170,6 +188,7 @@ public class ExprFilter extends SimpleExpression<Object> {
 			if (source != null) {
 				this.parent = source.parent;
 				this.inputType = source.inputType;
+				parent.removeChild(source);
 				parent.addChild(this);
 			}
 			this.superType = (Class<T>) Utils.getSuperType(types);
@@ -177,19 +196,19 @@ public class ExprFilter extends SimpleExpression<Object> {
 
 		@Override
 		public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-			if (ExprFilter.getParsing() == null || !(exprs[0] == null || exprs[0] instanceof Literal)) {
+			parent = ExprFilter.getParsing();
+			if (parent == null) {
 				return false;
 			}
-			parent = ExprFilter.getParsing();
 			parent.addChild(this);
-			inputType = (Literal<ClassInfo<?>>) exprs[0];
+			inputType = matchedPattern == 0 ? null : ((Literal<ClassInfo<?>>) exprs[0]).getSingle();
 			return true;
 		}
 
 		@Override
 		protected T[] get(Event e) {
 			Object current = parent.getCurrent();
-			if (inputType != null && !inputType.getSingle().getC().isInstance(current)) {
+			if (inputType != null && !inputType.getC().isInstance(current)) {
 				return null;
 			}
 			try {
@@ -219,7 +238,7 @@ public class ExprFilter extends SimpleExpression<Object> {
 		}
 
 		private ClassInfo<?> getClassInfo() {
-			return inputType == null ? null : inputType.getSingle();
+			return inputType;
 		}
 
 		@Override
@@ -229,7 +248,7 @@ public class ExprFilter extends SimpleExpression<Object> {
 
 		@Override
 		public String toString(Event e, boolean debug) {
-			return inputType == null ? "input" : String.format("%s input", inputType.toString(e, debug));
+			return inputType == null ? "input" : inputType.getCodeName() + " input";
 		}
 
 	}
