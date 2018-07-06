@@ -19,14 +19,12 @@
  */
 package ch.njol.skript.util;
 
+import java.util.stream.Stream;
+
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionList;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.UnparsedLiteral;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
  * A class that contains methods based around
@@ -46,8 +44,9 @@ public class LiteralUtils {
     @SuppressWarnings("unchecked")
     public static <T> Expression<T> defendExpression(Expression<?> expr) {
         if (expr instanceof ExpressionList) {
-            Stream.of(((ExpressionList) expr).getExpressions())
-                    .forEach(LiteralUtils::defendExpression);
+			Expression<?>[] exprs = ((ExpressionList) expr).getExpressions();
+			for (int i = 0; i < exprs.length; i++)
+				exprs[i] = defendExpression(exprs[i]);
         } else if (expr instanceof UnparsedLiteral) {
             Literal<?> parsedLiteral = ((UnparsedLiteral) expr).getConvertedExpression(Object.class);
             return (Expression<T>) (parsedLiteral == null ? expr : parsedLiteral);
@@ -67,7 +66,7 @@ public class LiteralUtils {
             return true;
         } else if (expr instanceof ExpressionList) {
             return Stream.of(((ExpressionList) expr).getExpressions())
-                    .anyMatch(e -> e instanceof UnparsedLiteral);
+                    .anyMatch(UnparsedLiteral.class::isInstance);
         }
         return false;
     }
