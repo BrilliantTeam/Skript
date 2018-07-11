@@ -34,6 +34,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 
 @Name("Sorted List")
@@ -57,8 +58,8 @@ public class ExprSortedList extends SimpleExpression<Object> {
 			Skript.error("List of type " + Classes.toString(type) + " does not support sorting.");
 			return false;
 		}
-		list = (Expression<Object>) exprs[0];
-		return true;
+		list = LiteralUtils.defendExpression(exprs[0]);
+		return LiteralUtils.canInitSafely(list);
 	}
 	
 	@Override

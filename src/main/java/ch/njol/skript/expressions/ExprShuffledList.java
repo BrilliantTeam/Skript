@@ -37,7 +37,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 
 @Name("Shuffled List")
@@ -56,8 +56,8 @@ public class ExprShuffledList extends SimpleExpression<Object> {
 	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		list = (Expression<Object>) exprs[0];
-		return true;
+		list = LiteralUtils.defendExpression(exprs[0]);
+		return LiteralUtils.canInitSafely(list);
 	}
 	
 	@Override
