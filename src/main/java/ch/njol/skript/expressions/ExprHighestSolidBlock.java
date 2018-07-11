@@ -39,7 +39,7 @@ public class ExprHighestSolidBlock extends SimplePropertyExpression<Location, Bl
 
 	static {
 		Skript.registerExpression(ExprHighestSolidBlock.class, Block.class, ExpressionType.PROPERTY,
-				"highest [(solid|non-air)] block[s] at %locations%"
+				"[the] highest [(solid|non-air)] block[s] at %locations%"
 		);
 	}
 
@@ -51,7 +51,7 @@ public class ExprHighestSolidBlock extends SimplePropertyExpression<Location, Bl
 	@Nullable
 	@Override
 	public Block convert(Location location) {
-		return location.getWorld().getHighestBlockAt(location);
+		return location.getWorld().getHighestBlockAt(location).getRelative(0, -1, 0);
 	}
 
 	@Override
