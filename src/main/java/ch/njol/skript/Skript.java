@@ -1332,7 +1332,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
 		} else if (Updater.state == UpdateState.UPDATE_AVAILABLE) {
 			logEx("You're running outdated version of Skript! Please try updating it NOW; it might fix this.");
-			logEx("You may download new version of Skript at https://github.com/bensku/Skript/releases");
+			logEx("You may download new version of Skript at https://github.com/SkriptLang/Skript/releases");
 			logEx("You will be given instructions how to report this error if it persists with latest Skript.");
 			logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
 		} else {
