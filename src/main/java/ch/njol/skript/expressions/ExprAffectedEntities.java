@@ -28,12 +28,23 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 
+@Name("Affected Entities")
+@Description("The affected entities in the <a href='events.html#aoe_cloud_effect>are cloud effect</a> event.")
+@Examples({"on area cloud effect:",
+		"	loop affected entities:",
+		"		if loop-value is a player:",
+		"			send \"WARNING: you've step on a area cloud!\""})
+@Since("INSERT VERSION")
 public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
 	
 	static {
