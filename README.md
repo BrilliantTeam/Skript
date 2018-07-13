@@ -102,7 +102,7 @@ this is for you.
 First, you need the repository. Skript is not available in Maven Central.
 ```
 maven {
-    url "https://raw.githubusercontent.com/bensku/mvn-repo/master"
+    url 'https://raw.githubusercontent.com/bensku/mvn-repo/master'
 }
 ```
 
@@ -116,8 +116,9 @@ Or, if you use Maven:
 
 Then you will also need to add Skript as a dependency.
 ```
-compile "ch.njol:skript:2.2-RELEASE_TAG"
+implementation 'ch.njol:skript:2.2-RELEASE_TAG'
 ```
+Note: If Gradle isn't able to resolve Skript's dependencies, just [disable the resolution of transitive dependencies](https://docs.gradle.org/current/userguide/managing_transitive_dependencies.html#sub:disabling_resolution_transitive_dependencies) for Skript in your project.
 
 Or, if you use Maven:
 ```
