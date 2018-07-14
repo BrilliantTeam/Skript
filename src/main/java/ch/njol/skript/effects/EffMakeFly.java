@@ -35,7 +35,8 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
 @Name("Make Fly")
-@Description("Forces a player to start/stop flying.")
+@Description({"Forces a player to start/stop flying.", 
+	     	"Be aware that this also changes the <a href='expressions.html#ExprFlightMode'>flight mode</a> of the player."})
 @Examples({"make player fly", "force all players to stop flying"})
 @Since("2.2-dev34")
 public class EffMakeFly extends Effect {
@@ -43,8 +44,8 @@ public class EffMakeFly extends Effect {
 	static {
 		if (Skript.methodExists(Player.class, "setFlying", boolean.class)) {
 			Skript.registerEffect(EffMakeFly.class, "force %players% to [(start|1¦stop)] fly[ing]",
-												"make %players% (start|1¦stop) flying",
-												"make %players% fly");
+								"make %players% (start|1¦stop) flying",
+								"make %players% fly");
 		}
 	}
 
