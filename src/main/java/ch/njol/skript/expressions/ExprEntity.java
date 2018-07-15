@@ -105,6 +105,11 @@ public class ExprEntity extends SimpleExpression<Entity> {
 	public Class<? extends Entity> getReturnType() {
 		return type.getType();
 	}
+
+	@Override
+	public boolean isDefault() {
+		return true;
+	}
 	
 	@Override
 	@Nullable
