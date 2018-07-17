@@ -26,6 +26,7 @@ import java.util.stream.IntStream;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.common.collect.Iterators;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.NoDoc;
 import ch.njol.skript.lang.Expression;
@@ -68,38 +69,21 @@ public class ExprTimes extends SimpleExpression<Number> {
 	@Nullable
 	@Override
 	protected Number[] get(final Event e) {
-		Number end = this.end.getSingle(e);
-		if (end == null) {
+		Iterator<? extends Integer> iter = iterator(e);
+		if (iter == null) {
 			return null;
 		}
-		// empty if the second param is lesser than 1
-		return IntStream.range(1, end.intValue() + 1).boxed().toArray(Integer[]::new);
+		return Iterators.toArray(iter, Integer.class);
 	}
 
 	@Nullable
 	@Override
-	public Iterator<? extends Number> iterator(final Event e) {
+	public Iterator<? extends Integer> iterator(final Event e) {
 		Number end = this.end.getSingle(e);
 		if (end == null) {
 			return null;
 		}
-		int endInt = end.intValue(); // this whole method is all about performance, so..
-		return new Iterator<Number>() {
-			int current = 0;
-
-			@Override
-			public boolean hasNext() {
-				return current < endInt;
-			}
-
-			@Override
-			public Number next() {
-				if (!hasNext()) {
-					throw new NoSuchElementException();
-				}
-				return ++current;
-			}
-		};
+		return IntStream.range(1, end.intValue() + 1).iterator();
 	}
 
 	@Override
