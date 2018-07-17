@@ -981,6 +981,7 @@ final public class ScriptLoader {
 				String name = replaceOptions("" + n.getKey());
 				if (!SkriptParser.validateLine(name))
 					continue;
+				TypeHints.enterScope(); // Begin conditional type hints
 				
 				if (StringUtils.startsWithIgnoreCase(name, "loop ")) {
 					final String l = "" + name.substring("loop ".length());
@@ -1058,6 +1059,9 @@ final public class ScriptLoader {
 					items.add(new Conditional(cond, (SectionNode) n));
 					hasDelayBefore = hadDelayBefore.or(hasDelayBefore.and(Kleenean.UNKNOWN));
 				}
+				
+				// Destroy these conditional type hints
+				TypeHints.exitScope();
 			}
 		}
 		

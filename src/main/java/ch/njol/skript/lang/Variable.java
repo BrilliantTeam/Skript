@@ -161,9 +161,20 @@ public class Variable<T> implements Expression<T> {
 		if (isLocal && vs.isSimple()) { // Only variable names we fully know already
 			Class<?> hint = TypeHints.get(vs.toString());
 			if (hint != null && !hint.equals(Object.class)) { // Type hint available
+				// See if we can get correct type without conversion
 				for (Class<? extends T> type : types) {
+					assert type != null;
 					if (type.isAssignableFrom(hint)) {
 						// Hint matches, use variable with exactly correct type
+						return new Variable<>(vs, CollectionUtils.array(type), isLocal, isPlural, null);
+					}
+				}
+				
+				// Or with conversion?
+				for (Class<? extends T> type : types) {
+					assert type != null;
+					if (Converters.converterExists(type, hint)) {
+						// Hint matches, even though converter is needed
 						return new Variable<>(vs, CollectionUtils.array(type), isLocal, isPlural, null);
 					}
 				}
