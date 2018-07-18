@@ -33,6 +33,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * <li>EffChange adds then when local variables are set
  * <li>Variable checks them when parser tries to create it
  * <li>ScriptLoader clears hints after each section has been parsed
+ * <li>ScriptLoader enters and exists scopes as needed
  * </ul>
  */
 public class TypeHints {

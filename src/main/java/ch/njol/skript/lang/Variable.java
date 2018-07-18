@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.NonNull;
@@ -173,9 +174,18 @@ public class Variable<T> implements Expression<T> {
 				// Or with conversion?
 				for (Class<? extends T> type : types) {
 					assert type != null;
-					if (Converters.converterExists(type, hint)) {
+					if (Converters.converterExists(hint, type)) {
 						// Hint matches, even though converter is needed
 						return new Variable<>(vs, CollectionUtils.array(type), isLocal, isPlural, null);
+					}
+					
+					// Special cases
+					if (type.isAssignableFrom(World.class) && hint.isAssignableFrom(String.class)) {
+						// String->World conversion is weird spaghetti code
+						return new Variable<>(vs, types, isLocal, isPlural, null);
+					} else if (type.isAssignableFrom(Player.class) && hint.isAssignableFrom(String.class)) {
+						// String->Player conversion is not available at this point
+						return new Variable<>(vs, types, isLocal, isPlural, null);
 					}
 				}
 				
