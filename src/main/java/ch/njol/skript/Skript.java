@@ -69,6 +69,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.aliases.Aliases;
+import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.bukkitutil.Workarounds;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Comparator;
@@ -381,6 +382,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		if (SkriptConfig.checkForNewVersion.value()) // We only start updater automatically if it was asked
 			Updater.start();
 		
+		BukkitUnsafe.initialize(); // Needed for aliases
 		Aliases.load();
 		
 		Commands.registerListeners();

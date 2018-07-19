@@ -19,15 +19,24 @@
  */
 package ch.njol.skript.bukkitutil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import ch.njol.skript.Skript;
 
@@ -70,6 +79,23 @@ public class BukkitUnsafe {
 	private static final boolean newMaterials = Skript.isRunningMinecraft(1, 13);
 	
 	@Nullable
+	private static Map<String,Material> materialMap;
+	
+	public static void initialize() {
+		if (!newMaterials) {
+			try {
+				boolean mapExists = loadMaterialMap();
+				if (!mapExists) {
+					Skript.warning("Material mappings are not available for this Minecraft version.");
+					// TODO try loading 1.12 ones
+				}
+			} catch (IOException e) {
+				Skript.exception(e, "Failed to load material mappings. Aliases may not work properly.");
+			}
+		}
+	}
+	
+	@Nullable
 	public static Material getMaterialFromMinecraftId(String id) {
 		if (newMaterials) {
 			// On 1.13, Vanilla and Spigot names are same
@@ -86,6 +112,21 @@ public class BukkitUnsafe {
 			}
 			return type;
 		}
+	}
+	
+	private static boolean loadMaterialMap() throws IOException {
+		// Figure correct map file
+		try (InputStream is = Skript.getInstance().getResource("materials/" + Skript.getMinecraftVersion() + ".json")) {
+			if (is == null) { // No mappings for this Minecraft version
+				return false;
+			}
+			String data = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+			
+			Type type = new TypeToken<Map<String,Material>>(){}.getType();
+			materialMap = new Gson().fromJson(data, type);
+		}
+		
+		return true;
 	}
 	
 	@Nullable
