@@ -72,7 +72,7 @@ public class BukkitUnsafe {
 	@Nullable
 	public static Material getMaterialFromMinecraftId(String id) {
 		if (newMaterials) {
-			// On 1.13 (according to preview API), Vanilla and Spigot names are same
+			// On 1.13, Vanilla and Spigot names are same
 			return Material.getMaterial(id);
 		} else {
 			Material type;

@@ -315,7 +315,7 @@ public final class Skript extends JavaPlugin implements Listener {
 						}
 					}
 				}
-				info("Successfully generated the config, the example scripts and the aliases files.");
+				info("Successfully generated the config and the example scripts.");
 			} catch (final ZipException e) {} catch (final IOException e) {
 				error("Error generating the default files: " + ExceptionUtils.toString(e));
 			} finally {
