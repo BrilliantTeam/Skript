@@ -507,7 +507,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	@Nullable
 	public ItemStack addTo(final @Nullable ItemStack item) {
-		if (item == null || item.getTypeId() == 0)
+		if (item == null || item.getType() == Material.AIR)
 			return getRandom();
 		if (isOfType(item))
 			item.setAmount(Math.min(item.getAmount() + getAmount(), item.getMaxStackSize()));

@@ -19,6 +19,10 @@
  */
 package ch.njol.skript.bukkitutil;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
@@ -39,15 +43,31 @@ public class BukkitUnsafe {
 	 * not particularly hard to achieve.
 	 */
 	private static final UnsafeValues unsafe;
+	
+	/**
+	 * Before 1.13, Vanilla material names were translated using
+	 * this + a lookup table.
+	 */
+	private static final MethodHandle unsafeFromInternalNameMethod;
+	
 	static {
 		UnsafeValues values = Bukkit.getUnsafe();
 		if (values == null) {
 			throw new Error("unsafe values are not available");
 		}
 		unsafe = values;
+		
+		try {
+			MethodHandle mh = MethodHandles.lookup().findVirtual(UnsafeValues.class,
+					"getMaterialFromInternalName", MethodType.methodType(String.class, Material.class));
+			assert mh != null;
+			unsafeFromInternalNameMethod = mh;
+		} catch (NoSuchMethodException | IllegalAccessException e) {
+			throw new Error(e);
+		}
 	}
 	
-	private static final boolean newMaterials = Skript.isRunningMinecraft(1, 13); // REMIND test when 1.13 hits!
+	private static final boolean newMaterials = Skript.isRunningMinecraft(1, 13);
 	
 	@Nullable
 	public static Material getMaterialFromMinecraftId(String id) {
@@ -55,7 +75,12 @@ public class BukkitUnsafe {
 			// On 1.13 (according to preview API), Vanilla and Spigot names are same
 			return Material.getMaterial(id);
 		} else {
-			Material type = unsafe.getMaterialFromInternalName(id);
+			Material type;
+			try {
+				type = (Material) unsafeFromInternalNameMethod.invokeExact(unsafe, id);
+			} catch (Throwable e) {
+				throw new RuntimeException(e); // Hmm
+			}
 			if (type == null || type == Material.AIR) { // If there is no item form, UnsafeValues won't work
 				type = checkForBuggedType(id);
 			}
