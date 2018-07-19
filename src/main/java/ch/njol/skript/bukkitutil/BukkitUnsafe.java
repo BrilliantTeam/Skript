@@ -39,6 +39,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.util.Version;
 
 /**
  * Contains helpers for Bukkit's not so safe stuff.
@@ -78,16 +79,28 @@ public class BukkitUnsafe {
 	
 	private static final boolean newMaterials = Skript.isRunningMinecraft(1, 13);
 	
+	/**
+	 * Vanilla material names to Bukkit materials.
+	 */
 	@Nullable
 	private static Map<String,Material> materialMap;
+	
+	/**
+	 * If we have material map for this version, using it is preferred.
+	 * Otherwise, it can be used as fallback.
+	 */
+	private static boolean preferMaterialMap;
 	
 	public static void initialize() {
 		if (!newMaterials) {
 			try {
-				boolean mapExists = loadMaterialMap();
+				Version version = Skript.getMinecraftVersion();
+				boolean mapExists = loadMaterialMap("materials/" + version.getMajor() + "." +  version.getMinor() + ".json");
 				if (!mapExists) {
-					Skript.warning("Material mappings are not available for this Minecraft version.");
-					// TODO try loading 1.12 ones
+					loadMaterialMap("materials/1.12.json");
+					preferMaterialMap = false;
+					Skript.warning("Material mappings for " + version + " are not available.");
+					Skript.warning("Depending on your server software, some aliases may not work.");
 				}
 			} catch (IOException e) {
 				Skript.exception(e, "Failed to load material mappings. Aliases may not work properly.");
@@ -101,6 +114,13 @@ public class BukkitUnsafe {
 			// On 1.13, Vanilla and Spigot names are same
 			return Material.getMaterial(id);
 		} else {
+			// If we have correct material map, prefer using it
+			if (preferMaterialMap) {
+				assert materialMap != null;
+				return materialMap.get(id);
+			}
+			
+			// Otherwise, hacks
 			Material type;
 			try {
 				type = (Material) unsafeFromInternalNameMethod.invokeExact(unsafe, id);
@@ -108,15 +128,16 @@ public class BukkitUnsafe {
 				throw new RuntimeException(e); // Hmm
 			}
 			if (type == null || type == Material.AIR) { // If there is no item form, UnsafeValues won't work
-				type = checkForBuggedType(id);
+				// So we're going to rely on 1.12's material mappings
+				assert materialMap != null;
+				return materialMap.get(id);
 			}
 			return type;
 		}
 	}
 	
-	private static boolean loadMaterialMap() throws IOException {
-		// Figure correct map file
-		try (InputStream is = Skript.getInstance().getResource("materials/" + Skript.getMinecraftVersion() + ".json")) {
+	private static boolean loadMaterialMap(String name) throws IOException {
+		try (InputStream is = Skript.getInstance().getResource(name)) {
 			if (is == null) { // No mappings for this Minecraft version
 				return false;
 			}
@@ -127,32 +148,6 @@ public class BukkitUnsafe {
 		}
 		
 		return true;
-	}
-	
-	@Nullable
-	private static Material checkForBuggedType(String id) {
-		// Lookup tables, again?
-		switch (id) {
-			case "minecraft:powered_repeater":
-				return Material.DIODE_BLOCK_OFF;
-			case "minecraft:unpowered_repeater":
-				return Material.DIODE_BLOCK_ON;
-			case "minecraft:piston_head":
-				return Material.PISTON_EXTENSION;
-			case "minecraft:piston_extension":
-				return Material.PISTON_MOVING_PIECE;
-			case "minecraft:lit_redstone_lamp":
-				return Material.REDSTONE_LAMP_ON;
-			case "minecraft:daylight_detector":
-				return Material.DAYLIGHT_DETECTOR;
-			case "minecraft:daylight_detector_inverted":
-				return Material.DAYLIGHT_DETECTOR_INVERTED;
-			case "minecraft:redstone_wire":
-				return Material.REDSTONE_WIRE;
-			case "minecraft:unlit_redstone_torch":
-				return Material.REDSTONE_TORCH_OFF;
-		}
-		return null;
 	}
 	
 	public static void modifyItemStack(ItemStack stack, String arguments) {
