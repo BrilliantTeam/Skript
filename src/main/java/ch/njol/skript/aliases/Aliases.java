@@ -91,19 +91,23 @@ public abstract class Aliases {
 		provider.registerCondition("minecraft version", (str) -> {
 			int orNewer = str.indexOf("or newer"); // For example: 1.12 or newer
 			if (orNewer != -1) {
+				@SuppressWarnings("null")
 				Version ver = new Version(str.substring(0, orNewer - 1));
 				return Skript.getMinecraftVersion().compareTo(ver) >= 0;
 			}
 			
 			int orOlder = str.indexOf("or older"); // For example: 1.11 or older
 			if (orOlder != -1) {
+				@SuppressWarnings("null")
 				Version ver = new Version(str.substring(0, orOlder - 1));
 				return Skript.getMinecraftVersion().compareTo(ver) <= 0;
 			}
 			
 			int to = str.indexOf("to"); // For example: 1.11 to 1.12
 			if (to != -1) {
+				@SuppressWarnings("null")
 				Version first = new Version(str.substring(0, to - 1));
+				@SuppressWarnings("null")
 				Version second = new Version(str.substring(to + 3));
 				Version current = Skript.getMinecraftVersion();
 				return current.compareTo(first) >= 0 && current.compareTo(second) <= 0;
@@ -332,7 +336,7 @@ public abstract class Aliases {
 			t.add(new ItemData(Material.AIR));
 			return t;
 		} else if (type.matches("\\d+")) {
-			// TODO error: numeric ids are not supported anymore
+			Skript.error("Numeric ids are not supported anymore.");
 			return null;
 		} else if ((i = getAlias(type)) != null) {
 			for (ItemData d : i) {
@@ -520,5 +524,24 @@ public abstract class Aliases {
 	@Nullable
 	public static String getMinecraftId(ItemData data) {
 		return provider.getMinecraftId(data);
+	}
+	
+	/**
+	 * Gets an item type that matches the given name.
+	 * If it doesn't exist, an exception is thrown instead.
+	 * 
+	 * <p>Item types provided by this method are updated when aliases are
+	 * reloaded. However, this also means they are tracked by aliases system.
+	 * Generally, they should be put in (static final) fields.
+	 * @param name Name of item to search from aliases.
+	 * @return An item.
+	 * @throws IllegalArgumentException When item is not found.
+	 */
+	public static ItemType javaItemType(String name) {
+		ItemType type = parseItemType(name);
+		if (type == null)
+			throw new IllegalArgumentException("type not found");
+		// TODO type tracking
+		return type;
 	}
 }

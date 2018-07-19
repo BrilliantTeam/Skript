@@ -194,7 +194,15 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		// TODO metadata - spawners, skulls, etc.
 	}
 	
+	/**
+	 * Copy constructor.
+	 * @param i Another ItemType.
+	 */
 	private ItemType(ItemType i) {
+		setTo(i);
+	}
+	
+	public void setTo(ItemType i) {
 		all = i.all;
 		amount = i.amount;
 		final ItemType bl = i.block, it = i.item;
@@ -217,7 +225,8 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	/**
-	 * @return amount or 1 if amount == -1
+	 * Returns amount of the item in stack that this type represents.
+	 * @return amount.
 	 */
 	@Override
 	public int getAmount() {
@@ -247,6 +256,11 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			block.amount = amount;
 	}
 	
+	/**
+	 * Checks if this item type represents one of its items (OR) or all of
+	 * them (AND). If this has only one item, it doesn't matter.
+	 * @return Whether all of the items are represented.
+	 */
 	public boolean isAll() {
 		return all;
 	}

@@ -86,6 +86,10 @@ jar {
 		attributes("Name": "ch/njol/skript",
 				"Sealed": "true")
 	}
+	
+	from('skript-aliases') {
+	    into('aliases')
+	}
 }
 
 license {
