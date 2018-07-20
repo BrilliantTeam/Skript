@@ -452,6 +452,17 @@ public abstract class Aliases {
 			assert aliasesFolder != null;
 			loadDirectory(aliasesFolder);
 		}
+		
+		// Update tracked item types
+		for (Map.Entry<String, ItemType> entry : trackedTypes.entrySet()) {
+			@SuppressWarnings("null") // No null keys in this map
+			ItemType type = parseItemType(entry.getKey());
+			if (type == null)
+				Skript.warning("Alias '" + entry.getKey() + "' is required by Skript, but does not exist anymore. "
+						+ "Make sure to fix this before restarting the server.");
+			else
+				entry.getValue().setTo(type);
+		}
 	}
 	
 	/**
@@ -526,13 +537,15 @@ public abstract class Aliases {
 		return provider.getMinecraftId(data);
 	}
 	
+	private static final Map<String, ItemType> trackedTypes = new HashMap<>();
+	
 	/**
 	 * Gets an item type that matches the given name.
 	 * If it doesn't exist, an exception is thrown instead.
 	 * 
 	 * <p>Item types provided by this method are updated when aliases are
-	 * reloaded. However, this also means they are tracked by aliases system.
-	 * Generally, they should be put in (static final) fields.
+	 * reloaded. However, this also means they are tracked by aliases system
+	 * and NOT necessarily garbage-collected.
 	 * @param name Name of item to search from aliases.
 	 * @return An item.
 	 * @throws IllegalArgumentException When item is not found.
@@ -541,7 +554,7 @@ public abstract class Aliases {
 		ItemType type = parseItemType(name);
 		if (type == null)
 			throw new IllegalArgumentException("type not found");
-		// TODO type tracking
+		trackedTypes.put(name, type);
 		return type;
 	}
 }
