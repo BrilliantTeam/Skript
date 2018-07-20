@@ -270,9 +270,21 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	public boolean isOfType(@Nullable ItemStack item) {
-		if (item == null)
-			return isOfType(Material.AIR, null);
-		return isOfType(new ItemData(item));
+		// Duplicate code to avoid creating ItemData
+		for (ItemData myType : types) {
+			if (item == null) { // Given item null
+				if (myType.type == Material.AIR)
+					return true; // Both items AIR/null
+			} else if (item.isSimilar(myType.stack)) {
+				return true; // Bukkit thinks they're similar enough
+			}
+		}
+		return false;
+		
+		// Alternative, simpler implementation
+//		if (item == null)
+//			return isOfType(Material.AIR, null);
+//		return isOfType(new ItemData(item));
 	}
 	
 	public boolean isOfType(@Nullable BlockState block) {
