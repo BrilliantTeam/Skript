@@ -83,4 +83,19 @@ public interface BlockCompat {
 	 */
 	@Nullable
 	BlockValues createBlockValues(Material type, String state);
+	
+	/**
+	 * Checks whether the given material implies emptiness. On Minecraft 1.13+,
+	 * there are several blocks that do so.
+	 * @param type Material of block.
+	 * @return Whether the material implies empty block.
+	 */
+	boolean isEmpty(Material type);
+	
+	/**
+	 * Checks whether the given material is a liquid.
+	 * @param type Material of block.
+	 * @return Whether the material is liquid.
+	 */
+	boolean isLiquid(Material type);
 }

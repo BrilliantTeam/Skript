@@ -294,5 +294,16 @@ public class MagicBlockCompat implements BlockCompat {
 		
 		return new MagicBlockValues(type, (byte) data);
 	}
+
+	@Override
+	public boolean isEmpty(Material type) {
+		return type == Material.AIR;
+	}
+
+	@Override
+	public boolean isLiquid(Material type) {
+		// TODO moving water and lava
+		return type == Material.WATER || type == Material.LAVA;
+	}
 	
 }
