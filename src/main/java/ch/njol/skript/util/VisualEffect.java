@@ -57,7 +57,7 @@ import ch.njol.yggdrasil.YggdrasilSerializable;
  * @author Peter Güttinger
  */
 public final class VisualEffect implements SyntaxElement, YggdrasilSerializable {
-	public static boolean EFFECT_LIB = false;
+
 	private final static String LANGUAGE_NODE = "visual effects";
 	
 	public static enum Type implements YggdrasilSerializable {
@@ -107,7 +107,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		FLYING_GLYPH(Particle.ENCHANTMENT_TABLE),
 		FLAME(Particle.FLAME),
 		LAVA_POP(Particle.LAVA),
-		FOOTSTEP(Particle.FOOTSTEP),
+		FOOTSTEP("FOOTSTEP"), // 1.13 removed
 		SPLASH(Particle.WATER_SPLASH),
 		PARTICLE_SMOKE(Particle.SMOKE_NORMAL), // Why separate particle... ?
 		EXPLOSION_HUGE(Particle.EXPLOSION_HUGE),
@@ -194,7 +194,7 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		@SuppressWarnings("deprecation")
 		private Type(final Effect effect) {
 			this.effect = effect;
-			this.name = effect.getName();
+			this.name = effect.name();
 		}
 		
 		private Type(final EntityEffect effect) {
