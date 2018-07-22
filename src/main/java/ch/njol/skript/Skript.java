@@ -26,7 +26,15 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,6 +62,7 @@ import java.util.zip.ZipFile;
 import ch.njol.skript.lang.Trigger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -67,9 +76,12 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.gson.Gson;
+
 import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.BurgerHelper;
 import ch.njol.skript.bukkitutil.Workarounds;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Comparator;
@@ -642,6 +654,52 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		// Tell Timings that we are here!
 		SkriptTimings.setSkript(this);
+		
+		handleJvmArguments();
+	}
+	
+	/**
+	 * Handles -Dskript.stuff command line arguments.
+	 */
+	private void handleJvmArguments() {
+		Path folder = getDataFolder().toPath();
+		String burgerEnabled = System.getProperty("skript.burger.enable");
+		if (burgerEnabled != null) {
+			String version = System.getProperty("skript.burger.version");
+			String burgerInput;
+			if (version == null) {
+				burgerInput = System.getProperty("skript.burger.file");
+				if (burgerInput == null) {
+					Skript.exception("burger enabled but skript.burger.file not provided");
+					return;
+				}
+			} else {
+				try {
+					URL url = new URL("https://pokechu22.github.io/Burger/" + version + ".json");
+					ReadableByteChannel ch = Channels.newChannel(url.openStream());
+					// TODO use data
+					burgerInput = "burger-" + version + ".json";
+				} catch (IOException e) {
+					Skript.exception(e);
+					return;
+				}
+			}
+			
+			try {
+				BurgerHelper burger = new BurgerHelper(new String(
+						Files.readAllBytes(Paths.get(burgerInput)),StandardCharsets.UTF_8));
+				Map<String,Material> materials = burger.mapMaterials();
+				Map<Integer,Material> ids = BurgerHelper.mapIds();
+				
+				Gson gson = new Gson();
+				Files.write(folder.resolve("materials.json"), gson.toJson(materials)
+						.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+				Files.write(folder.resolve("ids.json"), gson.toJson(ids)
+						.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+			} catch (IOException e) {
+				Skript.exception(e);
+			}
+		}
 	}
 	
 	private static Version minecraftVersion = new Version(666);

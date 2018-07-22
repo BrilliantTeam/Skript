@@ -110,5 +110,22 @@ public class BurgerHelper {
     
     public static class Source {
         public String file;
-}
+    }
+    
+    public static Map<Integer,Material> mapIds() {
+		if (typeIdMethod == null) {
+			throw new IllegalStateException("requires Minecraft 1.12.2 or older");
+		}
+    	
+    	Map<Integer,Material> ids = new HashMap<>();
+    	for (Material mat : Material.values()) {
+    		try {
+				ids.put((Integer) typeIdMethod.invokeExact(mat), mat);
+			} catch (Throwable e) {
+				throw new RuntimeException(e);
+			}
+    	}
+    	
+    	return ids;
+    }
 }
