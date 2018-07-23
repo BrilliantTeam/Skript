@@ -281,68 +281,79 @@ weather:
 
 # -- Biomes --
 biomes:
-	swampland: swampland, swamp, march
+	swamp: swampland, swamp, march
 	forest: forest
 	taiga: taiga
 	desert: desert
 	plains: plains
-	hell: hell, nether
-	sky: sky
+	nether: hell, nether
+	the_end: sky, the end
 	ocean: ocean, sea
 	river: river
-	extreme_hills: extreme hills
+	mountains: extreme hills, mountains
 	frozen_ocean: frozen ocean
 	frozen_river: frozen river
-	ice_plains: ice plains
-	ice_mountains: ice mountains
-	mushroom_island: mushroom island
-	mushroom_shore: mushroom shore
+	snowy_tundra: ice plains, snowy tundra
+	snowy_mountains: ice mountains, snowy mountains
+	mushroom_fields: mushroom island, mushroom fields
+	mushroom_field_shore: mushroom shore, mushroom island shore, mushroom fields shore
 	beach: beach
 	desert_hills: desert hills
-	forest_hills: forest hills
+	wooded_hills: forest hills, wooded hills
 	taiga_hills: taiga hills
-	small_mountains: small mountains, hills
+	mountain_edge: small mountains, hills, mountain edge
 	jungle: jungle
 	jungle_hills: jungle hills
 	jungle_edge: jungle edge
 	deep_ocean: deep ocean
-	stone_beach: stone beach
-	cold_beach: cold beach
+	stone_shore: stone beach, stone shore
+	snowy_beach: cold beach, snowy beach
 	birch_forest: birch forest
 	birch_forest_hills: birch forest hills
-	roofed_forest: roofed forest, black forest
-	cold_taiga: cold taiga
-	cold_taiga_hills: cold taiga hills
-	mega_taiga: mega taiga, extreme taiga
-	mega_taiga_hills: mega taiga hills, extreme taiga hills
-	extreme_hills_plus: extreme hills plus
+	dark_forest: roofed forest, black forest, dark forest
+	snowy_taiga: cold taiga, snowy taiga
+	snowy_taiga_hills: cold taiga hills, snowy taiga hills
+	giant_tree_taiga: mega taiga, giant tree taiga, redwood taiga
+	giant_tree_taiga_hills: mega taiga hills, giant tree taiga hills, redwood taiga hills
+	wooded_mountains: extreme hills plus, mountains with trees, wooded mountains
 	savanna: savanna
 	savanna_plateau: savanna plateau
-	mesa: mesa
-	mesa_plateau_forest: mesa plateau forest
-	mesa_plateau: mesa plateau
+	badlands: mesa, badlands
+	wooded_badlands_plateau: mesa plateau forest, badlands plateau forest, wooded badlands plateau
+	badlands_plateau: mesa plateau, badlands plateau
 	sunflower_plains: sunflower plains
-	desert_mountains: desert mountains
+	desert_lakes: desert lakes
 	flower_forest: flower forest
 	taiga_mountains: taiga mountains
-	swampland_mountains: swampland mountains
-	ice_plains_spikes: ice plains spikes, spiked ice plains, ice plains with spikes
-	jungle_mountains: jungle mountains
-	jungle_edge_mountains: jungle edge mountains
-	cold_taiga_mountains: cold taiga mountains
-	savanna_mountains: savanna mountains
-	savanna_plateau_mountains: savanna plateau mountains
-	mesa_bryce: bryce, mesa bryce, mesa (bryce), hoodoos
-	mesa_plateau_forest_mountains: mesa plateau forest mountains
-	mesa_plateau_mountains: mesa plateau mountains
-	birch_forest_mountains: birch forest mountains
-	birch_forest_hills_mountains: birch forest hills mountains
-	roofed_forest_mountains: roofed forest mountains
-	mega_spruce_taiga: mega spruce taiga
-	extreme_hills_mountains: extreme hills mountains
-	extreme_hills_plus_mountains: extreme hills plus mountains
-	mega_spruce_taiga_hills: mega spruce taiga hills
-	void: void
+	swampland_mountains: swampland mountains, swamp hills
+	ice_spikes: ice plains spikes, spiked ice plains, ice plains with spikes, ice spikes
+	modified_jungle: jungle mountains
+	modified_jungle_edge: jungle edge mountains
+	snowy_taiga_mountains: cold taiga mountains, snowy taiga mountains
+	shattered_savanna: savanna mountains, shattered savanna
+	shattered_savanna_plateau: savanna plateau mountains, shattered savanna plateau
+	eroded badlands: bryce, mesa bryce, mesa (bryce), hoodoos, eroded badlands
+	modified_wooded_badlands_plateau: mesa plateau forest mountains, modified wooded badlands plateau, badlands plateau forest mountains
+	modified_badlands_plateau: mesa plateau mountains, badlands plateau mountains, modified badlands plateau
+	tall_birch_forest: birch forest mountains, tall birch forest
+	tall_birch_hills: birch forest hills mountains, tall birch hills
+	dark_forest_hills: roofed forest mountains, dark forest hills
+	giant_spruce_taiga: mega spruce taiga, giant spruce taiga
+	gravelly_mountains: extreme hills mountains, gravelly mountains
+	modified_gravelly_mountains: extreme hills plus mountains, modified gravelly mountains
+	giant_spruce_taiga_hills: mega spruce taiga hills, giant spruce taiga hills
+	the_void: void, the void
+	small_end_islands: small end islands
+	end_midlands: end midlands
+	end_highlands: end highlands
+	end_barrens: end barrens
+	warm_ocean: warm ocean
+	lukewarm_ocean: lukewarm ocean
+	cold_ocean: cold ocean
+	deep_warm_ocean: deep warm ocean
+	deep_lukewarm_ocean: deep lukewarm ocean
+	deep_cold_ocean: deep cold ocean
+	deep_frozen_ocean: deep frozen ocean
 
 # -- Tree Types --
 tree types:

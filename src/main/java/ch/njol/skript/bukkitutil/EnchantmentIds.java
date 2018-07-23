@@ -13,6 +13,7 @@ import ch.njol.skript.Skript;
 public class EnchantmentIds {
 	
 	public static final Map<Enchantment,Integer> ids = new HashMap<>();
+	public static final Enchantment[] enchantments = new Enchantment[71];
 	
 	static {
 		ids.put(Enchantment.PROTECTION_ENVIRONMENTAL, 0);
@@ -47,6 +48,10 @@ public class EnchantmentIds {
 			ids.put(Enchantment.BINDING_CURSE, 10);
 			ids.put(Enchantment.VANISHING_CURSE, 71);
 			ids.put(Enchantment.SWEEPING_EDGE, 22); // Technically 1.11.1, but who runs 1.11 anymore?
+		}
+		
+		for (Map.Entry<Enchantment, Integer> entry : ids.entrySet()) {
+			enchantments[entry.getValue()] = entry.getKey();
 		}
 	}
 }

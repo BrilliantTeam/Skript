@@ -1294,12 +1294,11 @@ public class BukkitClasses {
 					}
 					
 //					return "" + e.getId();
-					@SuppressWarnings("deprecation")
 					@Override
 					@Nullable
 					public Enchantment deserialize(final String s) {
 						try {
-							return Enchantment.getById(Integer.parseInt(s));
+							return EnchantmentIds.enchantments[Integer.parseInt(s)];
 						} catch (final NumberFormatException e) {
 							return null;
 						}
