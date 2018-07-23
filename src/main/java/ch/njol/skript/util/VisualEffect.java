@@ -441,7 +441,8 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			} else {
 				// Non-particle effect (whatever Spigot API says, there are a few)
 				if (ps == null) {
-					l.getWorld().spigot().playEffect(l, (Effect) type.effect, 0, 0, dX, dY, dZ, speed, count, radius);
+					//l.getWorld().spigot().playEffect(l, (Effect) type.effect, 0, 0, dX, dY, dZ, speed, count, radius);
+					l.getWorld().playEffect(l, (Effect) type.effect, 0, radius);
 				} else {
 					for (final Player p : ps)
 						p.playEffect(l, (Effect) type.effect, type.getData(data, l));

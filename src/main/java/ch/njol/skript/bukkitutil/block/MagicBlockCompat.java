@@ -43,6 +43,7 @@ public class MagicBlockCompat implements BlockCompat {
 	
 	private static final MethodHandle setRawDataMethod;
 	private static final MethodHandle getBlockDataMethod;
+	static final MethodHandle setDataMethod;
 	
 	static {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -55,6 +56,10 @@ public class MagicBlockCompat implements BlockCompat {
 					MethodType.methodType(byte.class));
 			assert mh != null;
 			getBlockDataMethod = mh;
+			mh = lookup.findVirtual(Block.class, "setData",
+					MethodType.methodType(void.class, byte.class));
+			assert mh != null;
+			setDataMethod = mh;
 		} catch (NoSuchMethodException | IllegalAccessException e) {
 			throw new Error(e);
 		}
@@ -79,13 +84,16 @@ public class MagicBlockCompat implements BlockCompat {
 		public MagicBlockValues(Material id, byte data) {
 			this.id = id;
 			this.data = data;
-			System.out.println(this);
 		}
 
 		@Override
 		public void setBlock(Block block, boolean applyPhysics) {
 			block.setType(id);
-			block.setData(data);
+			try {
+				setDataMethod.invokeExact(block, data);
+			} catch (Throwable e) {
+				Skript.exception(e);
+			}
 		}
 
 		@Override

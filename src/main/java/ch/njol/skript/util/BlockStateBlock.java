@@ -159,34 +159,6 @@ public class BlockStateBlock implements Block {
 	}
 	
 	@Override
-	public void setData(final byte data) {
-		if (delayChanges) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					state.getBlock().setData(data);
-				}
-			});
-		} else {
-			state.setRawData(data);
-		}
-	}
-	
-	@Override
-	public void setData(final byte data, final boolean applyPhysics) {
-		if (delayChanges) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					state.getBlock().setData(data, applyPhysics);
-				}
-			});
-		} else {
-			state.setRawData(data);
-		}
-	}
-	
-	@Override
 	public void setType(final Material type) {
 		if (delayChanges) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
