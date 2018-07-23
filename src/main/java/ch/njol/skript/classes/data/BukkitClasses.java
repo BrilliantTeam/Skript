@@ -63,6 +63,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.EnchantmentIds;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.ConfigurationSerializer;
 import ch.njol.skript.classes.EnumSerializer;
@@ -183,7 +184,7 @@ public class BukkitClasses {
 					@SuppressWarnings("deprecation")
 					@Override
 					public String toString(final Block b, final int flags) {
-						return ItemType.toString(new ItemStack(b.getTypeId(), 1, b.getState().getRawData()), flags);
+						return ItemType.toString(new ItemStack(b.getType()), flags);
 					}
 					
 					@Override
@@ -987,7 +988,7 @@ public class BukkitClasses {
 						b.append(":" + i.getDurability());
 						b.append("*" + i.getAmount());
 						for (final Entry<Enchantment, Integer> e : i.getEnchantments().entrySet()) {
-							b.append("#" + e.getKey().getId());
+							b.append("#" + EnchantmentIds.ids.get(e.getKey()));
 							b.append(":" + e.getValue());
 						}
 						return "" + b.toString();
