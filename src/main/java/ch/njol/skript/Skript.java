@@ -29,6 +29,7 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -668,17 +669,30 @@ public final class Skript extends JavaPlugin implements Listener {
 			String version = System.getProperty("skript.burger.version");
 			String burgerInput;
 			if (version == null) {
-				burgerInput = System.getProperty("skript.burger.file");
-				if (burgerInput == null) {
+				String inputFile = System.getProperty("skript.burger.file");
+				if (inputFile == null) {
 					Skript.exception("burger enabled but skript.burger.file not provided");
+					return;
+				}
+				try {
+					burgerInput = new String(Files.readAllBytes(Paths.get(inputFile)), StandardCharsets.UTF_8);
+				} catch (IOException e) {
+					Skript.exception(e);
 					return;
 				}
 			} else {
 				try {
-					URL url = new URL("https://pokechu22.github.io/Burger/" + version + ".json");
-					ReadableByteChannel ch = Channels.newChannel(url.openStream());
-					// TODO use data
-					burgerInput = "burger-" + version + ".json";
+					Path data = folder.resolve("burger-" + version + ".json");
+					if (Files.exists(data)) {
+						burgerInput = new String(Files.readAllBytes(data), StandardCharsets.UTF_8);
+					} else {
+						URL url = new URL("https://pokechu22.github.io/Burger/" + version + ".json");
+						try (ReadableByteChannel ch = Channels.newChannel(url.openStream());
+								Scanner scanner = new Scanner(ch);) {
+							burgerInput = scanner.useDelimiter("\\z").next();
+							Files.write(data, burgerInput.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+						}
+					}
 				} catch (IOException e) {
 					Skript.exception(e);
 					return;
@@ -686,8 +700,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			}
 			
 			try {
-				BurgerHelper burger = new BurgerHelper(new String(
-						Files.readAllBytes(Paths.get(burgerInput)),StandardCharsets.UTF_8));
+				BurgerHelper burger = new BurgerHelper(burgerInput);
 				Map<String,Material> materials = burger.mapMaterials();
 				Map<Integer,Material> ids = BurgerHelper.mapIds();
 				
