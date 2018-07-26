@@ -112,8 +112,9 @@ public enum WeatherType {
 			case DOWNFALL:
 				return RAIN;
 			case CLEAR:
-			default:
 				return CLEAR;
+			default:
+				return null;
 		}
 	}
 
