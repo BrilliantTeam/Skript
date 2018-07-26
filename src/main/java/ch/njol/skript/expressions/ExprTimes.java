@@ -28,6 +28,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.Iterators;
 import ch.njol.skript.Skript;
+import ch.njol.skript.config.Node;
 import ch.njol.skript.doc.NoDoc;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -35,6 +36,7 @@ import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.lang.util.SimpleLiteral;
+import ch.njol.skript.log.SkriptLogger;
 import ch.njol.util.Kleenean;
 
 @NoDoc
@@ -52,18 +54,34 @@ public class ExprTimes extends SimpleExpression<Number> {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		end = matchedPattern == 0 ? (Expression<Number>) exprs[0] : new SimpleLiteral<>(matchedPattern, false);
+		
 		if (end instanceof Literal) {
 			int amount = ((Literal<Number>) end).getSingle().intValue();
-			if (amount == 0) {
+			if (amount == 0 && isInLoop()) {
 				Skript.warning("Looping zero times makes the code inside of the loop useless");
-			} else if (amount == 1) {
+			} else if (amount == 1 & isInLoop()) {
 				Skript.warning("Since you're looping exactly one time, you could simply remove the loop instead");
 			} else if (amount < 0) {
-				Skript.error("Looping a negative amount of times is impossible");
+				if (isInLoop())
+					Skript.error("Looping a negative amount of times is impossible");
+				else
+					Skript.error("The times expression only supports positive numbers");
 				return false;
 			}
 		}
 		return true;
+	}
+	
+	private boolean isInLoop() {
+		Node node = SkriptLogger.getNode();
+		if (node == null) {
+			return false;
+		}
+		String key = node.getKey();
+		if (key == null) {
+			return false;
+		}
+		return key.startsWith("loop ");
 	}
 
 	@Nullable
