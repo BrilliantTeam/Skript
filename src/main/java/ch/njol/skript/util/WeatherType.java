@@ -104,9 +104,10 @@ public enum WeatherType {
 		return CLEAR;
 	}
 
+	@Nullable
 	public static WeatherType fromPlayer(final Player player) {
 		if (player.getPlayerWeather() == null) {
-			return CLEAR;
+			return null;
 		}
 		switch (player.getPlayerWeather()) {
 			case DOWNFALL:
@@ -125,8 +126,10 @@ public enum WeatherType {
 				player.setPlayerWeather(org.bukkit.WeatherType.DOWNFALL);
 				break;
 			case CLEAR:
-			default:
 				player.setPlayerWeather(org.bukkit.WeatherType.CLEAR);
+				break;
+			default:
+				player.setPlayerWeather(null);
 		}
 	}
 

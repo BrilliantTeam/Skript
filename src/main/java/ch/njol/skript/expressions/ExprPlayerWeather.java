@@ -54,6 +54,7 @@ public class ExprPlayerWeather extends SimplePropertyExpression<Player, WeatherT
 	}
 
 	@Override
+	@Nullable
 	public WeatherType convert(Player player) {
 		return WeatherType.fromPlayer(player);
 	}
