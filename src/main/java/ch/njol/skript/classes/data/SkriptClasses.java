@@ -36,6 +36,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemData;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.EnchantmentIds;
 import ch.njol.skript.classes.Arithmetic;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.ClassInfo;
@@ -225,22 +226,20 @@ public class SkriptClasses {
 						return t.getDebugMessage();
 					}
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public String toVariableNameString(final ItemType t) {
 						final StringBuilder b = new StringBuilder("itemtype:");
 						b.append(t.getInternalAmount());
 						b.append("," + t.isAll());
-//						for (final ItemData d : t.getTypes()) { // FIXME maybe add this back
-//							b.append("," + d.getId());
-//							b.append(":" + d.dataMin);
-//							b.append("/" + d.dataMax);
-//						}
+						// TODO this is missing information
+						for (final ItemData d : t.getTypes()) {
+							b.append("," + d.getType());
+						}
 						final Map<Enchantment, Integer> enchs = t.getEnchantments();
 						if (enchs != null && !enchs.isEmpty()) {
 							b.append("|");
 							for (final Entry<Enchantment, Integer> e : enchs.entrySet()) {
-								b.append("#" + e.getKey().getId());
+								b.append("#" + EnchantmentIds.ids.get(e.getKey()));
 								b.append(":" + e.getValue());
 							}
 						}
@@ -745,7 +744,7 @@ public class SkriptClasses {
 						if (split.length != 2)
 							return null;
 						try {
-							final Enchantment ench = Enchantment.getById(Integer.parseInt(split[0]));
+							final Enchantment ench = EnchantmentIds.enchantments[Integer.parseInt(split[0])];
 							if (ench == null)
 								return null;
 							return new EnchantmentType(ench, Integer.parseInt(split[1]));

@@ -1023,6 +1023,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			if (noGenerics.get(0).getClass().equals(OldItemData.class)) { // Sorry generics :)
 				for (int i = 0; i < types.size(); i++) {
 					OldItemData old = (OldItemData) (Object) types.get(i); // Grab and hack together OldItemData
+					// TODO update for 1.13
 					ItemData data = new ItemData(Material.values()[old.typeid]); // Create new ItemData based on it
 					types.set(i, data); // Replace old with new
 					// TODO support for data values
