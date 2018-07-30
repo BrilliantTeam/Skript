@@ -21,6 +21,7 @@ package ch.njol.skript.classes.data;
 
 import java.util.Arrays;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
@@ -275,7 +276,6 @@ public class DefaultChangers {
 			return CollectionUtils.array(ItemType[].class, Inventory[].class);
 		}
 		
-		@SuppressWarnings("deprecation")
 		@Override
 		public void change(final Block[] blocks, final @Nullable Object[] delta, final ChangeMode mode) {
 			for (final Block block : blocks) {
@@ -286,7 +286,7 @@ public class DefaultChangers {
 						((ItemType) delta[0]).getBlock().setBlock(block, true);
 						break;
 					case DELETE:
-						block.setTypeId(0, true);
+						block.setType(Material.AIR, true);
 						break;
 					case ADD:
 					case REMOVE:

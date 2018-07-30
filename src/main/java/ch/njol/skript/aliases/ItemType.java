@@ -1116,4 +1116,11 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public void clearItemMeta() {
 		globalMeta = null;
 	}
+
+	public Material getMaterial() {
+		ItemData data = types.get(0);
+		if (data == null)
+			throw new IllegalStateException("material not found");
+		return data.getType();
+	}
 }
