@@ -664,11 +664,18 @@ public final class Skript extends JavaPlugin implements Listener {
 	 */
 	private void handleJvmArguments() {
 		Path folder = getDataFolder().toPath();
+		
+		/*
+		 * Burger is a Python application that extracts data from Minecraft.
+		 * Datasets for most common versions are available for download.
+		 * Skript uses them to provide minecraft:material to Bukkit
+		 * Material mappings on Minecraft 1.12 and older.
+		 */
 		String burgerEnabled = System.getProperty("skript.burger.enable");
 		if (burgerEnabled != null) {
 			String version = System.getProperty("skript.burger.version");
 			String burgerInput;
-			if (version == null) {
+			if (version == null) { // User should have provided JSON file path
 				String inputFile = System.getProperty("skript.burger.file");
 				if (inputFile == null) {
 					Skript.exception("burger enabled but skript.burger.file not provided");
@@ -680,7 +687,7 @@ public final class Skript extends JavaPlugin implements Listener {
 					Skript.exception(e);
 					return;
 				}
-			} else {
+			} else { // Try to download Burger dataset for this version
 				try {
 					Path data = folder.resolve("burger-" + version + ".json");
 					if (Files.exists(data)) {
@@ -699,6 +706,7 @@ public final class Skript extends JavaPlugin implements Listener {
 				}
 			}
 			
+			// Use BurgerHelper to create some mappings, then dump them as JSON
 			try {
 				BurgerHelper burger = new BurgerHelper(burgerInput);
 				Map<String,Material> materials = burger.mapMaterials();
