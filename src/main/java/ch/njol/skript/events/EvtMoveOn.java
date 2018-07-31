@@ -39,6 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.SkriptEventHandler;
+import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemData;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.lang.Literal;
@@ -56,6 +57,11 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 				.examples("on walking on dirt or grass", "on stepping on stone")
 				.since("2.0");
 	}
+	
+	/**
+	 * Actual fence blocks and fence gates.
+	 */
+	private static final ItemType fencePart = Aliases.javaItemType("fence part");
 	
 	final static HashMap<Material, List<Trigger>> itemTypeTriggers = new HashMap<>();
 	@SuppressWarnings("null")
@@ -105,14 +111,14 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 		Block block = l.getWorld().getBlockAt(l.getBlockX(), (int) (Math.ceil(l.getY()) - 1), l.getBlockZ());
 		if (block.getType() == Material.AIR && Math.abs((l.getY() - l.getBlockY()) - 0.5) < Skript.EPSILON) { // Fences
 			block = l.getWorld().getBlockAt(l.getBlockX(), l.getBlockY() - 1, l.getBlockZ());
-			if (block.getType() != Material.FENCE && block.getType() != Material.FENCE_GATE && block.getType() != Material.NETHER_FENCE)
+			if (!fencePart.isOfType(block))
 				return null;
 		}
 		return block;
 	}
 	
 	final static int getBlockY(final double y, final Material id) {
-		if ((id == Material.FENCE || id == Material.FENCE_GATE || id == Material.NETHER_FENCE) && Math.abs((y - Math.floor(y)) - 0.5) < Skript.EPSILON)
+		if (fencePart.isOfType(id) && Math.abs((y - Math.floor(y)) - 0.5) < Skript.EPSILON)
 			return (int) Math.floor(y) - 1;
 		return (int) Math.ceil(y) - 1;
 	}

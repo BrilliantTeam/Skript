@@ -313,9 +313,11 @@ public abstract class Utils {
 	}
 	
 	/**
-	 * Gets the collision height of solid or partially-solid blocks at the center of the block. This is mostly for use in the {@link EffTeleport teleport effect}.
+	 * Gets the collision height of solid or partially-solid blocks at the center of the block.
+	 * This is mostly for use in the {@link EffTeleport teleport effect}.
 	 * <p>
-	 * TODO !Update with every version [blocks]
+	 * This version operates on numeric ids, thus only working on
+	 * Minecraft 1.12 or older.
 	 * 
 	 * @param type
 	 * @return The block's height at the center

@@ -313,6 +313,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	public boolean isOfType(Material id) {
+		// TODO avoid object creation
 		return isOfType(new ItemData(id, null));
 	}
 	

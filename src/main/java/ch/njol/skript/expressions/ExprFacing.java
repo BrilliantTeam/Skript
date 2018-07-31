@@ -88,7 +88,6 @@ public class ExprFacing extends SimplePropertyExpression<Object, Direction> {
 		return Direction.class;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	@Nullable
 	public Class<?>[] acceptChange(final ChangeMode mode) {
@@ -112,7 +111,7 @@ public class ExprFacing extends SimplePropertyExpression<Object, Direction> {
 		if (!(d instanceof Directional))
 			return;
 		((Directional) d).setFacingDirection(toBlockFace(((Direction) delta[0]).getDirection(b)));
-		b.setData(d.getData());
+		//b.setData(d.getData()); // TODO update for 1.13?
 	}
 	
 	private final static BlockFace toBlockFace(final Vector dir) {
