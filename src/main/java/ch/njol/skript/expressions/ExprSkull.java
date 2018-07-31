@@ -90,17 +90,19 @@ public class ExprSkull extends SimplePropertyExpression<Object, ItemType> {
 		} else {
 			return null;
 		}
-		final ItemType i;
-		final SkullMeta s = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
-		if (o instanceof OfflinePlayer) {
-			i = new ItemType(Material.SKULL_ITEM);
-			s.setOwningPlayer((OfflinePlayer) o);
-			i.setItemMeta(s);
-		} else {
-			// TODO 1.13 will change this so each skull gets their own id (except player skulls)
-			i = new ItemType(Material.SKULL_ITEM, "{SkullType=" + type.ordinal() + "}");
-		}
-		return i;
+		
+//		final ItemType i;
+//		final SkullMeta s = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
+//		if (o instanceof OfflinePlayer) {
+//			i = new ItemType(Material.SKULL_ITEM);
+//			s.setOwningPlayer((OfflinePlayer) o);
+//			i.setItemMeta(s);
+//		} else {
+//			// TODO 1.13 will change this so each skull gets their own id (except player skulls)
+//			i = new ItemType(Material.SKULL_ITEM, "{SkullType=" + type.ordinal() + "}");
+//		}
+		throw new UnsupportedOperationException("1.13 update");
+//		return i;
 	}
 	
 	@Override

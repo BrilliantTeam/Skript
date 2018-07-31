@@ -65,7 +65,7 @@ public class ExprBurnCookTime extends PropertyExpression<Block, Timespan> {
 				"%blocks%'[s] (burn|1¦cook)[ing] time");
 	}
 	
-	private static final ItemType anyFurnace = Aliases.javaItemType("any furnace");
+	static final ItemType anyFurnace = Aliases.javaItemType("any furnace");
 
 	private boolean cookTime;
 	private boolean isEvent;
