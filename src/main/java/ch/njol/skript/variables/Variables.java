@@ -253,6 +253,27 @@ public abstract class Variables {
 	}
 	
 	/**
+	 * Removes local variables associated with given event and returns them,
+	 * if they exist.
+	 * @param event Event.
+	 * @return Local variables or null.
+	 */
+	@Nullable
+	public static VariablesMap removeLocals(Event event) {
+		return localVariables.remove(event);
+	}
+	
+	/**
+	 * Sets local variables associated with given event.
+	 * Warning: this can overwrite local variables!
+	 * @param event Event.
+	 * @param map New local variables.
+	 */
+	public static void setLocalVariables(Event event, Object map) {
+		localVariables.put(event, (VariablesMap) map);
+	}
+	
+	/**
 	 * Remember to lock with {@link #getReadLock()}!
 	 */
 	@SuppressWarnings("null")

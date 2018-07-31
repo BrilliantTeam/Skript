@@ -769,11 +769,13 @@ final public class ScriptLoader {
 	}
 	
 	/**
-	 * Loads structures of all scripts in given directory.
-	 * 
-	 * @param directory
+	 * Loads structures of all scripts in the given directory, or of the passed script if it's a normal file
+	 *
+	 * @param directory a directory or a single file
 	 */
-	public final static List<Config> loadStructures(final File directory) {
+	public static List<Config> loadStructures(final File directory) {
+		if (!directory.isDirectory())
+			return loadStructures(new File[]{directory});
 		final File[] files = directory.listFiles(scriptFilter);
 		Arrays.sort(files);
 		
