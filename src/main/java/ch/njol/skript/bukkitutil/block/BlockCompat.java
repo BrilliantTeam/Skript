@@ -26,6 +26,8 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
+
 /**
  * Methods which operate with blocks but are not compatible across some
  * Minecraft versions.
@@ -35,7 +37,8 @@ public interface BlockCompat {
 	/**
 	 * Instance of BlockCompat for current Minecraft version.
 	 */
-	static final BlockCompat INSTANCE = new MagicBlockCompat();
+	static final BlockCompat INSTANCE = Skript.isRunningMinecraft(1, 13)
+			? new NewBlockCompat() : new MagicBlockCompat();
 	
 	/**
 	 * Gets block values from a block state. They can be compared to other
