@@ -224,7 +224,10 @@ public class AliasesProvider {
 			id = item;
 			tags = new HashMap<>();
 		} else {
-			id = item.substring(0, firstBracket);
+			if (firstBracket == 0) {
+				throw new AssertionError("missing space between id and tags in " + item);
+			}
+			id = item.substring(0, firstBracket - 1);
 			String json = item.substring(firstBracket);
 			assert json != null;
 			tags = parseMojangson(json);
@@ -235,6 +238,9 @@ public class AliasesProvider {
 		String blockState = null; // Not all aliases have block state
 		int stateIndex = id.indexOf('[');
 		if (stateIndex != -1) {
+			if (stateIndex == 0) {
+				throw new AssertionError("missing id or - in " + id);
+			}
 			typeName = id.substring(0, stateIndex); // Id comes before block state
 			blockState = id.substring(stateIndex + 1, id.length() - 1);
 		} else { // No block state, just the id
@@ -454,9 +460,11 @@ public class AliasesProvider {
 					// If variations are used, id is just not the same
 					String variedId = entry.getValue().getId();
 					int mid;
+					char second;
 					if (variedId == null) {
 						variedId = id;
-					} else if (replacement && (mid = variedId.indexOf('-')) != -1) { // Inject alias id to variation's id
+					} else if (replacement && (mid = variedId.indexOf('-')) != -1 && variedId.length() > 1
+							&& (second = variedId.charAt(1)) != ' ' && second != '[') { // Inject alias id to variation's id
 						String idBefore = "";
 						String idAfter = "";
 						if (mid != 0)
