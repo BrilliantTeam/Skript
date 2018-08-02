@@ -553,7 +553,7 @@ public abstract class Aliases {
 	public static ItemType javaItemType(String name) {
 		ItemType type = parseItemType(name);
 		if (type == null)
-			throw new IllegalArgumentException("type not found");
+			throw new IllegalArgumentException("type " + name + " not found");
 		trackedTypes.put(name, type);
 		return type;
 	}

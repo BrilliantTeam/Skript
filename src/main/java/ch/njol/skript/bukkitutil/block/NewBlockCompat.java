@@ -28,6 +28,8 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
+
 /**
  * 1.13+ block compat.
  */
@@ -97,7 +99,12 @@ public class NewBlockCompat implements BlockCompat {
 	@Override
 	@Nullable
 	public BlockValues createBlockValues(Material type, String state) {
-		return new NewBlockValues(type, Bukkit.createBlockData(type, state));
+		try {
+			return new NewBlockValues(type, Bukkit.createBlockData(type, state));
+		} catch (IllegalArgumentException e) {
+			Skript.error("Parsing block state " + state + "failed!");
+			return null;
+		}	
 	}
 
 	@Override

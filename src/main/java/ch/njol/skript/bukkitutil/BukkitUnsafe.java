@@ -58,6 +58,7 @@ public class BukkitUnsafe {
 	 * Before 1.13, Vanilla material names were translated using
 	 * this + a lookup table.
 	 */
+	@Nullable
 	private static final MethodHandle unsafeFromInternalNameMethod;
 	
 	static {
@@ -67,14 +68,14 @@ public class BukkitUnsafe {
 		}
 		unsafe = values;
 		
+		MethodHandle mh;
 		try {
-			MethodHandle mh = MethodHandles.lookup().findVirtual(UnsafeValues.class,
+			mh = MethodHandles.lookup().findVirtual(UnsafeValues.class,
 					"getMaterialFromInternalName", MethodType.methodType(String.class, Material.class));
-			assert mh != null;
-			unsafeFromInternalNameMethod = mh;
 		} catch (NoSuchMethodException | IllegalAccessException e) {
-			throw new Error(e);
+			mh = null;
 		}
+		unsafeFromInternalNameMethod = mh;
 	}
 	
 	private static final boolean newMaterials = Skript.isRunningMinecraft(1, 13);
@@ -112,7 +113,10 @@ public class BukkitUnsafe {
 	public static Material getMaterialFromMinecraftId(String id) {
 		if (newMaterials) {
 			// On 1.13, Vanilla and Spigot names are same
-			return Material.getMaterial(id);
+			if (id.length() > 9)
+				return Material.matchMaterial(id.substring(10)); // Strip 'minecraft:' out
+			else // Malformed material name
+				return null;
 		} else {
 			// If we have correct material map, prefer using it
 			if (preferMaterialMap) {
@@ -123,6 +127,7 @@ public class BukkitUnsafe {
 			// Otherwise, hacks
 			Material type;
 			try {
+				assert unsafeFromInternalNameMethod != null;
 				type = (Material) unsafeFromInternalNameMethod.invokeExact(unsafe, id);
 			} catch (Throwable e) {
 				throw new RuntimeException(e); // Hmm

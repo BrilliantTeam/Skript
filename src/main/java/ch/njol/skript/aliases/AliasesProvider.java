@@ -224,7 +224,7 @@ public class AliasesProvider {
 			id = item;
 			tags = new HashMap<>();
 		} else {
-			id = item.substring(0, firstBracket - 1);
+			id = item.substring(0, firstBracket);
 			String json = item.substring(firstBracket);
 			assert json != null;
 			tags = parseMojangson(json);
@@ -339,9 +339,9 @@ public class AliasesProvider {
 	 * @param data Data of alias.
 	 */
 	private void loadAlias(String name, String data) {
-		Skript.debug("Loading alias: " + name + " = " + data);
+		//Skript.debug("Loading alias: " + name + " = " + data);
 		List<String> patterns = parseKeyPattern(name);
-		Skript.debug("Patterns: " + patterns);
+		//Skript.debug("Patterns: " + patterns);
 		
 		// Complex list parsing to avoid commas inside tags
 		int start = 0; // Start of next substring
@@ -401,9 +401,18 @@ public class AliasesProvider {
 		// Material part replacements for variations
 		// -stuff + minecraft:item_- -> minecraft:item_stuff
 		boolean replacement = false;
-		if (id != null && !id.isEmpty() && id.charAt(0) == '-' && id.length() != 1) {
-			id = id.substring(1);
-			replacement = true;
+		String replaceBefore = "";
+		String replaceAfter = "";
+		if (id != null && !id.isEmpty() && id.charAt(0) == '-') {
+			char second = id.charAt(1);
+			if (second != ' ' && second != '[') {
+				replacement = true;
+				int replaceMid = id.indexOf('-');
+				if (replaceMid != 0)
+					replaceBefore = id.substring(0, replaceMid);
+				if (replaceMid != id.length() - 1)
+					replaceAfter = id.substring(replaceMid + 1);
+			}
 		}
 		
 		// Find {variations}
@@ -444,10 +453,17 @@ public class AliasesProvider {
 					
 					// If variations are used, id is just not the same
 					String variedId = entry.getValue().getId();
+					int mid;
 					if (variedId == null) {
 						variedId = id;
-					} else if (replacement) { // Inject alias id to variation's id
-						variedId = variedId.replaceAll("-", id);
+					} else if (replacement && (mid = variedId.indexOf('-')) != -1) { // Inject alias id to variation's id
+						String idBefore = "";
+						String idAfter = "";
+						if (mid != 0)
+							idBefore = variedId.substring(0, mid);
+						if (mid != variedId.length() - 1)
+							idAfter = variedId.substring(mid + 1);
+						variedId = idBefore + replaceBefore + replaceAfter + idAfter;
 					}
 					
 					// TODO block state combinations

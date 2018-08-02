@@ -363,6 +363,9 @@ public final class Skript extends JavaPlugin implements Listener {
 			return;
 		}
 		
+		BukkitUnsafe.initialize(); // Needed for aliases
+		Aliases.load(); // Loaded before anything that might use them
+		
 		// If loading can continue (platform ok), check for potentially thrown error
 		if (classLoadError != null) {
 			exception(classLoadError);
@@ -394,9 +397,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		if (SkriptConfig.checkForNewVersion.value()) // We only start updater automatically if it was asked
 			Updater.start();
-		
-		BukkitUnsafe.initialize(); // Needed for aliases
-		Aliases.load();
 		
 		Commands.registerListeners();
 		
