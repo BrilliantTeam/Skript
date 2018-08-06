@@ -76,7 +76,6 @@ public class ExprItemWithLore extends PropertyExpression<ItemType, ItemType> {
 			if (meta == null) {
 				meta = Bukkit.getItemFactory().getItemMeta(Material.STONE);
 			}
-			Bukkit.getItemFactory().getItemMeta(Material.STONE);
 			meta.setLore(Arrays.asList(StringUtils.join(lore, "\n").split("\n")));
 			itemType.setItemMeta(meta);
 			return itemType;
