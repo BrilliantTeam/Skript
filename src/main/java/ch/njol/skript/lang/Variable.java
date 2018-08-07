@@ -69,8 +69,9 @@ import ch.njol.util.coll.iterator.EmptyIterator;
  * @author Peter Güttinger
  */
 public class Variable<T> implements Expression<T> {
-	
-	public final static String SEPARATOR = "::";
+
+	private final static String SINGLE_SEPARATOR_CHAR = ":";
+	public final static String SEPARATOR = SINGLE_SEPARATOR_CHAR + SINGLE_SEPARATOR_CHAR;
 	public final static String LOCAL_VARIABLE_TOKEN = "_";
 	
 	/**
@@ -135,6 +136,11 @@ public class Variable<T> implements Expression<T> {
 			if (printErrors)
 				Skript.error("A variable's name must not contain the separator '" + SEPARATOR + "' multiple times in a row (error in variable {" + name + "})");
 			return false;
+		} else if (org.apache.commons.lang3.StringUtils.remove(name, SEPARATOR).contains(SINGLE_SEPARATOR_CHAR)) {
+			if (printErrors)
+				Skript.warning("'" + SINGLE_SEPARATOR_CHAR + "' is a part of the separator '" + SEPARATOR + "', although you put only one '"
+						+ SINGLE_SEPARATOR_CHAR + "' - please either use the whole separator if that's what you intended, or otherwise don't use the '"
+						+ SINGLE_SEPARATOR_CHAR + "' at all to prevent confusion");
 		}
 		return true;
 	}
