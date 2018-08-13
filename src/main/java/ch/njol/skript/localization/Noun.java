@@ -223,7 +223,7 @@ public class Noun extends Message {
 		int i = StringUtils.count(s, '¦');
 		int last = 0, c = -1;
 		while ((c = s.indexOf('¦', c + 1)) != -1) {
-			final String x = s.substring(last, c);
+			final String x = s.substring(last, c).trim();
 			if ((part & 1) != 0)
 				r.setFirst(r.getFirst() + x);
 			if ((part & 2) != 0)

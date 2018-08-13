@@ -482,7 +482,7 @@ public class AliasesProvider {
 					if ("{default}".equals(currentVar)) {
 						currentVar = ""; // Nothing provided -> default variation
 					}
-					String aliasName = name.replace(varName, currentVar);
+					String aliasName = name.replace(varName, currentVar).trim();
 					assert aliasName != null;
 					loadVariedAlias(aliasName, variedId, combinedTags, blockState);
 				}
