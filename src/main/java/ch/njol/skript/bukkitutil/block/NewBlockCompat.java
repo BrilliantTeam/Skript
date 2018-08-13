@@ -49,7 +49,8 @@ public class NewBlockCompat implements BlockCompat {
 		@Override
 		public void setBlock(Block block, boolean applyPhysics) {
 			block.setType(type);
-			block.setBlockData(data, applyPhysics);
+			if (data != null)
+				block.setBlockData(data, applyPhysics);
 		}
 
 		@Override
