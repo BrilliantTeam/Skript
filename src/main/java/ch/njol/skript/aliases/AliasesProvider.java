@@ -242,7 +242,7 @@ public class AliasesProvider {
 				throw new AssertionError("missing id or - in " + id);
 			}
 			typeName = id.substring(0, stateIndex); // Id comes before block state
-			blockState = id.substring(stateIndex + 1, id.length() - 1);
+			blockState = id.substring(stateIndex, id.length());
 		} else { // No block state, just the id
 			typeName = id;
 		}

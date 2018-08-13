@@ -102,7 +102,8 @@ public class NewBlockCompat implements BlockCompat {
 		try {
 			return new NewBlockValues(type, Bukkit.createBlockData(type, state));
 		} catch (IllegalArgumentException e) {
-			Skript.error("Parsing block state " + state + "failed!");
+			Skript.error("Parsing block state " + state + " failed!");
+			e.printStackTrace();
 			return null;
 		}	
 	}
