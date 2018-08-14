@@ -26,7 +26,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -35,6 +34,7 @@ import org.bukkit.UnsafeValues;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -146,7 +146,7 @@ public class BukkitUnsafe {
 			if (is == null) { // No mappings for this Minecraft version
 				return false;
 			}
-			String data = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+			String data = new String(ByteStreams.toByteArray(is), StandardCharsets.UTF_8);
 			
 			Type type = new TypeToken<Map<String,Material>>(){}.getType();
 			materialMap = new Gson().fromJson(data, type);
