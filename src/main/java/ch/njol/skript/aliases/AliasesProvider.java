@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,15 +90,14 @@ public class AliasesProvider {
 	public static class Variation {
 		
 		@Nullable
-		private String id;
-		private Map<String, Object> tags;
-		@Nullable
-		private String state;
+		private final String id;
+		private final Map<String, Object> tags;
+		private final Map<String, String> states;
 		
-		public Variation(@Nullable String id, Map<String, Object> tags, @Nullable String state) {
+		public Variation(@Nullable String id, Map<String, Object> tags, Map<String, String> states) {
 			this.id = id;
 			this.tags = tags;
-			this.state = state;
+			this.states = states;
 		}
 		
 		@Nullable
@@ -109,16 +109,33 @@ public class AliasesProvider {
 			return tags;
 		}
 
-		@Nullable
-		public String getBlockState() {
-			return state;
+
+		public Map<String,String> getBlockStates() {
+			return states;
+		}
+	}
+	
+	public static class VariationGroup {
+		
+		public final List<String> keys;
+		
+		public final List<Variation> values;
+		
+		public VariationGroup() {
+			this.keys = new ArrayList<>();
+			this.values = new ArrayList<>();
+		}
+		
+		public void put(String key, Variation value) {
+			keys.add(key);
+			values.add(value);
 		}
 	}
 	
 	/**
 	 * Contains all variations. {@link #loadVariedAlias} uses this.
 	 */
-	private Map<String, Map<String, Variation>> variations;
+	private Map<String, VariationGroup> variations;
 	
 	/**
 	 * Subtypes of materials.
@@ -165,7 +182,7 @@ public class AliasesProvider {
 			
 			// Section nodes are for variations
 			if (node instanceof SectionNode) {
-				Map<String, Variation> vars = loadVariations((SectionNode) node);
+				VariationGroup vars = loadVariations((SectionNode) node);
 				if (vars != null) {
 					variations.put(node.getKey(), vars);
 				} else {
@@ -258,10 +275,10 @@ public class AliasesProvider {
 	/**
 	 * Loads variations from a section node.
 	 * @param root Root node for this variation.
-	 * @return Map of variations by their names.
+	 * @return Group of variations.
 	 */
 	@Nullable
-	private Map<String, Variation> loadVariations(SectionNode root) {
+	private VariationGroup loadVariations(SectionNode root) {
 		String name = root.getKey();
 		assert name != null; // Better be so
 		if (!name.startsWith("{") || !name.endsWith("}")) {
@@ -269,7 +286,7 @@ public class AliasesProvider {
 			return null;
 		}
 		
-		Map<String, Variation> vars = new HashMap<>();
+		VariationGroup vars = new VariationGroup();
 		for (Node node : root) {
 			String pattern = node.getKey();
 			assert pattern != null;
@@ -282,6 +299,7 @@ public class AliasesProvider {
 			
 			// Put var there for all keys it matches with
 			for (String key : keys) {
+				assert key != null;
 				vars.put(key, var);
 			}
 		}
@@ -298,8 +316,8 @@ public class AliasesProvider {
 		List<String> versions = new ArrayList<>();
 		
 		boolean simple = true; // Simple patterns are used as-is
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
+		for (int i = 0; i < name.length();) {
+			int c = name.codePointAt(i);
 			
 			if (c == '[') { // Optional part: versions with and without it
 				int end = name.indexOf(']', i);
@@ -332,6 +350,8 @@ public class AliasesProvider {
 				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(last + 1, end), name.substring(end + 1))));
 				simple = false; // Not simple, has choice group
 			}
+			
+			i += Character.charCount(c);
 		}
 		if (simple)
 			versions.add(name);
@@ -339,6 +359,149 @@ public class AliasesProvider {
 		return versions;
 	}
 	
+	private static class PatternSlot {
+		
+		public final String content;
+		
+		public PatternSlot(String content) {
+			this.content = content;
+		}
+	}
+	
+	private static class VariationSlot extends PatternSlot {
+		
+		/**
+		 * Variation group.
+		 */
+		public final VariationGroup vars;
+		
+		private int counter;
+		
+		public VariationSlot(VariationGroup vars) {
+			super("");
+			this.vars = vars;
+		}
+		
+		public String getName() {
+			return vars.keys.get(counter);
+		}
+		
+		public Variation getVariation() {
+			return vars.values.get(counter);
+		}
+		
+		public boolean increment() {
+			counter++;
+			if (counter == vars.keys.size()) {
+				counter = 0;
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	private Map<String, Variation> parseKeyVariation(String name) {
+		/**
+		 * Variation name start.
+		 */
+		int varStart = -1;
+		
+		/**
+		 * Variation name end.
+		 */
+		int varEnd = 0;
+		
+		/**
+		 * Variation slots in this name.
+		 */
+		List<PatternSlot> slots = new ArrayList<>();
+		
+		// Compute variation slots
+		for (int i = 0; i < name.length();) {
+			int c = name.codePointAt(i);
+			if (c == '{') { // Found variation name start
+				varStart = i;
+				slots.add(new PatternSlot(name.substring(varEnd, i)));
+			} else if (c == '}') { // Found variation name end
+				if (varStart == -1) { // Or just invalid syntax
+					Skript.error(m_brackets_error.toString());
+					continue;
+				}
+				varStart = -1; // This one ended now
+				varEnd = i + 1;
+				
+				// Extract variation name from full name
+				String varName = name.substring(varStart, i + 1);
+				assert varName != null;
+				// Get variations for that id and hope they exist
+				VariationGroup vars = variations.get(varName);
+				if (vars == null) {
+					Skript.error(m_unknown_variation.toString(varName));
+					continue;
+				}
+				slots.add(new VariationSlot(vars));
+			}
+			
+			i += Character.charCount(c);
+		}
+		
+		// Create all permutations caused by variations
+		while (true) {
+			/**
+			 * Count of pattern slots in this key pattern.
+			 */
+			int count = slots.size();
+			
+			/**
+			 * Currently manipulated variation.
+			 */
+			int incremented = 0;
+			
+			/**
+			 * This key pattern.
+			 */
+			StringBuilder pattern = new StringBuilder();
+			
+			// Variations replace or add to these after each other
+			
+			/**
+			 * Minecraft id. Can be replaced by subsequent variations.
+			 */
+			String id = null;
+			
+			/**
+			 * Tags by their names. All variations can add and overwrite them.
+			 */
+			Map<String, Object> tags = new HashMap<>();
+			
+			/**
+			 * Block states. All variations can add and overwrite them.
+			 */
+			Map<String, String> states = new HashMap<>();
+			
+			for (int i = 0; i < count; i++) {
+				PatternSlot slot = slots.get(i);
+				if (slot instanceof VariationSlot) { // A variation
+					VariationSlot varSlot = (VariationSlot) slot;
+					pattern.append(varSlot.getName());
+					Variation var = varSlot.getVariation();
+					String varId = var.getId();
+					if (varId != null)
+						id = varId;
+					tags.putAll(var.getTags());
+					states.putAll(var.getBlockStates());
+					
+					if (i == incremented) { // This slot is manipulated now
+						if (varSlot.increment())
+							incremented++; // And it flipped from max to 0 again
+					}
+				} else { // Just text
+					pattern.append(slot.content);
+				}
+			}
+		}
+	}
+		
 	/**
 	 * Loads an alias with given name (key pattern) and data (material id and tags).
 	 * @param name Name of alias.
