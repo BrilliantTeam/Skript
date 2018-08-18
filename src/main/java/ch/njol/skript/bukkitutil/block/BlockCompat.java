@@ -19,6 +19,8 @@
  */
 package ch.njol.skript.bukkitutil.block;
 
+import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -81,11 +83,11 @@ public interface BlockCompat {
 	/**
 	 * Creates new block values for given material and state.
 	 * @param type Block material.
-	 * @param state Block state, as used in /setblock command in Minecraft.
+	 * @param states Block states, as used in /setblock command in Minecraft.
 	 * @return Block values, or null if given state was invalid.
 	 */
 	@Nullable
-	BlockValues createBlockValues(Material type, String state);
+	BlockValues createBlockValues(Material type, Map<String, String> states);
 	
 	/**
 	 * Checks whether the given material implies emptiness. On Minecraft 1.13+,

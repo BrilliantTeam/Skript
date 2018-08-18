@@ -164,7 +164,7 @@ public class MagicBlockCompat implements BlockCompat {
 	
 	@Nullable
 	@Override
-	public BlockValues createBlockValues(Material type, String state) {
+	public BlockValues createBlockValues(Material type, Map<String, String> states) {
 //		Map<String, String> states = parseState(state);
 		int data = 0;
 		

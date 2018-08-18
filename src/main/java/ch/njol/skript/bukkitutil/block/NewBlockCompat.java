@@ -19,6 +19,8 @@
  */
 package ch.njol.skript.bukkitutil.block;
 
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -99,11 +101,22 @@ public class NewBlockCompat implements BlockCompat {
 
 	@Override
 	@Nullable
-	public BlockValues createBlockValues(Material type, String state) {
+	public BlockValues createBlockValues(Material type, Map<String, String> states) {
+		StringBuilder combined = new StringBuilder("[");
+		boolean first = true;
+		for (Map.Entry<String, String> entry : states.entrySet()) {
+			if (first)
+				first = false;
+			else
+				combined.append(',');
+			combined.append(entry.getKey()).append('=').append(entry.getValue());
+		}
+		combined.append(']');
+		
 		try {
-			return new NewBlockValues(type, Bukkit.createBlockData(type, state));
+			return new NewBlockValues(type, Bukkit.createBlockData(type, combined.toString()));
 		} catch (IllegalArgumentException e) {
-			Skript.error("Parsing block state " + state + " failed!");
+			Skript.error("Parsing block state " + combined + " failed!");
 			e.printStackTrace();
 			return null;
 		}	

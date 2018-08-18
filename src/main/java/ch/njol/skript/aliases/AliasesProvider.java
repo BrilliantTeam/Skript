@@ -91,11 +91,14 @@ public class AliasesProvider {
 		
 		@Nullable
 		private final String id;
+		private final int insertPoint;
+		
 		private final Map<String, Object> tags;
 		private final Map<String, String> states;
 		
-		public Variation(@Nullable String id, Map<String, Object> tags, Map<String, String> states) {
+		public Variation(@Nullable String id, int insertPoint, Map<String, Object> tags, Map<String, String> states) {
 			this.id = id;
+			this.insertPoint = insertPoint;
 			this.tags = tags;
 			this.states = states;
 		}
@@ -105,6 +108,25 @@ public class AliasesProvider {
 			return id;
 		}
 		
+		public int getInsertPoint() {
+			return insertPoint;
+		}
+		
+		public String insertId(String inserted) {
+			if (id == null) // Inserting to nothing
+				return inserted;
+			
+			String id = this.id;
+			assert id != null;
+			if (insertPoint == -1) // No place where to insert
+				return id; // So variation's id overrides main alias' one
+			
+			// Insert given string to in middle of our id
+			String before = id.substring(0, insertPoint);
+			String after = id.substring(insertPoint + 1);
+			return before + inserted + after;
+		}
+		
 		public Map<String, Object> getTags() {
 			return tags;
 		}
@@ -112,6 +134,16 @@ public class AliasesProvider {
 
 		public Map<String,String> getBlockStates() {
 			return states;
+		}
+
+
+		public Variation merge(Variation other) {
+			Map<String, Object> mergedTags = new HashMap<>(other.tags);
+			mergedTags.putAll(tags);
+			Map<String, String> mergedStates = new HashMap<>(other.states);
+			mergedStates.putAll(states);
+			return new Variation(id != null ? id : other.id,
+					insertPoint != -1 ? insertPoint : other.insertPoint, mergedTags, mergedStates);
 		}
 	}
 	
@@ -224,6 +256,32 @@ public class AliasesProvider {
 		return (Map<String, Object>) gson.fromJson(raw, Object.class);
 	}
 	
+	private Map<String, String> parseBlockStates(String input) {
+		Map<String,String> parsed = new HashMap<>();
+		
+		int comma;
+		int pos = 0;
+		while (pos != -1) { // Loop until we don't have more key=value pairs
+			comma = input.indexOf(',', pos); // Find where next key starts
+			
+			// Get key=value as string
+			String pair;
+			if (comma == -1) {
+				pair = input.substring(pos);
+				pos = -1;
+			} else {
+				pair = input.substring(pos, comma);
+				pos = comma + 1;
+			}
+			
+			// Split pair to parts, add them to map
+			String[] parts = pair.split("=");
+			parsed.put(parts[0], parts[1]);
+		}
+		
+		return parsed;
+	}
+	
 	/**
 	 * Parses a single variation from a string.
 	 * @param item Raw variation info.
@@ -252,16 +310,17 @@ public class AliasesProvider {
 		
 		// Separate block state from id
 		String typeName;
-		String blockState = null; // Not all aliases have block state
+		Map<String, String> blockStates;
 		int stateIndex = id.indexOf('[');
 		if (stateIndex != -1) {
 			if (stateIndex == 0) {
 				throw new AssertionError("missing id or - in " + id);
 			}
 			typeName = id.substring(0, stateIndex); // Id comes before block state
-			blockState = id.substring(stateIndex, id.length());
+			blockStates = parseBlockStates(id.substring(stateIndex + 1, id.length() - 1));
 		} else { // No block state, just the id
 			typeName = id;
+			blockStates = new HashMap<>();
 		}
 		
 		// Variations don't always need an id
@@ -269,7 +328,7 @@ public class AliasesProvider {
 			typeName = null;
 		}
 		
-		return new Variation(typeName, tags, blockState);
+		return new Variation(typeName, typeName == null ? -1 : typeName.indexOf('-'), tags, blockStates);
 	}
 	
 	/**
@@ -292,7 +351,7 @@ public class AliasesProvider {
 			assert pattern != null;
 			List<String> keys = parseKeyPattern(pattern);
 			Variation var = parseVariation(((EntryNode) node).getValue());
-			if (var.getId() == null && var.getTags().isEmpty() && var.getBlockState() == null) {
+			if (var.getId() == null && var.getTags().isEmpty() && var.getBlockStates().isEmpty()) {
 				// Useless variation, basically
 				Skript.warning(m_useless_variation.toString());
 			}
@@ -300,6 +359,8 @@ public class AliasesProvider {
 			// Put var there for all keys it matches with
 			for (String key : keys) {
 				assert key != null;
+				if (key.equals("{default}"))
+					key = "";
 				vars.put(key, var);
 			}
 		}
@@ -400,7 +461,12 @@ public class AliasesProvider {
 		}
 	}
 	
-	private Map<String, Variation> parseKeyVariation(String name) {
+	/**
+	 * Parses all possible variations from given name.
+	 * @param name Name which might contain variations.
+	 * @return Map of variations.
+	 */
+	private Map<String, Variation> parseKeyVariations(String name) {
 		/**
 		 * Variation name start.
 		 */
@@ -427,9 +493,7 @@ public class AliasesProvider {
 					Skript.error(m_brackets_error.toString());
 					continue;
 				}
-				varStart = -1; // This one ended now
-				varEnd = i + 1;
-				
+
 				// Extract variation name from full name
 				String varName = name.substring(varStart, i + 1);
 				assert varName != null;
@@ -440,9 +504,32 @@ public class AliasesProvider {
 					continue;
 				}
 				slots.add(new VariationSlot(vars));
+				
+				// Variation name finished
+				varStart = -1;
+				varEnd = i + 1;
 			}
 			
 			i += Character.charCount(c);
+		}
+		
+		if (varStart != -1) { // A variation was not properly finished
+			Skript.error(m_brackets_error.toString());
+		}
+		
+		/**
+		 * All possible variations by patterns of them.
+		 */
+		Map<String, Variation> variations = new HashMap<>();
+		
+		if (slots.size() == 1) {
+			// Fast path: no variations
+			PatternSlot slot = slots.get(0);
+			if (!(slot instanceof VariationSlot)) {
+				variations.put(name, new Variation(null, -1, new HashMap<>(), new HashMap<>()));
+				return variations;
+			}
+			// Otherwise we have only one slot, which is variation. Weird, isn't it?
 		}
 		
 		// Create all permutations caused by variations
@@ -453,7 +540,7 @@ public class AliasesProvider {
 			int count = slots.size();
 			
 			/**
-			 * Currently manipulated variation.
+			 * Slot index of currently manipulated variation.
 			 */
 			int incremented = 0;
 			
@@ -470,6 +557,11 @@ public class AliasesProvider {
 			String id = null;
 			
 			/**
+			 * Where to insert id of alias that uses this variation.
+			 */
+			int insertPoint = -1;
+			
+			/**
 			 * Tags by their names. All variations can add and overwrite them.
 			 */
 			Map<String, Object> tags = new HashMap<>();
@@ -479,6 +571,7 @@ public class AliasesProvider {
 			 */
 			Map<String, String> states = new HashMap<>();
 			
+			// Construct alias name and variations
 			for (int i = 0; i < count; i++) {
 				PatternSlot slot = slots.get(i);
 				if (slot instanceof VariationSlot) { // A variation
@@ -488,6 +581,9 @@ public class AliasesProvider {
 					String varId = var.getId();
 					if (varId != null)
 						id = varId;
+					if (var.getInsertPoint() != -1)
+						insertPoint = var.getInsertPoint();
+						
 					tags.putAll(var.getTags());
 					states.putAll(var.getBlockStates());
 					
@@ -496,10 +592,22 @@ public class AliasesProvider {
 							incremented++; // And it flipped from max to 0 again
 					}
 				} else { // Just text
+					if (i == incremented) // We can't do that
+						incremented++; // But perhaps next slot can
 					pattern.append(slot.content);
 				}
 			}
+			
+			// Put variation to map which we will return
+			variations.put(pattern.toString(), new Variation(id, insertPoint, tags, states));
+			
+			// Check if we're finished with permutations
+			if (incremented == count) {
+				break; // Indeed, get out now!
+			}
 		}
+		
+		return variations;
 	}
 		
 	/**
@@ -510,7 +618,13 @@ public class AliasesProvider {
 	private void loadAlias(String name, String data) {
 		//Skript.debug("Loading alias: " + name + " = " + data);
 		List<String> patterns = parseKeyPattern(name);
-		//Skript.debug("Patterns: " + patterns);
+		
+		// Create all variations now (might need them many times in future)
+		Map<String, Variation> variations = new HashMap<>();
+		for (String pattern : patterns) {
+			assert pattern != null;
+			variations.putAll(parseKeyVariations(pattern));
+		}
 		
 		// Complex list parsing to avoid commas inside tags
 		int start = 0; // Start of next substring
@@ -521,7 +635,7 @@ public class AliasesProvider {
 				if (indexStart == 0) { // Nothing was loaded, so no commas at all
 					String item = data.trim();
 					assert item != null;
-					loadSingleAlias(patterns, item);
+					loadSingleAlias(variations, item);
 					break;
 				} else {
 					comma = data.length();
@@ -539,7 +653,7 @@ public class AliasesProvider {
 			// Not inside tags, so process the item
 			String item = data.substring(start, comma).trim();
 			assert item != null;
-			loadSingleAlias(patterns, item);
+			loadSingleAlias(variations, item);
 			
 			// Set up for next item
 			start = comma + 1;
@@ -547,122 +661,24 @@ public class AliasesProvider {
 		}
 	}
 	
-	private void loadSingleAlias(List<String> patterns, String item) {
-		Variation var = parseVariation(item); // Share parsing code with variations
+	private void loadSingleAlias(Map<String, Variation> variations, String item) {
+		Variation base = parseVariation(item); // Share parsing code with variations
 		
-		for (String p : patterns) {
-			p = p.trim();
-			assert p != null; // No nulls in this list
-			loadVariedAlias(p, var.getId(), var.getTags(), var.getBlockState());
-		}
-	}
-	
-	/**
-	 * Loads alias which may contain variations.
-	 * @param name Alias name without patterns, which still might contain
-	 * variation blocks.
-	 * @param id Base id of material that this alias represents.
-	 * @param tags Base tags of material that this alias represents.
-	 * @param blockState Block state.
-	 * @param replacement Is id replacement to be used in variations.
-	 */
-	private void loadVariedAlias(String name, @Nullable String id, @Nullable Map<String, Object> tags, @Nullable String blockState) {
-		// Material part replacements for variations
-		// -stuff + minecraft:item_- -> minecraft:item_stuff
-		boolean replacement = false;
-		String replaceBefore = "";
-		String replaceAfter = "";
-		if (id != null && !id.isEmpty() && id.charAt(0) == '-') {
-			char second = id.charAt(1);
-			if (second != ' ' && second != '[') {
-				replacement = true;
-				int replaceMid = id.indexOf('-');
-				if (replaceMid != 0)
-					replaceBefore = id.substring(0, replaceMid);
-				if (replaceMid != id.length() - 1)
-					replaceAfter = id.substring(replaceMid + 1);
-			}
-		}
-		
-		// Find {variations}
-		boolean hasVariations = false;
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
+		for (Map.Entry<String, Variation> entry : variations.entrySet()) {
+			String name = entry.getKey().trim();
+			assert name != null;
+			Variation var = entry.getValue();
+			assert var != null;
+			Variation merged = base.merge(var);
 			
-			// Variation start here
-			if (c == '{') {
-				hasVariations = true;
-				
-				int end = name.indexOf('}', i);
-				if (end == -1) {
-					Skript.error(m_brackets_error.toString());
-					continue;
-				}
-				
-				// Take variation name, including the brackets
-				String varName = name.substring(i, end + 1);
-				// Get variations for that id and hope they exist
-				Map<String, Variation> vars = variations.get(varName);
-				if (vars == null) {
-					Skript.error(m_unknown_variation.toString(varName));
-					continue;
-				}
-				
-				// Iterate over variations
-				for (Entry<String, Variation> entry : vars.entrySet()) {
-					// Combine the tags
-					Map<String, Object> combinedTags;
-					if (tags != null) {
-						combinedTags = new HashMap<>(tags.size() + entry.getValue().getTags().size());
-						combinedTags.putAll(tags);
-						combinedTags.putAll(entry.getValue().getTags());
-					} else {
-						combinedTags = entry.getValue().getTags();
-					}
-					
-					// If variations are used, id is just not the same
-					String variedId = entry.getValue().getId();
-					int mid;
-					char second;
-					if (variedId == null) {
-						variedId = id;
-					} else if (replacement && (mid = variedId.indexOf('-')) != -1 && variedId.length() > 1
-							&& (second = variedId.charAt(1)) != ' ' && second != '[') { // Inject alias id to variation's id
-						String idBefore = "";
-						String idAfter = "";
-						if (mid != 0)
-							idBefore = variedId.substring(0, mid);
-						if (mid != variedId.length() - 1)
-							idAfter = variedId.substring(mid + 1);
-						variedId = idBefore + replaceBefore + replaceAfter + idAfter;
-					}
-					
-					// TODO block state combinations
-					// If we want them, that is
-					
-					// Figure out the key of alias
-					String currentVar = entry.getKey();
-					if ("{default}".equals(currentVar)) {
-						currentVar = ""; // Nothing provided -> default variation
-					}
-					String aliasName = name.replace(varName, currentVar).trim();
-					assert aliasName != null;
-					loadVariedAlias(aliasName, variedId, combinedTags, blockState);
-				}
-				
-				// Move to end of this variation
-				i = end;
-			}
-		}
-		
-		// Enough recursion! No more variations, just alias
-		if (!hasVariations) {
+			String id = merged.getId();
 			// For null ids, we just spit a warning
 			// They should have not gotten this far
 			if (id == null) {
 				Skript.warning(m_empty_alias.toString());
 			} else {
-				loadReadyAlias(name, id, tags, blockState);
+				id = var.insertId(item);
+				loadReadyAlias(name, id, merged.getTags(), merged.getBlockStates());
 			}
 		}
 	}
@@ -676,8 +692,8 @@ public class AliasesProvider {
 		Object damage = tags.get("Damage");
 		if (damage instanceof Number) { // Set durability manually, not NBT tag before 1.13
 			stack = new ItemStack(stack.getType(), 1, ((Number) damage).shortValue());
+			// Bukkit makes this work on 1.13+ too, which is nice
 			tags.remove("Damage");
-			// TODO 1.13 support
 		}
 		
 		// Apply random tags using JSON
@@ -693,9 +709,9 @@ public class AliasesProvider {
 	 * @param name Name of alias without any patterns or variation blocks.
 	 * @param id Id of material.
 	 * @param tags Tags for material.
-	 * @param blockState Block state.
+	 * @param blockStates Block states.
 	 */
-	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags, @Nullable String blockState) {
+	private void loadReadyAlias(String name, String id, @Nullable Map<String, Object> tags, Map<String, String> blockStates) {
 		// First, try to find if aliases already has a type with this id
 		// (so that aliases can refer to each other)
 		ItemType typeOfId = aliases.get(id);
@@ -712,8 +728,8 @@ public class AliasesProvider {
 			
 			// Parse block state to block values
 			BlockValues blockValues = null;
-			if (blockState != null) {
-				blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockState);
+			if (!blockStates.isEmpty()) {
+				blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockStates);
 				// TODO error reporting if we get null
 			}
 			
