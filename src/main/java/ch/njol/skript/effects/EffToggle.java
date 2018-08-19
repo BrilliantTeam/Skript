@@ -88,37 +88,37 @@ public class EffToggle extends Effect {
 	private final static byte[] bitFlags = new byte[Skript.MAXBLOCKID + 1];
 	private final static boolean[] doors = new boolean[Skript.MAXBLOCKID + 1];
 	static {
-		bitFlags[Material.DETECTOR_RAIL.getId()] = 0x8;
+		bitFlags[28] = 0x8; // Detector rail
 		// Doors
 		bitFlags[64] = 0x4; // Oak door (block)
-		bitFlags[Material.SPRUCE_DOOR.getId()] = 0x4;
-		bitFlags[Material.BIRCH_DOOR.getId()] = 0x4;
-		bitFlags[Material.JUNGLE_DOOR.getId()] = 0x4;
-		bitFlags[Material.ACACIA_DOOR.getId()] = 0x4;
-		bitFlags[Material.DARK_OAK_DOOR.getId()] = 0x4;
+		bitFlags[193] = 0x4; // Spruce door (block)
+		bitFlags[194] = 0x4; // Birch door (block)
+		bitFlags[195] = 0x4; // Jungle door (block)
+		bitFlags[196] = 0x4; // Acacia door (block)
+		bitFlags[197] = 0x4; // Dark oak door (block)
 		bitFlags[71] = 0x4; // Iron door (block)
 		// Redstone stuff
-		bitFlags[Material.LEVER.getId()] = 0x8;
+		bitFlags[69] = 0x8; // Lever
 		bitFlags[70] = 0x1; // Stone pressure plate
 		bitFlags[72] = 0x1; // Wooden pressure plate
-		bitFlags[Material.STONE_BUTTON.getId()] = 0x8;
+		bitFlags[77] = 0x8; // Stone button
 		// Trapdoors
 		bitFlags[96] = 0x4; // Wooden trapdoor
-		bitFlags[Material.IRON_TRAPDOOR.getId()] = 0x4;
+		bitFlags[167] = 0x4; // Iron trapdoor
 		// Fence gates
 		bitFlags[107] = 0x4; // Oak fence gate
-		bitFlags[Material.SPRUCE_FENCE_GATE.getId()] = 0x4;
-		bitFlags[Material.BIRCH_FENCE_GATE.getId()] = 0x4;
-		bitFlags[Material.JUNGLE_FENCE_GATE.getId()] = 0x4;
-		bitFlags[Material.DARK_OAK_FENCE_GATE.getId()] = 0x4;
-		bitFlags[Material.ACACIA_FENCE_GATE.getId()] = 0x4;
+		bitFlags[183] = 0x4; // Spruce fence gate
+		bitFlags[184] = 0x4; // Birch fence gate
+		bitFlags[185] = 0x4; // Jungle fence gate
+		bitFlags[186] = 0x4; // Dark oak fence gate
+		bitFlags[187] = 0x4; // Acacia fence gate
 		
 		doors[64] = true; // Oak door (block)
-		doors[Material.SPRUCE_DOOR.getId()] = true;
-		doors[Material.BIRCH_DOOR.getId()] = true;
-		doors[Material.JUNGLE_DOOR.getId()] = true;
-		doors[Material.ACACIA_DOOR.getId()] = true;
-		doors[Material.DARK_OAK_DOOR.getId()] = true;
+		doors[193] = true; // Spruce door (block)
+		doors[194] = true; // Birch door (block)
+		doors[195] = true; // Jungle door (block)
+		doors[196] = true; // Acacia door (block
+		doors[197] = true; // Dark oak door (block)
 		doors[71] = true; // Iron door (block)
 	}
 	
