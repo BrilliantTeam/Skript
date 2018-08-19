@@ -61,7 +61,10 @@ public class ExprRawName extends SimpleExpression<String> {
 	@Override
 	@Nullable
 	protected String[] get(final Event e) {
-		return Arrays.stream(types.getAll(e)).map(ItemType::getRawNames).flatMap(List::stream).toArray(String[]::new);
+		return Arrays.stream(types.getAll(e))
+				.map(ItemType::getRawNames)
+				.flatMap(List::stream)
+				.toArray(String[]::new);
 	}
 	
 	@Override
