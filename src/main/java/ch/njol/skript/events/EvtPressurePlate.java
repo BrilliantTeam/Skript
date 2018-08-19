@@ -47,7 +47,7 @@ public class EvtPressurePlate extends SkriptEvent {
 				.since("1.0 (pressure plate), 1.4.4 (tripwire)");
 	}
 	
-	private static final ItemType plate = Aliases.javaItemType("plate");
+	private static final ItemType plate = Aliases.javaItemType("pressure plate");
 	
 	private boolean tripwire;
 	

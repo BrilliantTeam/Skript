@@ -47,7 +47,7 @@ public class EvtEntityBlockChange extends SkriptEvent {
 				.since("");
 	}
 	
-	static final ItemType monsterEgg = Aliases.javaItemType("monster egg");
+	static final ItemType monsterEgg = Aliases.javaItemType("any spawn egg");
 	
 	private static enum ChangeEvent {
 		ENDERMAN_PLACE("enderman place", new Checker<EntityChangeBlockEvent>() {
