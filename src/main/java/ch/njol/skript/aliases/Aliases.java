@@ -45,6 +45,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.SkriptCommand;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.config.Config;
@@ -70,7 +71,7 @@ import ch.njol.util.Setter;
 public abstract class Aliases {
 		
 	private final static AliasesProvider provider = createProvider();
-	private static AliasesProvider localProvider = new AliasesProvider();
+	private final static AliasesParser parser = createParser(provider);
 	
 	@Nullable
 	private final static ItemType getAlias_i(final String s) {
@@ -81,14 +82,22 @@ public abstract class Aliases {
 	}
 	
 	/**
-	 * Creates an aliases provider and configures it a bit.
+	 * Creates an aliases provider with Skript's default configuration.
 	 * @return Aliases provider.
 	 */
 	private static AliasesProvider createProvider() {
-		AliasesProvider provider = new AliasesProvider();
+		return new AliasesProvider();
+	}
+	
+	/**
+	 * Creates an aliases parser with Skript's default configuration.
+	 * @return Aliases parser.
+	 */
+	private static AliasesParser createParser(AliasesProvider provider) {
+		AliasesParser parser = new AliasesParser(provider);
 		
 		// Register standard conditions
-		provider.registerCondition("minecraft version", (str) -> {
+		parser.registerCondition("minecraft version", (str) -> {
 			int orNewer = str.indexOf("or newer"); // For example: 1.12 or newer
 			if (orNewer != -1) {
 				@SuppressWarnings("null")
@@ -116,7 +125,7 @@ public abstract class Aliases {
 			return Skript.getMinecraftVersion().equals(new Version(str));
 		});
 		
-		return provider;
+		return parser;
 	}
 
 	static String itemSingular = "item";
@@ -510,7 +519,7 @@ public abstract class Aliases {
 				continue;
 			}
 			
-			provider.load((SectionNode) n);
+			parser.load((SectionNode) n);
 		}
 	}
 	
@@ -556,5 +565,20 @@ public abstract class Aliases {
 			throw new IllegalArgumentException("type " + name + " not found");
 		trackedTypes.put(name, type);
 		return type;
+	}
+	
+	/**
+	 * Creates an aliases provider to be used by given addon. It can be used to
+	 * register aliases and variations to be used in scripts.
+	 * @param addon Skript addon.
+	 * @return Aliases provider.
+	 */
+	public static AliasesProvider getAddonProvider(@Nullable SkriptAddon addon) {
+		if (addon == null) {
+			throw new IllegalArgumentException("addon needed");
+		}
+		
+		// TODO in future, maybe record and allow unloading addon-provided aliases?
+		return provider; // For now, just allow loading aliases easily
 	}
 }
