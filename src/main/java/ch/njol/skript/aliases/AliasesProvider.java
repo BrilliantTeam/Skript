@@ -774,7 +774,7 @@ public class AliasesProvider {
 		} else { // ... but quite often, we just got Vanilla id
 			// Prepare and modify ItemStack (using somewhat Unsafe methods)
 			Material material = BukkitUnsafe.getMaterialFromMinecraftId(id);
-			if (material == null || material == Material.AIR) { // If server doesn't recognize id, do not proceed
+			if (material == null) { // If server doesn't recognize id, do not proceed
 				Skript.error(m_invalid_minecraft_id.toString(id));
 				return; // Apparently ItemStack constructor on 1.12 can throw NPE
 			}
