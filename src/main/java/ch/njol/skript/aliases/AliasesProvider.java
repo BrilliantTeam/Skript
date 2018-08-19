@@ -112,14 +112,15 @@ public class AliasesProvider {
 			return insertPoint;
 		}
 		
-		public String insertId(String inserted) {
+		@Nullable
+		public String insertId(@Nullable String inserted) {
 			if (id == null) // Inserting to nothing
 				return inserted;
 			
 			String id = this.id;
 			assert id != null;
 			if (insertPoint == -1) // No place where to insert
-				return id; // So variation's id overrides main alias' one
+				return inserted != null ? inserted : id;
 			
 			// Insert given string to in middle of our id
 			String before = id.substring(0, insertPoint);
@@ -138,12 +139,16 @@ public class AliasesProvider {
 
 
 		public Variation merge(Variation other) {
+			// Merge tags and block states
 			Map<String, Object> mergedTags = new HashMap<>(other.tags);
 			mergedTags.putAll(tags);
 			Map<String, String> mergedStates = new HashMap<>(other.states);
 			mergedStates.putAll(states);
-			return new Variation(id != null ? id : other.id,
-					insertPoint != -1 ? insertPoint : other.insertPoint, mergedTags, mergedStates);
+			
+			// Potentially merge ids
+			String id = insertId(other.id);
+			
+			return new Variation(id, insertPoint != -1 ? insertPoint : other.insertPoint, mergedTags, mergedStates);
 		}
 	}
 	
@@ -203,7 +208,8 @@ public class AliasesProvider {
 	 * @param root Root section node for us to load.
 	 */
 	public void load(SectionNode root) {
-		Skript.debug("Loading aliases node: " + root.getKey() + " from " + root.getConfig().getFileName());
+		Skript.debug("Loading aliases node " + root.getKey() + " from " + root.getConfig().getFileName());
+		long start = System.currentTimeMillis();
 		for (Node node : root) {
 			// Get key and make sure it exists
 			String key = node.getKey();
@@ -244,6 +250,9 @@ public class AliasesProvider {
 			
 			loadAlias(key, value);
 		}
+		
+		long time = System.currentTimeMillis() - start;
+		Skript.debug("Finished loading " + root.getKey() + " in " + (time / 1000000) + "ms");
 	}
 	
 	/**
@@ -382,8 +391,8 @@ public class AliasesProvider {
 			
 			if (c == '[') { // Optional part: versions with and without it
 				int end = name.indexOf(']', i);
-				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(i + 1, end), name.substring(end + 1))));
-				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(end + 1))));
+				versions.addAll(parseKeyPattern(name.substring(0, i) + name.substring(i + 1, end) + name.substring(end + 1)));
+				versions.addAll(parseKeyPattern(name.substring(0, i) + name.substring(end + 1)));
 				simple = false; // Not simple, has optional group
 			} else if (c == '(') { // Choose one part: versions for multiple options
 				int end = name.indexOf(')', i);
@@ -400,7 +409,7 @@ public class AliasesProvider {
 						if (n > 0)
 							continue;
 						hasParts = true;
-						versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(last + 1, j), name.substring(end + 1))));
+						versions.addAll(parseKeyPattern(name.substring(0, i) + name.substring(last + 1, j) + name.substring(end + 1)));
 						last = j;
 					}
 				}
@@ -408,7 +417,7 @@ public class AliasesProvider {
 					Skript.error(m_brackets_error.toString());
 					return versions;
 				}
-				versions.addAll(parseKeyPattern(Aliases.concatenate(name.substring(0, i), name.substring(last + 1, end), name.substring(end + 1))));
+				versions.addAll(parseKeyPattern(name.substring(0, i) + name.substring(last + 1, end) + name.substring(end + 1)));
 				simple = false; // Not simple, has choice group
 			}
 			
@@ -512,6 +521,9 @@ public class AliasesProvider {
 			
 			i += Character.charCount(c);
 		}
+		
+		// Handle last non-variation slot
+		slots.add(new PatternSlot(name.substring(varEnd)));
 		
 		if (varStart != -1) { // A variation was not properly finished
 			Skript.error(m_brackets_error.toString());
@@ -665,7 +677,7 @@ public class AliasesProvider {
 		Variation base = parseVariation(item); // Share parsing code with variations
 		
 		for (Map.Entry<String, Variation> entry : variations.entrySet()) {
-			String name = entry.getKey().trim();
+			String name = entry.getKey();
 			assert name != null;
 			Variation var = entry.getValue();
 			assert var != null;
@@ -677,10 +689,51 @@ public class AliasesProvider {
 			if (id == null) {
 				Skript.warning(m_empty_alias.toString());
 			} else {
-				id = var.insertId(item);
-				loadReadyAlias(name, id, merged.getTags(), merged.getBlockStates());
+				loadReadyAlias(fixName(name), id, merged.getTags(), merged.getBlockStates());
 			}
 		}
+	}
+	
+	/**
+	 * Fixes an alias name by trimming it and removing all extraneous spaces
+	 * between the words.
+	 * @param name Name to be fixed.
+	 * @return Name fixed.
+	 */
+	private String fixName(String name) {
+		StringBuilder fixed = new StringBuilder();
+		
+		// Trim whitespace at beginning
+		int i = 0;
+		for (;i < name.length();) {
+			int c = name.codePointAt(i);
+			if (!Character.isWhitespace(c))
+				break;
+			
+			i += Character.charCount(c);
+		}
+		
+		// Remove extra whitespace
+		boolean whitespace = false;
+		for (;i < name.length();) {
+			int c = name.codePointAt(i);
+			if (Character.isWhitespace(c)) {
+				if (whitespace) {
+					i += Character.charCount(c);
+					continue;
+				}
+				else // First whitespace
+					whitespace = true;
+			} else {
+				whitespace = false;
+			}
+			
+			fixed.appendCodePoint(c);
+			
+			i += Character.charCount(c);
+		}
+		
+		return fixed.toString();
 	}
 	
 	/**
