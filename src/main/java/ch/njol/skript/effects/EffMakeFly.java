@@ -73,5 +73,4 @@ public class EffMakeFly extends Effect {
 	public String toString(@Nullable Event e, boolean debug) {
 		return "make " + players.toString(e, debug) + (flying ? " start " : " stop ") + "flying";
 	}
-
 }
