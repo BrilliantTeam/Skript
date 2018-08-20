@@ -45,9 +45,12 @@ public class EffToggleFlight extends Effect {
 			"(disallow|disable) (fly|flight) (for|to) %players%");
 	}
 
+	@SuppressWarnings("null")
 	private Expression<Player> players;
+
 	private boolean allow;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		players = (Expression<Player>) exprs[0];
@@ -65,5 +68,4 @@ public class EffToggleFlight extends Effect {
 	public String toString(final @Nullable Event e, final boolean debug) {
 		return "allow flight to " + players.toString(e, debug);
 	}
-
 }

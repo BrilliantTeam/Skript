@@ -43,11 +43,13 @@ public class CondCanFly extends Condition {
 	static {
 		Skript.registerCondition(CondCanFly.class,
 			"%players% can fly",
-			"%players% (can't|can not) fly");
+			"%players% (can't|can[ ]not) fly");
 	}
 
+	@SuppressWarnings("null")
 	private Expression<Player> players;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		players = (Expression<Player>) exprs[0];
@@ -57,18 +59,11 @@ public class CondCanFly extends Condition {
 
 	@Override
 	public boolean check(final Event e) {
-
-		return players.check(e, new Checker<Player>() {
-			@Override
-			public boolean check(final Player p) {
-				return p.getAllowFlight();
-			}
-		}, isNegated());
+		return players.check(e, Player::getAllowFlight, isNegated());
 	}
 
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return players.toString(e, debug) + (isNegated() ? " can " : " can not") + "fly";
+		return players.toString(e, debug) + (isNegated() ? " can " : " cannot ") + "fly";
 	}
-
 }
