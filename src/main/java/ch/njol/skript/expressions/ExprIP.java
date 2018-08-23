@@ -33,75 +33,38 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 
 @Name("IP")
-@Description("The IP address of a player.")
-@Examples({"IP-ban the player # is equal to the next line",
-		"ban the IP-address of the player",
-		"broadcast \"Banned the IP %IP of player%\""})
-@Since("1.4, 2.2-dev26 (when used in connect event)")
+@Description("The IP address in a <a href='events.html#connect'>connect</a> event.")
+@Examples({"on connect:",
+		"log \"[%now%] %IP% joined the server.\""})
+@Since("INSERT VERSION")
 public class ExprIP extends SimpleExpression<String> {
 	
 	static {
-		Skript.registerExpression(ExprIP.class, String.class, ExpressionType.PROPERTY, "IP[s][( |-)address[es]] of %players%",
-				"%players%'[s] IP[s][( |-)address[es]]");
+		Skript.registerExpression(ExprIP.class, String.class, ExpressionType.SIMPLE, "[the] IP[(-| )address]");
 	}
-	
-	@SuppressWarnings("null")
-	private Expression<Player> players;
-	private boolean connectEvent;
 	
 	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		players = (Expression<Player>) exprs[0];
-		connectEvent = ScriptLoader.isCurrentEvent(PlayerLoginEvent.class);
+		if (!ScriptLoader.isCurrentEvent(PlayerLoginEvent.class)) {
+			Skript.error("The 'IP' expression can only be used in a connect event.");
+			return false;
+		}
 		return true;
 	}
 	
 	@Override
 	@Nullable
 	protected String[] get(Event e) {
-		Player[] ps = players.getAll(e);
-		String[] ips = new String[ps.length];
-		for (int i = 0; i < ips.length; i++) {
-			Player p = ps[i];
-			InetAddress addr;
-			// Connect event: player has no ip yet, but event has it
-			// It is a "feature" of Spigot, apparently
-			if (connectEvent && ((PlayerLoginEvent) e).getPlayer().equals(p)) {
-				addr = ((PlayerLoginEvent) e).getAddress();
-			} else {
-				InetSocketAddress socketAddr = p.getAddress();
-				if (socketAddr == null) {
-					ips[i] = "unknown";
-					continue;
-				}
-				addr = socketAddr.getAddress();
-			}
-			
-			// Check if address is not available, just in case...
-			if (addr == null) {
-				ips[i] = "unknown";
-				continue;
-			}
-			
-			// Finally, place ip here to array...
-			ips[i] = addr.getHostAddress();
-		}
-		
-		return ips;
-	}
-	
-	@Override
-	public Class<String> getReturnType() {
-		return String.class;
+		return CollectionUtils.array(((PlayerLoginEvent) e).getAddress().toString());
 	}
 
 	@Override
@@ -109,13 +72,14 @@ public class ExprIP extends SimpleExpression<String> {
 		return true;
 	}
 
+	@Override
+	public Class<String> getReturnType() {
+		return String.class;
+	}
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		if (e != null)
-			return "ip of " + players.toString(e, debug);
-		else
-			return "ip";
+		return "the ip";
 	}
 	
 }
