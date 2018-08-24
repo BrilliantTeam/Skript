@@ -420,7 +420,9 @@ public abstract class Aliases {
 	 */
 	public static void load() {
 		try {
+			long start = System.currentTimeMillis();
 			loadInternal();
+			Skript.info("Loaded " + provider.getAliasCount() + " aliases in " + (System.currentTimeMillis() - start) + "ms");
 		} catch (IOException e) {
 			Skript.exception(e);
 		}

@@ -332,4 +332,8 @@ public class AliasesProvider {
 		return subtypes.get(supertype);
 	}
 
+	public int getAliasCount() {
+		return aliases.size();
+	}
+
 }
