@@ -481,7 +481,7 @@ public abstract class Aliases {
 	 */
 	public static void loadDirectory(Path dir) throws IOException {
 		try {
-			Files.list(dir).forEach((f) -> {
+			Files.list(dir).sorted().forEach((f) -> {
 				assert f != null;
 				try {
 					String name = f.getFileName().toString();
