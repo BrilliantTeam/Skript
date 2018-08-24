@@ -588,15 +588,17 @@ public class AliasesParser {
 		
 		// Remove extra whitespace
 		boolean whitespace = false;
-		for (;i < name.length();) {
+		int len = name.length();
+		for (;i < len;) {
 			int c = name.codePointAt(i);
 			if (Character.isWhitespace(c)) {
-				if (whitespace) {
+				// Ignore multiple whitespace after each other and the last whitespace
+				if (whitespace || i == len - 1) {
 					i += Character.charCount(c);
 					continue;
-				}
-				else // First whitespace
+				} else { // First whitespace
 					whitespace = true;
+				}
 			} else {
 				whitespace = false;
 			}
