@@ -106,11 +106,13 @@ public class AliasesProvider {
 		public String insertId(@Nullable String inserted) {
 			if (id == null) // Inserting to nothing
 				return inserted;
+			if (inserted == null)
+				return id;
 			
 			String id = this.id;
 			assert id != null;
 			if (insertPoint == -1) // No place where to insert
-				return inserted != null ? inserted : id;
+				return inserted;
 			
 			// Insert given string to in middle of our id
 			String before = id.substring(0, insertPoint);
@@ -138,7 +140,7 @@ public class AliasesProvider {
 			// Potentially merge ids
 			String id = insertId(other.id);
 			
-			return new Variation(id, insertPoint != -1 ? insertPoint : other.insertPoint, mergedTags, mergedStates);
+			return new Variation(id, -1, mergedTags, mergedStates);
 		}
 	}
 	

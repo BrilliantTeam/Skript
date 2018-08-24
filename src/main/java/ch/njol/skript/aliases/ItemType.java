@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -422,12 +423,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	}
 	
 	public void addAll(Collection<ItemData> types) {
-		for (final ItemData type : types) {
-			if (type != null) {
-				this.types.add(type);
-				//numItems += type.numItems();
-			}
-		}
+		this.types.addAll(types);
 		modified();
 	}
 	

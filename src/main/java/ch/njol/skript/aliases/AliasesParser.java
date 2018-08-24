@@ -73,7 +73,7 @@ public class AliasesParser {
 	 */
 	public void load(SectionNode root) {
 		Skript.debug("Loading aliases node " + root.getKey() + " from " + root.getConfig().getFileName());
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		for (Node node : root) {
 			// Get key and make sure it exists
 			String key = node.getKey();
@@ -117,8 +117,8 @@ public class AliasesParser {
 			loadAlias(key, value);
 		}
 		
-		long time = System.currentTimeMillis() - start;
-		Skript.debug("Finished loading " + root.getKey() + " in " + (time / 1000000) + "ms");
+		//long time = System.currentTimeMillis() - start;
+		//Skript.debug("Finished loading " + root.getKey() + " in " + (time / 1000000) + "ms");
 	}
 	
 	/**
@@ -172,17 +172,21 @@ public class AliasesParser {
 			assert pattern != null;
 			List<String> keys = parseKeyPattern(pattern);
 			Variation var = parseVariation(((EntryNode) node).getValue());
+			
+			// Put var there for all keys it matches with
+			boolean useful = false;
+			for (String key : keys) {
+				assert key != null;
+				if (key.equals("{default}")) {
+					key = "";
+					useful = true;
+				}
+				vars.put(key, var);
+			}
+			
 			if (var.getId() == null && var.getTags().isEmpty() && var.getBlockStates().isEmpty()) {
 				// Useless variation, basically
 				Skript.warning(m_useless_variation.toString());
-			}
-			
-			// Put var there for all keys it matches with
-			for (String key : keys) {
-				assert key != null;
-				if (key.equals("{default}"))
-					key = "";
-				vars.put(key, var);
 			}
 		}
 		
