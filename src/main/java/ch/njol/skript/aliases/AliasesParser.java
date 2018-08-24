@@ -47,7 +47,8 @@ public class AliasesParser {
 	private static final ArgsMessage m_invalid_variation_section = new ArgsMessage("aliases.invalid variation section");
 	private static final Message m_unexpected_section = new Message("aliases.unexpected section");
 	private static final Message m_useless_variation = new Message("aliases.useless variation");
-	private static final Message m_brackets_error = new Message("aliases.brackets error");
+	private static final ArgsMessage m_not_enough_brackets = new ArgsMessage("aliases.not enough brackets");
+	private static final ArgsMessage m_too_many_brackets = new ArgsMessage("aliases.too many brackets");
 	private static final ArgsMessage m_unknown_variation = new ArgsMessage("aliases.unknown variation");
 	private static final ArgsMessage m_invalid_minecraft_id = new ArgsMessage("aliases.invalid minecraft id");
 	private static final Message m_empty_alias = new Message("aliases.empty alias");
@@ -184,7 +185,7 @@ public class AliasesParser {
 				vars.put(key, var);
 			}
 			
-			if (var.getId() == null && var.getTags().isEmpty() && var.getBlockStates().isEmpty()) {
+			if (!useful && var.getId() == null && var.getTags().isEmpty() && var.getBlockStates().isEmpty()) {
 				// Useless variation, basically
 				Skript.warning(m_useless_variation.toString());
 			}
@@ -245,51 +246,130 @@ public class AliasesParser {
 	}
 	
 	/**
+	 * A very simple stack that operates with ints only.
+	 */
+	private static class IntStack {
+		
+		/**
+		 * Backing array of this stack.
+		 */
+		private int[] ints;
+		
+		/**
+		 * Current position in the array.
+		 */
+		private int pos;
+		
+		public IntStack(int capacity) {
+			this.ints = new int[capacity];
+			this.pos = 0;
+		}
+		
+		public void push(int value) {
+			if (pos == ints.length - 1)
+				enlargeArray();
+			ints[pos] = value;
+			pos++;
+		}
+		
+		public int pop() {
+			pos--;
+			return ints[pos];
+		}
+		
+		public boolean isEmpty() {
+			return pos == 0;
+		}
+		
+		private void enlargeArray() {
+			int[] newArray = new int[ints.length * 2];
+			System.arraycopy(ints, 0, newArray, 0, ints.length);
+			this.ints = newArray;
+		}
+
+		public void clear() {
+			pos = 0;
+		}
+	}
+	
+	/**
 	 * Parses alias key pattern using some black magic.
 	 * @param name Key/name of alias.
-	 * @return All strings that match aliase with this pattern.
+	 * @return All strings that match aliases with this pattern.
 	 */
 	protected List<String> parseKeyPattern(String name) {
 		List<String> versions = new ArrayList<>();
-		
 		boolean simple = true; // Simple patterns are used as-is
+		
+		IntStack optionals = new IntStack(4);
+		IntStack choices = new IntStack(4);
 		for (int i = 0; i < name.length();) {
 			int c = name.codePointAt(i);
 			
-			if (c == '[') { // Optional part: versions with and without it
-				int end = name.indexOf(']', i);
-				versions.addAll(parseKeyPattern(name.substring(0, i) + name.substring(i + 1, end) + name.substring(end + 1)));
-				versions.addAll(parseKeyPattern(name.substring(0, i) + name.substring(end + 1)));
-				simple = false; // Not simple, has optional group
-			} else if (c == '(') { // Choose one part: versions for multiple options
-				int end = name.indexOf(')', i);
-				int n = 0;
-				int last = i;
-				boolean hasParts = false;
-				for (int j = i + 1; j < end; j++) {
-					char x = name.charAt(j);
-					if (x == '(') {
-						n++;
-					} else if (x == ')') {
-						n--;
-					} else if (x == '|') {
-						if (n > 0)
-							continue;
-						hasParts = true;
-						versions.addAll(parseKeyPattern(name.substring(0, i) + name.substring(last + 1, j) + name.substring(end + 1)));
-						last = j;
-					}
-				}
-				if (!hasParts) {
-					Skript.error(m_brackets_error.toString());
+			if (c == '[') { // Start optional part
+				optionals.push(i);
+				simple = false;
+			} else if (c == '(') { // Start choice part
+				choices.push(i);
+				simple = false;
+			} else if (c == ']') { // End optional part
+				int start;
+				try {
+					start = optionals.pop();
+				} catch (ArrayIndexOutOfBoundsException e) {
+					Skript.error(m_too_many_brackets.toString(i, ']'));
 					return versions;
 				}
-				versions.addAll(parseKeyPattern(name.substring(0, i) + name.substring(last + 1, end) + name.substring(end + 1)));
-				simple = false; // Not simple, has choice group
+				versions.addAll(parseKeyPattern(name.substring(0, start) + name.substring(start + 1, i) + name.substring(i + 1)));
+				versions.addAll(parseKeyPattern(name.substring(0, start) + name.substring(i + 1)));
+			} else if (c == ')') { // End choice part
+				int start;
+				try {
+					start = choices.pop();
+				} catch (ArrayIndexOutOfBoundsException e) {
+					Skript.error(m_too_many_brackets.toString(i, ')'));
+					return versions;
+				}
+				int optionStart = start;
+				int nested = 0;
+				for (int j = start + 1; j < i;) {
+					c = name.codePointAt(j);
+					
+					if (c == '(' || c == '[') {
+						nested++;
+					} else if (c == ')' || c == ']') {
+						nested--;
+					} else if (c == '|' && nested == 0) {
+						versions.addAll(parseKeyPattern(name.substring(0, start) + name.substring(optionStart + 1, j) + name.substring(i + 1)));
+						optionStart = j; // Prepare for next option
+					}
+					
+					j += Character.charCount(c);
+				}
+				assert nested == 0;
+				versions.addAll(parseKeyPattern(name.substring(0, start) + name.substring(optionStart + 1, i) + name.substring(i + 1)));
 			}
 			
 			i += Character.charCount(c);
 		}
+		
+		// Make sure all groups were closed
+		if (!optionals.isEmpty() || !choices.isEmpty()) {
+			int errorStart;
+			if (!optionals.isEmpty())
+				errorStart = optionals.pop();
+			else
+				errorStart = choices.pop();
+			char errorChar = (char) name.codePointAt(errorStart);
+			
+			Skript.error(m_not_enough_brackets.toString(errorStart, errorChar));
+			optionals.clear();
+			choices.clear();
+			return versions;
+		}
+
+		// If this is a simple name, its needs to be added here
+		// (all groups were added earlier)
 		if (simple)
 			versions.add(name);
 		
@@ -370,7 +450,7 @@ public class AliasesParser {
 				slots.add(new PatternSlot(part));
 			} else if (c == '}') { // Found variation name end
 				if (varStart == -1) { // Or just invalid syntax
-					Skript.error(m_brackets_error.toString());
+					Skript.error(m_not_enough_brackets.toString());
 					continue;
 				}
 
@@ -399,7 +479,7 @@ public class AliasesParser {
 		slots.add(new PatternSlot(part));
 		
 		if (varStart != -1) { // A variation was not properly finished
-			Skript.error(m_brackets_error.toString());
+			Skript.error(m_not_enough_brackets.toString());
 		}
 		
 		/**

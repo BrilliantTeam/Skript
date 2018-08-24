@@ -181,6 +181,8 @@ aliases:
 	invalid item type: '%s' is not an item type
 	empty name: An alias must have name
 	brackets error: Invalid use of brackets
+	not enough brackets: Section starting at character %s ('%s') must be closed
+	too many brackets: Character %s ('%s') closes a nonexistent section
 	unknown variation: The variation %s has not been defined before
 	missing aliases: Following Minecraft ids do not have any aliases:
 	empty alias: Alias has no Minecraft id or tags defined
