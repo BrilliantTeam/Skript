@@ -110,7 +110,7 @@ public class BiomeMapUtil {
 		}
 		
 		To19Mapping(String name) {
-			this.handle = Biome.valueOf("name");
+			this.handle = Biome.valueOf(name);
 		}
 		
 		public Biome getHandle() {
