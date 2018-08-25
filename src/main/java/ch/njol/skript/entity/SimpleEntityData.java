@@ -35,9 +35,12 @@ import org.bukkit.entity.Boat;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.ChestedHorse;
 import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Cod;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Donkey;
+import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.ElderGuardian;
 import org.bukkit.entity.EnderCrystal;
@@ -49,6 +52,7 @@ import org.bukkit.entity.Evoker;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Fish;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Giant;
 import org.bukkit.entity.Golem;
@@ -67,9 +71,12 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Mule;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Painting;
+import org.bukkit.entity.Phantom;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.PufferFish;
+import org.bukkit.entity.Salmon;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.entity.Silverfish;
@@ -84,8 +91,11 @@ import org.bukkit.entity.Squid;
 import org.bukkit.entity.Stray;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownExpBottle;
+import org.bukkit.entity.TropicalFish;
+import org.bukkit.entity.Turtle;
 import org.bukkit.entity.Vex;
 import org.bukkit.entity.Vindicator;
+import org.bukkit.entity.WaterMob;
 import org.bukkit.entity.Witch;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkeleton;
@@ -204,12 +214,12 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("wither skeleton", WitherSkeleton.class));
 			types.add(new SimpleEntityDataInfo("stray", Stray.class));
 			types.add(new SimpleEntityDataInfo("skeleton", Skeleton.class, true));
-			
+
 			// Guardians
 			types.add(new SimpleEntityDataInfo("elder guardian", ElderGuardian.class));
 			types.add(new SimpleEntityDataInfo("normal guardian", Guardian.class));
 			types.add(new SimpleEntityDataInfo("guardian", Guardian.class, true));
-			
+
 			// Horses
 			types.add(new SimpleEntityDataInfo("donkey", Donkey.class));
 			types.add(new SimpleEntityDataInfo("mule", Mule.class));
@@ -217,18 +227,32 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("undead horse", ZombieHorse.class));
 			types.add(new SimpleEntityDataInfo("skeleton horse", SkeletonHorse.class));
 			types.add(new SimpleEntityDataInfo("horse", Horse.class));
-			
+
 			// New 1.11 horse supertypes
 			types.add(new SimpleEntityDataInfo("chested horse", ChestedHorse.class, true));
 			types.add(new SimpleEntityDataInfo("any horse", AbstractHorse.class, true));
-			
+
 			types.add(new SimpleEntityDataInfo("llama spit", LlamaSpit.class));
-			
+
 			// 1.11 hostile mobs
 			types.add(new SimpleEntityDataInfo("evoker", Evoker.class));
 			types.add(new SimpleEntityDataInfo("evoker fangs", EvokerFangs.class));
 			types.add(new SimpleEntityDataInfo("vex", Vex.class));
 			types.add(new SimpleEntityDataInfo("vindicator", Vindicator.class));
+
+
+		}
+		if (Skript.isRunningMinecraft(1, 13)) { // More subtypes, more supertypes - changes needed
+			types.add(new SimpleEntityDataInfo("dolphin", Dolphin.class));
+			types.add(new SimpleEntityDataInfo("phantom", Phantom.class));
+			types.add(new SimpleEntityDataInfo("drowned", Drowned.class));
+			types.add(new SimpleEntityDataInfo("turtle", Turtle.class));
+			types.add(new SimpleEntityDataInfo("cod", Cod.class));
+			types.add(new SimpleEntityDataInfo("puffer fish", PufferFish.class));
+			types.add(new SimpleEntityDataInfo("salmon", Salmon.class));
+			types.add(new SimpleEntityDataInfo("tropical fish", TropicalFish.class));
+
+
 		}
 		if (Skript.classExists("org.bukkit.entity.Illusioner")) {
 			types.add(new SimpleEntityDataInfo("illusioner", Illusioner.class));
@@ -244,6 +268,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("projectile", Projectile.class, true));
 		types.add(new SimpleEntityDataInfo("living entity", LivingEntity.class, true));
 		types.add(new SimpleEntityDataInfo("entity", Entity.class, true));
+		types.add(new SimpleEntityDataInfo("water mob" , WaterMob.class, true));
+		types.add(new SimpleEntityDataInfo("fish" , Fish.class, true));
 		
 		types.add(new SimpleEntityDataInfo("any fireball", Fireball.class, true));
 	}
