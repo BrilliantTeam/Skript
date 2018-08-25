@@ -54,29 +54,19 @@ public class BukkitUnsafe {
 	 */
 	private static final UnsafeValues unsafe;
 	
+	static {
+		UnsafeValues values = Bukkit.getUnsafe();
+		if (values == null)
+			throw new Error("UnsafeValues not available");
+		unsafe = values;
+	}
+	
 	/**
 	 * Before 1.13, Vanilla material names were translated using
 	 * this + a lookup table.
 	 */
 	@Nullable
-	private static final MethodHandle unsafeFromInternalNameMethod;
-	
-	static {
-		UnsafeValues values = Bukkit.getUnsafe();
-		if (values == null) {
-			throw new Error("unsafe values are not available");
-		}
-		unsafe = values;
-		
-		MethodHandle mh;
-		try {
-			mh = MethodHandles.lookup().findVirtual(UnsafeValues.class,
-					"getMaterialFromInternalName", MethodType.methodType(String.class, Material.class));
-		} catch (NoSuchMethodException | IllegalAccessException e) {
-			mh = null;
-		}
-		unsafeFromInternalNameMethod = mh;
-	}
+	private static MethodHandle unsafeFromInternalNameMethod;
 	
 	private static final boolean newMaterials = Skript.isRunningMinecraft(1, 13);
 	
@@ -92,8 +82,23 @@ public class BukkitUnsafe {
 	 */
 	private static boolean preferMaterialMap;
 	
+	/**
+	 * We only spit one exception (unless debugging) from UnsafeValues. Some
+	 * users might not care, and find 1.12 material mappings accurate enough.
+	 */
+	private static boolean unsafeValuesErrored;
+	
 	public static void initialize() {
 		if (!newMaterials) {
+			MethodHandle mh;
+			try {
+				mh = MethodHandles.lookup().findVirtual(UnsafeValues.class,
+						"getMaterialFromInternalName", MethodType.methodType(String.class, Material.class));
+			} catch (NoSuchMethodException | IllegalAccessException e) {
+				mh = null;
+			}
+			unsafeFromInternalNameMethod = mh;
+			
 			try {
 				Version version = Skript.getMinecraftVersion();
 				boolean mapExists = loadMaterialMap("materials/" + version.getMajor() + "." +  version.getMinor() + ".json");
@@ -125,12 +130,16 @@ public class BukkitUnsafe {
 			}
 			
 			// Otherwise, hacks
-			Material type;
+			Material type = null;
 			try {
 				assert unsafeFromInternalNameMethod != null;
 				type = (Material) unsafeFromInternalNameMethod.invokeExact(unsafe, id);
 			} catch (Throwable e) {
-				throw new RuntimeException(e); // Hmm
+				// Only spit out an error once unless debugging
+				if (!unsafeValuesErrored || Skript.debug()) {
+					Skript.exception(e, "UnsafeValues failed to get material from Vanilla id");
+					unsafeValuesErrored = true;
+				}
 			}
 			if (type == null || type == Material.AIR) { // If there is no item form, UnsafeValues won't work
 				// So we're going to rely on 1.12's material mappings
