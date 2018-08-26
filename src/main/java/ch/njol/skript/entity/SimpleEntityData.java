@@ -91,6 +91,7 @@ import org.bukkit.entity.Squid;
 import org.bukkit.entity.Stray;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownExpBottle;
+import org.bukkit.entity.Trident;
 import org.bukkit.entity.TropicalFish;
 import org.bukkit.entity.Turtle;
 import org.bukkit.entity.Vex;
@@ -251,6 +252,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("puffer fish", PufferFish.class));
 			types.add(new SimpleEntityDataInfo("salmon", Salmon.class));
 			types.add(new SimpleEntityDataInfo("tropical fish", TropicalFish.class));
+			types.add(new SimpleEntityDataInfo("trident", Trident.class));
 
 
 		}
