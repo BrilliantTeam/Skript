@@ -169,31 +169,31 @@ hooks:
 
 # -- Aliases --
 aliases:
-	# regexes
-	any: any
-	any-skp: any # the same as 'any', but as a Skript pattern
+	# regexes for Skript
+	any: any:
+	any-skp: any # same as 'any', but a Skript pattern
 	every: (?:every|all)
 	of every: of (?:every|all)
 	of: of(?: any)?
-	# messages
-	brackets error: Brackets have a special meaning in aliases and cannot be used as usual
-	invalid brackets: Invalid amount and/or placement of '%s' brackets in alias
-	empty alias: '%s' results in an empty alias (i.e. it doesn't map to any id/data), it will thus be ignored
-	unknown variation: The variation {%s} was never defined
-	starting with number: Aliases must not start with a number
-	missing aliases: There are no aliases defined for the following ids:
+	
+	# Errors and warnings
 	empty string: '' is not an item type
-	invalid item data: '%s' is not a valid item data
-	invalid id: There doesn't exist a material with id %s!
-	invalid block data: Blocks only have data values from 0 to 15
 	invalid item type: '%s' is not an item type
-	out of data range: Item datas must be between 0 and %s (inclusive)
-	invalid range: The first number of a data range must be smaller than the second
-	invalid section: Invalid section '%s'. If this is an alias section add it to 'aliases' so it will be loaded
-	section not found: Alias section '%s' not found!
-	not a section: Aliases have to be in sections, but '%s' is not a section!
-	unexpected non-variation section: Unexpected non-variation section
-	unexpected section: Unexpected section
+	empty name: An alias must have name
+	brackets error: Invalid use of brackets
+	not enough brackets: Section starting at character %s ('%s') must be closed
+	too many brackets: Character %s ('%s') closes a nonexistent section
+	unknown variation: The variation %s has not been defined before
+	missing aliases: Following Minecraft ids do not have any aliases:
+	empty alias: Alias has no Minecraft id or tags defined
+	invalid minecraft id: Minecraft id %s is not valid
+	useless variation: Variation has no Minecraft id or tags specified, so it is useless
+	invalid tags: Specified tags are not defined in valid JSON
+	unexpected section: Sections are not allowed here
+	invalid variation section: A section should be variation section, but %s is not valid variation name
+	outside section: Aliases must be put in sections
+	
+	# Other messages
 	loaded x aliases from: Loaded %s english aliases from %s
 	loaded x aliases: Loaded a total of %s english aliases
 	anything: anything
@@ -283,68 +283,79 @@ weather:
 
 # -- Biomes --
 biomes:
-	swampland: swampland, swamp, march
+	swamp: swampland, swamp, march
 	forest: forest
 	taiga: taiga
 	desert: desert
 	plains: plains
-	hell: hell, nether
-	sky: sky
+	nether: hell, nether
+	the_end: sky, the end
 	ocean: ocean, sea
 	river: river
-	extreme_hills: extreme hills
+	mountains: extreme hills, mountains
 	frozen_ocean: frozen ocean
 	frozen_river: frozen river
-	ice_plains: ice plains
-	ice_mountains: ice mountains
-	mushroom_island: mushroom island
-	mushroom_shore: mushroom shore
+	snowy_tundra: ice plains, snowy tundra
+	snowy_mountains: ice mountains, snowy mountains
+	mushroom_fields: mushroom island, mushroom fields
+	mushroom_field_shore: mushroom shore, mushroom island shore, mushroom fields shore
 	beach: beach
 	desert_hills: desert hills
-	forest_hills: forest hills
+	wooded_hills: forest hills, wooded hills
 	taiga_hills: taiga hills
-	small_mountains: small mountains, hills
+	mountain_edge: small mountains, hills, mountain edge
 	jungle: jungle
 	jungle_hills: jungle hills
 	jungle_edge: jungle edge
 	deep_ocean: deep ocean
-	stone_beach: stone beach
-	cold_beach: cold beach
+	stone_shore: stone beach, stone shore
+	snowy_beach: cold beach, snowy beach
 	birch_forest: birch forest
 	birch_forest_hills: birch forest hills
-	roofed_forest: roofed forest, black forest
-	cold_taiga: cold taiga
-	cold_taiga_hills: cold taiga hills
-	mega_taiga: mega taiga, extreme taiga
-	mega_taiga_hills: mega taiga hills, extreme taiga hills
-	extreme_hills_plus: extreme hills plus
+	dark_forest: roofed forest, black forest, dark forest
+	snowy_taiga: cold taiga, snowy taiga
+	snowy_taiga_hills: cold taiga hills, snowy taiga hills
+	giant_tree_taiga: mega taiga, giant tree taiga, redwood taiga
+	giant_tree_taiga_hills: mega taiga hills, giant tree taiga hills, redwood taiga hills
+	wooded_mountains: extreme hills plus, mountains with trees, wooded mountains
 	savanna: savanna
 	savanna_plateau: savanna plateau
-	mesa: mesa
-	mesa_plateau_forest: mesa plateau forest
-	mesa_plateau: mesa plateau
+	badlands: mesa, badlands
+	wooded_badlands_plateau: mesa plateau forest, badlands plateau forest, wooded badlands plateau
+	badlands_plateau: mesa plateau, badlands plateau
 	sunflower_plains: sunflower plains
-	desert_mountains: desert mountains
+	desert_lakes: desert lakes
 	flower_forest: flower forest
 	taiga_mountains: taiga mountains
-	swampland_mountains: swampland mountains
-	ice_plains_spikes: ice plains spikes, spiked ice plains, ice plains with spikes
-	jungle_mountains: jungle mountains
-	jungle_edge_mountains: jungle edge mountains
-	cold_taiga_mountains: cold taiga mountains
-	savanna_mountains: savanna mountains
-	savanna_plateau_mountains: savanna plateau mountains
-	mesa_bryce: bryce, mesa bryce, mesa (bryce), hoodoos
-	mesa_plateau_forest_mountains: mesa plateau forest mountains
-	mesa_plateau_mountains: mesa plateau mountains
-	birch_forest_mountains: birch forest mountains
-	birch_forest_hills_mountains: birch forest hills mountains
-	roofed_forest_mountains: roofed forest mountains
-	mega_spruce_taiga: mega spruce taiga
-	extreme_hills_mountains: extreme hills mountains
-	extreme_hills_plus_mountains: extreme hills plus mountains
-	mega_spruce_taiga_hills: mega spruce taiga hills
-	void: void
+	swampland_mountains: swampland mountains, swamp hills
+	ice_spikes: ice plains spikes, spiked ice plains, ice plains with spikes, ice spikes
+	modified_jungle: jungle mountains
+	modified_jungle_edge: jungle edge mountains
+	snowy_taiga_mountains: cold taiga mountains, snowy taiga mountains
+	shattered_savanna: savanna mountains, shattered savanna
+	shattered_savanna_plateau: savanna plateau mountains, shattered savanna plateau
+	eroded badlands: bryce, mesa bryce, mesa (bryce), hoodoos, eroded badlands
+	modified_wooded_badlands_plateau: mesa plateau forest mountains, modified wooded badlands plateau, badlands plateau forest mountains
+	modified_badlands_plateau: mesa plateau mountains, badlands plateau mountains, modified badlands plateau
+	tall_birch_forest: birch forest mountains, tall birch forest
+	tall_birch_hills: birch forest hills mountains, tall birch hills
+	dark_forest_hills: roofed forest mountains, dark forest hills
+	giant_spruce_taiga: mega spruce taiga, giant spruce taiga
+	gravelly_mountains: extreme hills mountains, gravelly mountains
+	modified_gravelly_mountains: extreme hills plus mountains, modified gravelly mountains
+	giant_spruce_taiga_hills: mega spruce taiga hills, giant spruce taiga hills
+	the_void: void, the void
+	small_end_islands: small end islands
+	end_midlands: end midlands
+	end_highlands: end highlands
+	end_barrens: end barrens
+	warm_ocean: warm ocean
+	lukewarm_ocean: lukewarm ocean
+	cold_ocean: cold ocean
+	deep_warm_ocean: deep warm ocean
+	deep_lukewarm_ocean: deep lukewarm ocean
+	deep_cold_ocean: deep cold ocean
+	deep_frozen_ocean: deep frozen ocean
 
 # -- Tree Types --
 tree types:
@@ -948,6 +959,37 @@ entities:
 	animal:
 		name: animal¦s
 		pattern: animal(|1¦s)
+	water mob:
+		name: water mob¦s
+		pattern: water mob(|1¦s)
+	cod:
+		name: cod¦s
+		pattern: cod(|1¦s)
+	salmon:
+		name: salmon¦s
+		pattern: salmon(|1¦s)
+	puffer fish:
+		name: puffer fish¦es
+		pattern: puffer fish(|1¦es)
+	tropical fish:
+		name: tropical fish¦es
+		pattern: tropical fish(|1¦es)
+	drowned:
+		name: drowned¦s
+		pattern: <age> drowned(|1¦s)|(4¦)drowned (kid(|1¦s)|child(|1¦ren))
+	dolphin:
+		name: dolphin¦s
+		pattern: dolphin(|1¦s)
+	phantom:
+		name: phantom¦s
+		pattern: phantom(|1¦s)
+	turtle:
+		name: turtle¦s
+		pattern: <age> turtle(|1¦s)|(4¦)turtle (kid(|1¦s)|child(|1¦ren))
+	trident:
+		name: trident¦s
+		pattern: trident(|1¦s)
+
 
 # -- Damage Causes --
 damage causes:
@@ -1197,37 +1239,6 @@ inventory types:
 	hopper: hopper inventory
 	shulker_box: shulker box inventory
 
-# -- Spawn Reasons --
-spawn reasons:
-    breeding: breed, breeding
-    build_irongolem: built iron golem, build iron golem
-    build_snowman: built snowman, build snowman
-    build_wither: built wither, build wither
-    chunk_gen: chunk generation
-    cured: cured
-    custom: customized, customised, custom
-    default: default
-    dispenser_egg: dispense egg, dispensing egg
-    drowned: drowned
-    egg: egg
-    ender_pearl: ender pearl
-    infection: infection, infected
-    jockey: jockey
-    lightning: lightning
-    mount: mount
-    natural: natural
-    nether_portal: nether portal
-    ocelot_baby: ocelot baby
-    reinforcements: reinforcements
-    shoulder_entity: perching, shoulder
-    silverfish_block: silverfish reveal, silverfish trap
-    slime_split: slime split
-    spawner: mob spawner, creature spawner, spawner
-    spawner_egg: spawn egg
-    trap: trap
-    village_defense: village defense, golem defense, iron golem defense
-    village_invasion: village invasion, village invading
-
 # -- Boolean --
 boolean:
 	true:
@@ -1273,11 +1284,8 @@ types:
 	damagecause: damage cause¦s @a
 	teleportcause: teleport cause¦s @a
 	inventoryaction: inventory action¦s @a
-	clicktype: click type¦s @a
+	clickaction: click actions¦s @a
 	vector: vector¦s @a
-	inventorytype: inventory type¦s @an
-	metadataholder: metadata holder¦s @a
-	spawnreason: spawn reason¦s @a
 	
 	# Skript
 	weathertype: weather type¦s @a
