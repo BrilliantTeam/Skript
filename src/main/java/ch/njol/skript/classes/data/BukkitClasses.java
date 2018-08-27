@@ -1324,6 +1324,11 @@ public class BukkitClasses {
 						return teleportCauses.toString(teleportCause, flags);
 					}
 
+					@Override
+					public boolean canParse(ParseContext context) {
+						return false;
+					}
+
 					@SuppressWarnings("null")
 					@Override
 					public String toVariableNameString(TeleportCause teleportCause) {
@@ -1348,6 +1353,11 @@ public class BukkitClasses {
 					@Override
 					public String toString(SpawnReason spawnReason, int flags) {
 						return spawnReasons.toString(spawnReason, flags);
+					}
+
+					@Override
+					public boolean canParse(ParseContext context) {
+						return false;
 					}
 
 					@SuppressWarnings("null")
