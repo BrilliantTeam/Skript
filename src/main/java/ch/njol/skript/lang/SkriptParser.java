@@ -31,15 +31,14 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.bekvon.bukkit.residence.commands.info;
-
+import com.google.common.primitives.Booleans;
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
-import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.ItemType;
@@ -48,10 +47,8 @@ import ch.njol.skript.command.Argument;
 import ch.njol.skript.command.Commands;
 import ch.njol.skript.command.ScriptCommand;
 import ch.njol.skript.command.ScriptCommandEvent;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.ExprParse;
 import ch.njol.skript.lang.function.ExprFunctionCall;
-import ch.njol.skript.lang.function.Function;
 import ch.njol.skript.lang.function.FunctionReference;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.lang.util.SimpleLiteral;
@@ -446,31 +443,42 @@ public class SkriptParser {
 						return null;
 					}
 				} else { // Mixed plurals/singulars
-					for (int i = 0; i < types.length; i++) {
-						if (types[i] == null)
-							continue;
-						@SuppressWarnings("unchecked")
-						final Variable<?> var = parseVariable(expr, new Class[] {types[i]});
-						if (var != null) { // Parsing succeeded, we have a variable
-							// If variables cannot be used here, it is now allowed
-							if ((flags & PARSE_EXPRESSIONS) == 0) {
-								Skript.error("Variables cannot be used here.");
-								log.printError();
-								return null;
-							}
-							
-							// Plural/singular sanity check
-							if (!vi.isPlural[i] && !var.isSingle()) {
-								Skript.error("'" + expr + "' can only accept a single " + vi.classes[i].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
-								return null;
-							}
-							
-							log.printLog();
-							return var;
-						} else if (log.hasError()) {
+					@SuppressWarnings("unchecked") final Variable<?> var = parseVariable(expr, types);
+					if (var != null) { // Parsing succeeded, we have a variable
+						// If variables cannot be used here, it is now allowed
+						if ((flags & PARSE_EXPRESSIONS) == 0) {
+							Skript.error("Variables cannot be used here.");
 							log.printError();
 							return null;
 						}
+						
+						// Plural/singular sanity check
+						//
+						// It's (currently?) not possible to detect this at parse time when there are multiple
+						// acceptable types and only some of them are single, since variables, global especially,
+						// can hold any possible type, and the type used can only be 100% known at runtime
+						//
+						// TODO:
+						// despite of that, we should probably implement a runtime check for this somewhere
+						// before executing the syntax element (perhaps even exceptionally with a console warning,
+						// otherwise users may have some hard time debugging the plurality issues) - currently an
+						// improper use in a script would result in an exception
+						if (vi.classes.length == 1 && !vi.isPlural[0] && !var.isSingle()) {
+							Skript.error("'" + expr + "' can only accept a single "
+									+ vi.classes[0].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
+							return null;
+						} else if (!Booleans.contains(vi.isPlural, true) && !var.isSingle()) {
+							Skript.error("'" + expr + "' can only accept a single "
+									+ Classes.toString(Stream.of(vi.classes).map(ci -> ci.getName().toString()).toArray(), false)
+									+ ", not more", ErrorQuality.SEMANTIC_ERROR);
+							return null;
+						}
+						
+						log.printLog();
+						return var;
+					} else if (log.hasError()) {
+						log.printError();
+						return null;
 					}
 				}
 				
@@ -1278,7 +1286,7 @@ public class SkriptParser {
 	
 	/**
 	 * Gets the next occurrence of a character in a string that is not escaped with a preceding backslash.
-	 * 
+	 *
 	 * @param pattern
 	 * @param c The character to search for
 	 * @param from The index to start searching from
