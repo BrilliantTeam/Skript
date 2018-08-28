@@ -68,6 +68,7 @@ import org.bukkit.event.player.PlayerLocaleChangeEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -89,6 +90,7 @@ import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.spigotmc.event.entity.EntityDismountEvent;
 import org.spigotmc.event.entity.EntityMountEvent;
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptEventHandler;
@@ -433,6 +435,24 @@ public class SimpleEvents {
 							"	if player's language starts with \"en\":",
 							"		send \"Hello!\"")
 					.since("2.2-dev37");
+		}
+		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerJumpEvent")) {
+			Skript.registerEvent("Jump", SimpleEvent.class, PlayerJumpEvent.class, "[player] jump[ing]")
+					.description("Called whenever a player jumps",
+							"This event requires PaperSpigot")
+					.examples("on jump:",
+							"	event-player does not have permission \"jump\"",
+							"	cancel event")
+					.since("2.2-dev38");
+		}
+		if (Skript.classExists("org.bukkit.event.player.PlayerSwapHandItemsEvent")) {
+			Skript.registerEvent("Hand Item Swap", SimpleEvent.class, PlayerSwapHandItemsEvent.class, "swap[ping of] [(hand|held)] item[s]")
+					.description("Called whenever a player swaps the items in their",
+							"main- and offhand slots. Does not require any items to be held.")
+					.examples("on swap hand items:",
+							"	event-player's tool is a diamond sword",
+							"	cancel event")
+					.since("2.2-dev38");
 		}
 	}
 }
