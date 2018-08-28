@@ -463,11 +463,8 @@ public class SkriptParser {
 						// before executing the syntax element (perhaps even exceptionally with a console warning,
 						// otherwise users may have some hard time debugging the plurality issues) - currently an
 						// improper use in a script would result in an exception
-						if (vi.classes.length == 1 && !vi.isPlural[0] && !var.isSingle()) {
-							Skript.error("'" + expr + "' can only accept a single "
-									+ vi.classes[0].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
-							return null;
-						} else if (!Booleans.contains(vi.isPlural, true) && !var.isSingle()) {
+						if (((vi.classes.length == 1 && !vi.isPlural[0]) || Booleans.contains(vi.isPlural, true))
+								&& !var.isSingle()) {
 							Skript.error("'" + expr + "' can only accept a single "
 									+ Classes.toString(Stream.of(vi.classes).map(ci -> ci.getName().toString()).toArray(), false)
 									+ ", not more", ErrorQuality.SEMANTIC_ERROR);
