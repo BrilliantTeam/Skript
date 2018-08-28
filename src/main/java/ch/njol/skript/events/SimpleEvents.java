@@ -443,7 +443,7 @@ public class SimpleEvents {
 					.examples("on jump:",
 							"	event-player does not have permission \"jump\"",
 							"	cancel event")
-					.since("2.2-dev38");
+					.since("INSERT VERSION");
 		}
 		if (Skript.classExists("org.bukkit.event.player.PlayerSwapHandItemsEvent")) {
 			Skript.registerEvent("Hand Item Swap", SimpleEvent.class, PlayerSwapHandItemsEvent.class, "swap[ping of] [(hand|held)] item[s]")
@@ -452,7 +452,7 @@ public class SimpleEvents {
 					.examples("on swap hand items:",
 							"	event-player's tool is a diamond sword",
 							"	cancel event")
-					.since("2.2-dev38");
+					.since("INSERT VERSION");
 		}
 	}
 }
