@@ -322,8 +322,8 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 
 	@Override
 	public void deserialize(Fields fields) throws StreamCorruptedException, NotSerializableException {
+		this.type = materialRegistry.getMaterial(fields.getAndRemovePrimitive("id", int.class));
 		fields.setFields(this); // Everything but ItemStack and Material
-		this.type = materialRegistry.getMaterial((int) fields.getPrimitive("id"));
 		
 		// Initialize ItemStack
 		this.stack = new ItemStack(type);

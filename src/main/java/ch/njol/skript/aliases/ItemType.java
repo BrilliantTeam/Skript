@@ -372,7 +372,8 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * @return Whether the block was successfully set
 	 */
 	public boolean setBlock(Block block, boolean applyPhysics) {
-		for (final ItemData d : types) {
+		for (int i = random.nextInt(types.size()); i < types.size(); i++) {
+			ItemData d = types.get(i);
 			if (!d.type.isBlock()) // Ignore items which cannot be placed
 				continue;
 			if (BlockUtils.set(block, d, applyPhysics))

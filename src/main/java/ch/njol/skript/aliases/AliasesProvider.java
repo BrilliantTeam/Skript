@@ -265,7 +265,9 @@ public class AliasesProvider {
 		NonNullPair<String, String> forms = Noun.getPlural(plain.getFirst()); // Singular and plural forms
 		
 		// Check if there is item type with this name already, create otherwise
-		ItemType type = aliases.get(name);
+		ItemType type = aliases.get(forms.getFirst());
+		if (type == null)
+			type = aliases.get(forms.getSecond());
 		if (type == null) {
 			type = new ItemType();
 			aliases.put(forms.getFirst(), type); // Singular form
@@ -288,7 +290,7 @@ public class AliasesProvider {
 			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
 				minecraftIds.put(data, id); // Register Minecraft id for the data, too
 			
-			materialNames.put(data, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), 0));
+			materialNames.putIfAbsent(data, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), 0));
 			// TODO gender
 		}
 	}
