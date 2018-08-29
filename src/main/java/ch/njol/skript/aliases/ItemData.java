@@ -19,8 +19,14 @@
  */
 package ch.njol.skript.aliases;
 
+import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,6 +45,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
@@ -72,6 +79,33 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	@SuppressWarnings("null")
 	static final ItemFactory itemFactory = Bukkit.getServer().getItemFactory();
 	
+	static final MaterialRegistry materialRegistry;
+	
+	// Load or create material registry
+	static {
+		Path materialsFile = Paths.get(Skript.getInstance().getDataFolder().getAbsolutePath(), "materials.json");
+		if (Files.exists(materialsFile)) {
+			String content = null;
+			try {
+				content = new String(Files.readAllBytes(materialsFile), StandardCharsets.UTF_8);
+			} catch (IOException e) {
+				Skript.exception(e, "Loading material registry failed!");
+			}
+			if (content != null)
+				materialRegistry = new MaterialRegistry(new Gson().fromJson(content, Material[].class));
+			else
+				materialRegistry = new MaterialRegistry();
+		} else {
+			materialRegistry = new MaterialRegistry();
+			String content = new Gson().toJson(materialRegistry.getMaterials());
+			try {
+				Files.write(materialsFile, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW);
+			} catch (IOException e) {
+				Skript.exception(e, "Saving material registry failed!");
+			}
+		}
+	}
+	
 	private final static Message m_named = new Message("aliases.named");
 	
 	/**
@@ -85,9 +119,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	ItemMeta meta;
 	
 	/**
-	 * Type of the item as Bukkit material.
+	 * Type of the item as Bukkit material. Serialized manually.
 	 */
-	Material type;
+	transient Material type;
 	
 	/**
 	 * If this represents all possible items.
@@ -281,12 +315,15 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 
 	@Override
 	public Fields serialize() throws NotSerializableException {
-		return new Fields(this); // ItemStack is transient, will be ignored
+		Fields fields = new Fields(this); // ItemStack is transient, will be ignored
+		fields.putPrimitive("id", materialRegistry.getId(type));
+		return fields;
 	}
 
 	@Override
 	public void deserialize(Fields fields) throws StreamCorruptedException, NotSerializableException {
-		fields.setFields(this); // Everything but ItemStack
+		fields.setFields(this); // Everything but ItemStack and Material
+		this.type = materialRegistry.getMaterial((int) fields.getPrimitive("id"));
 		
 		// Initialize ItemStack
 		this.stack = new ItemStack(type);
