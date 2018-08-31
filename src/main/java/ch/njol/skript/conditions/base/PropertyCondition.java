@@ -114,7 +114,7 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 					return expr.toString(e, debug) + (isNegated() ? " don't have " : " have ") + getPropertyName();
 			default:
 				assert false;
-				throw new IllegalStateException();
+				throw new AssertionError();
 		}
 	}
 }
