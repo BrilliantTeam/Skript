@@ -155,7 +155,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.type = type;
 		
 		this.stack = new ItemStack(type, Math.abs(amount));
-		blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 		this.meta = itemFactory.getItemMeta(type);
 	}
 	
@@ -171,7 +171,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.meta = data.meta;
 	}
 	
-	public ItemData(ItemStack stack, BlockValues values) {
+	public ItemData(ItemStack stack, @Nullable BlockValues values) {
 		this.stack = stack;
 		this.type = stack.getType();
 		this.blockValues = values;
@@ -179,7 +179,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	}
 	
 	public ItemData(ItemStack stack) {
-		this(stack, BlockCompat.INSTANCE.getBlockValues(stack)); // Grab block values from stack)
+		this(stack, null);
 	}
 	
 	public ItemData(BlockState block) {
@@ -251,13 +251,20 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		ItemData other = (ItemData) obj;
 		if (isAnything || other.isAnything) // First, isAnything check
 			return true;
+		BlockValues values = blockValues;
+		if (values != null && other.blockValues != null)
+			return values.equals(other.blockValues);
 		
 		return other.stack.isSimilar(stack);
 	}
 	
 	@Override
 	public int hashCode() {
-		return stack.hashCode();
+		int hash = stack.hashCode();
+		BlockValues values = blockValues;
+		if (values != null)
+			hash = 37 * hash + values.hashCode();
+		return hash;
 	}
 	
 	/**

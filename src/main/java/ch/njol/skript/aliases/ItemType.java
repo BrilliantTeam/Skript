@@ -1000,6 +1000,10 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return new ItemType(i).toString(flags);
 	}
 	
+	public static String toString(Block b, int flags) {
+		return new ItemType(b).toString(flags);
+	}
+	
 	public String getDebugMessage() {
 		return toString(true, 0, null);
 	}
