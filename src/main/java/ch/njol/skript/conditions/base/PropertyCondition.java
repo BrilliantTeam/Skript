@@ -34,6 +34,10 @@ import ch.njol.util.Kleenean;
  */
 public abstract class PropertyCondition<T> extends Condition implements Checker<T> {
 	
+	public enum PropertyType {
+		BE, HAVE, CAN
+	}
+	
 	@SuppressWarnings("null")
 	private Expression<? extends T> expr;
 	
@@ -43,7 +47,35 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 	 * @param type must be plural
 	 */
 	public static void register(final Class<? extends Condition> c, final String property, final String type) {
-		Skript.registerCondition(c, "%" + type + "% (is|are) " + property, "%" + type + "% (isn't|is not|aren't|are not) " + property);
+		register(c, PropertyType.BE, property, type);
+	}
+	
+	/**
+	 * @param c
+	 * @param propertyType
+	 * @param property
+	 * @param type must be plural
+	 */
+	public static void register(final Class<? extends Condition> c, final PropertyType propertyType, final String property, final String type) {
+		switch (propertyType) {
+			case BE:
+				Skript.registerCondition(c,
+						"%" + type + "% (is|are) " + property,
+						"%" + type + "% (isn't|is not|aren't|are not) " + property);
+				break;
+			case CAN:
+				Skript.registerCondition(c,
+						"%" + type + "% can " + property,
+						"%" + type + "% (can't|cannot|can not) " + property);
+				break;
+			case HAVE:
+				Skript.registerCondition(c,
+						"%" + type + "% (has|have) " + property,
+						"%" + type + "% (doesn't|does not|do not|don't) have " + property);
+				break;
+			default:
+				assert false;
+		}
 	}
 	
 	@SuppressWarnings({"unchecked", "null"})
@@ -64,9 +96,25 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 	
 	protected abstract String getPropertyName();
 	
-	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		return expr.toString(e, debug) + (expr.isSingle() ? " is " : " are ") + (isNegated() ? "not " : "") + getPropertyName();
+	public PropertyType getPropertyType() {
+		return PropertyType.BE;
 	}
 	
+	@Override
+	public String toString(final @Nullable Event e, final boolean debug) {
+		switch (getPropertyType()) {
+			case BE:
+				return expr.toString(e, debug) + (expr.isSingle() ? " is " : " are ") + (isNegated() ? "not " : "") + getPropertyName();
+			case CAN:
+				return expr.toString(e, debug) + (isNegated() ? " can't " : " can ") + getPropertyName();
+			case HAVE:
+				if (expr.isSingle())
+					return expr.toString(e, debug) + (isNegated() ? " doesn't have " : " has ") + getPropertyName();
+				else
+					return expr.toString(e, debug) + (isNegated() ? " don't have " : " have ") + getPropertyName();
+			default:
+				assert false;
+				return null;
+		}
+	}
 }
