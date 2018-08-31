@@ -75,7 +75,7 @@ jar {
 	}
 	
 	from('skript-aliases') {
-	    into('aliases')
+	    into('aliases-english') // Change this if we get aliases in other languages
 	}
 }
 
