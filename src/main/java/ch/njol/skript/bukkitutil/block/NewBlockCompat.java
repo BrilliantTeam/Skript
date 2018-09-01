@@ -56,7 +56,7 @@ public class NewBlockCompat implements BlockCompat {
 		}
 
 		@Override
-		public boolean equals(BlockValues other) {
+		public boolean equals(@Nullable Object other) {
 			if (!(other instanceof NewBlockValues))
 				return false;
 			NewBlockValues n = (NewBlockValues) other;

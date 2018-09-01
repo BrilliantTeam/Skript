@@ -21,6 +21,7 @@ package ch.njol.skript.bukkitutil.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Contains all data block has that is needed for comparisions.
@@ -29,7 +30,8 @@ public abstract class BlockValues {
 	
 	public abstract void setBlock(Block block, boolean applyPhysics);
 	
-	public abstract boolean equals(BlockValues other);
+	@Override
+	public abstract boolean equals(@Nullable Object other);
 	
 	@Override
 	public abstract int hashCode();

@@ -97,7 +97,7 @@ public class MagicBlockCompat implements BlockCompat {
 		}
 
 		@Override
-		public boolean equals(BlockValues other) {
+		public boolean equals(@Nullable Object other) {
 			if (!(other instanceof MagicBlockValues))
 				return false;
 			MagicBlockValues magic = (MagicBlockValues) other;
