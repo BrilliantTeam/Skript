@@ -39,6 +39,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -222,7 +223,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder(Aliases.getMaterialName(this, false));
+		StringBuilder builder = new StringBuilder(Aliases.getMaterialName(this.aliasCopy(), false));
 		if (meta.hasDisplayName()) {
 			builder.append(" ").append(m_named).append(" ");
 			builder.append(meta.getDisplayName());
@@ -338,6 +339,31 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		
 		// Initialize block values with a terrible hack
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+	}
+	
+	/**
+	 * Creates a plain copy of this ItemData. It will have same material,
+	 * amount of 1 and same block values. Tags will also be copied, with
+	 * following exceptions:
+	 * <ul>
+	 * <li>Damage: 1.13 tag-damage is only used for actual durability
+	 * <li>Name: custom names made with anvil do not change item type
+	 * </ul>
+	 * @return A modified copy of this item data.
+	 */
+	public ItemData aliasCopy() {
+		ItemData data = new ItemData();
+		data.stack = new ItemStack(type, 1);
+		
+		data.meta = meta;
+		data.meta.setDisplayName(null); // Clear display name
+		if (data.meta instanceof Damageable) // TODO MC<1.13 support
+			((Damageable) data.meta).setDamage(0);
+		data.stack.setItemMeta(data.meta);
+		
+		data.type = type;
+		data.blockValues = blockValues;
+		return data;
 	}
 	
 }
