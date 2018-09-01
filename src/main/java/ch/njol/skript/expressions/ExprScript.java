@@ -35,6 +35,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * @author Peter Güttinger
@@ -48,8 +49,10 @@ import ch.njol.util.Kleenean;
 @Since("2.0")
 @Events("Script Load/Unload")
 public class ExprScript extends SimpleExpression<String> {
+	
 	static {
-		Skript.registerExpression(ExprScript.class, String.class, ExpressionType.SIMPLE, "[the] script[['s] name]");
+		Skript.registerExpression(ExprScript.class, String.class, ExpressionType.SIMPLE,
+				"[the] script[['s] name]", "name of [the] script");
 	}
 	
 	@SuppressWarnings("null")
@@ -71,7 +74,7 @@ public class ExprScript extends SimpleExpression<String> {
 	
 	@Override
 	protected String[] get(final Event e) {
-		return new String[] {name};
+		return CollectionUtils.array(name);
 	}
 	
 	@Override
