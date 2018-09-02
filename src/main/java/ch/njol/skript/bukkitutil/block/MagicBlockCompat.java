@@ -114,11 +114,6 @@ public class MagicBlockCompat implements BlockCompat {
 	}
 
 	@Override
-	public BlockValues getBlockValues(ItemStack stack) {
-		return new MagicBlockValues(stack);
-	}
-
-	@Override
 	public BlockValues getBlockValues(BlockState block) {
 		return new MagicBlockValues(block);
 	}

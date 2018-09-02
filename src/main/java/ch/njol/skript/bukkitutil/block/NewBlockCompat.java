@@ -40,10 +40,9 @@ public class NewBlockCompat implements BlockCompat {
 	private static class NewBlockValues extends BlockValues {
 
 		private Material type;
-		@Nullable
 		private BlockData data;
 		
-		public NewBlockValues(Material type, @Nullable BlockData data) {
+		public NewBlockValues(Material type, BlockData data) {
 			this.type = type;
 			this.data = data;
 		}
@@ -51,8 +50,7 @@ public class NewBlockCompat implements BlockCompat {
 		@Override
 		public void setBlock(Block block, boolean applyPhysics) {
 			block.setType(type);
-			if (data != null)
-				block.setBlockData(data, applyPhysics);
+			block.setBlockData(data, applyPhysics);
 		}
 
 		@Override
@@ -60,12 +58,7 @@ public class NewBlockCompat implements BlockCompat {
 			if (!(other instanceof NewBlockValues))
 				return false;
 			NewBlockValues n = (NewBlockValues) other;
-			if (data == null) {
-				return n.data == null && type.equals(n.type);
-			} else {
-				assert data != null;
-				return data.equals(n.data) && type.equals(n.type);
-			}
+			return data.equals(n.data) && type.equals(n.type);
 		}
 
 		@SuppressWarnings("null")
@@ -81,15 +74,13 @@ public class NewBlockCompat implements BlockCompat {
 	}
 	
 	@SuppressWarnings("null")
+	@Nullable
 	@Override
 	public BlockValues getBlockValues(BlockState block) {
-		return new NewBlockValues(block.getType(), block.getBlockData());
-	}
-
-	@SuppressWarnings("null")
-	@Override
-	public BlockValues getBlockValues(ItemStack stack) {
-		return new NewBlockValues(stack.getType(), null);
+		// If block doesn't have useful data, data field of type is MaterialData
+		if (BlockData.class.isAssignableFrom(block.getType().data))
+			return new NewBlockValues(block.getType(), block.getBlockData());
+		return null;
 	}
 
 	@Override
@@ -102,6 +93,9 @@ public class NewBlockCompat implements BlockCompat {
 	@Override
 	@Nullable
 	public BlockValues createBlockValues(Material type, Map<String, String> states) {
+		if (states.isEmpty())
+			return null; // Block values not needed
+		
 		StringBuilder combined = new StringBuilder("[");
 		boolean first = true;
 		for (Map.Entry<String, String> entry : states.entrySet()) {
@@ -114,7 +108,9 @@ public class NewBlockCompat implements BlockCompat {
 		combined.append(']');
 		
 		try {
-			return new NewBlockValues(type, Bukkit.createBlockData(type, combined.toString()));
+			BlockData data =  Bukkit.createBlockData(type, combined.toString());
+			assert data != null;
+			return new NewBlockValues(type, data);
 		} catch (IllegalArgumentException e) {
 			Skript.error("Parsing block state " + combined + " failed!");
 			e.printStackTrace();

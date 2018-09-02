@@ -48,6 +48,7 @@ public interface BlockCompat {
 	 * @param block Block state to retrieve value from.
 	 * @return Block values.
 	 */
+	@Nullable
 	BlockValues getBlockValues(BlockState block);
 	
 	/**
@@ -56,18 +57,11 @@ public interface BlockCompat {
 	 * @param block Block to retrieve value from.
 	 * @return Block values.
 	 */
+	@Nullable
 	@SuppressWarnings("null")
 	default BlockValues getBlockValues(Block block) {
 		return getBlockValues(block.getState());
 	}
-
-	/**
-	 * Gets block values from a item stack. They can be compared to other values
-	 * if needed, but cannot be used to retrieve any other data.
-	 * @param stack Item that would be placed as the block
-	 * @return Block values.
-	 */
-	BlockValues getBlockValues(ItemStack stack);
 	
 	/**
 	 * Creates a block state from a falling block.
@@ -76,6 +70,7 @@ public interface BlockCompat {
 	 */
 	BlockState fallingBlockToState(FallingBlock entity);
 	
+	@Nullable
 	default BlockValues getBlockValues(FallingBlock entity) {
 		return getBlockValues(fallingBlockToState(entity));
 	}

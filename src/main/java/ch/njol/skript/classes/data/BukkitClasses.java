@@ -181,10 +181,9 @@ public class BukkitClasses {
 						return false;
 					}
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public String toString(final Block b, final int flags) {
-						return ItemType.toString(new ItemStack(b.getType()), flags);
+						return ItemType.toString(b, flags);
 					}
 					
 					@Override
