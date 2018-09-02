@@ -19,28 +19,21 @@
  */
 package ch.njol.skript.doc;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.bekvon.bukkit.residence.commands.info;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.classes.ClassInfo;
@@ -102,10 +95,13 @@ public class HTMLGenerator {
 				assert false;
 				throw new NullPointerException();
 			}
-			
-			if (o1.c.getAnnotation(NoDoc.class) != null)
+
+
+			if (o1.c.getAnnotation(NoDoc.class) != null) {
+				if (o2.c.getAnnotation(NoDoc.class) != null)
+					return 0;
 				return 1;
-			else if (o2.c.getAnnotation(NoDoc.class) != null)
+			} else if (o2.c.getAnnotation(NoDoc.class) != null)
 				return -1;
 			
 			Name name1 = o1.c.getAnnotation(Name.class);
@@ -117,7 +113,6 @@ public class HTMLGenerator {
 			
 			return name1.value().compareTo(name2.value());
 		}
-		
 	}
 	
 	private static final AnnotatedComparator annotatedComparator = new AnnotatedComparator();
@@ -525,7 +520,7 @@ public class HTMLGenerator {
 	@SuppressWarnings("null")
 	private static String readFile(File f) {
 		try {
-			return Files.toString(f, Charset.forName("UTF-8"));
+			return Files.toString(f, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "";
@@ -534,7 +529,7 @@ public class HTMLGenerator {
 	
 	private static void writeFile(File f, String data) {
 		try {
-			Files.write(data, f, Charset.forName("UTF-8"));
+			Files.write(data, f, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

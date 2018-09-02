@@ -99,36 +99,64 @@ More clear code style guidelines are probably coming in future.
 If you use Skript as (soft) dependency for your plugin, and use maven or Gradle,
 this is for you.
 
-First, you need the repository. Skript is not available in Maven Central.
-```
-maven {
-    url "https://raw.githubusercontent.com/bensku/mvn-repo/master"
+First, you need to add the JitPack repository at the **END** of all your repositories. Skript is not available in Maven Central.
+```gradle
+repositories {
+    jcenter()
+    ...
+    maven { 
+        url 'https://jitpack.io' 
+    }
 }
 ```
 
 Or, if you use Maven:
+```maven
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 ```
+
+For versions of Skript after dev37 you might need to add the paper-api repository to prevent build issues.
+
+```gradle
+maven { 
+    url 'https://repo.destroystokyo.com/repository/maven-public/' 
+}
+```
+
+Or, if you use Maven:
+```maven
 <repository>
-    <id>bensku-repo</id>
-    <url>https://raw.githubusercontent.com/bensku/mvn-repo/master</url>
+    <id>destroystokyo-repo</id>
+    <url>https://repo.destroystokyo.com/content/repositories/snapshots/</url>
 </repository>
 ```
 
 Then you will also need to add Skript as a dependency.
+```gradle
+dependencies {
+    implementation 'com.github.SkriptLang:Skript:[versionTag]'
+}
 ```
-compile "ch.njol:skript:2.2-RELEASE_TAG"
-```
+
+An example of the version tag would be ```dev37c```.
+
+> Note: If Gradle isn't able to resolve Skript's dependencies, just [disable the resolution of transitive dependencies](https://docs.gradle.org/current/userguide/managing_transitive_dependencies.html#sub:disabling_resolution_transitive_dependencies) for Skript in your project.
 
 Or, if you use Maven:
 ```
 <dependency>
-    <groupId>ch.njol</groupId>
-    <artifactId>skript</artifactId>
-    <version>2.2-RELEASE_TAG</version>
+    <groupId>com.github.SkriptLang</groupId>
+    <artifactId>Skript</artifactId>
+    <version>[versionTag]</version>
 </dependency>
 ```
 
-Note that these repositories are provided as-is, for now. I cannot currently spend time to add nice, but not mandatory, features like Javadoc.
+> Note that these repositories are provided as-is, for now. I cannot currently spend time to add nice, but not mandatory, features like Javadoc.
 
 ## Relevant Links
 * [SkUnity Forums](https://forums.skunity.com/)
@@ -145,6 +173,7 @@ Current team behind Skript:
 * [bensku](https://github.com/bensku) (Skript maintainer/developer)
 * [Snow-Pyon](https://github.com/Snow-Pyon) (Skript developer)
 * [Pikachu920](https://github.com/Pikachu920) (Skript developer)
+* [Nicofisi](https://github.com/Nicofisi) (Skript developer)
 * [TheBentoBox](https://github.com/TheBentoBox) (issue tracker manager)
 
 Also, of course, we should thank [Njol](https://github.com/Njol) for creating

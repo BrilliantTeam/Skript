@@ -71,5 +71,4 @@ public class EffMakeFly extends Effect {
         return "make " + players.toString(e, debug) + (flying ? " start " : " stop ") + "flying";
     }
 
-
 }

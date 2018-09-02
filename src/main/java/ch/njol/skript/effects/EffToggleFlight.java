@@ -17,71 +17,55 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.expressions;
+package ch.njol.skript.effects;
 
-import java.util.Arrays;
-import java.util.List;
-
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 
-@Name("Raw Name")
-@Description("The raw Minecraft material name of the given item. Note that this is not guaranteed to give same results on all servers.")
-@Examples("raw name of tool of player")
-@Since("unknown (2.2)")
-public class ExprRawName extends SimpleExpression<String> {
-	
+@Name("Toggle Flight")
+@Description("Toggle the <a href='expressions.html#ExprFlightMode'>flight mode</a> of a player.")
+@Examples("allow flight to event-player")
+@Since("INSERT VERSION")
+public class EffToggleFlight extends Effect {
+
 	static {
-		Skript.registerExpression(ExprRawName.class, String.class, ExpressionType.SIMPLE, "(raw|minecraft|vanilla) name[s] of %itemtypes%");
+		Skript.registerEffect(EffToggleFlight.class,
+			"(allow|enable) (fly|flight) (for|to) %players%",
+			"(disallow|disable) (fly|flight) (for|to) %players%");
 	}
-	
+
 	@SuppressWarnings("null")
-	private Expression<ItemType> types;
-	
+	private Expression<Player> players;
+
+	private boolean allow;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		this.types = (Expression<ItemType>) exprs[0];
+		players = (Expression<Player>) exprs[0];
+		allow = matchedPattern == 0;
 		return true;
 	}
-	
-	@SuppressWarnings("null")
+
 	@Override
-	@Nullable
-	protected String[] get(final Event e) {
-		return Arrays.stream(types.getAll(e))
-				.map(ItemType::getRawNames)
-				.flatMap(List::stream)
-				.toArray(String[]::new);
+	protected void execute(final Event e) {
+		for (Player player : players.getArray(e))
+			player.setAllowFlight(allow);
 	}
-	
-	@Override
-	public boolean isSingle() {
-		return false;
-	}
-	
-	@Override
-	public Class<? extends String> getReturnType() {
-		return String.class;
-	}
-	
-	@SuppressWarnings("null")
+
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		String[] strs = get(e);
-		if (strs == null) return "";
-		return Arrays.toString(strs);
+		return "allow flight to " + players.toString(e, debug);
 	}
 }
