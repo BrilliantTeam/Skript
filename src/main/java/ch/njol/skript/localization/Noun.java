@@ -294,10 +294,11 @@ public class Noun extends Message {
 	}
 	
 	/**
-	 * For use by {@link Aliases}
+	 * Strips the gender identifier from given string and returns the used
+	 * gender. Used for aliases.
 	 * 
-	 * @param s String
-	 * @param key Key to report in case of error
+	 * @param s String.
+	 * @param key Key to report in case of error.
 	 * @return (stripped string, gender or -1 if none)
 	 */
 	public final static NonNullPair<String, Integer> stripGender(String s, final String key) {

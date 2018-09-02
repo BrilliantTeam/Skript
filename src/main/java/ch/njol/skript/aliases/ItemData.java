@@ -221,16 +221,16 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder(Aliases.getMaterialName(this.aliasCopy(), false));
+		return toString(false, false);
+	}
+	
+	public String toString(final boolean debug, final boolean plural) {
+		StringBuilder builder = new StringBuilder(Aliases.getMaterialName(this, plural));
 		if (meta.hasDisplayName()) {
 			builder.append(" ").append(m_named).append(" ");
 			builder.append(meta.getDisplayName());
 		}
 		return builder.toString();
-	}
-	
-	public String toString(final boolean debug, final boolean plural) {
-		return toString(); // TODO better debug info
 	}
 	
 	/**

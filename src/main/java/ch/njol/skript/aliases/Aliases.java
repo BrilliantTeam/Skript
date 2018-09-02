@@ -183,7 +183,7 @@ public abstract class Aliases {
 	private final static Pattern numberWordPattern = Pattern.compile("\\d+\\s+.+");
 	
 	public static final String getMaterialName(ItemData type, boolean plural) {
-		MaterialName name = provider.getMaterialName(type);
+		MaterialName name = provider.getMaterialName(type.aliasCopy());
 		if (name == null) {
 			return "" + type.type;
 		}
