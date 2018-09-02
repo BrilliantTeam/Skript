@@ -64,6 +64,15 @@ public interface BlockCompat {
 	}
 	
 	/**
+	 * Gets block values from a item stack. They can be compared to other values
+	 * if needed, but cannot be used to retrieve any other data.
+	 * @param stack Item that would be placed as the block
+	 * @return Block values.
+	 */
+	@Nullable
+	BlockValues getBlockValues(ItemStack stack);
+	
+	/**
 	 * Creates a block state from a falling block.
 	 * @param entity Falling block entity
 	 * @return Block state.

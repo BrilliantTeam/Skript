@@ -308,5 +308,10 @@ public class MagicBlockCompat implements BlockCompat {
 		// TODO moving water and lava
 		return type == Material.WATER || type == Material.LAVA;
 	}
+
+	@Override
+	public BlockValues getBlockValues(ItemStack stack) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
 	
 }

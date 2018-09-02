@@ -127,5 +127,16 @@ public class NewBlockCompat implements BlockCompat {
 	public boolean isLiquid(Material type) {
 		return type == Material.WATER || type == Material.LAVA;
 	}
+
+	@Override
+	@Nullable
+	public BlockValues getBlockValues(ItemStack stack) {
+		Material type = stack.getType();
+		if (BlockData.class.isAssignableFrom(type.data)) { // Block has data
+			// Create default block data for the type
+			return new NewBlockValues(type, Bukkit.createBlockData(type));
+		}
+		return null;
+	}
 	
 }

@@ -140,6 +140,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.type = type;
 		
 		this.stack = new ItemStack(type);
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 		if (tags != null)
 			BukkitUnsafe.modifyItemStack(stack, tags);
 		assert stack != null; // Yeah nope; modifyItemStack is not THAT Unsafe
@@ -153,6 +154,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.type = type;
 		
 		this.stack = new ItemStack(type, Math.abs(amount));
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 		this.meta = itemFactory.getItemMeta(type);
 	}
 	
@@ -176,7 +178,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	}
 	
 	public ItemData(ItemStack stack) {
-		this(stack, null);
+		this(stack, BlockCompat.INSTANCE.getBlockValues(stack));
 	}
 	
 	public ItemData(BlockState block) {
