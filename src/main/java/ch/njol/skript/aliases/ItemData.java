@@ -115,11 +115,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	transient ItemStack stack;
 	
 	/**
-	 * ItemMeta of stack.
-	 */
-	ItemMeta meta;
-	
-	/**
 	 * Type of the item as Bukkit material. Serialized manually.
 	 */
 	transient Material type;
@@ -147,7 +142,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		
 		// Grab item meta (may be null)
 		assert stack != null;
-		this.meta = stack.getItemMeta();
 	}
 	
 	public ItemData(Material type, int amount) {
@@ -155,7 +149,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		
 		this.stack = new ItemStack(type, Math.abs(amount));
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
-		this.meta = itemFactory.getItemMeta(type);
 	}
 	
 	public ItemData(Material type) {
@@ -167,14 +160,12 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.stack = data.stack.clone();
 		this.type = data.type;
 		this.blockValues = data.blockValues;
-		this.meta = data.meta;
 	}
 	
 	public ItemData(ItemStack stack, @Nullable BlockValues values) {
 		this.stack = stack;
 		this.type = stack.getType();
 		this.blockValues = values;
-		this.meta = stack.getItemMeta(); // Grab meta from stack
 	}
 	
 	public ItemData(ItemStack stack) {
@@ -185,7 +176,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.type = block.getType();
 		this.stack = new ItemStack(type);
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(block);
-		this.meta = stack.getItemMeta();
 	}
 	
 	public ItemData(Block block) {
@@ -226,6 +216,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	
 	public String toString(final boolean debug, final boolean plural) {
 		StringBuilder builder = new StringBuilder(Aliases.getMaterialName(this, plural));
+		ItemMeta meta = stack.getItemMeta();
 		if (meta.hasDisplayName()) {
 			builder.append(" ").append(m_named).append(" ");
 			builder.append(meta.getDisplayName());
@@ -307,12 +298,12 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		return blockValues;
 	}
 	
+	@SuppressWarnings("null") // Meta is created if it does not exist
 	public ItemMeta getItemMeta() {
-		return meta;
+		return stack.getItemMeta();
 	}
 	
 	public void setItemMeta(ItemMeta meta) {
-		this.meta = meta;
 		stack.setItemMeta(meta);
 	}
 
@@ -320,12 +311,14 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	public Fields serialize() throws NotSerializableException {
 		Fields fields = new Fields(this); // ItemStack is transient, will be ignored
 		fields.putPrimitive("id", materialRegistry.getId(type));
+		fields.putObject("meta", stack.getItemMeta());
 		return fields;
 	}
 
 	@Override
 	public void deserialize(Fields fields) throws StreamCorruptedException, NotSerializableException {
 		this.type = materialRegistry.getMaterial(fields.getAndRemovePrimitive("id", int.class));
+		ItemMeta meta = fields.getAndRemoveObject("meta", ItemMeta.class);
 		fields.setFields(this); // Everything but ItemStack and Material
 		
 		// Initialize ItemStack
@@ -347,11 +340,11 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		ItemData data = new ItemData();
 		data.stack = new ItemStack(type, 1);
 		
-		data.meta = meta;
-		data.meta.setDisplayName(null); // Clear display name
-		if (data.meta instanceof Damageable) // TODO MC<1.13 support
-			((Damageable) data.meta).setDamage(0);
-		data.stack.setItemMeta(data.meta);
+		ItemMeta meta = stack.getItemMeta(); // Creates a copy
+		meta.setDisplayName(null); // Clear display name
+		if (meta instanceof Damageable) // TODO MC<1.13 support
+			((Damageable) meta).setDamage(0);
+		data.stack.setItemMeta(meta);
 		
 		data.type = type;
 		data.blockValues = blockValues;

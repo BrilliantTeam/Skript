@@ -112,7 +112,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * This contains all ItemDatas that this ItemType represents. Each of them
 	 * can have its own ItemMeta.
 	 */
-	final ArrayList<ItemData> types = new ArrayList<>();
+	final ArrayList<ItemData> types = new ArrayList<>(2);
 	
 	/**
 	 * Whether this ItemType represents all types or not.
