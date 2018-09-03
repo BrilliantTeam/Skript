@@ -30,6 +30,8 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemData;
+import ch.njol.skript.bukkitutil.block.BlockCompat;
+import ch.njol.skript.bukkitutil.block.BlockSetter;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.util.coll.CollectionUtils;
 
@@ -51,13 +53,12 @@ public abstract class BlockUtils {
 	};
 	
 	public static boolean set(Block block, ItemData type, boolean applyPhysics) {
-		BlockValues values = type.getBlockValues();
-		if (values != null)
-			values.setBlock(block, applyPhysics);
-		else
-			block.setType(type.getType(), applyPhysics);
+		int flags = BlockSetter.ROTATE | BlockSetter.ROTATE_FIX_TYPE | BlockSetter.MULTIPART;
+		if (applyPhysics)
+			flags |= BlockSetter.APPLY_PHYSICS;
+		BlockCompat.SETTER.setBlock(block, type.getType(), type.getBlockValues(), flags);
 		
-		// TODO advanced features
+		
 		return true;
 	}
 	
@@ -80,12 +81,13 @@ public abstract class BlockUtils {
 		if (b == null)
 			return null;
 		final Location l = b.getLocation().add(0.5, 0.5, 0.5);
-		final Material m = b.getType();
-		if (Directional.class.isAssignableFrom(m.getData())) {
-			final BlockFace f = ((Directional) m.getNewData(b.getData())).getFacing();
-			l.setPitch(Direction.getPitch(Math.sin(f.getModY())));
-			l.setYaw(Direction.getYaw(Math.atan2(f.getModZ(), f.getModX())));
-		}
+//		final Material m = b.getType();
+//		if (Directional.class.isAssignableFrom(m.getData())) {
+//			final BlockFace f = ((Directional) m.getNewData(b.getData())).getFacing();
+//			l.setPitch(Direction.getPitch(Math.sin(f.getModY())));
+//			l.setYaw(Direction.getYaw(Math.atan2(f.getModZ(), f.getModX())));
+//		}
+		// TODO figure out what this code means
 		return l;
 	}
 	

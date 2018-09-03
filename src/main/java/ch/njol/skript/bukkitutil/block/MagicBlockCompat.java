@@ -86,7 +86,6 @@ public class MagicBlockCompat implements BlockCompat {
 			this.data = data;
 		}
 
-		@Override
 		public void setBlock(Block block, boolean applyPhysics) {
 			block.setType(id);
 			try {
@@ -311,6 +310,11 @@ public class MagicBlockCompat implements BlockCompat {
 
 	@Override
 	public BlockValues getBlockValues(ItemStack stack) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	@Override
+	public BlockSetter getSetter() {
 		throw new UnsupportedOperationException("not yet implemented");
 	}
 	

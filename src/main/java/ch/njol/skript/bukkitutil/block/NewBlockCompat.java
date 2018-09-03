@@ -24,13 +24,19 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.Aliases;
+import ch.njol.skript.aliases.ItemType;
+import ch.njol.util.Setter;
 
 /**
  * 1.13+ block compat.
@@ -39,18 +45,12 @@ public class NewBlockCompat implements BlockCompat {
 
 	private static class NewBlockValues extends BlockValues {
 
-		private Material type;
-		private BlockData data;
+		Material type;
+		BlockData data;
 		
 		public NewBlockValues(Material type, BlockData data) {
 			this.type = type;
 			this.data = data;
-		}
-		
-		@Override
-		public void setBlock(Block block, boolean applyPhysics) {
-			block.setType(type);
-			block.setBlockData(data, applyPhysics);
 		}
 
 		@Override
@@ -73,6 +73,124 @@ public class NewBlockCompat implements BlockCompat {
 		
 	}
 	
+	private static class NewBlockSetter implements BlockSetter {
+		
+		private ItemType floorTorch;
+		private ItemType wallTorch;
+		
+		private ItemType specialTorchSides;
+		private ItemType specialTorchFloors;
+		
+		private boolean typesLoaded = false;
+
+		/**
+		 * Cached BlockFace values.
+		 */
+		private BlockFace[] faces = BlockFace.values();
+		
+		@SuppressWarnings("null") // Late initialization with loadTypes() to avoid circular dependencies
+		public NewBlockSetter() {}
+
+		@Override
+		public void setBlock(Block block, Material type, @Nullable BlockValues values, int flags) {
+			if (!typesLoaded)
+				loadTypes();
+			
+			boolean rotate = (flags | ROTATE) != 0;
+			boolean rotateForce = (flags | ROTATE_FORCE) != 0;
+			boolean rotateFixType = (flags | ROTATE_FIX_TYPE) != 0;
+			boolean applyPhysics = (flags | APPLY_PHYSICS) != 0;
+			NewBlockValues ourValues = null;
+			if (values != null)
+				ourValues = (NewBlockValues) values;
+			
+			Class<?> dataType = type.data;
+			
+			/**
+			 * Set to true when block is placed. If no special logic places
+			 * the block, generic placement will be done.
+			 */
+			boolean placed = false;
+			if (rotate) {
+				if (rotateFixType || floorTorch.isOfType(type)) {
+					// If floor torch cannot be placed, try a wall torch
+					Block under = block.getRelative(0, -1, 0);
+					boolean canPlace = true;
+					if (!under.getType().isOccluding()) { // Usually cannot be placed, but there are exceptions
+						// TODO check for stairs and slabs, currently complicated since there is no 'any' alias
+						if (specialTorchFloors.isOfType(under)) {
+							canPlace = true;
+						} else {
+							canPlace = false;
+						}
+					}
+					
+					// Can't really place a floor torch, try wall one instead
+					if (!canPlace) {
+						BlockFace face = findWallTorchSide(block);
+						if (face != null) { // Found better torch spot
+							block.setType(wallTorch.getMaterial());
+							Directional data = (Directional) block.getBlockData();
+							data.setFacing(face);
+							block.setBlockData(data, applyPhysics);
+							placed = true;
+						}
+					}
+				} else if (wallTorch.isOfType(type)) {
+					Directional data;
+					if (ourValues != null)
+						data = (Directional) ourValues.data;
+					else
+						data = (Directional) Bukkit.createBlockData(type);
+					
+					Block relative = block.getRelative(data.getFacing());
+					if (!relative.getType().isOccluding() && !specialTorchSides.isOfType(relative)) {
+						// Attempt to figure out a better rotation
+						BlockFace face = findWallTorchSide(block);
+						if (face != null) { // Found better torch spot
+							block.setType(type);
+							data.setFacing(face);
+							block.setBlockData(data, applyPhysics);
+							placed = true;
+						}
+					}
+				}
+			}
+			
+			// Generic block placement
+			if (!placed) {
+				block.setType(type);
+				if (ourValues != null)
+					block.setBlockData(ourValues.data, applyPhysics);
+			}
+		}
+		
+		private void loadTypes() {
+			floorTorch = Aliases.javaItemType("floor torch");
+			wallTorch = Aliases.javaItemType("wall torch");
+			
+			specialTorchSides = Aliases.javaItemType("special torch sides");
+			specialTorchFloors = Aliases.javaItemType("special torch floors");
+			
+			typesLoaded = true;
+		}
+
+		@Nullable
+		private BlockFace findWallTorchSide(Block block) {
+			for (BlockFace face : faces) {
+				assert face != null;
+				Block relative = block.getRelative(face);
+				if (relative.getType().isOccluding() || specialTorchSides.isOfType(relative))
+					return face.getOppositeFace(); // Torch can be rotated towards from this face
+			}
+			
+			return null; // Can't place torch here legally
+		}
+		
+	}
+	
+	private NewBlockSetter setter = new NewBlockSetter();
+	
 	@SuppressWarnings("null")
 	@Nullable
 	@Override
@@ -81,6 +199,22 @@ public class NewBlockCompat implements BlockCompat {
 		if (BlockData.class.isAssignableFrom(block.getType().data))
 			return new NewBlockValues(block.getType(), block.getBlockData());
 		return null;
+	}
+	
+	@Override
+	@Nullable
+	public BlockValues getBlockValues(ItemStack stack) {
+		Material type = stack.getType();
+		if (BlockData.class.isAssignableFrom(type.data)) { // Block has data
+			// Create default block data for the type
+			return new NewBlockValues(type, Bukkit.createBlockData(type));
+		}
+		return null;
+	}
+	
+	@Override
+	public BlockSetter getSetter() {
+		return setter;
 	}
 
 	@Override
@@ -126,17 +260,6 @@ public class NewBlockCompat implements BlockCompat {
 	@Override
 	public boolean isLiquid(Material type) {
 		return type == Material.WATER || type == Material.LAVA;
-	}
-
-	@Override
-	@Nullable
-	public BlockValues getBlockValues(ItemStack stack) {
-		Material type = stack.getType();
-		if (BlockData.class.isAssignableFrom(type.data)) { // Block has data
-			// Create default block data for the type
-			return new NewBlockValues(type, Bukkit.createBlockData(type));
-		}
-		return null;
 	}
 	
 }

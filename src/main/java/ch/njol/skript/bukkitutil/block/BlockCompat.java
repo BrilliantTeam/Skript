@@ -42,6 +42,8 @@ public interface BlockCompat {
 	static final BlockCompat INSTANCE = Skript.isRunningMinecraft(1, 13)
 			? new NewBlockCompat() : new MagicBlockCompat();
 	
+	static final BlockSetter SETTER = INSTANCE.getSetter();
+	
 	/**
 	 * Gets block values from a block state. They can be compared to other
 	 * values if needed, but cannot be used to retrieve any other data.
@@ -93,6 +95,13 @@ public interface BlockCompat {
 	@Nullable
 	BlockValues createBlockValues(Material type, Map<String, String> states);
 	
+	/**
+	 * Gets block setter that understands block values produced by this
+	 * compatibility layer.
+	 * @return Block setter.
+	 */
+	BlockSetter getSetter();
+		
 	/**
 	 * Checks whether the given material implies emptiness. On Minecraft 1.13+,
 	 * there are several blocks that do so.
