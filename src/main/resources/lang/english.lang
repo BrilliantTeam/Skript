@@ -245,7 +245,7 @@ potions:
 	slow: slowness, slow
 	fast_digging: haste, fast digging, fast mining
 	slow_digging: mining fatigue, slow digging, slow mining
-	increase_damage: strength, power, increase damage, increased damage
+	increase_damage: strength, increase damage, increased damage
 	heal: instant health, health
 	harm: instant damage, damage
 	jump: jump boost, jump
