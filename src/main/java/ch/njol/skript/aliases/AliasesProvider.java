@@ -242,11 +242,7 @@ public class AliasesProvider {
 			}
 			
 			// Parse block state to block values
-			BlockValues blockValues = null;
-			if (!blockStates.isEmpty()) {
-				blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockStates);
-				// TODO error reporting if we get null
-			}
+			BlockValues blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockStates);
 			
 			// Apply (NBT) tags to item stack
 			ItemStack stack = new ItemStack(material);
@@ -254,10 +250,7 @@ public class AliasesProvider {
 				stack = applyTags(stack, new HashMap<>(tags));
 			}
 			
-			if (blockValues == null)
-				datas = Collections.singletonList(new ItemData(stack));
-			else
-				datas = Collections.singletonList(new ItemData(stack, blockValues));
+			datas = Collections.singletonList(new ItemData(stack, blockValues));
 		}
 		
 		// Create plural form of the alias (warning: I don't understand it either)

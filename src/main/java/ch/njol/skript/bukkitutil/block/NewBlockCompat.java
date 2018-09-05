@@ -29,6 +29,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
+import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
@@ -58,6 +59,11 @@ public class NewBlockCompat implements BlockCompat {
 			if (!(other instanceof NewBlockValues))
 				return false;
 			NewBlockValues n = (NewBlockValues) other;
+			
+			// Set some data that is not used to defaults
+			if (data instanceof Leaves) { // Leaf distance
+				((Leaves) data).setDistance(7);
+			}
 			return data.equals(n.data) && type.equals(n.type);
 		}
 
@@ -249,7 +255,7 @@ public class NewBlockCompat implements BlockCompat {
 			Skript.error("Parsing block state " + combined + " failed!");
 			e.printStackTrace();
 			return null;
-		}	
+		}
 	}
 
 	@Override
