@@ -53,7 +53,7 @@ public class ExprSortedList extends SimpleExpression<Object> {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		Class<? extends Object> type = exprs[0].getReturnType();
-		if (Comparable.class.isAssignableFrom(type)) {
+		if (!Comparable.class.isAssignableFrom(type)) {
 			Skript.error("List of type " + Classes.toString(type) + " does not support sorting.");
 			return false;
 		}
