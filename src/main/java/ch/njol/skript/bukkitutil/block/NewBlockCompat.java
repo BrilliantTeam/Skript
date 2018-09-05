@@ -29,6 +29,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
@@ -105,7 +106,8 @@ public class NewBlockCompat implements BlockCompat {
 			boolean rotate = (flags | ROTATE) != 0;
 			boolean rotateForce = (flags | ROTATE_FORCE) != 0;
 			boolean rotateFixType = (flags | ROTATE_FIX_TYPE) != 0;
-			boolean applyPhysics = (flags | APPLY_PHYSICS) != 0;
+			boolean multipart = (flags | MULTIPART) != 0;
+			boolean applyPhysics = (flags | APPLY_PHYSICS) == 0;
 			NewBlockValues ourValues = null;
 			if (values != null)
 				ourValues = (NewBlockValues) values;
@@ -150,7 +152,7 @@ public class NewBlockCompat implements BlockCompat {
 						data = (Directional) Bukkit.createBlockData(type);
 					
 					Block relative = block.getRelative(data.getFacing());
-					if (!relative.getType().isOccluding() && !specialTorchSides.isOfType(relative)) {
+					if ((!relative.getType().isOccluding() && !specialTorchSides.isOfType(relative)) || rotateForce) {
 						// Attempt to figure out a better rotation
 						BlockFace face = findWallTorchSide(block);
 						if (face != null) { // Found better torch spot
@@ -160,6 +162,41 @@ public class NewBlockCompat implements BlockCompat {
 							placed = true;
 						}
 					}
+				}
+			}
+			
+			if (multipart) {
+				// Bed part handling
+				if (Bed.class.isAssignableFrom(dataType)) {
+					Bed data;
+					if (ourValues != null)
+						data = (Bed) ourValues.data;
+					else
+						data = (Bed) Bukkit.createBlockData(type);
+					
+					// Place this bed
+					block.setType(type, false);
+					block.setBlockData(data, applyPhysics);
+					
+					// Calculate rotation and location of other part
+					BlockFace facing = data.getFacing();
+					BlockFace otherFacing = facing;
+					Bed.Part otherPart = Bed.Part.HEAD;
+					if (data.getPart().equals(Bed.Part.HEAD)) {
+						facing = facing.getOppositeFace();
+						otherPart = Bed.Part.FOOT;
+					}
+					
+					// Place the other part
+					Block other = block.getRelative(facing);
+					other.setType(type, false);
+					
+					Bed otherBed = (Bed) Bukkit.createBlockData(type);
+					otherBed.setPart(otherPart);
+					otherBed.setFacing(otherFacing);
+					other.setBlockData(otherBed, applyPhysics);
+					
+					placed = true;
 				}
 			}
 			
