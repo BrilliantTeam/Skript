@@ -54,27 +54,24 @@ import ch.njol.util.Kleenean;
 @Since("2.0, 2.2-dev34 (inventories)")
 public class ExprNamed extends PropertyExpression<Object, Object> {
 	static {
-		Skript.registerExpression(ExprNamed.class, Object.class, ExpressionType.PROPERTY, "%itemtype/inventorytype% (named|with name[s]) %string%");
+		Skript.registerExpression(ExprNamed.class, Object.class, ExpressionType.PROPERTY,
+				"%itemtype/inventorytype% (named|with name[s]) %string%");
 	}
 	
 	@SuppressWarnings("null")
 	private Expression<String> name;
-	private boolean inventory;
+	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		setExpr(exprs[0]);
 		name = (Expression<String>) exprs[1];
-		inventory = getExpr().getReturnType().isAssignableFrom(InventoryType.class);
 		return true;
 	}
 	
 	@Override
 	protected Object[] get(final Event e, final Object[] source) {
 		String name = this.name.getSingle(e);
-		if (name == null)
-			return inventory ? new Inventory[0] : new ItemType[0];
-
 		return get(source, new Getter<Object, Object>() {
 			@Override
 			@Nullable
@@ -82,20 +79,19 @@ public class ExprNamed extends PropertyExpression<Object, Object> {
 				if (obj instanceof InventoryType)
 					return Bukkit.createInventory(null, (InventoryType) obj, name);
 				ItemType item = (ItemType) obj;
-				ItemMeta meta = (ItemMeta) item.getItemMeta();
-				if (meta == null)
-					meta = Bukkit.getItemFactory().getItemMeta(Material.STONE); // Meta is null if the item is air
+				ItemMeta meta = item.getItemMeta();
+				if (meta == null) // Global item meta may or may not exist
+					meta = Bukkit.getItemFactory().getItemMeta(Material.STONE);
 				meta.setDisplayName(name);
 				item.setItemMeta(meta);
 				return item;
 			}
 		});
-
 	}
 	
 	@Override
 	public Class<? extends Object> getReturnType() {
-		return inventory ? Inventory.class : ItemType.class;
+		return Object.class;
 	}
 	
 	@Override

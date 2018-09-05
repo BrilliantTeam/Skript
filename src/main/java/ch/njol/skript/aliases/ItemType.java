@@ -1110,6 +1110,11 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	public void setItemMeta(ItemMeta meta) {
 		globalMeta = meta;
+		
+		// Apply new meta to all datas
+		for (ItemData data : types) {
+			data.applyMeta(meta);
+		}
 	}
 	
 	/**

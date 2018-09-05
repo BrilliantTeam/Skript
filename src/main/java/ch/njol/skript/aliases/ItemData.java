@@ -37,7 +37,9 @@ import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFactory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -349,6 +351,32 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		data.type = type;
 		data.blockValues = blockValues;
 		return data;
+	}
+
+	/**
+	 * Applies an item meta to this item. Currently, it copies the following,
+	 * provided that they exist in given meta:
+	 * <ul>
+	 * <li>Lore
+	 * <li>Display name
+	 * <li>
+	 * @param meta Item meta.
+	 */
+	public void applyMeta(ItemMeta meta) {
+		ItemMeta our = stack.getItemMeta();
+		if (meta.hasLore())
+			our.setLore(meta.getLore());
+		if (meta.hasDisplayName())
+			our.setDisplayName(meta.getDisplayName());
+		if (meta.hasEnchants()) {
+			for (Map.Entry<Enchantment, Integer> entry : meta.getEnchants().entrySet()) {
+				our.addEnchant(entry.getKey(), entry.getValue(), true);
+			}
+		}
+		for (ItemFlag flag : meta.getItemFlags()) {
+			our.addItemFlags(flag);
+		}
+		stack.setItemMeta(meta);
 	}
 	
 }
