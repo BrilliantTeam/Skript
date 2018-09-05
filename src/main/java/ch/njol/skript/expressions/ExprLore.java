@@ -174,13 +174,12 @@ public class ExprLore extends SimpleExpression<String> {
 					return;
 			}
 		} else {
-			// note that the line number is changed from one-indexed to zero-indexed here
+			// Note: line number is changed from one-indexed to zero-indexed here
 			int lineNum = Math2.fit(0, lineNumber.intValue() - 1, 99); // TODO figure out the actual maximum
 
-			// fill in the empty lines above the line being set with empty strings, if they haven't been set to anything already
-			if (lineNum > lore.size()) {
-				lore.addAll(Collections.nCopies(lineNum - lore.size() + 1, ""));
-			}
+			// Fill in the empty lines above the line being set with empty strings (avoids index out of bounds)
+			while (lore.size() <= lineNum)
+				lore.add("");
 			switch (mode) {
 				case SET:
 					assert stringDelta != null;
