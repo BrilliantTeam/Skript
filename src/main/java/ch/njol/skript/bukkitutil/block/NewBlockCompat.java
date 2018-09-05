@@ -26,10 +26,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.ItemStack;
@@ -107,7 +109,7 @@ public class NewBlockCompat implements BlockCompat {
 			boolean rotateForce = (flags | ROTATE_FORCE) != 0;
 			boolean rotateFixType = (flags | ROTATE_FIX_TYPE) != 0;
 			boolean multipart = (flags | MULTIPART) != 0;
-			boolean applyPhysics = (flags | APPLY_PHYSICS) == 0;
+			boolean applyPhysics = (flags | APPLY_PHYSICS) != 0;
 			NewBlockValues ourValues = null;
 			if (values != null)
 				ourValues = (NewBlockValues) values;
@@ -166,7 +168,7 @@ public class NewBlockCompat implements BlockCompat {
 			}
 			
 			if (multipart) {
-				// Bed part handling
+				// Beds
 				if (Bed.class.isAssignableFrom(dataType)) {
 					Bed data;
 					if (ourValues != null)
@@ -191,10 +193,39 @@ public class NewBlockCompat implements BlockCompat {
 					Block other = block.getRelative(facing);
 					other.setType(type, false);
 					
-					Bed otherBed = (Bed) Bukkit.createBlockData(type);
-					otherBed.setPart(otherPart);
-					otherBed.setFacing(otherFacing);
-					other.setBlockData(otherBed, applyPhysics);
+					data.setPart(otherPart);
+					data.setFacing(otherFacing);
+					other.setBlockData(data, applyPhysics);
+					
+					placed = true;
+				}
+				
+				// Top-down bisected blocks (doors etc.)
+				if (Bisected.class.isAssignableFrom(dataType)) {
+					Bisected data;
+					if (ourValues != null)
+						data = (Bisected) ourValues.data;
+					else
+						data = (Bisected) Bukkit.createBlockData(type);
+					
+					// Place this part
+					block.setType(type, false);
+					block.setBlockData(data, applyPhysics);
+					
+					// Figure out place of other part
+					BlockFace facing = BlockFace.DOWN;
+					Bisected.Half otherHalf = Bisected.Half.BOTTOM;
+					if (data.getHalf().equals(Bisected.Half.BOTTOM)) {
+						facing = BlockFace.UP;
+						otherHalf = Bisected.Half.TOP;
+					}
+					
+					// Place the other block
+					Block other = block.getRelative(facing);
+					other.setType(type, false);
+					
+					data.setHalf(otherHalf);
+					other.setBlockData(data, applyPhysics);
 					
 					placed = true;
 				}
