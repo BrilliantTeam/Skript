@@ -126,13 +126,13 @@ public class DefaultComparators {
 			
 		});
 		
-		// Slot - Integer
-		Comparators.registerComparator(Slot.class, Integer.class, new Comparator<Slot, Integer>() {
+		// Slot - Number
+		Comparators.registerComparator(Slot.class, Number.class, new Comparator<Slot, Number>() {
 
 			@Override
-			public Relation compare(Slot o1, Integer o2) {
+			public Relation compare(Slot o1, Number o2) {
 				if (o1 instanceof SlotWithIndex) {
-					boolean same = ((SlotWithIndex) o1).getIndex() == o2;
+					boolean same = ((SlotWithIndex) o1).getIndex() == o2.intValue();
 					if (same) // Slot has index and the index is same with number
 						return Relation.EQUAL;
 				}
