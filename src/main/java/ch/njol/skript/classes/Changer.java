@@ -37,7 +37,7 @@ import ch.njol.skript.lang.Expression;
  */
 public interface Changer<T> {
 	
-	enum ChangeMode {
+	public static enum ChangeMode {
 		ADD, SET, REMOVE, REMOVE_ALL, DELETE, RESET;
 	}
 	
@@ -52,7 +52,7 @@ public interface Changer<T> {
 	 *         mark them as supported.
 	 */
 	@Nullable
-	Class<?>[] acceptChange(ChangeMode mode);
+	public abstract Class<?>[] acceptChange(ChangeMode mode);
 	
 	/**
 	 * @param what The objects to change
@@ -61,12 +61,12 @@ public interface Changer<T> {
 	 * @param mode
 	 * @throws UnsupportedOperationException (optional) if this method was called on an unsupported ChangeMode.
 	 */
-	void change(T[] what, @Nullable Object[] delta, ChangeMode mode);
+	public abstract void change(T[] what, @Nullable Object[] delta, ChangeMode mode);
 	
-	abstract class ChangerUtils {
+	public static abstract class ChangerUtils {
 		
 		@SuppressWarnings("unchecked")
-		public static <T, V> void change(final Changer<T> changer, final Object[] what, final @Nullable Object[] delta, final ChangeMode mode) {
+		public final static <T, V> void change(final Changer<T> changer, final Object[] what, final @Nullable Object[] delta, final ChangeMode mode) {
 			changer.change((T[]) what, delta, mode);
 		}
 		
@@ -78,7 +78,7 @@ public interface Changer<T> {
 		 * @param types The types to test for
 		 * @return Whether <tt>e.{@link Expression#change(Event, Object[], ChangeMode) change}(event, type[], mode)</tt> can be used or not.
 		 */
-		public static boolean acceptsChange(final Expression<?> e, final ChangeMode mode, final Class<?>... types) {
+		public final static boolean acceptsChange(final Expression<?> e, final ChangeMode mode, final Class<?>... types) {
 			final Class<?>[] cs = e.acceptChange(mode);
 			if (cs == null)
 				return false;

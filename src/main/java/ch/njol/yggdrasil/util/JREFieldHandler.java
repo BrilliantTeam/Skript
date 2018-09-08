@@ -95,7 +95,17 @@ public class JREFieldHandler implements FieldHandler {
 					while (i < l)
 						array[i++] = null;
 				}
-			} catch (final IllegalArgumentException | IllegalStateException | NullPointerException | ClassCastException | UnsupportedOperationException | IllegalAccessException e) {
+			} catch (final IllegalArgumentException e) {
+				throw new YggdrasilException(e);
+			} catch (final IllegalAccessException e) {
+				throw new YggdrasilException(e);
+			} catch (final UnsupportedOperationException e) {
+				throw new YggdrasilException(e);
+			} catch (final ClassCastException e) {
+				throw new YggdrasilException(e);
+			} catch (final NullPointerException e) {
+				throw new YggdrasilException(e);
+			} catch (final IllegalStateException e) {
 				throw new YggdrasilException(e);
 			}
 		} else if (value instanceof Map) {
@@ -108,7 +118,15 @@ public class JREFieldHandler implements FieldHandler {
 					m.putAll((Map) value);
 					return true;
 				}
-			} catch (final IllegalArgumentException | NullPointerException | ClassCastException | UnsupportedOperationException | IllegalAccessException e) {
+			} catch (final IllegalArgumentException e) {
+				throw new YggdrasilException(e);
+			} catch (final IllegalAccessException e) {
+				throw new YggdrasilException(e);
+			} catch (final UnsupportedOperationException e) {
+				throw new YggdrasilException(e);
+			} catch (final ClassCastException e) {
+				throw new YggdrasilException(e);
+			} catch (final NullPointerException e) {
 				throw new YggdrasilException(e);
 			}
 		}

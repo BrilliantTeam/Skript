@@ -120,8 +120,8 @@ public class DatabaseStorage extends VariablesStorage {
 	private String formattedCreateQuery;
 
 	@SuppressWarnings("null")
-	final SynchronizedReference<Database> db = new SynchronizedReference<>(null);
-	
+	final SynchronizedReference<Database> db = new SynchronizedReference<Database>(null);
+
 	private boolean monitor = false;
 	long monitor_interval;
 
@@ -260,7 +260,8 @@ public class DatabaseStorage extends VariablesStorage {
 					}
 					db.query("DELETE FROM " + OLD_TABLE_NAME + " WHERE value IS NULL");
 					db.query("DELETE FROM old USING " + OLD_TABLE_NAME + " AS old, " + getTableName() + " AS new WHERE old.name = new.name");
-					try (ResultSet r = db.query("SELECT * FROM " + OLD_TABLE_NAME + " LIMIT 1")) {
+					final ResultSet r = db.query("SELECT * FROM " + OLD_TABLE_NAME + " LIMIT 1");
+					try {
 						if (r.next()) {// i.e. the old table is not empty
 							Skript.error("Could not successfully convert & transfer all variables to the new table in the database '" + databaseName + "'. "
 									+ "Variables that could not be transferred are left in the old table and Skript will reattempt to transfer them whenever it starts until the old table is empty or is manually deleted. "
@@ -280,6 +281,8 @@ public class DatabaseStorage extends VariablesStorage {
 							if (!hadNewTable)
 								Skript.info("Database '" + databaseName + "' successfully updated.");
 						}
+					} finally {
+						r.close();
 					}
 				}
 			} catch (final SQLException e) {

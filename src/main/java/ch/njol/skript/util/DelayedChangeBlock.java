@@ -32,6 +32,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -39,6 +40,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.block.BlockCompat;
 
 /**
  * A block that gets all data from the world, but either delays any changes by 1 tick of reflects them on a given BlockState depending on which constructor is used.
@@ -111,11 +113,6 @@ public class DelayedChangeBlock implements Block {
 	}
 	
 	@Override
-	public int getTypeId() {
-		return b.getTypeId();
-	}
-	
-	@Override
 	public byte getLightLevel() {
 		return b.getLightLevel();
 	}
@@ -161,34 +158,6 @@ public class DelayedChangeBlock implements Block {
 	}
 	
 	@Override
-	public void setData(final byte data) {
-		if (newState != null) {
-			newState.setRawData(data);
-		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					b.setData(data);
-				}
-			});
-		}
-	}
-	
-	@Override
-	public void setData(final byte data, final boolean applyPhysics) {
-		if (newState != null) {
-			newState.setRawData(data);
-		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					b.setData(data, applyPhysics);
-				}
-			});
-		}
-	}
-	
-	@Override
 	public void setType(final Material type) {
 		if (newState != null) {
 			newState.setType(type);
@@ -199,58 +168,6 @@ public class DelayedChangeBlock implements Block {
 					b.setType(type);
 				}
 			});
-		}
-	}
-	
-	@Override
-	public boolean setTypeId(final int type) {
-		final BlockState newState = this.newState;
-		if (newState != null) {
-			newState.setTypeId(type);
-			return newState.getTypeId() != getTypeId();
-		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					b.setTypeId(type);
-				}
-			});
-			return true;
-		}
-	}
-	
-	@Override
-	public boolean setTypeId(final int type, final boolean applyPhysics) {
-		final BlockState newState = this.newState;
-		if (newState != null) {
-			newState.setTypeId(type);
-			return newState.getTypeId() != getTypeId();
-		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					b.setTypeId(type, applyPhysics);
-				}
-			});
-			return true;
-		}
-	}
-	
-	@Override
-	public boolean setTypeIdAndData(final int type, final byte data, final boolean applyPhysics) {
-		final BlockState newState = this.newState;
-		if (newState != null) {
-			newState.setTypeId(type);
-			newState.setRawData(data);
-			return newState.getTypeId() != getTypeId() || newState.getRawData() != getData();
-		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					b.setTypeIdAndData(type, data, applyPhysics);
-				}
-			});
-			return true;
 		}
 	}
 	
@@ -311,13 +228,15 @@ public class DelayedChangeBlock implements Block {
 	
 	@Override
 	public boolean isEmpty() {
-		return getTypeId() == 0;
-	}
+		Material type = getType();
+		assert type != null;
+		return BlockCompat.INSTANCE.isEmpty(type);	}
 	
 	@Override
 	public boolean isLiquid() {
-		return getType() == Material.WATER || getType() == Material.STATIONARY_WATER || getType() == Material.LAVA || getType() == Material.STATIONARY_LAVA;
-	}
+		Material type = getType();
+		assert type != null;
+		return BlockCompat.INSTANCE.isLiquid(type);	}
 	
 	@Override
 	public double getTemperature() {
@@ -388,9 +307,24 @@ public class DelayedChangeBlock implements Block {
 	}
 
 	@Override
-	public void setType(Material arg0, boolean arg1) {
-		// TODO Auto-generated method stub
-		
+	public void setType(Material type, boolean applyPhysics) {
+		throw new UnsupportedOperationException("update 1.13");
+	}
+
+	@Override
+	public BlockData getBlockData() {
+		throw new UnsupportedOperationException("update 1.13");
+
+	}
+
+	@Override
+	public void setBlockData(BlockData arg0) {
+		throw new UnsupportedOperationException("update 1.13");
+	}
+
+	@Override
+	public void setBlockData(BlockData arg0, boolean arg1) {
+		throw new UnsupportedOperationException("update 1.13");
 	}
 	
 }

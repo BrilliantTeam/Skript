@@ -81,7 +81,7 @@ public abstract class TriggerItem implements Debuggable {
 	 * @param e
 	 * @return false iff an exception occurred
 	 */
-	public static boolean walk(final TriggerItem start, final Event e) {
+	public final static boolean walk(final TriggerItem start, final Event e) {
 		assert start != null && e != null;
 		TriggerItem i = start;
 		try {

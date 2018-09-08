@@ -27,15 +27,16 @@ package ch.njol.skript.classes;
  */
 public interface Arithmetic<A, R> {
 	
-	R difference(A first, A second);
+	public R difference(A first, A second);
 	
-	A add(A value, R difference);
+	public A add(A value, R difference);
 	
-	A subtract(A value, R difference);
+	public A subtract(A value, R difference);
 	
-	A multiply(A value, R multiplier);
+	public A multiply(A value, R multiplier);
 	
-	A divide(A value, R divider);
+	public A divide(A value, R divider);
 	
-	A power(A value, R exponent);
+	public A power(A value, R exponent);
+	
 }

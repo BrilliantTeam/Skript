@@ -31,15 +31,14 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.bekvon.bukkit.residence.commands.info;
-
+import com.google.common.primitives.Booleans;
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
-import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.ItemType;
@@ -48,10 +47,8 @@ import ch.njol.skript.command.Argument;
 import ch.njol.skript.command.Commands;
 import ch.njol.skript.command.ScriptCommand;
 import ch.njol.skript.command.ScriptCommandEvent;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.ExprParse;
 import ch.njol.skript.lang.function.ExprFunctionCall;
-import ch.njol.skript.lang.function.Function;
 import ch.njol.skript.lang.function.FunctionReference;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.lang.util.SimpleLiteral;
@@ -156,7 +153,7 @@ public class SkriptParser {
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public static <T> Literal<? extends T> parseLiteral(String expr, final Class<T> c, final ParseContext context) {
+	public final static <T> Literal<? extends T> parseLiteral(String expr, final Class<T> c, final ParseContext context) {
 		expr = "" + expr.trim();
 		if (expr.isEmpty())
 			return null;
@@ -169,7 +166,7 @@ public class SkriptParser {
 	 * Can print an error.
 	 */
 	@Nullable
-	public static <T extends SyntaxElement> T parse(String expr, final Iterator<? extends SyntaxElementInfo<T>> source, final @Nullable String defaultError) {
+	public final static <T extends SyntaxElement> T parse(String expr, final Iterator<? extends SyntaxElementInfo<T>> source, final @Nullable String defaultError) {
 		expr = "" + expr.trim();
 		if (expr.isEmpty()) {
 			Skript.error(defaultError);
@@ -190,7 +187,7 @@ public class SkriptParser {
 	}
 	
 	@Nullable
-	public static <T extends SyntaxElement> T parseStatic(String expr, final Iterator<? extends SyntaxElementInfo<? extends T>> source, final @Nullable String defaultError) {
+	public final static <T extends SyntaxElement> T parseStatic(String expr, final Iterator<? extends SyntaxElementInfo<? extends T>> source, final @Nullable String defaultError) {
 		expr = "" + expr.trim();
 		if (expr.isEmpty()) {
 			Skript.error(defaultError);
@@ -255,7 +252,9 @@ public class SkriptParser {
 								return t;
 							}
 						}
-					} catch (final InstantiationException | IllegalAccessException e) {
+					} catch (final InstantiationException e) {
+						assert false;
+					} catch (final IllegalAccessException e) {
 						assert false;
 					}
 				}
@@ -274,7 +273,7 @@ public class SkriptParser {
 	 * Prints errors
 	 */
 	@Nullable
-	private static <T> Variable<T> parseVariable(final String expr, final Class<? extends T>[] returnTypes) {
+	private final static <T> Variable<T> parseVariable(final String expr, final Class<? extends T>[] returnTypes) {
 		if (varPattern.matcher(expr).matches())
 			return Variable.newInstance("" + expr.substring(expr.indexOf('{') + 1, expr.lastIndexOf('}')), returnTypes);
 		return null;
@@ -446,31 +445,39 @@ public class SkriptParser {
 						return null;
 					}
 				} else { // Mixed plurals/singulars
-					for (int i = 0; i < types.length; i++) {
-						if (types[i] == null)
-							continue;
-						@SuppressWarnings("unchecked")
-						final Variable<?> var = parseVariable(expr, new Class[] {types[i]});
-						if (var != null) { // Parsing succeeded, we have a variable
-							// If variables cannot be used here, it is now allowed
-							if ((flags & PARSE_EXPRESSIONS) == 0) {
-								Skript.error("Variables cannot be used here.");
-								log.printError();
-								return null;
-							}
-							
-							// Plural/singular sanity check
-							if (!vi.isPlural[i] && !var.isSingle()) {
-								Skript.error("'" + expr + "' can only accept a single " + vi.classes[i].getName() + ", not more", ErrorQuality.SEMANTIC_ERROR);
-								return null;
-							}
-							
-							log.printLog();
-							return var;
-						} else if (log.hasError()) {
+					@SuppressWarnings("unchecked") final Variable<?> var = parseVariable(expr, types);
+					if (var != null) { // Parsing succeeded, we have a variable
+						// If variables cannot be used here, it is now allowed
+						if ((flags & PARSE_EXPRESSIONS) == 0) {
+							Skript.error("Variables cannot be used here.");
 							log.printError();
 							return null;
 						}
+						
+						// Plural/singular sanity check
+						//
+						// It's (currently?) not possible to detect this at parse time when there are multiple
+						// acceptable types and only some of them are single, since variables, global especially,
+						// can hold any possible type, and the type used can only be 100% known at runtime
+						//
+						// TODO:
+						// despite of that, we should probably implement a runtime check for this somewhere
+						// before executing the syntax element (perhaps even exceptionally with a console warning,
+						// otherwise users may have some hard time debugging the plurality issues) - currently an
+						// improper use in a script would result in an exception
+						if (((vi.classes.length == 1 && !vi.isPlural[0]) || Booleans.contains(vi.isPlural, true))
+								&& !var.isSingle()) {
+							Skript.error("'" + expr + "' can only accept a single "
+									+ Classes.toString(Stream.of(vi.classes).map(ci -> ci.getName().toString()).toArray(), false)
+									+ ", not more", ErrorQuality.SEMANTIC_ERROR);
+							return null;
+						}
+						
+						log.printLog();
+						return var;
+					} else if (log.hasError()) {
+						log.printError();
+						return null;
 					}
 				}
 				
@@ -1232,7 +1239,9 @@ public class SkriptParser {
 							log.printLog();
 							return new NonNullPair<>(info, e);
 						}
-					} catch (final InstantiationException | IllegalAccessException e) {
+					} catch (final InstantiationException e) {
+						assert false;
+					} catch (final IllegalAccessException e) {
 						assert false;
 					}
 				}
@@ -1260,6 +1269,7 @@ public class SkriptParser {
 		for (int i = start; i < pattern.length(); i++) {
 			if (pattern.charAt(i) == '\\') {
 				i++;
+				continue;
 			} else if (pattern.charAt(i) == closingBracket) {
 				if (n == 0) {
 					if (!isGroup)
@@ -1278,7 +1288,7 @@ public class SkriptParser {
 	
 	/**
 	 * Gets the next occurrence of a character in a string that is not escaped with a preceding backslash.
-	 * 
+	 *
 	 * @param pattern
 	 * @param c The character to search for
 	 * @param from The index to start searching from
@@ -1342,7 +1352,7 @@ public class SkriptParser {
 	 * @param cs
 	 * @return "not an x" or "neither an x, a y nor a z"
 	 */
-	public static String notOfType(final Class<?>... cs) {
+	public final static String notOfType(final Class<?>... cs) {
 		if (cs.length == 1) {
 			final Class<?> c = cs[0];
 			assert c != null;
@@ -1364,7 +1374,7 @@ public class SkriptParser {
 		}
 	}
 	
-	public static String notOfType(final ClassInfo<?>... cs) {
+	public final static String notOfType(final ClassInfo<?>... cs) {
 		if (cs.length == 1) {
 			return Language.get("not") + " " + cs[0].getName().withIndefiniteArticle();
 		} else {
@@ -1390,7 +1400,7 @@ public class SkriptParser {
 	 * @return The next index (can be expr.length()), or -1 if an invalid string, variable or bracket is found or if <tt>i >= expr.length()</tt>.
 	 * @throws StringIndexOutOfBoundsException if <tt>i < 0</tt>
 	 */
-	public static int next(final String expr, final int i, final ParseContext context) {
+	public final static int next(final String expr, final int i, final ParseContext context) {
 		if (i >= expr.length())
 			return -1;
 		if (i < 0)
@@ -1414,7 +1424,7 @@ public class SkriptParser {
 		return i + 1;
 	}
 	
-	private static int getGroupLevel(final String pattern, final int j) {
+	private final static int getGroupLevel(final String pattern, final int j) {
 		assert j >= 0 && j <= pattern.length() : j + "; " + pattern;
 		int level = 0;
 		for (int i = 0; i < j; i++) {
@@ -1653,7 +1663,7 @@ public class SkriptParser {
 	 * @return The pattern with %codenames% and a boolean array that contains whetehr the expressions are plural or not
 	 */
 	@Nullable
-	public static NonNullPair<String, boolean[]> validatePattern(final String pattern) {
+	public final static NonNullPair<String, boolean[]> validatePattern(final String pattern) {
 		final List<Boolean> ps = new ArrayList<>();
 		int groupLevel = 0, optionalLevel = 0;
 		final Deque<Character> groups = new LinkedList<>();
@@ -1723,7 +1733,7 @@ public class SkriptParser {
 	}
 	
 	@Nullable
-	private static NonNullPair<String, boolean[]> error(final String error) {
+	private final static NonNullPair<String, boolean[]> error(final String error) {
 		Skript.error("Invalid pattern: " + error);
 		return null;
 	}
@@ -1731,7 +1741,7 @@ public class SkriptParser {
 	private final static Message m_quotes_error = new Message("skript.quotes error");
 	private final static Message m_brackets_error = new Message("skript.brackets error");
 	
-	public static boolean validateLine(final String line) {
+	public final static boolean validateLine(final String line) {
 		if (StringUtils.count(line, '"') % 2 != 0) {
 			Skript.error(m_quotes_error.toString());
 			return false;

@@ -156,7 +156,7 @@ public class CondCompare extends Condition {
 		return true;
 	}
 	
-	public static String f(final Expression<?> e) {
+	public final static String f(final Expression<?> e) {
 		if (e.getReturnType() == Object.class)
 			return e.toString(null, false);
 		return Classes.getSuperClassInfo(e.getReturnType()).getName().withIndefiniteArticle();

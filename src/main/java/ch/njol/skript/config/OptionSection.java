@@ -48,7 +48,9 @@ public class OptionSection {
 					final Option<?> o = (Option<?>) f.get(this);
 					if (o.key.equals(key))
 						return (T) o.value();
-				} catch (final IllegalArgumentException | IllegalAccessException e) {
+				} catch (final IllegalArgumentException e) {
+					assert false;
+				} catch (final IllegalAccessException e) {
 					assert false;
 				}
 			}

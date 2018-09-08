@@ -154,7 +154,7 @@ public class VariableString implements Expression<String> {
 	 * @param withQuotes Whether s must be surrounded by double quotes or not
 	 * @return Whether the string is quoted correctly
 	 */
-	public static boolean isQuotedCorrectly(final String s, final boolean withQuotes) {
+	public final static boolean isQuotedCorrectly(final String s, final boolean withQuotes) {
 		if (withQuotes && (!s.startsWith("\"") || !s.endsWith("\"")))
 			return false;
 		boolean quote = false;
@@ -176,7 +176,7 @@ public class VariableString implements Expression<String> {
 	 * @param surroundingQuotes Whether the string has quotes at the start & end that should be removed
 	 * @return The string with double quotes replaced with signle ones and optionally with removed surrounding quotes.
 	 */
-	public static String unquote(final String s, final boolean surroundingQuotes) {
+	public final static String unquote(final String s, final boolean surroundingQuotes) {
 		assert isQuotedCorrectly(s, surroundingQuotes);
 		if (surroundingQuotes)
 			return "" + s.substring(1, s.length() - 1).replace("\"\"", "\"");
@@ -409,21 +409,15 @@ public class VariableString implements Expression<String> {
 	
 	/**
 	 * Parses all expressions in the string and returns it.
-	 * If this is a simple string, the event may be null.
 	 * 
 	 * @param e Event to pass to the expressions.
 	 * @return The input string with all expressions replaced.
 	 */
-	public String toString(@Nullable final Event e) {
+	public String toString(final Event e) {
 		if (isSimple) {
 			assert simple != null;
 			return simple;
 		}
-
-		if (e == null) {
-			throw new IllegalArgumentException("Event may not be null in non-simple VariableStrings!");
-		}
-
 		final Object[] string = this.string;
 		assert string != null;
 		final StringBuilder b = new StringBuilder();
@@ -512,7 +506,7 @@ public class VariableString implements Expression<String> {
 	}
 	
 	@Nullable
-	private static ChatColor getLastColor(final CharSequence s) {
+	private final static ChatColor getLastColor(final CharSequence s) {
 		for (int i = s.length() - 2; i >= 0; i--) {
 			if (s.charAt(i) == ChatColor.COLOR_CHAR) {
 				final ChatColor c = ChatColor.getByChar(s.charAt(i + 1));
@@ -691,7 +685,7 @@ public class VariableString implements Expression<String> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> Expression<T> setStringMode(final Expression<T> e, final StringMode mode) {
+	public final static <T> Expression<T> setStringMode(final Expression<T> e, final StringMode mode) {
 		if (e instanceof ExpressionList) {
 			final Expression<?>[] ls = ((ExpressionList<?>) e).getExpressions();
 			for (int i = 0; i < ls.length; i++) {

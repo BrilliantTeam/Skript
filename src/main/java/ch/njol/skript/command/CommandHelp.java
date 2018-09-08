@@ -50,7 +50,7 @@ public class CommandHelp {
 	@Nullable
 	private String langNode = null;
 	
-	private final LinkedHashMap<String, Object> arguments = new LinkedHashMap<>();
+	private final LinkedHashMap<String, Object> arguments = new LinkedHashMap<String, Object>();
 	
 	@Nullable
 	private Message wildcardArg = null;

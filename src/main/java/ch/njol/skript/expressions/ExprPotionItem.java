@@ -69,6 +69,7 @@ import ch.njol.util.Kleenean;
 @Description("Potion in item form, with advanced parameters.")
 @Examples("strong splash potion of instant damage")
 @Since("unknown (2.2)")
+// TODO replace this whole thing with new aliases
 public class ExprPotionItem extends SimpleExpression<ItemType> {
 	
 	public static final String POTION_MODS = "[(0¦(regular|normal)|1¦(strong|upgraded|level 2)|2¦(extended|long)) ][(20¦(splash|exploding)|40¦lingering) ]";
@@ -132,7 +133,7 @@ public class ExprPotionItem extends SimpleExpression<ItemType> {
 		item.setItemMeta(meta);
 		
 		ItemType it = new ItemType(item);
-		if (matchAll) it.setIgnoreMeta(true);
+		//if (matchAll) it.setIgnoreMeta(true);
 		return new ItemType[] {it};
 	}
 	

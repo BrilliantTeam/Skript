@@ -108,7 +108,9 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 				final EntityData<?> d = info.c.newInstance();
 				d.deserialize(fields);
 				return d;
-			} catch (final InstantiationException | IllegalAccessException e) {
+			} catch (final InstantiationException e) {
+				Skript.exception(e);
+			} catch (final IllegalAccessException e) {
 				Skript.exception(e);
 			}
 			throw new StreamCorruptedException();
@@ -153,7 +155,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 				.examples("victim is a cow",
 						"spawn a creeper")
 				.since("1.3")
-				.defaultExpression(new SimpleLiteral<>(new SimpleEntityData(Entity.class), true))
+				.defaultExpression(new SimpleLiteral<EntityData>(new SimpleEntityData(Entity.class), true))
 				.before("entitytype")
 				.parser(new Parser<EntityData>() {
 					@Override
@@ -367,7 +369,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		return equals_i(other);
 	}
 	
-	public static EntityDataInfo<?> getInfo(final Class<? extends EntityData<?>> c) {
+	public final static EntityDataInfo<?> getInfo(final Class<? extends EntityData<?>> c) {
 		for (final EntityDataInfo<?> i : infos) {
 			if (i.c == c)
 				return i;
@@ -376,7 +378,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	}
 	
 	@Nullable
-	public static EntityDataInfo<?> getInfo(final String codeName) {
+	public final static EntityDataInfo<?> getInfo(final String codeName) {
 		for (final EntityDataInfo<?> i : infos) {
 			if (i.codeName.equals(codeName))
 				return i;
@@ -392,7 +394,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 */
 	@SuppressWarnings("null")
 	@Nullable
-	public static EntityData<?> parse(final String s) {
+	public final static EntityData<?> parse(final String s) {
 		final Iterator<EntityDataInfo<EntityData<?>>> it = infos.iterator();
 		return SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), it, null);
 	}
@@ -405,7 +407,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 */
 	@SuppressWarnings("null")
 	@Nullable
-	public static EntityData<?> parseWithoutIndefiniteArticle(final String s) {
+	public final static EntityData<?> parseWithoutIndefiniteArticle(final String s) {
 		final Iterator<EntityDataInfo<EntityData<?>>> it = infos.iterator();
 		return SkriptParser.parseStatic(s, it, null);
 	}
@@ -460,7 +462,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 * @return All entities of this type in the given worlds
 	 */
 	@SuppressWarnings({"null", "unchecked"})
-	public static <E extends Entity> E[] getAll(final EntityData<?>[] types, final Class<E> type, @Nullable World[] worlds) {
+	public final static <E extends Entity> E[] getAll(final EntityData<?>[] types, final Class<E> type, @Nullable World[] worlds) {
 		assert types.length > 0;
 		if (type == Player.class) {
 			if (worlds == null && types.length == 1 && types[0] instanceof PlayerData && ((PlayerData) types[0]).op == 0)
@@ -525,19 +527,19 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		return getData(null, e);
 	}
 	
-	public static String toString(final Entity e) {
+	public final static String toString(final Entity e) {
 		return fromEntity(e).getSuperType().toString();
 	}
 	
-	public static String toString(final Class<? extends Entity> c) {
+	public final static String toString(final Class<? extends Entity> c) {
 		return fromClass(c).getSuperType().toString();
 	}
 	
-	public static String toString(final Entity e, final int flags) {
+	public final static String toString(final Entity e, final int flags) {
 		return fromEntity(e).getSuperType().toString(flags);
 	}
 	
-	public static String toString(final Class<? extends Entity> c, final int flags) {
+	public final static String toString(final Class<? extends Entity> c, final int flags) {
 		return fromClass(c).getSuperType().toString(flags);
 	}
 	

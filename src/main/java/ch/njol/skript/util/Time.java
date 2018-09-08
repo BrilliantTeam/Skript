@@ -92,7 +92,7 @@ public class Time implements YggdrasilSerializable {
 	 */
 	@SuppressWarnings("null")
 	@Nullable
-	public static Time parse(final String s) {
+	public final static Time parse(final String s) {
 //		if (s.matches("\\d+")) {
 //			return new Time(Integer.parseInt(s));
 //		} else

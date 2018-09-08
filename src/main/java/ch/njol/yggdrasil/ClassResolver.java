@@ -30,7 +30,7 @@ public interface ClassResolver {
 	 * @return The Class object that represents data with the given ID, or null if the ID does not belong to the implementor
 	 */
 	@Nullable
-	Class<?> getClass(String id);
+	public Class<?> getClass(String id);
 	
 	/**
 	 * Gets an ID for a Class. The ID is used to identify the type of a saved object.
@@ -41,5 +41,6 @@ public interface ClassResolver {
 	 * @return The ID of the given class, or null if this is not a class of the implementor
 	 */
 	@Nullable
-	String getID(Class<?> c);
+	public String getID(Class<?> c);
+	
 }

@@ -32,7 +32,7 @@ public abstract class BiomeUtils {
 	private BiomeUtils() {}
 	
 	@Nullable
-	public static Biome parse(final String s) {
+	public final static Biome parse(final String s) {
 		return BiomeMappings.parse(s);
 	}
 	
@@ -40,7 +40,7 @@ public abstract class BiomeUtils {
 		return BiomeMappings.toString(b, flags);
 	}
 	
-	public static String getAllNames() { // This is hack for class loading order...
+	public final static String getAllNames() { // This is hack for class loading order...
 		return "Biome names; you can use F3 ingame";
 		//return BiomeMappings.getAllNames();
 	}

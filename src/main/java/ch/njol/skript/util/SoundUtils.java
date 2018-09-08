@@ -35,7 +35,7 @@ public abstract class SoundUtils {
 	private final static EnumUtils<Sound> util = new EnumUtils<>(Sound.class, "sounds");
 	
 	@Nullable
-	public static Sound parse(final String s) {
+	public final static Sound parse(final String s) {
 		return util.parse(s);
 	}
 	
@@ -43,7 +43,7 @@ public abstract class SoundUtils {
 		return util.toString(s, flags);
 	}
 	
-	public static String getAllNames() {
+	public final static String getAllNames() {
 		return util.getAllNames();
 	}
 	

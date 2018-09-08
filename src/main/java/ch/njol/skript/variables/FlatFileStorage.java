@@ -65,7 +65,7 @@ public class FlatFileStorage extends VariablesStorage {
 	/**
 	 * A Lock on this object must be acquired after connectionLock (if that lock is used) (and thus also after {@link Variables#getReadLock()}).
 	 */
-	private final NotifyingReference<PrintWriter> changesWriter = new NotifyingReference<>();
+	private final NotifyingReference<PrintWriter> changesWriter = new NotifyingReference<PrintWriter>();
 	
 	private volatile boolean loaded = false;
 	
@@ -100,7 +100,9 @@ public class FlatFileStorage extends VariablesStorage {
 		final Version v2_1 = new Version(2, 1);
 		boolean update2_1 = false;
 		
-		try (BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8))) {
+		BufferedReader r = null;
+		try {
+			r = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
 			String line = null;
 			int lineNum = 0;
 			while ((line = r.readLine()) != null) {
@@ -149,6 +151,12 @@ public class FlatFileStorage extends VariablesStorage {
 		} catch (final IOException e) {
 			loadError = true;
 			ioEx = e;
+		} finally {
+			if (r != null) {
+				try {
+					r.close();
+				} catch (final IOException e) {}
+			}
 		}
 		
 		final File file = this.file;
@@ -218,7 +226,7 @@ public class FlatFileStorage extends VariablesStorage {
 		return new File(file);
 	}
 	
-	static String encode(final byte[] data) {
+	final static String encode(final byte[] data) {
 		final char[] r = new char[data.length * 2];
 		for (int i = 0; i < data.length; i++) {
 			r[2 * i] = Character.toUpperCase(Character.forDigit((data[i] & 0xF0) >>> 4, 16));
@@ -227,7 +235,7 @@ public class FlatFileStorage extends VariablesStorage {
 		return new String(r);
 	}
 	
-	static byte[] decode(final String hex) {
+	final static byte[] decode(final String hex) {
 		final byte[] r = new byte[hex.length() / 2];
 		for (int i = 0; i < r.length; i++) {
 			r[i] = (byte) ((Character.digit(hex.charAt(2 * i), 16) << 4) + Character.digit(hex.charAt(2 * i + 1), 16));
@@ -239,10 +247,10 @@ public class FlatFileStorage extends VariablesStorage {
 	private final static Pattern csv = Pattern.compile("(?<=^|,)\\s*([^\",]*|\"([^\"]|\"\")*\")\\s*(,|$)");
 	
 	@Nullable
-	static String[] splitCSV(final String line) {
+	final static String[] splitCSV(final String line) {
 		final Matcher m = csv.matcher(line);
 		int lastEnd = 0;
-		final ArrayList<String> r = new ArrayList<>();
+		final ArrayList<String> r = new ArrayList<String>();
 		while (m.find()) {
 			if (lastEnd != m.start())
 				return null;
@@ -287,7 +295,7 @@ public class FlatFileStorage extends VariablesStorage {
 	@SuppressWarnings("null")
 	private final static Pattern containsWhitespace = Pattern.compile("\\s");
 	
-	private static void writeCSV(final PrintWriter pw, final String... values) {
+	private final static void writeCSV(final PrintWriter pw, final String... values) {
 		assert values.length == 3; // name, type, value
 		for (int i = 0; i < values.length; i++) {
 			if (i != 0)
@@ -377,7 +385,9 @@ public class FlatFileStorage extends VariablesStorage {
 						}
 					}
 					final File tempFile = new File(Skript.getInstance().getDataFolder(), "variables.csv.temp");
-					try (PrintWriter pw = new PrintWriter(tempFile, "UTF-8")) {
+					PrintWriter pw = null;
+					try {
+						pw = new PrintWriter(tempFile, "UTF-8");
 						pw.println("# === Skript's variable storage ===");
 						pw.println("# Please do not modify this file manually!");
 						pw.println("#");
@@ -390,6 +400,9 @@ public class FlatFileStorage extends VariablesStorage {
 						FileUtils.move(tempFile, f, true);
 					} catch (final IOException e) {
 						Skript.error("Unable to make a final save of the database '" + databaseName + "' (no variables are lost): " + ExceptionUtils.toString(e)); // FIXME happens at random - check locks/threads
+					} finally {
+						if (pw != null)
+							pw.close();
 					}
 				} finally {
 					if (!finalSave) {

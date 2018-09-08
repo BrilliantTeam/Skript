@@ -34,11 +34,11 @@ public class NodeMap {
 	
 	private final Map<String, Node> map = new HashMap<>();
 	
-	public static boolean inMap(final Node n) {
+	public final static boolean inMap(final Node n) {
 		return n instanceof EntryNode || n instanceof SectionNode;
 	}
 	
-	private static String getKey(final Node n) {
+	private final static String getKey(final Node n) {
 		final String key = n.getKey();
 		if (key == null) {
 			assert false : n;
@@ -47,7 +47,7 @@ public class NodeMap {
 		return "" + key.toLowerCase(Locale.ENGLISH);
 	}
 	
-	private static String getKey(final String key) {
+	private final static String getKey(final String key) {
 		return "" + key.toLowerCase(Locale.ENGLISH);
 	}
 	

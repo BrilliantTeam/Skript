@@ -15,7 +15,7 @@ Documentation is available [here](http://skriptlang.github.io/Skript/) for the
 latest version of Skript.
 
 ## Reporting Issues
-You should use Github [issue tracker](https://github.com/SkriptLang/Skript/issues)
+You should use Github [issue tracker](https://github.com/bensku/Skript/issues)
 for all bug reports, feature requests and such. If you are not sure if something
 is a bug, please still report it.
 
@@ -57,7 +57,7 @@ and package Skript for you:
 gradlew clean build # on Windows
 ```
 
-You can get source code from the [releases](https://github.com/SkriptLang/Skript/releases) page. You may also clone this
+You can get source code from the [releases](https://github.com/bensku/Skript/releases) page. You may also clone this
 repository, but that code may or may not be stable.
 
 ### Importing to Eclipse
@@ -142,6 +142,7 @@ dependencies {
     implementation 'com.github.SkriptLang:Skript:[versionTag]'
 }
 ```
+
 An example of the version tag would be ```dev37c```.
 
 > Note: If Gradle isn't able to resolve Skript's dependencies, just [disable the resolution of transitive dependencies](https://docs.gradle.org/current/userguide/managing_transitive_dependencies.html#sub:disabling_resolution_transitive_dependencies) for Skript in your project.
@@ -180,7 +181,7 @@ Skript and [Mirreski](https://github.com/Mirreski) for maintaining it for a
 long time.
 
 In addition to that, Skript has received a lot of pull requests over time.
-You can find all contributors [here](https://github.com/SkriptLang/Skript/graphs/contributors).
+You can find all contributors [here](https://github.com/bensku/Skript/graphs/contributors).
 
 All code is owned by it's writer, licensed for others under GPLv3 (see LICENSE)
 unless otherwise specified.

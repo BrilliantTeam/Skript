@@ -95,7 +95,7 @@ public class UnparsedLiteral implements Literal<Object> {
 				final R r = Classes.parse(data, t, context);
 				if (r != null) {
 					log.printLog();
-					return new SimpleLiteral<>(r, false);
+					return new SimpleLiteral<R>(r, false);
 				}
 				log.clear();
 			}
@@ -269,7 +269,7 @@ public class UnparsedLiteral implements Literal<Object> {
 		return this;
 	}
 	
-	private static SkriptAPIException invalidAccessException() {
+	private final static SkriptAPIException invalidAccessException() {
 		return new SkriptAPIException("UnparsedLiterals must be converted before use");
 	}
 	

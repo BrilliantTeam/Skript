@@ -66,7 +66,6 @@ public class EffTeleport extends Effect {
 		return true;
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void execute(final Event e) {
 		Location to = location.getSingle(e);
@@ -76,7 +75,8 @@ public class EffTeleport extends Effect {
 			final Block on = to.getBlock().getRelative(BlockFace.DOWN);
 			if (on.getType() != Material.AIR) {
 				to = to.clone();
-				to.setY(on.getY() + Utils.getBlockHeight(on.getTypeId(), on.getData()));
+				// TODO 1.13 block height stuff
+				//to.setY(on.getY() + Utils.getBlockHeight(on.getTypeId(), on.getData()));
 			}
 		}
 		for (final Entity entity : entities.getArray(e)) {
@@ -102,7 +102,7 @@ public class EffTeleport extends Effect {
 	 * @param pitch Notch-pitch
 	 * @return Whether the given pitch and yaw represent a cartesian coordinate direction
 	 */
-	private static boolean ignoreDirection(final float yaw, final float pitch) {
+	private final static boolean ignoreDirection(final float yaw, final float pitch) {
 		return (pitch == 0 || Math.abs(pitch - 90) < Skript.EPSILON || Math.abs(pitch + 90) < Skript.EPSILON)
 				&& (yaw == 0 || Math.abs(Math.sin(Math.toRadians(yaw))) < Skript.EPSILON || Math.abs(Math.cos(Math.toRadians(yaw))) < Skript.EPSILON);
 	}

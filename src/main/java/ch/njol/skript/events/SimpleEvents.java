@@ -432,7 +432,7 @@ public class SimpleEvents {
 					.examples("on language change:",
 							"	if player's language starts with \"en\":",
 							"		send \"Hello!\"")
-					.since("2.2-dev37");
+					.since("INSERT VERSION");
 		}
 	}
 }

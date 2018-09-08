@@ -31,7 +31,7 @@ public abstract class DamageCauseUtils {
 	private final static EnumUtils<DamageCause> util = new EnumUtils<>(DamageCause.class, "damage causes");
 	
 	@Nullable
-	public static DamageCause parse(final String s) {
+	public final static DamageCause parse(final String s) {
 		return util.parse(s);
 	}
 	
@@ -39,7 +39,7 @@ public abstract class DamageCauseUtils {
 		return util.toString(dc, flags);
 	}
 	
-	public static String getAllNames() {
+	public final static String getAllNames() {
 		return util.getAllNames();
 	}
 	

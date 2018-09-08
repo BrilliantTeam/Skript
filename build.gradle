@@ -20,7 +20,7 @@ repositories {
 	}
 
 	maven {
-		url 'https://repo.destroystokyo.com/repository/maven-public/'
+		url 'https://repo.destroystokyo.com/repository/maven-public//'
 	}
 
 	maven {
@@ -34,10 +34,14 @@ repositories {
 	maven {
 		url 'https://jitpack.io'
 	}
+	
+	maven {
+		url = "https://oss.sonatype.org/content/repositories/snapshots/"
+	}
 }
 
 dependencies {
-	implementation 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
+	implementation 'com.destroystokyo.paper:paper-api:1.13-R0.1-SNAPSHOT'
 	implementation 'org.eclipse.jdt:org.eclipse.jdt.annotation:1.1.0'
 	implementation 'com.google.code.findbugs:findbugs:2.0.3'
 	implementation 'com.sk89q:worldguard:6.1.1-SNAPSHOT'
@@ -69,11 +73,16 @@ jar {
 		attributes("Name": "ch/njol/skript",
 				"Sealed": "true")
 	}
+	
+	from('skript-aliases') {
+	    into('aliases-english') // Change this if we get aliases in other languages
+	}
 }
 
 license {
     header file('licenseheader.txt')
     exclude('**/Metrics.java') // Not under GPLv3
+    exclude('**/BurgerHelper.java') // Not exclusively GPLv3
     exclude('**/*.sk') // Sample scripts and maybe aliases
     exclude('**/*.lang') // Language files
 }

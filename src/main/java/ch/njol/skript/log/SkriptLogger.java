@@ -61,7 +61,7 @@ public abstract class SkriptLogger {
 	 * 
 	 * @return A newly created RetainingLogHandler
 	 */
-	public static RetainingLogHandler startRetainingLog() {
+	public final static RetainingLogHandler startRetainingLog() {
 		return startLogHandler(new RetainingLogHandler());
 	}
 	
@@ -70,7 +70,7 @@ public abstract class SkriptLogger {
 	 * 
 	 * @return A newly created ParseLogHandler
 	 */
-	public static ParseLogHandler startParseLogHandler() {
+	public final static ParseLogHandler startParseLogHandler() {
 		return startLogHandler(new ParseLogHandler());
 	}
 	
@@ -98,28 +98,28 @@ public abstract class SkriptLogger {
 	 * @see FilteringLogHandler
 	 * @see RedirectingLogHandler
 	 */
-	public static <T extends LogHandler> T startLogHandler(final T h) {
+	public final static <T extends LogHandler> T startLogHandler(final T h) {
 		handlers.add(h);
 		return h;
 	}
 	
-	static void removeHandler(final LogHandler h) {
+	final static void removeHandler(final LogHandler h) {
 		if (!handlers.contains(h))
 			return;
 		if (!h.equals(handlers.remove())) {
 			int i = 1;
 			while (!h.equals(handlers.remove()))
 				i++;
-			LOGGER.severe("[Skript] " + i + " log handler" + (i == 1 ? " was" : "s were") + " not stopped properly! (at " + getCaller() + ") [if you're a server admin and you see this message please file a bug report at https://github.com/SkriptLang/Skript/issues if there is not already one]");
+			LOGGER.severe("[Skript] " + i + " log handler" + (i == 1 ? " was" : "s were") + " not stopped properly! (at " + getCaller() + ") [if you're a server admin and you see this message please file a bug report at https://github.com/bensku/skript/issues if there is not already one]");
 		}
 	}
 	
-	static boolean isStopped(final LogHandler h) {
+	final static boolean isStopped(final LogHandler h) {
 		return !handlers.contains(h);
 	}
 	
 	@Nullable
-	static StackTraceElement getCaller() {
+	final static StackTraceElement getCaller() {
 		for (final StackTraceElement e : new Exception().getStackTrace()) {
 			if (!e.getClassName().startsWith(SkriptLogger.class.getPackage().getName()))
 				return e;
@@ -178,6 +178,7 @@ public abstract class SkriptLogger {
 					entry.discarded("denied by " + h);
 					return;
 				case LOG:
+					continue;
 			}
 		}
 		entry.logged();

@@ -59,11 +59,11 @@ public class EventValues {
 		}
 	}
 	
-	private final static List<EventValueInfo<?, ?>> defaultEventValues = new ArrayList<>(30);
-	private final static List<EventValueInfo<?, ?>> futureEventValues = new ArrayList<>();
-	private final static List<EventValueInfo<?, ?>> pastEventValues = new ArrayList<>();
+	private final static List<EventValueInfo<?, ?>> defaultEventValues = new ArrayList<EventValueInfo<?, ?>>(30);
+	private final static List<EventValueInfo<?, ?>> futureEventValues = new ArrayList<EventValueInfo<?, ?>>();
+	private final static List<EventValueInfo<?, ?>> pastEventValues = new ArrayList<EventValueInfo<?, ?>>();
 	
-	private static List<EventValueInfo<?, ?>> getEventValuesList(final int time) {
+	private final static List<EventValueInfo<?, ?>> getEventValuesList(final int time) {
 		if (time == -1)
 			return pastEventValues;
 		if (time == 0)
@@ -107,11 +107,11 @@ public class EventValues {
 		for (int i = 0; i < eventValues.size(); i++) {
 			final EventValueInfo<?, ?> info = eventValues.get(i);
 			if (info.event != e ? info.event.isAssignableFrom(e) : info.c.isAssignableFrom(c)) {
-				eventValues.add(i, new EventValueInfo<>(e, c, g, excludeErrorMessage, excludes));
+				eventValues.add(i, new EventValueInfo<E, T>(e, c, g, excludeErrorMessage, excludes));
 				return;
 			}
 		}
-		eventValues.add(new EventValueInfo<>(e, c, g, excludeErrorMessage, excludes));
+		eventValues.add(new EventValueInfo<E, T>(e, c, g, excludeErrorMessage, excludes));
 	}
 	
 	@Deprecated
@@ -153,13 +153,13 @@ public class EventValues {
 	 * @see EventValueExpression#EventValueExpression(Class)
 	 */
 	@Nullable
-	public static <T, E extends Event> Getter<? extends T, ? super E> getEventValueGetter(final Class<E> e, final Class<T> c, final int time) {
+	public final static <T, E extends Event> Getter<? extends T, ? super E> getEventValueGetter(final Class<E> e, final Class<T> c, final int time) {
 		return EventValues.getEventValueGetter(e, c, time, true);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Nullable
-	private static <T, E extends Event> Getter<? extends T, ? super E> getEventValueGetter(final Class<E> e, final Class<T> c, final int time, final boolean allowDefault) {
+	private final static <T, E extends Event> Getter<? extends T, ? super E> getEventValueGetter(final Class<E> e, final Class<T> c, final int time, final boolean allowDefault) {
 		final List<EventValueInfo<?, ?>> eventValues = getEventValuesList(time);
 		boolean b;
 		for (final EventValueInfo<?, ?> ev : eventValues) {
@@ -212,7 +212,7 @@ public class EventValues {
 		return null;
 	}
 	
-	private static boolean checkExcludes(final EventValueInfo<?, ?> ev, final Class<? extends Event> e) {
+	private final static boolean checkExcludes(final EventValueInfo<?, ?> ev, final Class<? extends Event> e) {
 		final Class<? extends Event>[] excl = ev.exculdes;
 		if (excl == null)
 			return true;
@@ -226,7 +226,7 @@ public class EventValues {
 	}
 	
 	@Nullable
-	private static <E extends Event, F, T> Getter<? extends T, ? super E> getConvertedGetter(final EventValueInfo<E, F> i, final Class<T> to, final boolean checkInstanceOf) {
+	private final static <E extends Event, F, T> Getter<? extends T, ? super E> getConvertedGetter(final EventValueInfo<E, F> i, final Class<T> to, final boolean checkInstanceOf) {
 		final Converter<? super F, ? extends T> c = Converters.getConverter(i.c, to);
 		if (c == null)
 			return null;
@@ -244,7 +244,7 @@ public class EventValues {
 		};
 	}
 	
-	public static boolean doesEventValueHaveTimeStates(final Class<? extends Event> e, final Class<?> c) {
+	public final static boolean doesEventValueHaveTimeStates(final Class<? extends Event> e, final Class<?> c) {
 		return getEventValueGetter(e, c, -1, false) != null || getEventValueGetter(e, c, 1, false) != null;
 	}
 	

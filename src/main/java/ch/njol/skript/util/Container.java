@@ -41,13 +41,13 @@ public interface Container<T> {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Documented
 	@NonNullByDefault
-	@interface ContainerType {
-		
+	public static @interface ContainerType {
 		Class<?> value();
 	}
 	
 	/**
 	 * @return All element within this container in no particular order
 	 */
-	Iterator<T> containerIterator();
+	public Iterator<T> containerIterator();
+	
 }

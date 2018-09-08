@@ -40,8 +40,6 @@ import ch.njol.skript.lang.VariableString;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.chat.BungeeConverter;
-import ch.njol.skript.util.chat.MessageComponent;
 import ch.njol.skript.variables.Variables;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -91,7 +89,7 @@ public class ScriptCommand implements CommandExecutor {
 	private final List<String> aliases;
 	private List<String> activeAliases;
 	private String permission;
-	private final VariableString permissionMessage;
+	private final Expression<String> permissionMessage;
 	private final String description;
 	@Nullable
 	private final Timespan cooldown;
@@ -128,16 +126,15 @@ public class ScriptCommand implements CommandExecutor {
 	 */
 	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments,
 						 final String description, final String usage, final ArrayList<String> aliases,
-						 final String permission, @Nullable final VariableString permissionMessage, @Nullable final Timespan cooldown,
+						 final String permission, @Nullable final Expression<String> permissionMessage, @Nullable final Timespan cooldown,
 						 @Nullable final VariableString cooldownMessage, final String cooldownBypass,
 						 @Nullable VariableString cooldownStorage, final int executableBy, final List<TriggerItem> items) {
 		Validate.notNull(name, pattern, arguments, description, usage, aliases, items);
 		this.name = name;
 		label = "" + name.toLowerCase();
 		this.permission = permission;
-		assert permissionMessage != null;
 		this.permissionMessage = permissionMessage == null ?
-				VariableString.newInstance(Language.get("commands.no permission message"))
+				new SimpleLiteral<>(Language.get("commands.no permission message"), false)
 				: permissionMessage;
 
 		this.cooldown = cooldown;
@@ -153,7 +150,7 @@ public class ScriptCommand implements CommandExecutor {
 				as.remove();
 		}
 		this.aliases = aliases;
-		activeAliases = new ArrayList<>(aliases);
+		activeAliases = new ArrayList<String>(aliases);
 		
 		this.description = Utils.replaceEnglishChatStyles(description);
 		this.usage = Utils.replaceEnglishChatStyles(usage);
@@ -177,9 +174,9 @@ public class ScriptCommand implements CommandExecutor {
 			bukkitCommand.setDescription(description);
 			bukkitCommand.setLabel(label);
 			bukkitCommand.setPermission(permission);
-			// We can only set the message if it's simple (doesn't contains expressions)
-			if (permissionMessage.isSimple())
-				bukkitCommand.setPermissionMessage(permissionMessage.toString(null));
+			// We can only set the message if it's available at parse time (aka a literal)
+			if (permissionMessage instanceof Literal)
+				bukkitCommand.setPermissionMessage(((Literal<String>) permissionMessage).getSingle());
 			bukkitCommand.setUsage(usage);
 			bukkitCommand.setExecutor(this);
 			return bukkitCommand;
@@ -213,13 +210,7 @@ public class ScriptCommand implements CommandExecutor {
 		final ScriptCommandEvent event = new ScriptCommandEvent(ScriptCommand.this, sender);
 
 		if (!permission.isEmpty() && !sender.hasPermission(permission)) {
-			if (sender instanceof Player) {
-				List<MessageComponent> components =
-						permissionMessage.getMessageComponents(event);
-				((Player) sender).spigot().sendMessage(BungeeConverter.convert(components));
-			} else {
-				sender.sendMessage(permissionMessage.getSingle(event));
-			}
+			sender.sendMessage(permissionMessage.getSingle(event));
 			return false;
 		}
 
@@ -320,7 +311,7 @@ public class ScriptCommand implements CommandExecutor {
 	
 	@Nullable
 	private transient Command overridden = null;
-	private transient Map<String, Command> overriddenAliases = new HashMap<>();
+	private transient Map<String, Command> overriddenAliases = new HashMap<String, Command>();
 	
 	public void register(final SimpleCommandMap commandMap, final Map<String, Command> knownCommands, final @Nullable Set<String> aliases) {
 		synchronized (commandMap) {
@@ -354,7 +345,7 @@ public class ScriptCommand implements CommandExecutor {
 				knownCommands.remove(alias);
 				knownCommands.remove("skript:" + alias);
 			}
-			activeAliases = new ArrayList<>(this.aliases);
+			activeAliases = new ArrayList<String>(this.aliases);
 			bukkitCommand.unregister(commandMap);
 			bukkitCommand.setAliases(this.aliases);
 			if (overridden != null) {
@@ -372,7 +363,7 @@ public class ScriptCommand implements CommandExecutor {
 		}
 	}
 	
-	private transient Collection<HelpTopic> helps = new ArrayList<>();
+	private transient Collection<HelpTopic> helps = new ArrayList<HelpTopic>();
 	
 	public void registerHelp() {
 		helps.clear();
@@ -386,7 +377,8 @@ public class ScriptCommand implements CommandExecutor {
 			try {
 				final Field topics = IndexHelpTopic.class.getDeclaredField("allTopics");
 				topics.setAccessible(true);
-				@SuppressWarnings("unchecked") final ArrayList<HelpTopic> as = new ArrayList<>((Collection<HelpTopic>) topics.get(aliases));
+				@SuppressWarnings("unchecked")
+				final ArrayList<HelpTopic> as = new ArrayList<HelpTopic>((Collection<HelpTopic>) topics.get(aliases));
 				for (final String alias : activeAliases) {
 					final HelpTopic at = new CommandAliasHelpTopic("/" + alias, "/" + getLabel(), help);
 					as.add(at);
@@ -407,7 +399,8 @@ public class ScriptCommand implements CommandExecutor {
 			try {
 				final Field topics = IndexHelpTopic.class.getDeclaredField("allTopics");
 				topics.setAccessible(true);
-				@SuppressWarnings("unchecked") final ArrayList<HelpTopic> as = new ArrayList<>((Collection<HelpTopic>) topics.get(aliases));
+				@SuppressWarnings("unchecked")
+				final ArrayList<HelpTopic> as = new ArrayList<HelpTopic>((Collection<HelpTopic>) topics.get(aliases));
 				as.removeAll(helps);
 				topics.set(aliases, as);
 			} catch (final Exception e) {

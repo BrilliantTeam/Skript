@@ -102,7 +102,7 @@ public class ExprRemainingAir extends SimplePropertyExpression<LivingEntity, Tim
 			case REMOVE_ALL:
 			case RESET:
 				for (LivingEntity entity : getExpr().getArray(event))
-					entity.setRemainingAir(20);
+					entity.setRemainingAir(20 * 15); // 15 seconds of air
 				break;
 		}
 	}
