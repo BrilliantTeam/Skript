@@ -239,7 +239,7 @@ enchantments:
 		sweeping: Sweeping Edge
 		sweeping_edge: Sweeping Edge
 		# New 1.13 Enchantments
-		channeling: Channeling
+		channeling: Channeling, Channelling
 		riptide: Riptide
 		impaling: Impaling
 		loyalty: Loyalty
