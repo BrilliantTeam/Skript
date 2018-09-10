@@ -219,7 +219,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	public String toString(final boolean debug, final boolean plural) {
 		StringBuilder builder = new StringBuilder(Aliases.getMaterialName(this, plural));
 		ItemMeta meta = stack.getItemMeta();
-		if (meta.hasDisplayName()) {
+		if (meta != null && meta.hasDisplayName()) {
 			builder.append(" ").append(m_named).append(" ");
 			builder.append(meta.getDisplayName());
 		}
@@ -342,11 +342,13 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		ItemData data = new ItemData();
 		data.stack = new ItemStack(type, 1);
 		
-		ItemMeta meta = stack.getItemMeta(); // Creates a copy
-		meta.setDisplayName(null); // Clear display name
-		if (meta instanceof Damageable) // TODO MC<1.13 support
-			((Damageable) meta).setDamage(0);
-		data.stack.setItemMeta(meta);
+		if (stack.hasItemMeta()) {
+			ItemMeta meta = stack.getItemMeta(); // Creates a copy
+			meta.setDisplayName(null); // Clear display name
+			if (meta instanceof Damageable) // TODO MC<1.13 support
+				((Damageable) meta).setDamage(0);
+			data.stack.setItemMeta(meta);
+		}
 		
 		data.type = type;
 		data.blockValues = blockValues;
