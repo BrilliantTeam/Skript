@@ -244,7 +244,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		if (isAnything || other.isAnything) // First, isAnything check
 			return true;
 		BlockValues values = blockValues;
-		if (values != null)
+		if (values != null && other.blockValues != null)
 			return values.equals(other.blockValues);
 		
 		return other.stack.isSimilar(stack);
