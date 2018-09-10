@@ -28,6 +28,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.Powerable;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -129,11 +130,16 @@ public class EffToggle extends Effect {
 			return;
 		}
 		
-		// 1.13 and newer: use Openable BlockData
+		// 1.13 and newer: use BlockData
 		for (Block b : blocks.getArray(e)) {
 			BlockData data = b.getBlockData();
-			if (data instanceof Openable) // open = NOT was open
+			if (data instanceof Openable) { // open = NOT was open
 				((Openable) data).setOpen(!((Openable) data).isOpen());
+				b.setBlockData(data);
+			} else if (data instanceof Powerable) { // power = NOT power
+				((Powerable) data).setPowered(!((Powerable) data).isPowered());
+				b.setBlockData(data);
+			}
 		}
 	}
 	
