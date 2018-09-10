@@ -62,12 +62,7 @@ public class NewBlockCompat implements BlockCompat {
 			if (!(other instanceof NewBlockValues))
 				return false;
 			NewBlockValues n = (NewBlockValues) other;
-			
-			// Set some data that is not used to defaults
-			if (data instanceof Leaves) { // Leaf distance
-				((Leaves) data).setDistance(7);
-			}
-			return data.equals(n.data) && type.equals(n.type);
+			return data.matches(n.data) && type.equals(n.type);
 		}
 
 		@SuppressWarnings("null")

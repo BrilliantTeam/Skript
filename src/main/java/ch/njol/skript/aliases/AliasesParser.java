@@ -73,7 +73,7 @@ public class AliasesParser {
 	 * @param root Root section node for us to load.
 	 */
 	public void load(SectionNode root) {
-		Skript.debug("Loading aliases node " + root.getKey() + " from " + root.getConfig().getFileName());
+		Skript.debug("Loading aliases node " + root.getKey() + " from " + root.getConfig().getFileName() + " (" + provider.getAliasCount() + " aliases loaded)");
 		//long start = System.currentTimeMillis();
 		for (Node node : root) {
 			// Get key and make sure it exists
