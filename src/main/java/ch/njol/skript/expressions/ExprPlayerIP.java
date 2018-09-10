@@ -31,10 +31,13 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
 @Name("Player IP")
-@Description({"The IP address of a player.", "",
-			"Note: you may use the '<a href='expressions.html#ExprIP'>IP</a>' expression for getting the IP in a " +
-			"<a href='events.html#connect>connect</a> event."})
-@Examples("ban IP of the player")
+@Description({"Returns the IP addresses of the given players.",
+		"",
+		"You can also use the <a href='expressions.html#ExprIP'>IP</a> expression get the IP of the connected player in a " +
+		"<a href='events.html#connect>connect</a> event or the IP of the pinger in a " +
+		"<a href='events.html#server_list_ping'>server list ping</a> event."})
+@Examples({"ban the IP-address of the player",
+		"broadcast \"Banned the IP %IP of player%\""})
 @Since("1.4")
 public class ExprPlayerIP extends SimplePropertyExpression<Player, String> {
 
@@ -46,7 +49,7 @@ public class ExprPlayerIP extends SimplePropertyExpression<Player, String> {
 	@Override
 	public String convert(final Player player) {
 		InetSocketAddress address = player.getAddress();
-		return address == null ? "unknown" : address.getAddress().toString();
+		return address == null ? "unknown" : address.getHostName();
 	}
 
 	@Override
@@ -58,4 +61,5 @@ public class ExprPlayerIP extends SimplePropertyExpression<Player, String> {
 	public Class<? extends String> getReturnType() {
 		return String.class;
 	}
+
 }

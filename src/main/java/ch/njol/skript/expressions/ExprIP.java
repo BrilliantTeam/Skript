@@ -20,13 +20,13 @@
 package ch.njol.skript.expressions;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -41,30 +41,47 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("IP")
-@Description("The IP address in a <a href='events.html#connect'>connect</a> event.")
+@Description({"Returns the IP address of the connected player in a " +
+		"<a href='events.html#connect>connect</a> event or the IP address of the pinger in a " +
+		"<a href='events.html#server_list_ping'>server list ping</a> event."})
 @Examples({"on connect:",
-		"log \"[%now%] %IP% joined the server.\""})
+		"log \"[%now%] %player% (%IP%) joined the server.\"",
+		"",
+		"on server list ping:",
+		"\tsend \"%ip address of the pinger%\" to the console"})
 @Since("INSERT VERSION")
 public class ExprIP extends SimpleExpression<String> {
-	
+
 	static {
-		Skript.registerExpression(ExprIP.class, String.class, ExpressionType.SIMPLE, "[the] IP[(-| )address]");
+		Skript.registerExpression(ExprIP.class, String.class, ExpressionType.SIMPLE, "IP[( |-)address]");
 	}
-	
+
+	private static final boolean PAPER_EVENT_EXISTS = Skript.classExists("com.destroystokyo.paper.event.server.PaperServerListPingEvent");
+
+	private boolean isConnectEvent;
+
 	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!ScriptLoader.isCurrentEvent(PlayerLoginEvent.class)) {
-			Skript.error("The 'IP' expression can only be used in a connect event.");
+		isConnectEvent = ScriptLoader.isCurrentEvent(PlayerLoginEvent.class);
+		boolean isServerPingEvent = ScriptLoader.isCurrentEvent(ServerListPingEvent.class) ||
+				(PAPER_EVENT_EXISTS && ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class));
+		if (!isConnectEvent && !isServerPingEvent) {
+			Skript.error("The IP expression can't be used outside of a connect or server list ping event");
 			return false;
 		}
 		return true;
 	}
-	
+
 	@Override
 	@Nullable
 	protected String[] get(Event e) {
-		return CollectionUtils.array(((PlayerLoginEvent) e).getAddress().toString());
+		InetAddress address;
+		if (isConnectEvent)
+			address = ((PlayerLoginEvent) e).getAddress();
+		else
+			address = ((ServerListPingEvent) e).getAddress();
+		return CollectionUtils.array(address == null ? "unknown" : address.getHostAddress());
 	}
 
 	@Override
@@ -79,7 +96,7 @@ public class ExprIP extends SimpleExpression<String> {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "the ip";
+		return "the IP-address";
 	}
-	
+
 }
