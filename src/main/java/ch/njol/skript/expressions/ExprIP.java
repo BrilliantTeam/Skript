@@ -48,7 +48,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"log \"[%now%] %player% (%IP%) joined the server.\"",
 		"",
 		"on server list ping:",
-		"\tsend \"%ip address of the pinger%\" to the console"})
+		"\tsend \"%IP-address%\" to the console"})
 @Since("INSERT VERSION")
 public class ExprIP extends SimpleExpression<String> {
 
