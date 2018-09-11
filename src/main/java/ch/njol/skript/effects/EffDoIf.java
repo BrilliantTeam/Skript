@@ -45,6 +45,7 @@ public class EffDoIf extends Effect  {
 		Skript.registerEffect(EffDoIf.class, "[(do|execute)] <.+> if <.+>");
 	}
 	
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		String eff = parseResult.regexes.get(0).group();
