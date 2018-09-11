@@ -84,7 +84,8 @@ license {
     exclude('**/Metrics.java') // Not under GPLv3
     exclude('**/BurgerHelper.java') // Not exclusively GPLv3
     exclude('**/*.sk') // Sample scripts and maybe aliases
-    exclude('**/*.lang') // Language files
+    exclude('**/*.lang') // Language files do not have headers (still under GPLv3)
+    exclude('**/*.json') // JSON files do not have headers
 }
 
 configurations {

@@ -120,7 +120,7 @@ public class BurgerHelper {
     	Map<Integer,Material> ids = new HashMap<>();
     	for (Material mat : Material.values()) {
     		try {
-				ids.put((Integer) typeIdMethod.invokeExact(mat), mat);
+				ids.put((int) typeIdMethod.invokeExact(mat), mat);
 			} catch (Throwable e) {
 				throw new RuntimeException(e);
 			}

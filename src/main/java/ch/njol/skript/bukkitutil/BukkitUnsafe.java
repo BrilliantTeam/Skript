@@ -80,7 +80,7 @@ public class BukkitUnsafe {
 	 * If we have material map for this version, using it is preferred.
 	 * Otherwise, it can be used as fallback.
 	 */
-	private static boolean preferMaterialMap;
+	private static boolean preferMaterialMap = true;
 	
 	/**
 	 * We only spit one exception (unless debugging) from UnsafeValues. Some
@@ -93,7 +93,7 @@ public class BukkitUnsafe {
 			MethodHandle mh;
 			try {
 				mh = MethodHandles.lookup().findVirtual(UnsafeValues.class,
-						"getMaterialFromInternalName", MethodType.methodType(String.class, Material.class));
+						"getMaterialFromInternalName", MethodType.methodType(Material.class, String.class));
 			} catch (NoSuchMethodException | IllegalAccessException e) {
 				mh = null;
 			}

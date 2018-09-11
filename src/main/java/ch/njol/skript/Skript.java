@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -282,6 +283,8 @@ public final class Skript extends JavaPlugin implements Listener {
 			setEnabled(false);
 			return;
 		}
+		
+		handleJvmArguments(); // JVM arguments
 		
 		version = new Version("" + getDescription().getVersion()); // Skript version
 		
@@ -655,8 +658,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		// Tell Timings that we are here!
 		SkriptTimings.setSkript(this);
-		
-		handleJvmArguments();
 	}
 	
 	/**
@@ -690,16 +691,13 @@ public final class Skript extends JavaPlugin implements Listener {
 			} else { // Try to download Burger dataset for this version
 				try {
 					Path data = folder.resolve("burger-" + version + ".json");
-					if (Files.exists(data)) {
-						burgerInput = new String(Files.readAllBytes(data), StandardCharsets.UTF_8);
-					} else {
+					if (!Files.exists(data)) {
 						URL url = new URL("https://pokechu22.github.io/Burger/" + version + ".json");
-						try (ReadableByteChannel ch = Channels.newChannel(url.openStream());
-								Scanner scanner = new Scanner(ch);) {
-							burgerInput = scanner.useDelimiter("\\z").next();
-							Files.write(data, burgerInput.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+						try (InputStream is = url.openStream()) {
+							Files.copy(is, data);
 						}
 					}
+					burgerInput = new String(Files.readAllBytes(data), StandardCharsets.UTF_8);
 				} catch (IOException e) {
 					Skript.exception(e);
 					return;
@@ -713,9 +711,9 @@ public final class Skript extends JavaPlugin implements Listener {
 				Map<Integer,Material> ids = BurgerHelper.mapIds();
 				
 				Gson gson = new Gson();
-				Files.write(folder.resolve("materials.json"), gson.toJson(materials)
+				Files.write(folder.resolve("materials_mappings.json"), gson.toJson(materials)
 						.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
-				Files.write(folder.resolve("ids.json"), gson.toJson(ids)
+				Files.write(folder.resolve("id_mappings.json"), gson.toJson(ids)
 						.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
 			} catch (IOException e) {
 				Skript.exception(e);
