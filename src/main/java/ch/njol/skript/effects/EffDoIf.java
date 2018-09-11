@@ -20,6 +20,7 @@
 package ch.njol.skript.effects;
 
 import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -34,17 +35,21 @@ import ch.njol.util.Kleenean;
 
 @Name("Do If")
 @Description("Execute an effect if a condition is true.")
-@Examples("on join:\n\tgive diamond to player if player has permission \"rank.vip\"")
+@Examples({"on join:",
+		"\tgive a diamond to the player if the player has permission \"rank.vip\""})
 @Since("INSERT VERSION")
 public class EffDoIf extends Effect  {
 
+	static {
+		Skript.registerEffect(EffDoIf.class, "<.+> if <.+>");
+	}
+
+	@SuppressWarnings({"unchecked", "null"})
 	private Effect effect;
+
+	@SuppressWarnings({"unchecked", "null"})
 	private Condition condition;
 
-	static {
-		Skript.registerEffect(EffDoIf.class, "[(do|execute)] <.+> if <.+>");
-	}
-	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
@@ -52,7 +57,7 @@ public class EffDoIf extends Effect  {
 		String cond = parseResult.regexes.get(1).group();
 		effect = Effect.parse(eff, "Can't understand this effect: " + eff);
 		condition = Condition.parse(cond, "Can't understand this condition: " + cond);
-		return effect != null && condition != null;
+		return effect != null || condition != null;
 	}
 
 	@Override
@@ -62,8 +67,8 @@ public class EffDoIf extends Effect  {
 	}
 
 	@Override
-	public String toString(Event event, boolean debug) {
-		return "do " + effect.toString(event, debug) + " if " + condition.toString(event, debug);
+	public String toString(@Nullable Event event, boolean debug) {
+		return effect.toString(event, debug) + " if " + condition.toString(event, debug);
 	}
 
 }
