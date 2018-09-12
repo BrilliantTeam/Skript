@@ -57,6 +57,10 @@ public class EffDoIf extends Effect  {
 		String cond = parseResult.regexes.get(1).group();
 		effect = Effect.parse(eff, "Can't understand this effect: " + eff);
 		condition = Condition.parse(cond, "Can't understand this condition: " + cond);
+		if (effect instanceof EffDoIf) {
+			Skript.error("Do if effects may not be nested!");
+			return false;
+		}
 		return effect != null && condition != null;
 	}
 
