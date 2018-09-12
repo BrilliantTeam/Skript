@@ -56,23 +56,23 @@ public class EffDoIf extends Effect  {
 		String eff = parseResult.regexes.get(0).group();
 		String cond = parseResult.regexes.get(1).group();
 		effect = Effect.parse(eff, "Can't understand this effect: " + eff);
-		condition = Condition.parse(cond, "Can't understand this condition: " + cond);
 		if (effect instanceof EffDoIf) {
 			Skript.error("Do if effects may not be nested!");
 			return false;
 		}
+		condition = Condition.parse(cond, "Can't understand this condition: " + cond);
 		return effect != null && condition != null;
 	}
 
 	@Override
-	protected void execute(Event event) {
-		if (condition.check(event))
-			effect.run(event);
+	protected void execute(Event e) {
+		if (condition.check(e))
+			effect.run(e);
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return effect.toString(event, debug) + " if " + condition.toString(event, debug);
+	public String toString(@Nullable Event e, boolean debug) {
+		return effect.toString(e, debug) + " if " + condition.toString(e, debug);
 	}
 
 }
