@@ -108,6 +108,7 @@ public class AliasesProvider {
 				return inserted;
 			if (inserted == null)
 				return id;
+			inserted = inserted.substring(0, inserted.length() - 1); // Strip out -
 			
 			String id = this.id;
 			assert id != null;

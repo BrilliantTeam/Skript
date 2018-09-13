@@ -125,8 +125,10 @@ public class BukkitUnsafe {
 		} else {
 			// If we have correct material map, prefer using it
 			if (preferMaterialMap) {
-				assert materialMap != null;
-				return materialMap.get(id);
+				if (id.length() > 9) {
+					assert materialMap != null;
+					return materialMap.get(id.substring(10)); // Strip 'minecraft:' out
+				}
 			}
 			
 			// Otherwise, hacks
