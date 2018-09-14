@@ -91,7 +91,7 @@ public class ExprNamed extends PropertyExpression<Object, Object> {
 	
 	@Override
 	public Class<? extends Object> getReturnType() {
-		return Object.class;
+		return ItemType.class; // For some reason, inventories still work too... Weird
 	}
 	
 	@Override
