@@ -62,7 +62,7 @@ public class NewBlockCompat implements BlockCompat {
 			if (!(other instanceof NewBlockValues))
 				return false;
 			NewBlockValues n = (NewBlockValues) other;
-			return data.matches(n.data) && type.equals(n.type);
+			return (data.matches(n.data) || n.data.matches(data)) && type.equals(n.type);
 		}
 
 		@SuppressWarnings("null")
