@@ -117,7 +117,7 @@ public class NewBlockCompat implements BlockCompat {
 			 */
 			boolean placed = false;
 			if (rotate) {
-				if (rotateFixType || floorTorch.isOfType(type)) {
+				if (floorTorch.isOfType(type) || (rotateFixType && wallTorch.isOfType(type))) {
 					// If floor torch cannot be placed, try a wall torch
 					Block under = block.getRelative(0, -1, 0);
 					boolean canPlace = true;
