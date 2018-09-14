@@ -75,6 +75,12 @@ public class NewBlockCompat implements BlockCompat {
 			return result;
 		}
 		
+		@SuppressWarnings("null")
+		@Override
+		public String toString() {
+			return data.toString();
+		}
+		
 	}
 	
 	private static class NewBlockSetter implements BlockSetter {

@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -133,6 +134,14 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	@Nullable
 	transient BlockValues blockValues;
 	
+	/**
+	 * Whether this represents an item (that definitely cannot have
+	 * block states) or a block, which might have them.
+	 */
+	boolean itemForm;
+	
+	boolean strictEquality;
+	
 	public ItemData(Material type, @Nullable String tags) {
 		this.type = type;
 		
@@ -171,7 +180,8 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	}
 	
 	public ItemData(ItemStack stack) {
-		this(stack, BlockCompat.INSTANCE.getBlockValues(stack));
+		this(stack, null);
+		this.itemForm = true;
 	}
 	
 	public ItemData(BlockState block) {
@@ -244,7 +254,14 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		if (isAnything || other.isAnything) // First, isAnything check
 			return true;
 		BlockValues values = blockValues;
-		if (values != null && other.blockValues != null)
+		if (itemForm && other.blockValues != null)
+			return false; // We want an item, not a block
+		if (other.itemForm && blockValues != null)
+			return false;
+		
+		if (strictEquality && !Objects.equals(values, other.blockValues))
+			return false;
+		if (values != null)
 			return values.equals(other.blockValues);
 		
 		return other.stack.isSimilar(stack);
@@ -352,6 +369,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		
 		data.type = type;
 		data.blockValues = blockValues;
+		data.itemForm = itemForm;
 		return data;
 	}
 
@@ -361,7 +379,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	 * <ul>
 	 * <li>Lore
 	 * <li>Display name
-	 * <li>
+	 * <li>Enchantments
+	 * <li>Item flags
+	 * </ul>
 	 * @param meta Item meta.
 	 */
 	public void applyMeta(ItemMeta meta) {
