@@ -300,6 +300,7 @@ public abstract class Variables {
         if (caseInsensitiveVariables) {
             n = name.toLowerCase(Locale.ENGLISH);
         }
+        assert n != null;
 	    if (local) {
 			final VariablesMap map = localVariables.get(e);
 			if (map == null)
@@ -326,6 +327,7 @@ public abstract class Variables {
         if (caseInsensitiveVariables) {
             n = name.toLowerCase(Locale.ENGLISH);
         }
+        assert n != null;
 	    if (value != null) {
 			assert !n.endsWith("::*");
 			final ClassInfo<?> ci = Classes.getSuperClassInfo(value.getClass());

@@ -65,7 +65,7 @@ public class FlatFileStorage extends VariablesStorage {
 	/**
 	 * A Lock on this object must be acquired after connectionLock (if that lock is used) (and thus also after {@link Variables#getReadLock()}).
 	 */
-	private final NotifyingReference<PrintWriter> changesWriter = new NotifyingReference<PrintWriter>();
+	private final NotifyingReference<PrintWriter> changesWriter = new NotifyingReference<>();
 	
 	private volatile boolean loaded = false;
 	
@@ -250,7 +250,7 @@ public class FlatFileStorage extends VariablesStorage {
 	final static String[] splitCSV(final String line) {
 		final Matcher m = csv.matcher(line);
 		int lastEnd = 0;
-		final ArrayList<String> r = new ArrayList<String>();
+		final ArrayList<String> r = new ArrayList<>();
 		while (m.find()) {
 			if (lastEnd != m.start())
 				return null;
@@ -266,7 +266,6 @@ public class FlatFileStorage extends VariablesStorage {
 		return r.toArray(new String[r.size()]);
 	}
 	
-	@SuppressWarnings("resource")
 	@Override
 	protected boolean save(final String name, final @Nullable String type, final @Nullable byte[] value) {
 		synchronized (connectionLock) {
@@ -308,7 +307,6 @@ public class FlatFileStorage extends VariablesStorage {
 		pw.println();
 	}
 	
-	@SuppressWarnings("null")
 	@Override
 	protected final void disconnect() {
 		synchronized (connectionLock) {
@@ -323,18 +321,17 @@ public class FlatFileStorage extends VariablesStorage {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	protected final boolean connect() {
 		synchronized (connectionLock) {
 			synchronized (changesWriter) {
 				if (changesWriter.get() != null)
 					return true;
-				try {
-					changesWriter.set(new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, true), UTF_8)));
+				try (FileOutputStream fos = new FileOutputStream(file, true)){
+					changesWriter.set(new PrintWriter(new OutputStreamWriter(fos, UTF_8)));
 					loaded = true;
 					return true;
-				} catch (final FileNotFoundException e) {
+				} catch (IOException e) { // close() might throw ANY IOException
 					Skript.exception(e);
 					return false;
 				}
