@@ -307,7 +307,12 @@ public class HTMLGenerator {
 				generate = page.indexOf("${generate", nextBracket);
 			}
 			
-			writeFile(new File(output + "/" + f.getName()), page);
+			String name = f.getName();
+			if (name.endsWith(".html")) { // Fix some stuff specially for HTML
+				page = page.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;"); // Tab to 4 non-collapsible spaces
+			}
+			assert page != null;
+			writeFile(new File(output + File.separator + name), page);
 		}
 	}
 	
