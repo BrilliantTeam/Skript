@@ -279,7 +279,7 @@ public abstract class VariablesStorage implements Closeable {
 	}
 	
 	/**
-	 * Clears the queue of unsaved variables. Only used if all variables are saved immediately after calling this method.
+	 * Clears the saveQueue of unsaved variables. Only used if all variables are saved immediately after calling this method.
 	 */
 	protected void clearChangesQueue() {
 		changesQueue.clear();

@@ -26,9 +26,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -235,15 +237,15 @@ public abstract class Variables {
 		return variableNameSplitPattern.split(name);
 	}
 	
-	private final static ReadWriteLock variablesLock = new ReentrantReadWriteLock(true);
+	final static ReadWriteLock variablesLock = new ReentrantReadWriteLock(true);
 	/**
 	 * must be locked with {@link #variablesLock}.
 	 */
-	private final static VariablesMap variables = new VariablesMap();
+	final static VariablesMap variables = new VariablesMap();
 	/**
 	 * Not accessed concurrently
 	 */
-	private final static WeakHashMap<Event, VariablesMap> localVariables = new WeakHashMap<>();
+	private final static Map<Event, VariablesMap> localVariables = new HashMap<>();
 	
 	/**
 	 * Remember to lock with {@link #getReadLock()} and to not make any changes!
@@ -308,6 +310,14 @@ public abstract class Variables {
 			return map.getVariable(n);
 		} else {
 			try {
+				// Prevent race conditions from returning variables with incorrect values
+				if (!changeQueue.isEmpty()) {
+					for (VariableChange change : changeQueue) {
+						if (change.name.equals(n))
+							return change.value;
+					}
+				}
+				
 				variablesLock.readLock().lock();
 				return variables.getVariable(n);
 			} finally {
@@ -349,13 +359,63 @@ public abstract class Variables {
 	}
 	
 	final static void setVariable(final String name, @Nullable final Object value) {
-		try {
-			variablesLock.writeLock().lock();
-			variables.setVariable(name, value);
-		} finally {
-			variablesLock.writeLock().unlock();
+		boolean gotLock = variablesLock.writeLock().tryLock();
+		if (gotLock) {
+			try {
+				variables.setVariable(name, value);
+				saveVariableChange(name, value);
+				processChangeQueue(); // Process all previously queued writes
+			} finally {
+				variablesLock.writeLock().unlock();
+			}
+		} else { // Can't block here, queue the change
+			queueVariableChange(name, value);
 		}
-		saveVariableChange(name, value);
+	}
+	
+	/**
+	 * Changes to variables that have not yet been written.
+	 */
+	final static Queue<VariableChange> changeQueue = new ConcurrentLinkedQueue<>();
+	
+	/**
+	 * A variable change name-value pair.
+	 */
+	private static class VariableChange {
+		
+		public final String name;
+		@Nullable
+		public final Object value;
+		
+		public VariableChange(String name, @Nullable Object value) {
+			this.name = name;
+			this.value = value;
+		}
+	}
+	
+	/**
+	 * Queues a variable change. Only to be called when direct write is not
+	 * possible, but thread cannot be allowed to block.
+	 * @param name Variable name.
+	 * @param value New value.
+	 */
+	private final static void queueVariableChange(String name, @Nullable Object value) {
+		changeQueue.add(new VariableChange(name, value));
+	}
+	
+	/**
+	 * Processes all entries in variable change queue. Note that caller MUST
+	 * acquire write lock before calling this, then release it.
+	 */
+	final static void processChangeQueue() {
+		while (true) { // Run as long as we still have changes
+			VariableChange change = changeQueue.poll();
+			if (change == null)
+				break;
+			
+			variables.setVariable(change.name, change.value);
+			saveVariableChange(change.name, change.value);
+		}
 	}
 	
 	/**
@@ -449,7 +509,7 @@ public abstract class Variables {
 				for (final VariablesStorage s : storages)
 					s.allLoaded();
 				
-				Skript.debug("Variables set. Queue size = " + queue.size());
+				Skript.debug("Variables set. Queue size = " + saveQueue.size());
 				
 				return n;
 			} finally {
@@ -471,10 +531,10 @@ public abstract class Variables {
 	}
 	
 	private final static void saveVariableChange(final String name, final @Nullable Object value) {
-		queue.add(serialize(name, value));
+		saveQueue.add(serialize(name, value));
 	}
 	
-	final static BlockingQueue<SerializedVariable> queue = new LinkedBlockingQueue<>();
+	final static BlockingQueue<SerializedVariable> saveQueue = new LinkedBlockingQueue<>();
 	
 	static volatile boolean closed = false;
 	
@@ -483,8 +543,9 @@ public abstract class Variables {
 		public void run() {
 			while (!closed) {
 				try {
-					final SerializedVariable v = queue.take();
-					for (final VariablesStorage s : storages) {
+					// Save one variable change
+					SerializedVariable v = saveQueue.take();
+					for (VariablesStorage s : storages) {
 						if (s.accept(v.name)) {
 							s.save(v);
 							break;
@@ -496,7 +557,14 @@ public abstract class Variables {
 	}, "Skript variable save thread");
 	
 	public static void close() {
-		while (queue.size() > 0) {
+		try { // Ensure that all changes are to save soon
+			variablesLock.writeLock().lock();
+			processChangeQueue();
+		} finally {
+			variablesLock.writeLock().unlock();
+		}
+		
+		while (saveQueue.size() > 0) {
 			try {
 				Thread.sleep(10);
 			} catch (final InterruptedException e) {}
