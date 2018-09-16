@@ -7,13 +7,15 @@
   <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
-  ${include navbar.html}
-  <nav>
-    <p id="nav-title">Table of Contents</p>
-    <div id="nav-contents">
-      ${generate ${pagename} desc_nav.html}
-    </div>
-  </nav>
+  <div id="navigation-parent">
+    ${include navbar.html}
+    <nav id="side-nav">
+      <p id="nav-title">Table of Contents</p>
+      <div id="nav-contents">
+        ${generate ${pagename} desc_nav.html}
+      </div>
+    </nav>
+  </div>
   <div id="content">
     ${content}
   </div>
