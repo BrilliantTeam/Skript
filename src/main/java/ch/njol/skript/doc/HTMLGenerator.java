@@ -310,10 +310,32 @@ public class HTMLGenerator {
 			String name = f.getName();
 			if (name.endsWith(".html")) { // Fix some stuff specially for HTML
 				page = page.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;"); // Tab to 4 non-collapsible spaces
+				assert page != null;
+				page = minifyHtml(page);
 			}
 			assert page != null;
 			writeFile(new File(output + File.separator + name), page);
 		}
+	}
+	
+	private static String minifyHtml(String page) {
+		StringBuilder sb = new StringBuilder(page.length());
+		boolean space = false;
+		for (int i = 0; i < page.length();) {
+			int c = page.codePointAt(i);
+			if ((c == '\n' || c == ' ')) {
+				if (!space) {
+					sb.append(' ');
+					space = true;
+				}
+			} else {
+				space = false;
+				sb.appendCodePoint(c);
+			}
+			
+			i += Character.charCount(c);
+		}
+		return sb.toString();
 	}
 	
 	/**
