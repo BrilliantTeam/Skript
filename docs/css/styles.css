@@ -5,14 +5,21 @@
 
 body {
   background-color: oldlace;
+  display: grid;
+  grid-template-rows: 3.3em 100%;
+  grid-template-columns: minmax(15em, 18em) minmax(80%, 100%);
 }
 
 #global-navigation {
-  float: right;
+  grid-row-start: 1;
+  grid-row-end: 1;
+  grid-column-start: 2;
+  position: sticky;
+  top: 0em;
+  
   background-color: tan;
   padding: 1em;
   padding-left: 0em;
-  width: 80%;
 }
 
 #global-navigation > a {
@@ -20,7 +27,7 @@ body {
   text-decoration: none;
   color: #403200;
   font-size: 120%;
-  font-style: bold;
+  font-weight: bold;
 
   padding: 0.8em;
 }
@@ -31,20 +38,34 @@ body {
 }
 
 #side-nav {
-  display: table-cell;
-  width: 20%;
-  max-width: 5em;
-  min-width: 3em;
+  grid-row-start: 2;
+  grid-row-end: 2;
+  grid-column-start: 1;
+
 }
 
 #nav-title {
+  grid-row-start: 1;
+  grid-row-end: 1;
+  grid-column-start: 1;
+  grid-column-end: 1;
+  position: sticky;
+  top: 0em;
+  
   font-family: arial;
   text-decoration: none;
   background-color: tan;
-  font-size: 120%;
-  font-style: bold;
+  font-size: 130%;
+  font-weight: bold;
 
   padding: 0.845em;
+  padding-top: 0.7em;
+  padding-left: 1em;
+}
+
+#nav-contents {
+  position: sticky;
+  top: 3.3em;
 }
 
 #nav-contents > p {
@@ -70,6 +91,6 @@ body {
 }
 
 #content {
-  float: right;
-  width: 80%;
+  grid-row-start: 2;
+  grid-column-start: 2;
 }
