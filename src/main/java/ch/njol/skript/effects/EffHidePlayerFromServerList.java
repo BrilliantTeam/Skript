@@ -21,6 +21,16 @@ package ch.njol.skript.effects;
 
 import java.util.Arrays;
 import java.util.Iterator;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.server.ServerListPingEvent;
+import org.eclipse.jdt.annotation.Nullable;
+
+import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
+import com.google.common.collect.Iterators;
+
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -29,14 +39,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.ScriptLoader;
 import ch.njol.util.Kleenean;
-import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
-import com.google.common.collect.Iterators;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.server.ServerListPingEvent;
-import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Hide Player from Server List")
 @Description({"Hides a player from the <a href='expressions.html#ExprHoverList'>hover list</a> " +
