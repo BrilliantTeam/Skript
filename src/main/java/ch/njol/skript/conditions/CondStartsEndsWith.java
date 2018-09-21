@@ -50,14 +50,14 @@ public class CondStartsEndsWith extends Condition {
 	private Expression<String> strings;
 	@SuppressWarnings("null")
 	private Expression<String> affix;
-	private boolean usedEnds;
+	private boolean usingEnds;
 
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		strings = (Expression<String>) exprs[0];
 		affix = (Expression<String>) exprs[1];
-		usedEnds = parseResult.mark == 1;
+		usingEnds = parseResult.mark == 1;
 		setNegated(matchedPattern == 1);
 		return true;
 	}
@@ -68,7 +68,7 @@ public class CondStartsEndsWith extends Condition {
 		return strings.check(e, new Checker<String>() {
 			@Override
 			public boolean check(String s) {
-				return usedEnds ? s.endsWith(a) : s.startsWith(a);
+				return usingEnds ? s.endsWith(a) : s.startsWith(a);
 			}
 		}, isNegated());
 	}
@@ -76,9 +76,9 @@ public class CondStartsEndsWith extends Condition {
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
 		if (isNegated())
-			return strings.toString(e, debug) + " doesn't " + (usedEnds ? "end" : "start") + " with " + affix.toString(e, debug);
+			return strings.toString(e, debug) + " doesn't " + (usingEnds ? "end" : "start") + " with " + affix.toString(e, debug);
 		else
-			return strings.toString(e, debug) + (usedEnds ? " ends" : " starts") + " with " + affix.toString(e, debug);
+			return strings.toString(e, debug) + (usingEnds ? " ends" : " starts") + " with " + affix.toString(e, debug);
 	}
 
 
