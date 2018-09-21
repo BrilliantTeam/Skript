@@ -38,48 +38,47 @@ import ch.njol.util.Kleenean;
 @Examples({"if the argument starts with \"test\":",
 		"	send \"Stop!\""})
 @Since("2.2-dev36")
-public class CondStartsWith extends Condition {
+public class CondStartsEndsWith extends Condition {
 
 	static {
-		Skript.registerCondition(CondStartsWith.class,
+		Skript.registerCondition(CondStartsEndsWith.class,
 				"%strings% (start|1¦end)[s] with %string%",
-				"%strings% do[es](n't| not) (start|1¦end) with %string%");
+				"%strings% (doesn't|does not|do not|don't) (start|1¦end) with %string%");
 	}
 
 	@SuppressWarnings("null")
 	private Expression<String> strings;
 	@SuppressWarnings("null")
-	private Expression<String> prefix;
-	private boolean ends;
+	private Expression<String> affix;
+	private boolean usedEnds;
 
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		strings = (Expression<String>) exprs[0];
-		prefix = (Expression<String>) exprs[1];
-		ends = parseResult.mark == 1;
+		affix = (Expression<String>) exprs[1];
+		usedEnds = parseResult.mark == 1;
 		setNegated(matchedPattern == 1);
 		return true;
 	}
 
 	@Override
 	public boolean check(Event e) {
-		String p = prefix.getSingle(e);
-
-		if (p == null)
-			return false;
-
+		String a = affix.getSingle(e);
 		return strings.check(e, new Checker<String>() {
 			@Override
 			public boolean check(String s) {
-				return ends ? s.startsWith(p) : s.endsWith(p);
+				return usedEnds ? s.endsWith(a) : s.startsWith(a);
 			}
 		}, isNegated());
 	}
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return strings.toString(e, debug) + (isNegated() ? " don't " : " ") + (ends ? "start" : "end") +  " with " + prefix.toString(e, debug);
+		if (isNegated())
+			return strings.toString(e, debug) + " doesn't " + (usedEnds ? "end" : "start") + " with " + affix.toString(e, debug);
+		else
+			return strings.toString(e, debug) + (usedEnds ? " ends" : " starts") + " with " + affix.toString(e, debug);
 	}
 
 
