@@ -69,16 +69,16 @@ public class ExprIP extends SimpleExpression<String> {
 	@SuppressWarnings("null")
 	private Expression<Player> players;
 
-	private boolean isConnectEvent, usedPlayerPatterns;
+	private boolean isConnectEvent, isProperty;
 
 	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		usedPlayerPatterns = matchedPattern < 2;
+		isProperty = matchedPattern < 2;
 		isConnectEvent = ScriptLoader.isCurrentEvent(PlayerLoginEvent.class);
 		boolean isServerPingEvent = ScriptLoader.isCurrentEvent(ServerListPingEvent.class) ||
 				(PAPER_EVENT_EXISTS && ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class));
-		if (usedPlayerPatterns) {
+		if (isProperty) {
 			players = (Expression<Player>) exprs[0];
 		} else if (!isConnectEvent && !isServerPingEvent) {
 			Skript.error("The IP expression can't be used outside of a connect or server list ping event");
@@ -90,7 +90,7 @@ public class ExprIP extends SimpleExpression<String> {
 	@Override
 	@Nullable
 	protected String[] get(Event e) {
-		if (!usedPlayerPatterns) {
+		if (!isProperty) {
 			InetAddress address;
 			if (isConnectEvent)
 				// Return IP address of the connected player in connect event
@@ -119,7 +119,7 @@ public class ExprIP extends SimpleExpression<String> {
 
 	@Override
 	public boolean isSingle() {
-		return !usedPlayerPatterns || players.isSingle();
+		return !isProperty || players.isSingle();
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class ExprIP extends SimpleExpression<String> {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		if (e == null || !usedPlayerPatterns)
+		if (e == null || !isProperty)
 			return "the IP address";
 		return "the IP address of " + players.toString(e, debug);
 	}
