@@ -46,7 +46,8 @@ public class MaterialRegistry {
 		this.ids = new int[materials.length];
 		for (int i = 0; i < materials.length; i++) {
 			Material m = materials[i];
-			ids[m.ordinal()] = i;
+			if (m != null)
+				ids[m.ordinal()] = i;
 		}
 	}
 	
