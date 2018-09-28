@@ -251,7 +251,9 @@ public class AliasesProvider {
 				stack = applyTags(stack, new HashMap<>(tags));
 			}
 			
-			datas = Collections.singletonList(new ItemData(stack, blockValues));
+			ItemData data = new ItemData(stack, blockValues);
+			data.isAlias = true;
+			datas = Collections.singletonList(data);
 		}
 		
 		// Create plural form of the alias (warning: I don't understand it either)

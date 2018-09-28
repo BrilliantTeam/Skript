@@ -276,8 +276,10 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			if (item == null) { // Given item null
 				if (myType.type == Material.AIR)
 					return true; // Both items AIR/null
-			} else if (item.isSimilar(myType.stack)) {
-				return true; // Bukkit thinks they're similar enough
+			} else if (myType.isAlias) {
+				return myType.type.equals(item.getType());
+			} else {
+				return item.isSimilar(myType.stack);
 			}
 		}
 		return false;

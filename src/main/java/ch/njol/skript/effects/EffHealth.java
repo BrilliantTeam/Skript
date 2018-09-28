@@ -95,6 +95,7 @@ public class EffHealth extends Effect {
 			ItemStack i = (ItemStack) damageables.getSingle(e);
 			if (i == null)
 				return;
+			// TODO migrate to use ItemType and durability methods there
 			if (this.damage == null) {
 				i.setDurability((short) 0);
 			} else {
