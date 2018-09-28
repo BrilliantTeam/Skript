@@ -310,15 +310,15 @@ public abstract class Variables {
 				return null;
 			return map.getVariable(n);
 		} else {
-			try {
-				// Prevent race conditions from returning variables with incorrect values
-				if (!changeQueue.isEmpty()) {
-					for (VariableChange change : changeQueue) {
-						if (change.name.equals(n))
-							return change.value;
-					}
+			// Prevent race conditions from returning variables with incorrect values
+			if (!changeQueue.isEmpty()) {
+				for (VariableChange change : changeQueue) {
+					if (change.name.equals(n))
+						return change.value;
 				}
+			}
 				
+			try {
 				variablesLock.readLock().lock();
 				return variables.getVariable(n);
 			} finally {
