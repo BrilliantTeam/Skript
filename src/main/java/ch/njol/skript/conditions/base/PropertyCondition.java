@@ -23,6 +23,7 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -30,33 +31,75 @@ import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 
 /**
- * @author Peter Güttinger
+ * This class can be used for an easier writing of conditions that contain only one type in the pattern,
+ * and are in one of the following forms:
+ * <ul>
+ *     <li>something is something</li>
+ *     <li>something can something</li>
+ *     <li>something has something</li>
+ * </ul>
+ * The plural and negated forms are also supported.
+ *
+ * The gains of using this class:
+ * <ul>
+ *     <li>The {@link ch.njol.skript.lang.Debuggable#toString(Event, boolean)} method is already implemented,
+ *     and it works well with the plural and negated forms</li>
+ *     <li>You can use the {@link PropertyCondition#register(Class, PropertyType, String, String)}
+ *     method for an easy registration</li>
+ * </ul>
+ *
+ * <b>Note:</b> if you choose to register this class in any other way than by calling
+ * {@link PropertyCondition#register(Class, PropertyType, String, String)} or
+ * {@link PropertyCondition#register(Class, String, String)}, be aware that there can only be two patterns -
+ * the first one needs to be a non-negated one and a negated one.
  */
 public abstract class PropertyCondition<T> extends Condition implements Checker<T> {
 	
+	/**
+	 * See {@link PropertyCondition} for more info
+	 */
 	public enum PropertyType {
-		BE, HAVE, CAN
+		/**
+		 * Indicates that the condition is in a form of <code>something is/are something</code>,
+		 * also possibly in the negated form
+		 */
+		BE,
+		
+		/**
+		 * Indicates that the condition is in a form of <code>something can something</code>,
+		 * also possibly in the negated form
+		 */
+		CAN,
+		
+		/**
+		 * Indicates that the condition is in a form of <code>something has/have something</code>,
+		 * also possibly in the negated form
+		 */
+		HAVE
 	}
 	
 	@SuppressWarnings("null")
 	private Expression<? extends T> expr;
 	
 	/**
-	 * @param c
-	 * @param property
-	 * @param type must be plural
+	 * @param c the class to register
+	 * @param property the property name, for example <i>fly</i> in <i>players can fly</i>
+	 * @param type must be plural, for example <i>players</i> in <i>players can fly</i>
 	 */
 	public static void register(final Class<? extends Condition> c, final String property, final String type) {
 		register(c, PropertyType.BE, property, type);
 	}
 	
 	/**
-	 * @param c
-	 * @param propertyType
-	 * @param property
-	 * @param type must be plural
+	 * @param c the class to register
+	 * @param propertyType the property type, see {@link PropertyType}
+	 * @param property the property name, for example <i>fly</i> in <i>players can fly</i>
+	 * @param type must be plural, for example <i>players</i> in <i>players can fly</i>
 	 */
 	public static void register(final Class<? extends Condition> c, final PropertyType propertyType, final String property, final String type) {
+		if (type.contains("%")) {
+			throw new SkriptAPIException("The type argument must not contain any '%'s");
+		}
 		switch (propertyType) {
 			case BE:
 				Skript.registerCondition(c,
@@ -96,7 +139,7 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 	
 	protected abstract String getPropertyName();
 	
-	public PropertyType getPropertyType() {
+	protected PropertyType getPropertyType() {
 		return PropertyType.BE;
 	}
 	
