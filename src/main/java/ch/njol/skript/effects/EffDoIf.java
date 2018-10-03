@@ -45,7 +45,7 @@ public class EffDoIf extends Effect  {
 		Skript.registerEffect(EffDoIf.class, "<.+> if <.+>");
 	}
 
-	@SuppressWarnings("null"})
+	@SuppressWarnings("null")
 	private Effect effect;
 
 	@SuppressWarnings("null")
