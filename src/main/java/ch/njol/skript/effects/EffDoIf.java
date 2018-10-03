@@ -45,13 +45,13 @@ public class EffDoIf extends Effect  {
 		Skript.registerEffect(EffDoIf.class, "<.+> if <.+>");
 	}
 
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings("null"})
 	private Effect effect;
 
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings("null")
 	private Condition condition;
 
-	@SuppressWarnings({"unchecked", "null"})
+	@SuppressWarnings("null")
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		String eff = parseResult.regexes.get(0).group();
@@ -70,6 +70,7 @@ public class EffDoIf extends Effect  {
         	walk(e);
     	}
 
+	@SuppressWarnings("null")
     	@Override
     	public TriggerItem walk(Event e) {
         	if (condition.check(e)) {
