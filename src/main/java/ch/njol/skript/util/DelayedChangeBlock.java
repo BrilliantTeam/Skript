@@ -43,11 +43,11 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 
 /**
- * A block that gets all data from the world, but either delays any changes by 1 tick of reflects them on a given BlockState depending on which constructor is used.
+ * A block that gets all data from the world, but either delays
+ * any changes by 1 tick of reflects them on a given BlockState
+ * depending on which constructor is used.
  * 
- * @author Peter Güttinger
  */
-@SuppressWarnings("deprecation")
 @NonNullByDefault(false)
 public class DelayedChangeBlock implements Block {
 	
@@ -87,6 +87,7 @@ public class DelayedChangeBlock implements Block {
 		b.removeMetadata(metadataKey, owningPlugin);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public byte getData() {
 		return b.getData();
@@ -230,13 +231,15 @@ public class DelayedChangeBlock implements Block {
 	public boolean isEmpty() {
 		Material type = getType();
 		assert type != null;
-		return BlockCompat.INSTANCE.isEmpty(type);	}
+		return BlockCompat.INSTANCE.isEmpty(type);
+	}
 	
 	@Override
 	public boolean isLiquid() {
 		Material type = getType();
 		assert type != null;
-		return BlockCompat.INSTANCE.isLiquid(type);	}
+		return BlockCompat.INSTANCE.isLiquid(type);
+	}
 	
 	@Override
 	public double getTemperature() {
@@ -308,23 +311,35 @@ public class DelayedChangeBlock implements Block {
 
 	@Override
 	public void setType(Material type, boolean applyPhysics) {
-		throw new UnsupportedOperationException("update 1.13");
+		if (newState != null) {
+			newState.setType(type);
+		} else {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					b.setType(type, applyPhysics);
+				}
+			});
+		}
 	}
 
 	@Override
 	public BlockData getBlockData() {
-		throw new UnsupportedOperationException("update 1.13");
-
+		return b.getBlockData();
 	}
 
 	@Override
-	public void setBlockData(BlockData arg0) {
-		throw new UnsupportedOperationException("update 1.13");
+	public void setBlockData(BlockData data) {
+		setBlockData(data, true);
 	}
 
 	@Override
-	public void setBlockData(BlockData arg0, boolean arg1) {
-		throw new UnsupportedOperationException("update 1.13");
+	public void setBlockData(BlockData data, boolean applyPhysics) {
+		if (newState != null) {
+			newState.setBlockData(data);
+		} else {
+			b.setBlockData(data, applyPhysics);
+		}
 	}
 	
 }
