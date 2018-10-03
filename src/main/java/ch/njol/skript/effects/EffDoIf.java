@@ -33,6 +33,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.util.Kleenean;
+import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Do If")
 @Description("Execute an effect if a condition is true.")
@@ -66,11 +67,9 @@ public class EffDoIf extends Effect  {
 	}
 
 	@Override
-    	protected void execute(Event e) {
-        	walk(e);
-    	}
-
-	@SuppressWarnings("null")
+    	protected void execute(Event e) {}
+	
+	@Nullable
     	@Override
     	public TriggerItem walk(Event e) {
         	if (condition.check(e)) {
