@@ -88,10 +88,11 @@ public final class SkriptAddon {
 	 */
 	public SkriptAddon loadClasses(String basePackage, final String... subPackages) throws IOException {
 		assert subPackages != null;
+		final JarFile jar = new JarFile(getFile());
 		for (int i = 0; i < subPackages.length; i++)
 			subPackages[i] = subPackages[i].replace('.', '/') + "/";
 		basePackage = basePackage.replace('.', '/') + "/";
-		try (JarFile jar = new JarFile(getFile())) {
+		try {
 			for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
 				if (e.getName().startsWith(basePackage) && e.getName().endsWith(".class")) {
 					boolean load = subPackages.length == 0;
@@ -110,9 +111,14 @@ public final class SkriptAddon {
 						} catch (final ExceptionInInitializerError err) {
 							Skript.exception(err.getCause(), this + "'s class " + c + " generated an exception while loading");
 						}
+						continue;
 					}
 				}
 			}
+		} finally {
+			try {
+				jar.close();
+			} catch (final IOException e) {}
 		}
 		return this;
 	}
@@ -159,7 +165,9 @@ public final class SkriptAddon {
 			getFile.setAccessible(true);
 			file = (File) getFile.invoke(plugin);
 			return file;
-		} catch (final NoSuchMethodException | IllegalArgumentException e) {
+		} catch (final NoSuchMethodException e) {
+			Skript.outdatedError(e);
+		} catch (final IllegalArgumentException e) {
 			Skript.outdatedError(e);
 		} catch (final IllegalAccessException e) {
 			assert false;

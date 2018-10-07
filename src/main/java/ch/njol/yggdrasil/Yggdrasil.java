@@ -153,7 +153,9 @@ public final class Yggdrasil {
 		try {
 			return c.isPrimitive() || c == Object.class || (Enum.class.isAssignableFrom(c) || PseudoEnum.class.isAssignableFrom(c)) && getIDNoError(c) != null ||
 					((YggdrasilSerializable.class.isAssignableFrom(c) || getSerializer(c) != null) && newInstance(c) != c);// whatever, just make true out if it (null is a valid return value)
-		} catch (final StreamCorruptedException | NotSerializableException e) { // thrown by newInstance if the class does not provide a correct constructor or is abstract
+		} catch (final StreamCorruptedException e) { // thrown by newInstance if the class does not provide a correct constructor or is abstract
+			return false;
+		} catch (final NotSerializableException e) {
 			return false;
 		}
 	}
@@ -289,16 +291,34 @@ public final class Yggdrasil {
 	}
 	
 	public void saveToFile(final Object o, final File f) throws IOException {
-		try (FileOutputStream fout = new FileOutputStream(f); YggdrasilOutputStream yout = newOutputStream(fout)) {
+		FileOutputStream fout = null;
+		YggdrasilOutputStream yout = null;
+		try {
+			fout = new FileOutputStream(f);
+			yout = newOutputStream(fout);
 			yout.writeObject(o);
 			yout.flush();
+		} finally {
+			if (yout != null)
+				yout.close();
+			if (fout != null)
+				fout.close();
 		}
 	}
 	
 	@Nullable
 	public <T> T loadFromFile(final File f, final Class<T> expectedType) throws IOException {
-		try (FileInputStream fin = new FileInputStream(f); YggdrasilInputStream yin = newInputStream(fin)) {
+		FileInputStream fin = null;
+		YggdrasilInputStream yin = null;
+		try {
+			fin = new FileInputStream(f);
+			yin = newInputStream(fin);
 			return yin.readObject(expectedType);
+		} finally {
+			if (yin != null)
+				yin.close();
+			if (fin != null)
+				fin.close();
 		}
 	}
 	
@@ -333,7 +353,11 @@ public final class Yggdrasil {
 			throw new StreamCorruptedException("Cannot create an instance of " + c + " because the security manager didn't allow it");
 		} catch (final InstantiationException e) {
 			throw new StreamCorruptedException("Cannot create an instance of " + c + " because it is abstract");
-		} catch (final IllegalAccessException | IllegalArgumentException e) {
+		} catch (final IllegalAccessException e) {
+			e.printStackTrace();
+			assert false;
+			return null;
+		} catch (final IllegalArgumentException e) {
 			e.printStackTrace();
 			assert false;
 			return null;

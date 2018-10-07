@@ -39,7 +39,6 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.SkriptConfig;
@@ -151,7 +150,7 @@ public class Variable<T> implements Expression<T> {
 		name = "" + name.trim();
 		if (!isValidVariableName(name, true, true))
 			return null;
-		VariableString vs = VariableString.newInstance(name.startsWith(LOCAL_VARIABLE_TOKEN) ? "" + name.substring(LOCAL_VARIABLE_TOKEN.length()).trim() : name, StringMode.VARIABLE_NAME);
+		final VariableString vs = VariableString.newInstance(name.startsWith(LOCAL_VARIABLE_TOKEN) ? "" + name.substring(LOCAL_VARIABLE_TOKEN.length()).trim() : name, StringMode.VARIABLE_NAME);
 		if (vs == null)
 			return null;
 		
@@ -242,16 +241,12 @@ public class Variable<T> implements Expression<T> {
 	public <R> Variable<R> getConvertedExpression(final Class<R>... to) {
 		return new Variable<>(name, to, local, list, this);
 	}
-
+	
 	/**
 	 * Gets the value of this variable as stored in the variables map.
-	 *
-	 * This is mostly for internal usage, if you want to get the value(s)
-	 * the variable holds then use {@link Variable#getArray(Event)},
-	 * {@link Variable#getAll(Event)} or {@link Variable#getSingle(Event)}
 	 */
 	@Nullable
-	public Object getRaw(final Event e) {
+	private Object getRaw(final Event e) {
 		final String n = name.toString(e);
 		if (n.endsWith(Variable.SEPARATOR + "*") != list) // prevents e.g. {%expr%} where "%expr%" ends with "::*" from returning a Map
 			return null;

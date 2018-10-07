@@ -427,9 +427,13 @@ public abstract class Commands {
 
 		final String rawPermissionMessage = ScriptLoader.replaceOptions(node.get("permission message", ""));
 
-		VariableString permissionMessage = rawPermissionMessage.isEmpty() ?
+		Expression<String> permissionMessage = rawPermissionMessage.isEmpty() ?
 				null
 				: VariableString.newInstance(rawPermissionMessage);
+
+		if (permissionMessage != null && ((VariableString) permissionMessage).isSimple()) {
+			permissionMessage = new SimpleLiteral<>(rawPermissionMessage, false);
+		}
 
 		final SectionNode trigger = (SectionNode) node.get("trigger");
 		if (trigger == null)

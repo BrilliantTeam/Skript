@@ -85,7 +85,7 @@ public class EffMessage extends Effect {
 			for (CommandSender sender : recipients.getArray(e)) {
 				if (message instanceof VariableString && sender instanceof Player) { // this could contain json formatting
 					List<MessageComponent> components = ((VariableString) message).getMessageComponents(e);
-					((Player) sender).spigot().sendMessage(BungeeConverter.convert(components));
+					((Player) sender).spigot().sendMessage(BungeeConverter.convert(components.toArray(new MessageComponent[components.size()])));
 				} else {
 					for (String string : message.getArray(e)) {
 						sender.sendMessage(string);

@@ -24,10 +24,10 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.WeatherType;
 import ch.njol.util.coll.CollectionUtils;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
@@ -72,17 +72,13 @@ public class ExprPlayerWeather extends SimplePropertyExpression<Player, WeatherT
 		return null;
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) {
-		for (final Player player : getExpr().getArray(e)) {
-			switch (mode) {
-				case SET:
-					assert delta != null;
-					((WeatherType) delta[0]).setWeather(player);
-					break;
-				case RESET:
-					player.resetPlayerWeather();
-			}
+		final WeatherType type = delta == null ? WeatherType.CLEAR : (WeatherType) delta[0];
+		for (final Player p : getExpr().getArray(e)) {
+			type.setWeather(p);
 		}
 	}
+
 }

@@ -26,7 +26,17 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,6 +64,7 @@ import java.util.zip.ZipFile;
 import ch.njol.skript.lang.Trigger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -67,8 +78,12 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.gson.Gson;
+
 import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.aliases.Aliases;
+import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.BurgerHelper;
 import ch.njol.skript.bukkitutil.Workarounds;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Comparator;
@@ -269,6 +284,8 @@ public final class Skript extends JavaPlugin implements Listener {
 			return;
 		}
 		
+		handleJvmArguments(); // JVM arguments
+		
 		version = new Version("" + getDescription().getVersion()); // Skript version
 		
 		Language.loadDefault(getAddonInstance());
@@ -280,9 +297,11 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		final File scripts = new File(getDataFolder(), SCRIPTSFOLDER);
 		if (!scripts.isDirectory()) {
-			try (ZipFile f = new ZipFile(getFile())) {
+			ZipFile f = null;
+			try {
 				if (!scripts.mkdirs())
 					throw new IOException("Could not create the directory " + scripts);
+				f = new ZipFile(getFile());
 				for (final ZipEntry e : new EnumerationIterable<ZipEntry>(f.entries())) {
 					if (e.isDirectory())
 						continue;
@@ -294,24 +313,34 @@ public final class Skript extends JavaPlugin implements Listener {
 						final File cf = new File(getDataFolder(), e.getName());
 						if (!cf.exists())
 							saveTo = cf;
-					} else if (e.getName().startsWith("aliases-") && e.getName().endsWith(".sk") && !e.getName().contains("/")) {
-						final File af = new File(getDataFolder(), e.getName());
-						if (!af.exists())
-							saveTo = af;
+//					} else if (e.getName().startsWith("aliases-") && e.getName().endsWith(".sk") && !e.getName().contains("/")) {
+//						final File af = new File(getDataFolder(), e.getName());
+//						if (!af.exists())
+//							saveTo = af;
 					} else if (e.getName().startsWith("features.sk")) {
 						final File af = new File(getDataFolder(), e.getName());
 						if (!af.exists())
 							saveTo = af;
 					}
 					if (saveTo != null) {
-						try (InputStream in = f.getInputStream(e)) {
+						final InputStream in = f.getInputStream(e);
+						try {
+							assert in != null;
 							FileUtils.save(in, saveTo);
+						} finally {
+							in.close();
 						}
 					}
 				}
-				info("Successfully generated the config, the example scripts and the aliases files.");
+				info("Successfully generated the config and the example scripts.");
 			} catch (final ZipException e) {} catch (final IOException e) {
 				error("Error generating the default files: " + ExceptionUtils.toString(e));
+			} finally {
+				if (f != null) {
+					try {
+						f.close();
+					} catch (final IOException e) {}
+				}
 			}
 		}
 		
@@ -336,6 +365,9 @@ public final class Skript extends JavaPlugin implements Listener {
 			setEnabled(false); // Cannot continue; user got errors in console to tell what happened
 			return;
 		}
+		
+		BukkitUnsafe.initialize(); // Needed for aliases
+		Aliases.load(); // Loaded before anything that might use them
 		
 		// If loading can continue (platform ok), check for potentially thrown error
 		if (classLoadError != null) {
@@ -369,8 +401,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		if (SkriptConfig.checkForNewVersion.value()) // We only start updater automatically if it was asked
 			Updater.start();
 		
-		Aliases.load();
-		
 		Commands.registerListeners();
 		
 		if (logNormal())
@@ -385,7 +415,8 @@ public final class Skript extends JavaPlugin implements Listener {
 				
 				// load hooks
 				try {
-					try (JarFile jar = new JarFile(getFile())) {
+					final JarFile jar = new JarFile(getFile());
+					try {
 						for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
 							if (e.getName().startsWith("ch/njol/skript/hooks/") && e.getName().endsWith("Hook.class") && StringUtils.count("" + e.getName(), '/') <= 5) {
 								final String c = e.getName().replace('/', '.').substring(0, e.getName().length() - ".class".length());
@@ -400,8 +431,13 @@ public final class Skript extends JavaPlugin implements Listener {
 								} catch (final ExceptionInInitializerError err) {
 									Skript.exception(err.getCause(), "Class " + c + " generated an exception while loading");
 								}
+								continue;
 							}
 						}
+					} finally {
+						try {
+							jar.close();
+						} catch (final IOException e) {}
 					}
 				} catch (final Exception e) {
 					error("Error while loading plugin hooks" + (e.getLocalizedMessage() == null ? "" : ": " + e.getLocalizedMessage()));
@@ -624,6 +660,67 @@ public final class Skript extends JavaPlugin implements Listener {
 		SkriptTimings.setSkript(this);
 	}
 	
+	/**
+	 * Handles -Dskript.stuff command line arguments.
+	 */
+	private void handleJvmArguments() {
+		Path folder = getDataFolder().toPath();
+		
+		/*
+		 * Burger is a Python application that extracts data from Minecraft.
+		 * Datasets for most common versions are available for download.
+		 * Skript uses them to provide minecraft:material to Bukkit
+		 * Material mappings on Minecraft 1.12 and older.
+		 */
+		String burgerEnabled = System.getProperty("skript.burger.enable");
+		if (burgerEnabled != null) {
+			String version = System.getProperty("skript.burger.version");
+			String burgerInput;
+			if (version == null) { // User should have provided JSON file path
+				String inputFile = System.getProperty("skript.burger.file");
+				if (inputFile == null) {
+					Skript.exception("burger enabled but skript.burger.file not provided");
+					return;
+				}
+				try {
+					burgerInput = new String(Files.readAllBytes(Paths.get(inputFile)), StandardCharsets.UTF_8);
+				} catch (IOException e) {
+					Skript.exception(e);
+					return;
+				}
+			} else { // Try to download Burger dataset for this version
+				try {
+					Path data = folder.resolve("burger-" + version + ".json");
+					if (!Files.exists(data)) {
+						URL url = new URL("https://pokechu22.github.io/Burger/" + version + ".json");
+						try (InputStream is = url.openStream()) {
+							Files.copy(is, data);
+						}
+					}
+					burgerInput = new String(Files.readAllBytes(data), StandardCharsets.UTF_8);
+				} catch (IOException e) {
+					Skript.exception(e);
+					return;
+				}
+			}
+			
+			// Use BurgerHelper to create some mappings, then dump them as JSON
+			try {
+				BurgerHelper burger = new BurgerHelper(burgerInput);
+				Map<String,Material> materials = burger.mapMaterials();
+				Map<Integer,Material> ids = BurgerHelper.mapIds();
+				
+				Gson gson = new Gson();
+				Files.write(folder.resolve("materials_mappings.json"), gson.toJson(materials)
+						.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+				Files.write(folder.resolve("id_mappings.json"), gson.toJson(ids)
+						.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+			} catch (IOException e) {
+				Skript.exception(e);
+			}
+		}
+	}
+	
 	private static Version minecraftVersion = new Version(666);
 	private static ServerPlatform serverPlatform = ServerPlatform.BUKKIT_UNKNOWN; // Start with unknown... onLoad changes this
 	
@@ -692,7 +789,9 @@ public final class Skript extends JavaPlugin implements Listener {
 		try {
 			c.getDeclaredMethod(methodName, parameterTypes);
 			return true;
-		} catch (final NoSuchMethodException | SecurityException e) {
+		} catch (final NoSuchMethodException e) {
+			return false;
+		} catch (final SecurityException e) {
 			return false;
 		}
 	}
@@ -712,7 +811,9 @@ public final class Skript extends JavaPlugin implements Listener {
 		try {
 			final Method m = c.getDeclaredMethod(methodName, parameterTypes);
 			return m.getReturnType() == returnType;
-		} catch (final NoSuchMethodException | SecurityException e) {
+		} catch (final NoSuchMethodException e) {
+			return false;
+		} catch (final SecurityException e) {
 			return false;
 		}
 	}
@@ -728,7 +829,9 @@ public final class Skript extends JavaPlugin implements Listener {
 		try {
 			c.getDeclaredField(fieldName);
 			return true;
-		} catch (final NoSuchFieldException | SecurityException e) {
+		} catch (final NoSuchFieldException e) {
+			return false;
+		} catch (final SecurityException e) {
 			return false;
 		}
 	}
@@ -787,7 +890,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	}
 	
 	@SuppressWarnings("null")
-	private final static Collection<Closeable> closeOnDisable = Collections.synchronizedCollection(new ArrayList<>());
+	private final static Collection<Closeable> closeOnDisable = Collections.synchronizedCollection(new ArrayList<Closeable>());
 	
 	/**
 	 * Registers a Closeable that should be closed when this plugin is disabled.
@@ -832,7 +935,8 @@ public final class Skript extends JavaPlugin implements Listener {
 				try {
 					final Field modifiers = Field.class.getDeclaredField("modifiers");
 					modifiers.setAccessible(true);
-					try (JarFile jar = new JarFile(getFile())) {
+					final JarFile jar = new JarFile(getFile());
+					try {
 						for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
 							if (e.getName().endsWith(".class")) {
 								try {
@@ -852,6 +956,8 @@ public final class Skript extends JavaPlugin implements Listener {
 								}
 							}
 						}
+					} finally {
+						jar.close();
 					}
 				} catch (final Throwable ex) {
 					if (testing())
@@ -1332,7 +1438,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
 		} else if (Updater.state == UpdateState.UPDATE_AVAILABLE) {
 			logEx("You're running outdated version of Skript! Please try updating it NOW; it might fix this.");
-			logEx("You may download new version of Skript at https://github.com/SkriptLang/Skript/releases");
+			logEx("You may download new version of Skript at https://github.com/bensku/Skript/releases");
 			logEx("You will be given instructions how to report this error if it persists with latest Skript.");
 			logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
 		} else {

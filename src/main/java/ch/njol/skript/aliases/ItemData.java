@@ -19,117 +19,231 @@
  */
 package ch.njol.skript.aliases;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.StreamCorruptedException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.UnsafeValues;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFactory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+
+import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.block.BlockCompat;
+import ch.njol.skript.bukkitutil.block.BlockValues;
+import ch.njol.skript.localization.Message;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.SingleItemIterator;
+import ch.njol.yggdrasil.Fields;
 import ch.njol.yggdrasil.YggdrasilSerializable;
+import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 
-/**
- * @author Peter Güttinger
- */
 @SuppressWarnings("deprecation")
-public class ItemData implements Cloneable, YggdrasilSerializable {
+public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
+	
 	static {
-		Variables.yggdrasil.registerSingleClass(ItemData.class, "ItemData");
+		Variables.yggdrasil.registerSingleClass(ItemData.class, "NewItemData");
+		Variables.yggdrasil.registerSingleClass(OldItemData.class, "ItemData");
 	}
 	
 	/**
-	 * Only ItemType may set this directly.
+	 * Represents old ItemData (before aliases rework and MC 1.13).
 	 */
-	int typeid = -1;
-	public short dataMin = -1;
-	public short dataMax = -1;
+	public static class OldItemData {
+		
+		int typeid = -1;
+		public short dataMin = -1;
+		public short dataMax = -1;
+	}
+
+	@SuppressWarnings("null")
+	static final ItemFactory itemFactory = Bukkit.getServer().getItemFactory();
 	
-	public ItemData(final int typeid) {
-		this.typeid = typeid;
+	static final MaterialRegistry materialRegistry;
+	
+	// Load or create material registry
+	static {
+		Path materialsFile = Paths.get(Skript.getInstance().getDataFolder().getAbsolutePath(), "materials.json");
+		if (Files.exists(materialsFile)) {
+			String content = null;
+			try {
+				content = new String(Files.readAllBytes(materialsFile), StandardCharsets.UTF_8);
+			} catch (IOException e) {
+				Skript.exception(e, "Loading material registry failed!");
+			}
+			if (content != null)
+				materialRegistry = new MaterialRegistry(new Gson().fromJson(content, Material[].class));
+			else
+				materialRegistry = new MaterialRegistry();
+		} else {
+			materialRegistry = new MaterialRegistry();
+			String content = new Gson().toJson(materialRegistry.getMaterials());
+			try {
+				Files.write(materialsFile, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW);
+			} catch (IOException e) {
+				Skript.exception(e, "Saving material registry failed!");
+			}
+		}
 	}
 	
-	public ItemData(final int typeid, final short data) {
-		if (data < -1)
-			throw new IllegalArgumentException("data (" + data + ") must be >= -1");
-		this.typeid = typeid;
-		dataMin = dataMax = data;
+	private final static Message m_named = new Message("aliases.named");
+	
+	/**
+	 * ItemStack, which is used for everything but serialization.
+	 */
+	transient ItemStack stack;
+	
+	/**
+	 * Type of the item as Bukkit material. Serialized manually.
+	 */
+	transient Material type;
+	
+	/**
+	 * If this represents all possible items.
+	 */
+	boolean isAnything;
+	
+	/**
+	 * When this ItemData represents a block, this contains information to
+	 * allow comparing it against other blocks.
+	 */
+	@Nullable
+	transient BlockValues blockValues;
+	
+	/**
+	 * Whether this represents an item (that definitely cannot have
+	 * block states) or a block, which might have them.
+	 */
+	boolean itemForm;
+	
+	boolean strictEquality;
+	
+	boolean isAlias;
+	
+	public ItemData(Material type, @Nullable String tags) {
+		this.type = type;
+		
+		this.stack = new ItemStack(type);
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
+		if (tags != null)
+			BukkitUnsafe.modifyItemStack(stack, tags);
+		assert stack != null; // Yeah nope; modifyItemStack is not THAT Unsafe
+		
+		// Grab item meta (may be null)
+		assert stack != null;
 	}
 	
-	public ItemData(final int typeid, final short dMin, final short dMax) {
-		if (dMin < -1 || dMax < -1)
-			throw new IllegalArgumentException("datas (" + dMin + "," + dMax + ") must be >= -1");
-		if (dMin == -1 && dMax != -1 || dMin != -1 && dMax == -1)
-			throw new IllegalArgumentException("dataMin (" + dMin + ") and dataMax (" + dMax + ") must either both be -1 or positive");
-		if (dMin > dMax)
-			throw new IllegalArgumentException("dataMin (" + dMin + ") must not be grater than dataMax (" + dMax + ")");
-		this.typeid = typeid;
-		dataMin = dMin;
-		dataMax = dMax;
+	public ItemData(Material type, int amount) {
+		this.type = type;
+		
+		this.stack = new ItemStack(type, Math.abs(amount));
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 	}
 	
-	public ItemData() {
-		typeid = -1;
-		dataMin = -1;
-		dataMax = -1;
+	public ItemData(Material type) {
+		this(type, 1);
 	}
 	
-	public ItemData(final ItemStack i) {
-		typeid = i.getTypeId();
-		dataMin = dataMax = i.getDurability();// <- getData() returns a new data object based on the durability (see Bukkit source)
+	@SuppressWarnings("null") // clone() always returns stuff
+	public ItemData(ItemData data) {
+		this.stack = data.stack.clone();
+		this.type = data.type;
+		this.blockValues = data.blockValues;
+		this.isAlias = data.isAlias;
 	}
 	
-	public ItemData(final ItemData other) {
-		typeid = other.typeid;
-		dataMax = other.dataMax;
-		dataMin = other.dataMin;
+	public ItemData(ItemStack stack, @Nullable BlockValues values) {
+		this.stack = stack;
+		this.type = stack.getType();
+		this.blockValues = values;
 	}
 	
-	public int getId() {
-		return typeid;
+	public ItemData(ItemStack stack) {
+		this(stack, null);
+		this.itemForm = true;
 	}
+	
+	public ItemData(BlockState block) {
+		this.type = block.getType();
+		this.stack = new ItemStack(type);
+		this.blockValues = BlockCompat.INSTANCE.getBlockValues(block);
+	}
+	
+	public ItemData(Block block) {
+		this(block.getState());
+	}
+	
+	/**
+	 * Only to be used for serialization.
+	 */
+	@SuppressWarnings("null") // Yeah, only for internal use
+	public ItemData() {}
 	
 	/**
 	 * Tests whether the given item is of this type.
 	 * 
 	 * @param item
-	 * @return Whether the given item is of this type. If <tt>item</tt> is <tt>null</tt> this returns <tt>getId() == 0</tt>.
+	 * @return Whether the given item is of this type.
 	 */
-	public boolean isOfType(final @Nullable ItemStack item) {
+	public boolean isOfType(@Nullable ItemStack item) {
 		if (item == null)
-			return typeid == 0;
-		return isOfType(item.getTypeId(), item.getDurability());
+			return type == Material.AIR;
+		return item.isSimilar(stack);
 	}
 	
-	public boolean isOfType(final int id, final short data) {
-		return (typeid == -1 || typeid == id) && (dataMin == -1 || dataMin <= data) && (dataMax == -1 || data <= dataMax);
-	}
-	
-	public boolean isSupertypeOf(final ItemData other) {
-		return (typeid == -1 || other.typeid == typeid) && (dataMin == -1 || dataMin <= other.dataMin) && (dataMax == -1 || dataMax >= other.dataMax);
+	public boolean isSupertypeOf(ItemData o) {
+		// Since numeric ids are not used anymore, supertype-ness is based on aliases
+		return Aliases.isSupertypeOf(this, o);
 	}
 	
 	/**
-	 * Returns <code>Aliases.{@link Aliases#getMaterialName(int, short, short, boolean) getMaterialName}(typeid, dataMin, dataMax, false)</code>
+	 * Returns <code>Aliases.{@link Aliases#getMaterialName(ItemData, boolean) getMaterialName}(ItemData, boolean)</code>
+	 * called with this object and relevant plurarily setting.
 	 */
 	@Override
 	public String toString() {
-		return Aliases.getMaterialName(typeid, dataMin, dataMax, false);
+		return toString(false, false);
 	}
 	
 	public String toString(final boolean debug, final boolean plural) {
-		return debug ? Aliases.getDebugMaterialName(typeid, dataMin, dataMax, plural) : Aliases.getMaterialName(typeid, dataMin, dataMax, plural);
+		StringBuilder builder = new StringBuilder(Aliases.getMaterialName(this, plural));
+		ItemMeta meta = stack.getItemMeta();
+		if (meta != null && meta.hasDisplayName()) {
+			builder.append(" ").append(m_named).append(" ");
+			builder.append(meta.getDisplayName());
+		}
+		return builder.toString();
 	}
 	
 	/**
 	 * @return The item's gender or -1 if no name is found
 	 */
 	public int getGender() {
-		return Aliases.getGender(typeid, dataMin, dataMax);
+		return Aliases.getGender(this);
 	}
 	
 	@Override
@@ -138,13 +252,42 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 			return true;
 		if (!(obj instanceof ItemData))
 			return false;
-		final ItemData other = (ItemData) obj;
-		return other.typeid == typeid && other.dataMin == dataMin && other.dataMax == dataMax;
+		
+		ItemData other = (ItemData) obj;
+		if (isAnything || other.isAnything) // First, isAnything check
+			return true;
+		BlockValues values = blockValues;
+		if (itemForm && other.blockValues != null)
+			return false; // We want an item, not a block
+		if (other.itemForm && blockValues != null)
+			return false;
+		
+		if (strictEquality && !Objects.equals(values, other.blockValues))
+			return false;
+		if (values != null)
+			return values.equals(other.blockValues);
+		
+		if (!type.equals(other.type))
+			return false; // Types are not equal
+		
+		// Check the item meta, unless either ItemData is alias
+		if (!isAlias && !other.isAlias) {
+			return Objects.equals(getItemMeta(), other.getItemMeta());
+		} else { // Even for aliases, do a few checks
+			// REMIND follow bug reports closely to see which checks are needed
+		}
+
+		return true; // All equality checks passed
 	}
 	
 	@Override
 	public int hashCode() {
-		return (typeid * 31 + dataMin) * 31 + dataMax;
+		int hash = stack.hashCode();
+		// TODO need a reliable BlockValues hashCode
+//		BlockValues values = blockValues;
+//		if (values != null)
+//			hash = 37 * hash + values.hashCode();
+		return hash;
 	}
 	
 	/**
@@ -157,76 +300,20 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 	 */
 	@Nullable
 	public ItemData intersection(final ItemData other) {
-		if (other.dataMin != -1 && dataMin != -1 && (other.dataMax < dataMin || dataMax < other.dataMin) || other.typeid != -1 && typeid != -1 && other.typeid != typeid)
+		if (other.type != type) // Different type, no intersection possible
 			return null;
 		
-		return new ItemData(typeid == -1 ? other.typeid : typeid,
-				(short) Math.max(dataMin, other.dataMin),
-				dataMax == -1 ? other.dataMax : (other.dataMax == -1 ? dataMax : (short) Math.min(dataMax, other.dataMax)));
+		// TODO implement meta intersection
+		return null;
 	}
 	
-	public ItemStack getRandom() {
-		int type = typeid;
-		if (type == -1) {
-			final Material m = CollectionUtils.getRandom(Material.values(), 1);
-			assert m != null;
-			type = m.getId();
-		}
-		if (dataMin == -1 && dataMax == -1) {
-			return new ItemStack(type, 1);
-		} else {
-			return new ItemStack(type, 1, (short) (Utils.random(dataMin, dataMax + 1)));
-		}
-	}
-	
-	public Iterator<ItemStack> getAll() {
-		if (typeid == -1) {
-			return new Iterator<ItemStack>() {
-				
-				@SuppressWarnings("null")
-				private final Iterator<Material> iter = Arrays.asList(Material.values()).listIterator(1); // ignore air
-				
-				@Override
-				public boolean hasNext() {
-					return iter.hasNext();
-				}
-				
-				@Override
-				public ItemStack next() {
-					return new ItemStack(iter.next(), 1);
-				}
-				
-				@Override
-				public void remove() {
-					throw new UnsupportedOperationException();
-				}
-				
-			};
-		}
-		if (dataMin == dataMax)
-			return new SingleItemIterator<>(new ItemStack(typeid, 1, dataMin == -1 ? 0 : dataMin));
-		return new Iterator<ItemStack>() {
-			
-			private short data = dataMin;
-			
-			@Override
-			public boolean hasNext() {
-				return data <= dataMax;
-			}
-			
-			@Override
-			public ItemStack next() {
-				if (!hasNext())
-					throw new NoSuchElementException();
-				return new ItemStack(typeid, 1, data++);
-			}
-			
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-			
-		};
+	/**
+	 * Returns the ItemStack backing this ItemData.
+	 * It is not a copy, so please be careful.
+	 * @return Item stack.
+	 */
+	public ItemStack getStack() {
+		return stack;
 	}
 	
 	@Override
@@ -234,12 +321,107 @@ public class ItemData implements Cloneable, YggdrasilSerializable {
 		return new ItemData(this);
 	}
 	
-	public boolean hasDataRange() {
-		return dataMin != dataMax;
+	public Material getType() {
+		return type;
 	}
 	
-	public int numItems() {
-		return dataMax - dataMin + 1;
+	@Nullable
+	public BlockValues getBlockValues() {
+		return blockValues;
+	}
+	
+	@SuppressWarnings("null") // Meta is created if it does not exist
+	public ItemMeta getItemMeta() {
+		return stack.getItemMeta();
+	}
+	
+	public void setItemMeta(ItemMeta meta) {
+		stack.setItemMeta(meta);
+		isAlias = false; // This is no longer exact alias
+	}
+	
+	public int getDurability() {
+		return stack.getDurability();
+	}
+	
+	public void setDurability(int durability) {
+		stack.setDurability((short) durability);
+		isAlias = false; // Change happened
+	}
+
+	@Override
+	public Fields serialize() throws NotSerializableException {
+		Fields fields = new Fields(this); // ItemStack is transient, will be ignored
+		fields.putPrimitive("id", materialRegistry.getId(type));
+		fields.putObject("meta", stack.getItemMeta());
+		return fields;
+	}
+
+	@Override
+	public void deserialize(Fields fields) throws StreamCorruptedException, NotSerializableException {
+		this.type = materialRegistry.getMaterial(fields.getAndRemovePrimitive("id", int.class));
+		ItemMeta meta = fields.getAndRemoveObject("meta", ItemMeta.class);
+		fields.setFields(this); // Everything but ItemStack and Material
+		
+		// Initialize ItemStack
+		this.stack = new ItemStack(type);
+		stack.setItemMeta(meta); // Just set meta to it
+	}
+	
+	/**
+	 * Creates a plain copy of this ItemData. It will have same material,
+	 * amount of 1 and same block values. Tags will also be copied, with
+	 * following exceptions:
+	 * <ul>
+	 * <li>Damage: 1.13 tag-damage is only used for actual durability
+	 * <li>Name: custom names made with anvil do not change item type
+	 * </ul>
+	 * @return A modified copy of this item data.
+	 */
+	public ItemData aliasCopy() {
+		ItemData data = new ItemData();
+		data.stack = new ItemStack(type, 1);
+		
+		if (stack.hasItemMeta()) {
+			ItemMeta meta = stack.getItemMeta(); // Creates a copy
+			meta.setDisplayName(null); // Clear display name
+			if (meta instanceof Damageable) // TODO MC<1.13 support
+				((Damageable) meta).setDamage(0);
+			data.stack.setItemMeta(meta);
+		}
+		
+		data.type = type;
+		data.blockValues = blockValues;
+		data.itemForm = itemForm;
+		return data;
+	}
+
+	/**
+	 * Applies an item meta to this item. Currently, it copies the following,
+	 * provided that they exist in given meta:
+	 * <ul>
+	 * <li>Lore
+	 * <li>Display name
+	 * <li>Enchantments
+	 * <li>Item flags
+	 * </ul>
+	 * @param meta Item meta.
+	 */
+	public void applyMeta(ItemMeta meta) {
+		ItemMeta our = stack.getItemMeta();
+		if (meta.hasLore())
+			our.setLore(meta.getLore());
+		if (meta.hasDisplayName())
+			our.setDisplayName(meta.getDisplayName());
+		if (meta.hasEnchants()) {
+			for (Map.Entry<Enchantment, Integer> entry : meta.getEnchants().entrySet()) {
+				our.addEnchant(entry.getKey(), entry.getValue(), true);
+			}
+		}
+		for (ItemFlag flag : meta.getItemFlags()) {
+			our.addItemFlags(flag);
+		}
+		setItemMeta(meta);
 	}
 	
 }

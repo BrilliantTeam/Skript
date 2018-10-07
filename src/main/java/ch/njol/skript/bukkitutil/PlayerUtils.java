@@ -92,7 +92,9 @@ public abstract class PlayerUtils {
 					return ImmutableList.copyOf((Collection<? extends Player>) o);
 				else
 					return Arrays.asList(((Player[]) o).clone());
-			} catch (final IllegalAccessException | IllegalArgumentException e) {
+			} catch (final IllegalAccessException e) {
+				Skript.outdatedError(e);
+			} catch (final IllegalArgumentException e) {
 				Skript.outdatedError(e);
 			} catch (final InvocationTargetException e) {
 				Skript.exception(e);

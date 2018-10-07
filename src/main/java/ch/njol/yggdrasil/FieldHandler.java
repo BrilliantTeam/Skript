@@ -33,7 +33,7 @@ public interface FieldHandler {
 	 * @param field The field read from stream
 	 * @return Whether this Handler handled the request
 	 */
-	boolean excessiveField(Object o, FieldContext field) throws StreamCorruptedException;
+	public boolean excessiveField(Object o, FieldContext field) throws StreamCorruptedException;
 	
 	/**
 	 * Called if a field was not found in the stream.
@@ -42,7 +42,7 @@ public interface FieldHandler {
 	 * @param field The field that didn't occur in the stream
 	 * @return Whether this Handler handled the request
 	 */
-	boolean missingField(Object o, Field field) throws StreamCorruptedException;
+	public boolean missingField(Object o, Field field) throws StreamCorruptedException;
 	
 	/**
 	 * Called when a loaded value is not compatible with the type of a field.
@@ -52,5 +52,6 @@ public interface FieldHandler {
 	 * @param field The field read from stream
 	 * @return Whether this Handler handled the request
 	 */
-	boolean incompatibleField(Object o, Field f, FieldContext field) throws StreamCorruptedException;
+	public boolean incompatibleField(Object o, Field f, FieldContext field) throws StreamCorruptedException;
+	
 }

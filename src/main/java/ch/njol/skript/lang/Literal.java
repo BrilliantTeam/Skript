@@ -28,13 +28,14 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public interface Literal<T> extends Expression<T> {
 	
-	T[] getArray();
+	public T[] getArray();
 	
-	T getSingle();
+	public T getSingle();
 	
 	@Override
 	@Nullable
-	<R> Literal<? extends R> getConvertedExpression(Class<R>... to);
+	public <R> Literal<? extends R> getConvertedExpression(Class<R>... to);
 	
-	T[] getAll();
+	public T[] getAll();
+	
 }

@@ -24,10 +24,12 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.MaterialData;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -83,17 +85,24 @@ public class ExprSkull extends SimplePropertyExpression<Object, ItemType> {
 			type = SkullType.PLAYER;
 		} else if (o instanceof Creeper || o instanceof CreeperData) {
 			type = SkullType.CREEPER;
+		} else if (o instanceof EnderDragon || o instanceof EntityData && EnderDragon.class.isAssignableFrom(((EntityData<?>) o).getType())) {
+			type = SkullType.DRAGON;
 		} else {
 			return null;
 		}
-		@SuppressWarnings("deprecation")
-		final ItemType i = new ItemType(Material.SKULL_ITEM.getId(), (short) type.ordinal());
-		if (o instanceof OfflinePlayer) {
-			final SkullMeta s = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
-			s.setOwner(((OfflinePlayer) o).getName());
-			i.setItemMeta(s);
-		}
-		return i;
+		
+//		final ItemType i;
+//		final SkullMeta s = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
+//		if (o instanceof OfflinePlayer) {
+//			i = new ItemType(Material.SKULL_ITEM);
+//			s.setOwningPlayer((OfflinePlayer) o);
+//			i.setItemMeta(s);
+//		} else {
+//			// TODO 1.13 will change this so each skull gets their own id (except player skulls)
+//			i = new ItemType(Material.SKULL_ITEM, "{SkullType=" + type.ordinal() + "}");
+//		}
+		throw new UnsupportedOperationException("1.13 update");
+//		return i;
 	}
 	
 	@Override

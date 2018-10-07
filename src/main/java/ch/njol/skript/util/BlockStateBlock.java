@@ -33,12 +33,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.block.BlockCompat;
 
 /**
  * A block that gets all data from a BlockState, and either reflects changes on the BlockState or delays them to the real block by 1 tick depending on which constructor is used.
@@ -48,6 +50,8 @@ import ch.njol.skript.Skript;
 @SuppressWarnings("deprecation")
 @NonNullByDefault(false)
 public class BlockStateBlock implements Block {
+	
+	private static final boolean minecraft113 = Skript.isRunningMinecraft(1, 13);
 	
 	final BlockState state;
 	private final boolean delayChanges;
@@ -110,11 +114,6 @@ public class BlockStateBlock implements Block {
 	}
 	
 	@Override
-	public int getTypeId() {
-		return state.getTypeId();
-	}
-	
-	@Override
 	public byte getLightLevel() {
 		return state.getLightLevel();
 	}
@@ -160,34 +159,6 @@ public class BlockStateBlock implements Block {
 	}
 	
 	@Override
-	public void setData(final byte data) {
-		if (delayChanges) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					state.getBlock().setData(data);
-				}
-			});
-		} else {
-			state.setRawData(data);
-		}
-	}
-	
-	@Override
-	public void setData(final byte data, final boolean applyPhysics) {
-		if (delayChanges) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					state.getBlock().setData(data, applyPhysics);
-				}
-			});
-		} else {
-			state.setRawData(data);
-		}
-	}
-	
-	@Override
 	public void setType(final Material type) {
 		if (delayChanges) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
@@ -198,59 +169,6 @@ public class BlockStateBlock implements Block {
 			});
 		} else {
 			state.setType(type);
-		}
-	}
-	
-	@Override
-	public boolean setTypeId(final int type) {
-		if (delayChanges) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					state.getBlock().setTypeId(type);
-				}
-			});
-			return true;
-		} else {
-			final int id = getTypeId();
-			state.setTypeId(type);
-			return id != type;
-		}
-	}
-	
-	@Override
-	public boolean setTypeId(final int type, final boolean applyPhysics) {
-		if (delayChanges) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					state.getBlock().setTypeId(type, applyPhysics);
-				}
-			});
-			return true;
-		} else {
-			final int id = getTypeId();
-			state.setTypeId(type);
-			return id != type;
-		}
-	}
-	
-	@Override
-	public boolean setTypeIdAndData(final int type, final byte data, final boolean applyPhysics) {
-		if (delayChanges) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					state.getBlock().setTypeIdAndData(type, data, applyPhysics);
-				}
-			});
-			return true;
-		} else {
-			final int id = getTypeId();
-			final byte d = getData();
-			state.setTypeId(type);
-			state.setRawData(data);
-			return id != type || d != data;
 		}
 	}
 	
@@ -311,12 +229,16 @@ public class BlockStateBlock implements Block {
 	
 	@Override
 	public boolean isEmpty() {
-		return getTypeId() == 0;
+		Material type = getType();
+		assert type != null;
+		return BlockCompat.INSTANCE.isEmpty(type);
 	}
 	
 	@Override
 	public boolean isLiquid() {
-		return getType() == Material.WATER || getType() == Material.STATIONARY_WATER || getType() == Material.LAVA || getType() == Material.STATIONARY_LAVA;
+		Material type = getType();
+		assert type != null;
+		return BlockCompat.INSTANCE.isLiquid(type);
 	}
 	
 	@Override
@@ -389,10 +311,70 @@ public class BlockStateBlock implements Block {
 		return loc;
 	}
 
+	// 1.13 additions
+	// Note that overridden methods may not exist on Minecraft<1.13
+	
 	@Override
-	public void setType(Material arg0, boolean arg1) {
-		// TODO Auto-generated method stub
+	public void setType(Material type, boolean applyPhysics) {
+		if (!minecraft113) {
+			throw new IllegalStateException("not on 1.13");
+		}
 		
+		if (delayChanges) {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					state.getBlock().setType(type, applyPhysics);
+				}
+			});
+		} else { // Can't do physics for block state
+			state.setType(type);
+		}
+	}
+
+	@Override
+	public BlockData getBlockData() {
+		if (!minecraft113) {
+			throw new IllegalStateException("not on 1.13");
+		}
+		
+		return state.getBlockData();
+	}
+
+	@Override
+	public void setBlockData(BlockData data) {
+		if (!minecraft113) {
+			throw new IllegalStateException("not on 1.13");
+		}
+		
+		if (delayChanges) {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					state.getBlock().setBlockData(data);
+				}
+			});
+		} else {
+			state.setBlockData(data);
+		}
+	}
+
+	@Override
+	public void setBlockData(BlockData data, boolean applyPhysics) {
+		if (!minecraft113) {
+			throw new IllegalStateException("not on 1.13");
+		}
+		
+		if (delayChanges) {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					state.getBlock().setBlockData(data, applyPhysics);
+				}
+			});
+		} else { // Cannot apply physics to a block state
+			state.setBlockData(data);
+		}
 	}
 	
 }

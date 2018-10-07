@@ -32,6 +32,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -61,6 +62,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.EnchantmentIds;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.ConfigurationSerializer;
 import ch.njol.skript.classes.EnumSerializer;
@@ -178,10 +180,9 @@ public class BukkitClasses {
 						return false;
 					}
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public String toString(final Block b, final int flags) {
-						return ItemType.toString(new ItemStack(b.getTypeId(), 1, b.getState().getRawData()), flags);
+						return ItemType.toString(b, flags);
 					}
 					
 					@Override
@@ -957,12 +958,15 @@ public class BukkitClasses {
 							Skript.error("'" + s + "' represents multiple materials");
 							return null;
 						}
-						if (!t.getTypes().get(0).hasDataRange())
-							return t.getRandom();
-						if (t.getTypes().get(0).dataMin > 0) {
-							Skript.error("'" + s + "' represents multiple materials");
-							return null;
-						}
+						
+						// Legacy code; probably not needed
+//						if (!t.getTypes().get(0).hasDataRange())
+//							return t.getRandom();
+//						if (t.getTypes().get(0).dataMin > 0) {
+//							Skript.error("'" + s + "' represents multiple materials");
+//							return null;
+//						}
+						
 						final ItemStack i = t.getRandom();
 						assert i != null;
 						i.setDurability((short) 0);
@@ -982,7 +986,7 @@ public class BukkitClasses {
 						b.append(":" + i.getDurability());
 						b.append("*" + i.getAmount());
 						for (final Entry<Enchantment, Integer> e : i.getEnchantments().entrySet()) {
-							b.append("#" + e.getKey().getId());
+							b.append("#" + EnchantmentIds.ids.get(e.getKey()));
 							b.append(":" + e.getValue());
 						}
 						return "" + b.toString();
@@ -992,12 +996,13 @@ public class BukkitClasses {
 					public String getVariableNamePattern() {
 						return "item:.+";
 					}
-				}).serializer(new ConfigurationSerializer<>()));
+				}).serializer(new ConfigurationSerializer<ItemStack>()));
 		
 		Classes.registerClass(new ClassInfo<>(Item.class, "itementity")
 				.name(ClassInfo.NO_DOC)
 				.since("2.0")
 				.changer(DefaultChangers.itemChanger));
+		
 		
 		Classes.registerClass(new ClassInfo<>(Biome.class, "biome")
 				.user("biomes?")
@@ -1287,12 +1292,11 @@ public class BukkitClasses {
 					}
 					
 //					return "" + e.getId();
-					@SuppressWarnings("deprecation")
 					@Override
 					@Nullable
 					public Enchantment deserialize(final String s) {
 						try {
-							return Enchantment.getById(Integer.parseInt(s));
+							return EnchantmentIds.enchantments[Integer.parseInt(s)];
 						} catch (final NumberFormatException e) {
 							return null;
 						}
@@ -1302,6 +1306,43 @@ public class BukkitClasses {
 					public boolean mustSyncDeserialization() {
 						return false;
 					}
+				}));
+		
+		Material[] allMaterials = Material.values();
+		Classes.registerClass(new ClassInfo<>(Material.class, "material")
+				.name(ClassInfo.NO_DOC)
+				.since("aliases-rework")
+				.serializer(new Serializer<Material>() {
+
+					@Override
+					public Fields serialize(Material o) throws NotSerializableException {
+						Fields f = new Fields();
+						f.putObject("i", o.ordinal());
+						return f;
+					}
+
+					@Override
+					public void deserialize(Material o, Fields f) throws StreamCorruptedException, NotSerializableException {
+						assert false;
+					}
+					
+					@Override
+					public Material deserialize(Fields f) throws StreamCorruptedException {
+						Material mat = allMaterials[(int) f.getPrimitive("i")];
+						assert mat != null; // Hope server owner didn't mod too much...
+						return mat;
+					}
+
+					@Override
+					public boolean mustSyncDeserialization() {
+						return false;
+					}
+
+					@Override
+					protected boolean canBeInstantiated() {
+						return false; // It is an enum, come on
+					}
+					
 				}));
 
 		Classes.registerClass(new ClassInfo<>(Metadatable.class, "metadataholder")

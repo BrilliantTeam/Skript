@@ -133,7 +133,7 @@ final public class ScriptLoader {
 	 * @param state The new value for {@link ScriptLoader#callPreLoadEvent}
 	 * @param addon A non-null SkriptAddon
 	 */
-	public static void setCallPreloadEvent(boolean state, SkriptAddon addon) {
+	public static void setCallPreloadEvent(boolean state, @NonNull SkriptAddon addon) {
 		Validate.notNull(addon);
 		callPreLoadEvent = state;
 		if (state)
@@ -188,14 +188,13 @@ final public class ScriptLoader {
 		currentEventName = null;
 		currentEvents = null;
 		hasDelayBefore = Kleenean.FALSE;
-		TypeHints.clear(); // Local variables are local to event
 	}
 	
 	public static List<TriggerSection> currentSections = new ArrayList<>();
 	public static List<Loop> currentLoops = new ArrayList<>();
 	private final static Map<String, ItemType> currentAliases = new HashMap<>();
 	final static HashMap<String, String> currentOptions = new HashMap<>();
-		
+	
 	public static Map<String, ItemType> getScriptAliases() {
 		return currentAliases;
 	}
@@ -777,6 +776,7 @@ final public class ScriptLoader {
 	public static List<Config> loadStructures(final File directory) {
 		if (!directory.isDirectory())
 			return loadStructures(new File[]{directory});
+		
 		final File[] files = directory.listFiles(scriptFilter);
 		Arrays.sort(files);
 		
@@ -865,6 +865,8 @@ final public class ScriptLoader {
 						final Signature<?> func = Functions.loadSignature(config.getFileName(), node);
 						
 						deleteCurrentEvent();
+						
+						continue;
 					}
 				}
 				

@@ -19,6 +19,9 @@
  */
 package ch.njol.skript.expressions;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -53,8 +56,22 @@ import ch.njol.util.coll.iterator.SingleItemIterator;
 @Examples({"message \"the ID of %type of the clicked block% is %id of the clicked block%.\""})
 @Since("1.0")
 public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
+	
 	static {
 		Skript.registerExpression(ExprIdOf.class, Integer.class, ExpressionType.PROPERTY, "[the] id(1¦s|) of %itemtype%", "%itemtype%'[s] id(1¦s|)");
+	}
+	
+	@Nullable
+	private static final MethodHandle getMaterialMethod;
+	
+	static {
+		MethodHandle mh;
+		try {
+			mh = MethodHandles.lookup().findStatic(Material.class, "getMaterial", MethodType.methodType(Material.class, int.class));
+		} catch (NoSuchMethodException | IllegalAccessException e) {
+			mh = null;
+		}
+		getMaterialMethod = mh;
 	}
 	
 	private boolean single = false;
@@ -62,6 +79,13 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
+		if (getMaterialMethod == null) {
+			Skript.error("Items do not have numeric ids on Minecraft 1.13 or newer.");
+			return false;
+		} else {
+			Skript.warning("Items do not have numeric ids on Minecraft 1.13 or newer. This script will not work on those versions!");
+		}
+		
 		setExpr((Expression<ItemType>) vars[0]);
 		if (parser.mark != 1) {
 			single = true;
@@ -80,12 +104,12 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 			final ItemType t = getExpr().getSingle(e);
 			if (t == null)
 				return new Integer[0];
-			return new Integer[] {t.getTypes().get(0).getId()};
+			return new Integer[] {t.getTypes().get(0).getType().getId()};
 		}
 		final ArrayList<Integer> r = new ArrayList<>();
 		for (final ItemType t : source) {
 			for (final ItemData d : t) {
-				r.add(Integer.valueOf(d.getId()));
+				r.add(Integer.valueOf(d.getType().getId()));
 			}
 		}
 		return r.toArray(new Integer[r.size()]);
@@ -130,7 +154,7 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 		final ItemStack is = it.getRandom();
 		if (is == null)
 			return;
-		int type = is.getTypeId();
+		int type = is.getType().getId();
 		switch (mode) {
 			case ADD:
 				type += i;
@@ -148,7 +172,13 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 				assert false;
 				return;
 		}
-		final Material m = Material.getMaterial(type);
+		Material m = null;
+		try {
+			assert getMaterialMethod != null; // Got past init
+			m = (Material) getMaterialMethod.invoke(type);
+		} catch (Throwable ex) {
+			Skript.exception(ex);
+		}
 		if (m != null) {
 			is.setType(m);
 			if (changeItemStack)
@@ -158,7 +188,6 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 		}
 	}
 	
-	@SuppressWarnings("null")
 	@Override
 	@Nullable
 	public Iterator<Integer> iterator(final Event e) {
@@ -168,7 +197,7 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 				return null;
 			if (t.numTypes() == 0)
 				return null;
-			return new SingleItemIterator<>(t.getTypes().get(0).getId());
+			return new SingleItemIterator<>(t.getTypes().get(0).getType().getId());
 		}
 		final Iterator<? extends ItemType> iter = getExpr().iterator(e);
 		if (iter == null || !iter.hasNext())
@@ -188,7 +217,7 @@ public class ExprIdOf extends PropertyExpression<ItemType, Integer> {
 			public Integer next() {
 				if (!hasNext())
 					throw new NoSuchElementException();
-				return current.next().getId();
+				return current.next().getType().getId();
 			}
 			
 			@Override

@@ -36,6 +36,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemData;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.EnchantmentIds;
 import ch.njol.skript.classes.Arithmetic;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.ClassInfo;
@@ -225,22 +226,20 @@ public class SkriptClasses {
 						return t.getDebugMessage();
 					}
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public String toVariableNameString(final ItemType t) {
 						final StringBuilder b = new StringBuilder("itemtype:");
 						b.append(t.getInternalAmount());
 						b.append("," + t.isAll());
+						// TODO this is missing information
 						for (final ItemData d : t.getTypes()) {
-							b.append("," + d.getId());
-							b.append(":" + d.dataMin);
-							b.append("/" + d.dataMax);
+							b.append("," + d.getType());
 						}
 						final Map<Enchantment, Integer> enchs = t.getEnchantments();
 						if (enchs != null && !enchs.isEmpty()) {
 							b.append("|");
 							for (final Entry<Enchantment, Integer> e : enchs.entrySet()) {
-								b.append("#" + e.getKey().getId());
+								b.append("#" + EnchantmentIds.ids.get(e.getKey()));
 								b.append(":" + e.getValue());
 							}
 						}
@@ -252,84 +251,7 @@ public class SkriptClasses {
 						return "itemtype:.+";
 					}
 				})
-				.serializer(new YggdrasilSerializer<ItemType>() {
-//						final StringBuilder b = new StringBuilder();
-//						b.append(t.getInternalAmount());
-//						b.append("," + t.isAll());
-//						for (final ItemData d : t.getTypes()) {
-//							b.append("," + d.getId());
-//							b.append(":" + d.dataMin);
-//							b.append("/" + d.dataMax);
-//						}
-//						if (t.getEnchantments() != null) {
-//							b.append("|");
-//							for (final Entry<Enchantment, Integer> e : t.getEnchantments().entrySet()) {
-//								b.append("#" + e.getKey().getId());
-//								b.append(":" + e.getValue());
-//							}
-//						}
-//						if (t.getItemMeta() != null) {
-//							b.append("¦");
-//							b.append(ConfigurationSerializer.serializeCS((ItemMeta) t.getItemMeta()).replace("¦", "¦¦"));
-//						}
-//						return b.toString();
-					@Override
-					@Deprecated
-					@Nullable
-					public ItemType deserialize(final String s) {
-						final String[] ss = s.split("\\|");
-						if (ss.length > 2)
-							return null;
-						final String[] split = ss[0].split("[,:/]");
-						if (split.length < 5 || (split.length - 2) % 3 != 0)
-							return null;
-						final ItemType t = new ItemType();
-						try {
-							t.setAmount(Integer.parseInt(split[0]));
-							if (split[1].equals("true"))
-								t.setAll(true);
-							else if (split[1].equals("false"))
-								t.setAll(false);
-							else
-								return null;
-							for (int i = 2; i < split.length; i += 3) {
-								t.add(new ItemData(Integer.parseInt(split[i]), Short.parseShort(split[i + 1]), Short.parseShort(split[i + 2])));
-							}
-						} catch (final NumberFormatException e) {
-							return null;
-						}
-						if (ss.length == 2) {
-							final String[] sss = ss[1].split("¦", 2);
-							if (!sss[0].isEmpty()) {
-								final String[] es = sss[0].split("#");
-								for (final String e : es) {
-									if (e.isEmpty())
-										continue;
-									final String[] en = e.split(":");
-									if (en.length != 2)
-										return null;
-									try {
-										final Enchantment ench = Enchantment.getById(Integer.parseInt(en[0]));
-										if (ench == null)
-											return null;
-										t.addEnchantment(ench, Integer.parseInt(en[1]));
-									} catch (final NumberFormatException ex) {
-										return null;
-									}
-								}
-							}
-							if (sss.length == 2) {
-								if (!ItemType.itemMetaSupported)
-									return null;
-								final ItemMeta m = ConfigurationSerializer.deserializeCSOld("" + sss[1].replace("¦¦", "¦"), ItemMeta.class);
-								if (m == null)
-									return null;
-								t.setItemMeta(m);
-							}
-						}
-						return t;
-					}
-				}));
+				.serializer(new YggdrasilSerializer<>()));
 		
 		Classes.registerClass(new ClassInfo<>(Time.class, "time")
 				.user("times?")
@@ -822,7 +744,7 @@ public class SkriptClasses {
 						if (split.length != 2)
 							return null;
 						try {
-							final Enchantment ench = Enchantment.getById(Integer.parseInt(split[0]));
+							final Enchantment ench = EnchantmentIds.enchantments[Integer.parseInt(split[0])];
 							if (ench == null)
 								return null;
 							return new EnchantmentType(ench, Integer.parseInt(split[1]));
@@ -913,7 +835,7 @@ public class SkriptClasses {
 							return ".*";
 						}
 					})
-					.serializer(new YggdrasilSerializer<>()));
+					.serializer(new YggdrasilSerializer<VisualEffect>()));
 		} else {
 			Classes.registerClass(new ClassInfo<>(VisualEffectDummy.class, "visualeffect"));
 		}

@@ -419,7 +419,7 @@ public class SimpleEvents {
 						"	world is \"city\"",
 					 	"	send \"Welcome to the City!\"")
 				.since("2.2-dev28");
-		Skript.registerEvent("Flight Toggle", SimpleEvent.class, PlayerToggleFlightEvent.class, "[player] flight togg(e|ing)", "[player] toggl(e|ing) flight")
+		Skript.registerEvent("Flight Toggle", SimpleEvent.class, PlayerToggleFlightEvent.class, "[player] flight toggl(e|ing)", "[player] toggl(e|ing) flight")
 				.description("Called when a players stops/starts flying.")
 				.examples("on flight toggle:",
 						"	if {game::%player%::playing} exists:",
@@ -432,7 +432,7 @@ public class SimpleEvents {
 					.examples("on language change:",
 							"	if player's language starts with \"en\":",
 							"		send \"Hello!\"")
-					.since("2.2-dev37");
+					.since("INSERT VERSION");
 		}
 	}
 }

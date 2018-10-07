@@ -18,7 +18,7 @@ import ch.njol.util.Kleenean;
 @Name("${Expression_Name}")
 @Description("${Description}")
 @Examples("")
-@Since("2.2-dev37")
+@Since("INSERT VERSION")
 public class Expr${NAME} extends SimpleExpression<${Return_Type}> {
 	
 	static {

@@ -37,6 +37,7 @@ import org.bukkit.entity.Horse.Variant;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -142,7 +143,7 @@ public class ClassesTest {
 				new XpOrbData(50),
 				
 				// Bukkit - simple classes only
-				GameMode.ADVENTURE, Biome.EXTREME_HILLS, DamageCause.FALL,
+				GameMode.ADVENTURE, InventoryType.CHEST, DamageCause.FALL,
 				
 				// there is also at least one variable for each class on my test server which are tested whenever the server shuts down.
 		};

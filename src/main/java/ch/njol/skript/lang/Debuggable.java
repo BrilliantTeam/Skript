@@ -32,11 +32,12 @@ public interface Debuggable {
 	 * @param debug If true this should print more information, if false this should print what is shown to the end user
 	 * @return String representation of this object
 	 */
-	String toString(@Nullable Event e, boolean debug);
+	public String toString(@Nullable Event e, boolean debug);
 	
 	/**
 	 * Should return <tt>{@link #toString(Event, boolean) toString}(null, false)</tt>
 	 */
 	@Override
-	String toString();
+	public String toString();
+	
 }

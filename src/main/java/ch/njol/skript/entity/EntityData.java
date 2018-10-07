@@ -108,7 +108,9 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 				final EntityData<?> d = info.c.newInstance();
 				d.deserialize(fields);
 				return d;
-			} catch (final InstantiationException | IllegalAccessException e) {
+			} catch (final InstantiationException e) {
+				Skript.exception(e);
+			} catch (final IllegalAccessException e) {
 				Skript.exception(e);
 			}
 			throw new StreamCorruptedException();
@@ -153,7 +155,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 				.examples("victim is a cow",
 						"spawn a creeper")
 				.since("1.3")
-				.defaultExpression(new SimpleLiteral<>(new SimpleEntityData(Entity.class), true))
+				.defaultExpression(new SimpleLiteral<EntityData>(new SimpleEntityData(Entity.class), true))
 				.before("entitytype")
 				.parser(new Parser<EntityData>() {
 					@Override

@@ -252,7 +252,9 @@ public class SkriptParser {
 								return t;
 							}
 						}
-					} catch (final InstantiationException | IllegalAccessException e) {
+					} catch (final InstantiationException e) {
+						assert false;
+					} catch (final IllegalAccessException e) {
 						assert false;
 					}
 				}
@@ -1237,7 +1239,9 @@ public class SkriptParser {
 							log.printLog();
 							return new NonNullPair<>(info, e);
 						}
-					} catch (final InstantiationException | IllegalAccessException e) {
+					} catch (final InstantiationException e) {
+						assert false;
+					} catch (final IllegalAccessException e) {
 						assert false;
 					}
 				}
@@ -1265,6 +1269,7 @@ public class SkriptParser {
 		for (int i = start; i < pattern.length(); i++) {
 			if (pattern.charAt(i) == '\\') {
 				i++;
+				continue;
 			} else if (pattern.charAt(i) == closingBracket) {
 				if (n == 0) {
 					if (!isGroup)

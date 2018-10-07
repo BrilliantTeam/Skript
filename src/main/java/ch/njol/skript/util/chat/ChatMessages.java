@@ -280,6 +280,10 @@ public class ChatMessages {
 				}
 				
 				char color = chars[i + 1];
+				if (color >= colorChars.length) { // Invalid Unicode color character
+					curStr.append(c);
+					continue;
+				}
 				code = colorChars[color];
 				if (code == null) {
 					curStr.append(c).append(color); // Invalid formatting char, plain append

@@ -31,7 +31,7 @@ import org.bukkit.World;
 @Name("Is Loaded")
 @Description("Checks whether or not a chunk/world is loaded")
 @Examples("if chunk at {home::%player's uuid%} is loaded:")
-@Since("2.2-dev37")
+@Since("INSERT VERSION")
 public class CondIsLoaded extends PropertyCondition<Object> {
 
 	static {
