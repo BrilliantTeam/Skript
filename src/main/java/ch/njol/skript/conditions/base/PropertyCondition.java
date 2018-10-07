@@ -143,18 +143,31 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 		return PropertyType.BE;
 	}
 	
+	/**
+	 * Sets the expression this condition checks a property of. No reference to the expression should be kept.
+	 *
+	 * @param expr
+	 */
+	protected final void setExpr(final Expression<? extends T> expr) {
+		this.expr = expr;
+	}
+	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		switch (getPropertyType()) {
+		return toString(this, getPropertyType(), e, debug, expr, getPropertyName());
+	}
+	
+	public static String toString(Condition condition, PropertyType propertyType, Event e, boolean debug, Expression<?> expr, String property) {
+		switch (propertyType) {
 			case BE:
-				return expr.toString(e, debug) + (expr.isSingle() ? " is " : " are ") + (isNegated() ? "not " : "") + getPropertyName();
+				return expr.toString(e, debug) + (expr.isSingle() ? " is " : " are ") + (condition.isNegated() ? "not " : "") + property;
 			case CAN:
-				return expr.toString(e, debug) + (isNegated() ? " can't " : " can ") + getPropertyName();
+				return expr.toString(e, debug) + (condition.isNegated() ? " can't " : " can ") + property;
 			case HAVE:
 				if (expr.isSingle())
-					return expr.toString(e, debug) + (isNegated() ? " doesn't have " : " has ") + getPropertyName();
+					return expr.toString(e, debug) + (condition.isNegated() ? " doesn't have " : " has ") + property;
 				else
-					return expr.toString(e, debug) + (isNegated() ? " don't have " : " have ") + getPropertyName();
+					return expr.toString(e, debug) + (condition.isNegated() ? " don't have " : " have ") + property;
 			default:
 				assert false;
 				throw new AssertionError();
