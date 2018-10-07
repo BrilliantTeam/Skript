@@ -71,7 +71,9 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	}
 	
 	@Override
-	public boolean canBuild_i(final Player p, final Location l) {
+	public boolean canBuild_i(Player p, Location l) {
+		if (p.hasPermission("worldguard.region.bypass." + l.getWorld().getName()))
+			return true; // Build access always granted by permission
 		WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
 		RegionQuery query = platform.getRegionContainer().createQuery();
 		return query.testBuild(BukkitAdapter.adapt(l), plugin.wrapPlayer(p));
@@ -150,7 +152,7 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 			fields.setFields(this);
 			
 			WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
-			ProtectedRegion region = platform.getRegionContainer().get(platform.getWorldByName(world.getName())).getRegion(r);
+			ProtectedRegion region = platform.getRegionContainer().get(BukkitAdapter.adapt(world)).getRegion(r);
 			if (region == null)
 				throw new StreamCorruptedException("Invalid region " + r + " in world " + world);
 			this.region = region;
@@ -195,10 +197,10 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 			return Collections.emptyList();
 		
 		WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
-		RegionManager manager = platform.getRegionContainer().get(platform.getWorldByName(l.getWorld().getName()));
+		RegionManager manager = platform.getRegionContainer().get(BukkitAdapter.adapt(l.getWorld()));
 		if (manager == null)
 			return r;
-		ApplicableRegionSet applicable = manager.getApplicableRegions(new com.sk89q.worldedit.Vector(l.getX(), l.getY(), l.getZ()));
+		ApplicableRegionSet applicable = manager.getApplicableRegions(BukkitAdapter.asVector(l));
 		if (applicable == null)
 			return r;
 		final Iterator<ProtectedRegion> i = applicable.iterator();
@@ -211,7 +213,7 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	@Nullable
 	public Region getRegion_i(final World world, final String name) {
 		WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
-		ProtectedRegion region = platform.getRegionContainer().get(platform.getWorldByName(world.getName())).getRegion(name);
+		ProtectedRegion region = platform.getRegionContainer().get(BukkitAdapter.adapt(world)).getRegion(name);
 		if (region != null)
 			return new WorldGuardRegion(world, region);
 		return null;
