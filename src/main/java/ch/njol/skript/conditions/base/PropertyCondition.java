@@ -157,7 +157,8 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 		return toString(this, getPropertyType(), e, debug, expr, getPropertyName());
 	}
 	
-	public static String toString(Condition condition, PropertyType propertyType, Event e, boolean debug, Expression<?> expr, String property) {
+	public static String toString(Condition condition, PropertyType propertyType, @Nullable Event e,
+								  boolean debug, Expression<?> expr, String property) {
 		switch (propertyType) {
 			case BE:
 				return expr.toString(e, debug) + (expr.isSingle() ? " is " : " are ") + (condition.isNegated() ? "not " : "") + property;
