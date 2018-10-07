@@ -39,11 +39,11 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Locally Suppress Warning")
 @Description("Suppresses target warnings from the current script.")
 @Examples({"locally suppress conflict warnings",
-			"suppress variable save warnings"})
+			"suppress the variable save warnings"})
 @Since("INSERT VERSION")
 public class EffSuppressWarnings extends Effect {
 	static {
-		Skript.registerEffect(EffSuppressWarnings.class, "[local[ly]] suppress (1¦conflict|2¦variable save|3¦[missing] conjunction[s]|4¦starting [with] expression[s]) warning[s]");
+		Skript.registerEffect(EffSuppressWarnings.class, "[local[ly]] suppress [the] (1¦conflict|2¦variable save|3¦[missing] conjunction[s]|4¦starting [with] expression[s]) warning[s]");
 	}
 	
 	private int CONFLICT = 1, INSTANCE = 2, CONJUNCTION = 3, STARTEXPR = 4;
