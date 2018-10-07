@@ -172,9 +172,9 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 			hasElement = true;
 			final boolean b = c.check(t);
 			if (and && !b)
-				return invert ^ false;
+				return invert;
 			if (!and && b)
-				return invert ^ true;
+				return !invert;
 		}
 		if (!hasElement)
 			return invert;
