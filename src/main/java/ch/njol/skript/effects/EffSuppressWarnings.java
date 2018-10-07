@@ -53,7 +53,7 @@ public class EffSuppressWarnings extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		Config cs = ScriptLoader.currentScript;
 		if (cs == null) {
-			Skript.error("Current script is null!");
+			Skript.error("You can only suppress warnings for script files!");
 			return false;
 		}
 		File scriptFile = cs.getFile();
@@ -75,9 +75,8 @@ public class EffSuppressWarnings extends Effect {
 				ScriptOptions.getInstance().setSuppressWarning(scriptFile, "start expression");
 				break;
 			}
-			default: { //How did this happen?
-				Skript.error("Skript returned an invalid parse mark, this should never happen. Please report this!");
-				return false;
+			default: {
+				throw new AssertionError();
 			}
 		}
 		return true;
@@ -85,7 +84,7 @@ public class EffSuppressWarnings extends Effect {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "supress " + (mark == CONFLICT ? "conflict" : mark == INSTANCE ? "variable save" : mark == CONJUNCTION ? "missing conjunction" : mark == STARTEXPR ? "starting expression" : "") + " warnings";
+		return "suppress " + (mark == CONFLICT ? "conflict" : mark == INSTANCE ? "variable save" : mark == CONJUNCTION ? "missing conjunction" : mark == STARTEXPR ? "starting expression" : "") + " warnings";
 	}
 
 	@Override
