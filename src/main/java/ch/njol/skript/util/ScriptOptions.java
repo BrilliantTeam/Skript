@@ -42,13 +42,20 @@
 package ch.njol.skript.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Mirreducki
  * 
  */
 public class ScriptOptions {
+	
+	private HashMap<File, List<String>> localWarningSuppression = new HashMap<>();
 	
 	private HashMap<File, Boolean> usesNewLoops = new HashMap<>();
 	
@@ -72,5 +79,17 @@ public class ScriptOptions {
 	
 	public void setUsesNewLoops(File file, boolean b){
 		usesNewLoops.put(file, b);
+	}
+	
+	public boolean suppressesWarning(@Nullable File scriptFile, String warning) {
+		if (localWarningSuppression.containsKey(scriptFile))
+			return localWarningSuppression.get(scriptFile).contains(warning);
+		return false;
+	}
+	
+ 	public void setSuppressWarning(@Nullable File scriptFile, String warning) {
+		if (!localWarningSuppression.containsKey(scriptFile))
+			localWarningSuppression.put(scriptFile, new ArrayList<>());
+		localWarningSuppression.get(scriptFile).add(warning);
 	}
 }

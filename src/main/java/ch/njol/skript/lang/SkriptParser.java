@@ -47,6 +47,7 @@ import ch.njol.skript.command.Argument;
 import ch.njol.skript.command.Commands;
 import ch.njol.skript.command.ScriptCommand;
 import ch.njol.skript.command.ScriptCommandEvent;
+import ch.njol.skript.config.Config;
 import ch.njol.skript.expressions.ExprParse;
 import ch.njol.skript.lang.function.ExprFunctionCall;
 import ch.njol.skript.lang.function.FunctionReference;
@@ -60,6 +61,7 @@ import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.util.ScriptOptions;
 import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
@@ -618,6 +620,10 @@ public class SkriptParser {
 					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
 					final SkriptParser p = new SkriptParser(expr, PARSE_LITERALS, context);
 					p.suppressMissingAndOrWarnings = suppressMissingAndOrWarnings; // If we suppress warnings here, we suppress them in parser what we created too
+					if (ScriptLoader.currentScript != null) {
+						Config cs = ScriptLoader.currentScript;
+						p.suppressMissingAndOrWarnings = ScriptOptions.getInstance().suppressesWarning(cs.getFile(), "conjunction");
+					}
 					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
 						final Expression<?> e = p.parseExpression(c);
 						if (e != null) {
@@ -767,8 +773,15 @@ public class SkriptParser {
 			if (ts.size() == 1)
 				return ts.get(0);
 			
-			if (and.isUnknown() && !suppressMissingAndOrWarnings)
-				Skript.warning(MISSING_AND_OR + ": " + expr);
+			if (and.isUnknown() && !suppressMissingAndOrWarnings) {
+				if (ScriptLoader.currentScript != null) {
+					Config cs = ScriptLoader.currentScript;
+					if (!ScriptOptions.getInstance().suppressesWarning(cs.getFile(), "conjunction"))
+						Skript.warning(MISSING_AND_OR + ": " + expr);
+				} else {
+					Skript.warning(MISSING_AND_OR + ": " + expr);
+				}
+			}
 			
 			final Class<? extends T>[] exprRetTypes = new Class[ts.size()];
 			for (int i = 0; i < ts.size(); i++)
@@ -802,6 +815,10 @@ public class SkriptParser {
 					// Hack as items use '..., ... and ...' for enchantments. Numbers and times are parsed beforehand as they use the same (deprecated) id[:data] syntax.
 					final SkriptParser p = new SkriptParser(expr, PARSE_LITERALS, context);
 					p.suppressMissingAndOrWarnings = suppressMissingAndOrWarnings; // If we suppress warnings here, we suppress them in parser what we created too
+					if (ScriptLoader.currentScript != null) {
+						Config cs = ScriptLoader.currentScript;
+						p.suppressMissingAndOrWarnings = ScriptOptions.getInstance().suppressesWarning(cs.getFile(), "conjunction");
+					}
 					for (final Class<?> c : new Class[] {Number.class, Time.class, ItemType.class, ItemStack.class}) {
 						@SuppressWarnings("unchecked")
 						final Expression<?> e = p.parseExpression(c);
@@ -964,8 +981,15 @@ public class SkriptParser {
 				return ts.get(0);
 			}
 			
-			if (and.isUnknown() && !suppressMissingAndOrWarnings)
-				Skript.warning(MISSING_AND_OR + ": " + expr);
+			if (and.isUnknown() && !suppressMissingAndOrWarnings) {
+				if (ScriptLoader.currentScript != null) {
+					Config cs = ScriptLoader.currentScript;
+					if (!ScriptOptions.getInstance().suppressesWarning(cs.getFile(), "conjunction"))
+						Skript.warning(MISSING_AND_OR + ": " + expr);
+				} else {
+					Skript.warning(MISSING_AND_OR + ": " + expr);
+				}
+			}
 			
 			final Class<?>[] exprRetTypes = new Class[ts.size()];
 			for (int i = 0; i < ts.size(); i++)
