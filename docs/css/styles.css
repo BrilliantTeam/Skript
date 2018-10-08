@@ -112,11 +112,20 @@ table {
   border-collapse: collapse;
 }
 
+.item-anchor {
+  display: block;
+  position: relative;
+  top: -3em;
+  visibility: hidden;
+}
+
 .item-title {
   font-size: 130%;
   padding: 0.2em;
   padding-top: 0.5em;
   padding-left: 0.4em;
+  
+  color: #261908;
 }
 
 .item-title > a {
@@ -134,12 +143,12 @@ table {
   padding: 0.3em;
 }
 
-tr {
+.item-details {
   display: block;
   border-collapse: collapse;
 }
 
-td:nth-child(2) {
+.item-details td:nth-child(2) {
   border-style: solid;
   border-left-style: none;
   border-color: burlywood;
@@ -164,7 +173,6 @@ td ul {
   font-family: monospace;
   width: 82.5%;
   max-width: 69.6em;
-  height: 100%;
   background-color: gainsboro;
 }
 
