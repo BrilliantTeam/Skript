@@ -26,6 +26,8 @@ import java.lang.invoke.MethodType;
 import org.bukkit.Server;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
+
 /**
  * Utilizes CraftServer with reflection to re-send commands to clients.
  */
@@ -40,7 +42,9 @@ public class CommandReloader {
 			MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(craftServer, MethodHandles.lookup());
 			syncCommandsMethod = lookup.findVirtual(craftServer, "syncCommands", MethodType.methodType(void.class));
 		} catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException e) {
-			// Ignore. This is not necessary or in any way supported functionality
+			// Ignore except for debugging. This is not necessary or in any way supported functionality
+			if (Skript.debug())
+				e.printStackTrace();
 		}
 	}
 	
@@ -58,7 +62,8 @@ public class CommandReloader {
 			syncCommandsMethod.invoke(server);
 			return true; // Sync probably succeeded
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (Skript.debug())
+				e.printStackTrace();
 			return false; // Something went wrong, sync probably failed
 		}
 	}
