@@ -22,6 +22,7 @@ package ch.njol.skript.bukkitutil;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
 
 import org.bukkit.Server;
 import org.eclipse.jdt.annotation.Nullable;
@@ -34,14 +35,15 @@ import ch.njol.skript.Skript;
 public class CommandReloader {
 	
 	@Nullable
-	private static MethodHandle syncCommandsMethod;
+	private static Method syncCommandsMethod;
 	
 	static {
 		try {
 			Class<?> craftServer = Class.forName("org.bukkit.craftbukkit.v1_13_R2.CraftServer");
-			MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(craftServer, MethodHandles.lookup());
-			syncCommandsMethod = lookup.findVirtual(craftServer, "syncCommands", MethodType.methodType(void.class));
-		} catch (ClassNotFoundException | IllegalAccessException | NoSuchMethodException e) {
+			syncCommandsMethod = craftServer.getDeclaredMethod("syncCommands");
+			if (syncCommandsMethod != null)
+				syncCommandsMethod.setAccessible(true);
+		} catch (ClassNotFoundException | NoSuchMethodException e) {
 			// Ignore except for debugging. This is not necessary or in any way supported functionality
 			if (Skript.debug())
 				e.printStackTrace();
