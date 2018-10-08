@@ -63,7 +63,7 @@ public class ExprServerIcon extends SimpleExpression<CachedServerIcon> {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!PAPER_EVENT_EXISTS) {
-			Skript.error("Server icon stuff requires PaperSpigot 1.12.2+");
+			Skript.error("The server icon expression requires PaperSpigot 1.12.2+");
 			return false;
 		}
 		isServerPingEvent = ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class);

@@ -1419,7 +1419,7 @@ public class BukkitClasses {
 			Classes.registerClass(new ClassInfo<>(CachedServerIcon.class, "cachedservericon")
 					.user("server ?icons?")
 					.name("Server Icon")
-					.description("A server icon that loaded using the <a href='effects.html#EffLoadServerIcon'>load server icon</a> effect.")
+					.description("A server icon that was loaded using the <a href='effects.html#EffLoadServerIcon'>load server icon</a> effect.")
 					.examples("")
 					.since("INSERT VERSION")
 					.parser(new Parser<CachedServerIcon>() {

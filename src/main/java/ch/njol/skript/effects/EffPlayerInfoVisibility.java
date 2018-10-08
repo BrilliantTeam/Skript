@@ -61,10 +61,10 @@ public class EffPlayerInfoVisibility extends Effect {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (ScriptLoader.isCurrentEvent(ServerListPingEvent.class)) {
+		if (!PAPER_EVENT_EXISTS) {
 			Skript.error("The player info visibility effect requires PaperSpigot 1.12.2+");
 			return false;
-		} else if (!(PAPER_EVENT_EXISTS && ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class))) {
+		} else if (!ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class)) {
 			Skript.error("The player info visibility effect can't be used outside of a server list ping event");
 			return false;
 		} else if (isDelayed == Kleenean.TRUE) {

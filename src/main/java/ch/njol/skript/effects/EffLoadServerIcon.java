@@ -55,7 +55,7 @@ import ch.njol.util.Kleenean;
 public class EffLoadServerIcon extends AsyncEffect {
 
 	static {
-		Skript.registerEffect(EffLoadServerIcon.class, "(load|cache) [the] server icon (of|from) [image] [file] %string%");
+		Skript.registerEffect(EffLoadServerIcon.class, "load [the] server icon (from|of) [the] [image] [file] %string%");
 	}
 
 	private static final boolean PAPER_EVENT_EXISTS = Skript.classExists("com.destroystokyo.paper.event.server.PaperServerListPingEvent");
@@ -70,7 +70,7 @@ public class EffLoadServerIcon extends AsyncEffect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		if (!PAPER_EVENT_EXISTS) {
-			Skript.error("Server icon stuff requires PaperSpigot 1.12.2+");
+			Skript.error("The load server icon effect requires PaperSpigot 1.12.2+");
 			return false;
 		}
 		path = (Expression<String>) exprs[0];

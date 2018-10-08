@@ -100,7 +100,7 @@ public class ExprMOTD extends SimpleExpression<String> {
 	@Override
 	public void change(Event e, @Nullable Object[] delta, ChangeMode mode) {
 		ServerListPingEvent event = (ServerListPingEvent) e;
-		switch (mode){
+		switch (mode) {
 			case SET:
 				event.setMotd((String) delta[0]);
 				break;
