@@ -276,8 +276,10 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			if (item == null) { // Given item null
 				if (myType.type == Material.AIR)
 					return true; // Both items AIR/null
-			} else if (item.isSimilar(myType.stack)) {
-				return true; // Bukkit thinks they're similar enough
+			} else if (myType.isAlias) {
+				return myType.type.equals(item.getType());
+			} else {
+				return item.isSimilar(myType.stack);
 			}
 		}
 		return false;
@@ -581,7 +583,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return addTo(getStorageContents(invi));
 	}
 	
-	public final static ItemStack[] getCopiedContents(Inventory invi) {
+	public static ItemStack[] getCopiedContents(Inventory invi) {
 		final ItemStack[] buf = invi.getContents();
 		for (int i = 0; i < buf.length; i++)
 			if (buf[i] != null)
@@ -595,7 +597,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * @param invi Inventory
 	 * @return Copied storage contents
 	 */
-	public final static ItemStack[] getStorageContents(Inventory invi) {
+	public static ItemStack[] getStorageContents(final Inventory invi) {
 		if (invi instanceof PlayerInventory) {
 			ItemStack[] buf = invi.getContents();
 			ItemStack[] tBuf = new ItemStack[36];
@@ -877,7 +879,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * @param sub
 	 * @return Whether all item types in <tt>sub</tt> have at least one {@link #isSupertypeOf(ItemType) super type} in <tt>set</tt>
 	 */
-	public final static boolean isSubset(final ItemType[] set, final ItemType[] sub) {
+	public static boolean isSubset(final ItemType[] set, final ItemType[] sub) {
 		outer: for (final ItemType i : sub) {
 			assert i != null;
 			for (final ItemType t : set) {

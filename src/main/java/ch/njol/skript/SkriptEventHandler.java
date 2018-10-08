@@ -46,6 +46,7 @@ import ch.njol.skript.lang.SelfRegisteringSkriptEvent;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.function.Functions;
 import ch.njol.skript.timings.SkriptTimings;
+import ch.njol.skript.variables.Variables;
 
 /**
  * @author Peter Güttinger
@@ -57,7 +58,7 @@ public abstract class SkriptEventHandler {
 	
 	private final static List<Trigger> selfRegisteredTriggers = new ArrayList<>();
 	
-	private final static Iterator<Trigger> getTriggers(final Class<? extends Event> event) {
+	private static Iterator<Trigger> getTriggers(final Class<? extends Event> event) {
 		return new Iterator<Trigger>() {
 			@Nullable
 			private Class<?> e = event;
@@ -153,6 +154,21 @@ public abstract class SkriptEventHandler {
 			SkriptTimings.stop(timing);
 			logTriggerEnd(t);
 		}
+		
+		// Clear local variables
+		Variables.removeLocals(e);
+		/*
+		 * Local variables can be used in delayed effects by backing reference
+		 * of VariablesMap up. Basically:
+		 * 
+		 * Object localVars = Variables.removeLocals(e);
+		 * 
+		 * ... and when you want to continue execution:
+		 * 
+		 * Variables.setLocalVariables(e, localVars);
+		 * 
+		 * See Delay effect for reference.
+		 */
 		
 		logEventEnd();
 	}
@@ -261,7 +277,7 @@ public abstract class SkriptEventHandler {
 	 * triggers are using.
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	final static void registerBukkitEvents() {
+	static void registerBukkitEvents() {
 		for (final Class<? extends Event> e : triggers.keySet()) {
 			assert e != null;
 			if (!containsSuperclass((Set) registeredEvents, e)) { // I just love Java's generics
@@ -278,7 +294,7 @@ public abstract class SkriptEventHandler {
 		}
 	}
 	
-	public final static boolean containsSuperclass(final Set<Class<?>> classes, final Class<?> c) {
+	public static boolean containsSuperclass(final Set<Class<?>> classes, final Class<?> c) {
 		if (classes.contains(c))
 			return true;
 		for (final Class<?> cl : classes) {

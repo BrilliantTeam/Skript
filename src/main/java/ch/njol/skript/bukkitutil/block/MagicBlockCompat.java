@@ -139,7 +139,7 @@ public class MagicBlockCompat implements BlockCompat {
 	@Nullable
 	@Override
 	public BlockValues createBlockValues(Material type, Map<String, String> states) {
-		return new MagicBlockValues(type, (byte) 0); // TODO maybe support block states?
+		return null;
 	}
 
 	@Override

@@ -233,7 +233,7 @@ public abstract class Variables {
 	private final static Pattern variableNameSplitPattern = Pattern.compile(Pattern.quote(Variable.SEPARATOR));
 	
 	@SuppressWarnings("null")
-	public final static String[] splitVariableName(final String name) {
+	public static String[] splitVariableName(final String name) {
 		return variableNameSplitPattern.split(name);
 	}
 	
@@ -242,8 +242,9 @@ public abstract class Variables {
 	 * must be locked with {@link #variablesLock}.
 	 */
 	final static VariablesMap variables = new VariablesMap();
+
 	/**
-	 * Not accessed concurrently
+	 * Not to be accessed outside of Bukkit's main thread!
 	 */
 	private final static Map<Event, VariablesMap> localVariables = new HashMap<>();
 	
@@ -297,7 +298,7 @@ public abstract class Variables {
 	 * @return an Object for a normal Variable or a Map<String, Object> for a list variable, or null if the variable is not set.
 	 */
 	@Nullable
-	public final static Object getVariable(final String name, final @Nullable Event e, final boolean local) {
+	public static Object getVariable(final String name, final @Nullable Event e, final boolean local) {
 		String n = name;
         if (caseInsensitiveVariables) {
             n = name.toLowerCase(Locale.ENGLISH);
@@ -309,15 +310,15 @@ public abstract class Variables {
 				return null;
 			return map.getVariable(n);
 		} else {
-			try {
-				// Prevent race conditions from returning variables with incorrect values
-				if (!changeQueue.isEmpty()) {
-					for (VariableChange change : changeQueue) {
-						if (change.name.equals(n))
-							return change.value;
-					}
+			// Prevent race conditions from returning variables with incorrect values
+			if (!changeQueue.isEmpty()) {
+				for (VariableChange change : changeQueue) {
+					if (change.name.equals(n))
+						return change.value;
 				}
+			}
 				
+			try {
 				variablesLock.readLock().lock();
 				return variables.getVariable(n);
 			} finally {
@@ -332,7 +333,7 @@ public abstract class Variables {
 	 * @param name The variable's name. Can be a "list variable::*" (<tt>value</tt> must be <tt>null</tt> in this case)
 	 * @param value The variable's value. Use <tt>null</tt> to delete the variable.
 	 */
-	public final static void setVariable(final String name, @Nullable Object value, final @Nullable Event e, final boolean local) {
+	public static void setVariable(final String name, @Nullable Object value, final @Nullable Event e, final boolean local) {
         String n = name;
         if (caseInsensitiveVariables) {
             n = name.toLowerCase(Locale.ENGLISH);
@@ -358,7 +359,7 @@ public abstract class Variables {
 		}
 	}
 	
-	final static void setVariable(final String name, @Nullable final Object value) {
+	static void setVariable(final String name, @Nullable final Object value) {
 		boolean gotLock = variablesLock.writeLock().tryLock();
 		if (gotLock) {
 			try {
@@ -399,7 +400,7 @@ public abstract class Variables {
 	 * @param name Variable name.
 	 * @param value New value.
 	 */
-	private final static void queueVariableChange(String name, @Nullable Object value) {
+	private static void queueVariableChange(String name, @Nullable Object value) {
 		changeQueue.add(new VariableChange(name, value));
 	}
 	
@@ -407,7 +408,7 @@ public abstract class Variables {
 	 * Processes all entries in variable change queue. Note that caller MUST
 	 * acquire write lock before calling this, then release it.
 	 */
-	final static void processChangeQueue() {
+	static void processChangeQueue() {
 		while (true) { // Run as long as we still have changes
 			VariableChange change = changeQueue.poll();
 			if (change == null)
@@ -440,7 +441,7 @@ public abstract class Variables {
 	 * @param source
 	 * @return Whether the variable was stored somewhere. Not valid while storages are loading.
 	 */
-	final static boolean variableLoaded(final String name, final @Nullable Object value, final VariablesStorage source) {
+	static boolean variableLoaded(final String name, final @Nullable Object value, final VariablesStorage source) {
 		assert Bukkit.isPrimaryThread(); // required by serialisation
 		
 		synchronized (tempVars) {
@@ -518,19 +519,19 @@ public abstract class Variables {
 		}
 	}
 	
-	public final static SerializedVariable serialize(final String name, final @Nullable Object value) {
+	public static SerializedVariable serialize(final String name, final @Nullable Object value) {
 		assert Bukkit.isPrimaryThread();
 		final SerializedVariable.Value var = serialize(value);
 		return new SerializedVariable(name, var);
 	}
 	
 	@Nullable
-	public final static SerializedVariable.Value serialize(final @Nullable Object value) {
+	public static SerializedVariable.Value serialize(final @Nullable Object value) {
 		assert Bukkit.isPrimaryThread();
 		return Classes.serialize(value);
 	}
-	
-	private final static void saveVariableChange(final String name, final @Nullable Object value) {
+
+	private static void saveVariableChange(final String name, final @Nullable Object value) {
 		saveQueue.add(serialize(name, value));
 	}
 	

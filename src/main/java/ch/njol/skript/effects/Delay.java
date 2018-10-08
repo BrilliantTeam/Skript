@@ -94,6 +94,10 @@ public class Delay extends Effect {
 					if (Skript.debug())
 						Skript.info(getIndentation() + "... continuing after " + (System.nanoTime() - start) / 1000000000. + "s");
 					
+					// Re-set local variables
+					if (localVars != null)
+						Variables.setLocalVariables(e, localVars);
+					
 					Object timing = null;
 					if (SkriptTimings.enabled()) { // getTrigger call is not free, do it only if we must
 						Trigger trigger = getTrigger();
@@ -114,7 +118,7 @@ public class Delay extends Effect {
 	@SuppressWarnings("null")
 	protected final static Set<Event> delayed = Collections.newSetFromMap(new WeakHashMap<Event, Boolean>());
 
-	public final static boolean isDelayed(final Event e) {
+	public static boolean isDelayed(final Event e) {
 		return delayed.contains(e);
 	}
 

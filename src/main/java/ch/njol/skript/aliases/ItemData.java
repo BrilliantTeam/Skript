@@ -142,6 +142,8 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	
 	boolean strictEquality;
 	
+	boolean isAlias;
+	
 	public ItemData(Material type, @Nullable String tags) {
 		this.type = type;
 		
@@ -171,6 +173,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.stack = data.stack.clone();
 		this.type = data.type;
 		this.blockValues = data.blockValues;
+		this.isAlias = data.isAlias;
 	}
 	
 	public ItemData(ItemStack stack, @Nullable BlockValues values) {
@@ -264,7 +267,17 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		if (values != null)
 			return values.equals(other.blockValues);
 		
-		return other.stack.isSimilar(stack);
+		if (!type.equals(other.type))
+			return false; // Types are not equal
+		
+		// Check the item meta, unless either ItemData is alias
+		if (!isAlias && !other.isAlias) {
+			return Objects.equals(getItemMeta(), other.getItemMeta());
+		} else { // Even for aliases, do a few checks
+			// REMIND follow bug reports closely to see which checks are needed
+		}
+
+		return true; // All equality checks passed
 	}
 	
 	@Override
@@ -324,6 +337,16 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	
 	public void setItemMeta(ItemMeta meta) {
 		stack.setItemMeta(meta);
+		isAlias = false; // This is no longer exact alias
+	}
+	
+	public int getDurability() {
+		return stack.getDurability();
+	}
+	
+	public void setDurability(int durability) {
+		stack.setDurability((short) durability);
+		isAlias = false; // Change happened
 	}
 
 	@Override
@@ -398,7 +421,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		for (ItemFlag flag : meta.getItemFlags()) {
 			our.addItemFlags(flag);
 		}
-		stack.setItemMeta(meta);
+		setItemMeta(meta);
 	}
 	
 }

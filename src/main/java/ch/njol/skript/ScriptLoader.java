@@ -40,12 +40,14 @@ import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jdt.annotation.NonNull;
 
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.CommandReloader;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.command.CommandEvent;
 import ch.njol.skript.command.Commands;
@@ -378,7 +380,7 @@ final public class ScriptLoader {
 	 * @param configs Configs for scripts, loaded by {@link #loadStructures(File[])}
 	 * @return Info on the loaded scripts.
 	 */
-	public final static ScriptInfo loadScripts(final List<Config> configs) {
+	public static ScriptInfo loadScripts(final List<Config> configs) {
 		ScriptInfo i = new ScriptInfo();
 		
 		Runnable task = () -> {
@@ -401,6 +403,12 @@ final public class ScriptLoader {
 		else
 			task.run();
 		
+		// After we've loaded everything, refresh commands
+		// TODO only sync if new were defined
+		Server server = Bukkit.getServer();
+		assert server != null;
+		CommandReloader.syncCommands(server);
+		
 		// If task was ran asynchronously, returned stats may be wrong
 		// This is probably ok, since loadScripts() will go async if needed
 		return i;
@@ -413,7 +421,7 @@ final public class ScriptLoader {
 	 * @param logOut List where to place log.
 	 * @return Info on the loaded scripts.
 	 */
-	public final static ScriptInfo loadScripts(final List<Config> configs, final List<LogEntry> logOut) {
+	public static ScriptInfo loadScripts(final List<Config> configs, final List<LogEntry> logOut) {
 		final RetainingLogHandler logHandler = SkriptLogger.startRetainingLog();
 		try {
 			return loadScripts(configs);
@@ -431,7 +439,7 @@ final public class ScriptLoader {
 	 * @return Info on the loaded scripts
 	 */
 	@SuppressWarnings("null")
-	public final static ScriptInfo loadScripts(final Config... configs) {
+	public static ScriptInfo loadScripts(final Config... configs) {
 		return loadScripts(Arrays.asList(configs));
 	}
 	
@@ -443,7 +451,7 @@ final public class ScriptLoader {
 	 * @deprecated Use the methods that take configs as parameters.
 	 */
 	@Deprecated
-	public final static ScriptInfo loadScripts(final File... files) {
+	public static ScriptInfo loadScripts(final File... files) {
 		List<Config> configs = loadStructures(files);
 		return loadScripts(configs);
 	}
@@ -473,7 +481,7 @@ final public class ScriptLoader {
 	 * @return Info about script that is loaded
 	 */
 	@SuppressWarnings("unchecked")
-	private final static ScriptInfo loadScript(final @Nullable Config config) {
+	private static ScriptInfo loadScript(final @Nullable Config config) {
 		if (config == null) { // Something bad happened, hopefully got logged to console
 			return new ScriptInfo();
 		}
@@ -756,7 +764,7 @@ final public class ScriptLoader {
 	 * 
 	 * @param files
 	 */
-	public final static List<Config> loadStructures(final File[] files) {
+	public static List<Config> loadStructures(final File[] files) {
 		Arrays.sort(files);
 		
 		List<Config> loadedFiles = new ArrayList<>(files.length);
@@ -776,6 +784,7 @@ final public class ScriptLoader {
 	public static List<Config> loadStructures(final File directory) {
 		if (!directory.isDirectory())
 			return loadStructures(new File[]{directory});
+		
 		final File[] files = directory.listFiles(scriptFilter);
 		Arrays.sort(files);
 		
@@ -796,7 +805,7 @@ final public class ScriptLoader {
 	 * @param f Script file.
 	 */
 	@SuppressWarnings("resource") // Stream is closed in Config constructor called in loadStructure
-	public final static @Nullable Config loadStructure(final File f) {
+	public static @Nullable Config loadStructure(final File f) {
 		if (!f.exists()) { // If file does not exist...
 			unloadScript(f); // ... it might be good idea to unload it now
 			return null;
@@ -819,7 +828,7 @@ final public class ScriptLoader {
 	 * @param source Source input stream.
 	 * @param name Name of source "file".
 	 */
-	public final static @Nullable Config loadStructure(final InputStream source, final String name) {
+	public static @Nullable Config loadStructure(final InputStream source, final String name) {
 		try {
 			final Config config = new Config(source, name,
 					Skript.getInstance().getDataFolder().toPath().resolve(Skript.SCRIPTSFOLDER).resolve(name).toFile(), true, false, ":");
@@ -837,7 +846,7 @@ final public class ScriptLoader {
 	 * @param config Config object for the script.
 	 */
 	@SuppressWarnings("unchecked")
-	public final static @Nullable Config loadStructure(final Config config) {
+	public static @Nullable Config loadStructure(final Config config) {
 		try {
 			//final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
 			
@@ -889,13 +898,13 @@ final public class ScriptLoader {
 	 * @param folder
 	 * @return Info on the unloaded scripts
 	 */
-	final static ScriptInfo unloadScripts(final File folder) {
+	static ScriptInfo unloadScripts(final File folder) {
 		final ScriptInfo r = unloadScripts_(folder);
 		Functions.validateFunctions();
 		return r;
 	}
 	
-	private final static ScriptInfo unloadScripts_(final File folder) {
+	private static ScriptInfo unloadScripts_(final File folder) {
 		final ScriptInfo info = new ScriptInfo();
 		final File[] files = folder.listFiles(scriptFilter);
 		for (final File f : files) {
@@ -914,14 +923,14 @@ final public class ScriptLoader {
 	 * @param script
 	 * @return Info on the unloaded script
 	 */
-	final static ScriptInfo unloadScript(final File script) {
+	static ScriptInfo unloadScript(final File script) {
 		final ScriptInfo r = unloadScript_(script);
 		Functions.clearFunctions(script);
 		Functions.validateFunctions();
 		return r;
 	}
 	
-	private final static ScriptInfo unloadScript_(final File script) {
+	private static ScriptInfo unloadScript_(final File script) {
 		if (loadedFiles.contains(script)) {
 			final ScriptInfo info = SkriptEventHandler.removeTriggers(script); // Remove triggers
 			synchronized (loadedScripts) { // Update script info
@@ -938,7 +947,7 @@ final public class ScriptLoader {
 	/**
 	 * Replaces options in a string.
 	 */
-	public final static String replaceOptions(final String s) {
+	public static String replaceOptions(final String s) {
 		final String r = StringUtils.replaceAll(s, "\\{@(.+?)\\}", new Callback<String, Matcher>() {
 			@Override
 			@Nullable
@@ -1109,36 +1118,36 @@ final public class ScriptLoader {
 		}
 	}
 	
-	public final static int loadedScripts() {
+	public static int loadedScripts() {
 		synchronized (loadedScripts) {
 			return loadedScripts.files;
 		}
 	}
 	
-	public final static int loadedCommands() {
+	public static int loadedCommands() {
 		synchronized (loadedScripts) {
 			return loadedScripts.commands;
 		}
 	}
 	
-	public final static int loadedFunctions() {
+	public static int loadedFunctions() {
 		synchronized (loadedScripts) {
 			return loadedScripts.functions;
 		}
 	}
 	
-	public final static int loadedTriggers() {
+	public static int loadedTriggers() {
 		synchronized (loadedScripts) {
 			return loadedScripts.triggers;
 		}
 	}
 	
-	public final static boolean isCurrentEvent(final @Nullable Class<? extends Event> event) {
+	public static boolean isCurrentEvent(final @Nullable Class<? extends Event> event) {
 		return CollectionUtils.containsSuperclass(currentEvents, event);
 	}
 	
 	@SafeVarargs
-	public final static boolean isCurrentEvent(final Class<? extends Event>... events) {
+	public static boolean isCurrentEvent(final Class<? extends Event>... events) {
 		return CollectionUtils.containsAnySuperclass(currentEvents, events);
 	}
 	

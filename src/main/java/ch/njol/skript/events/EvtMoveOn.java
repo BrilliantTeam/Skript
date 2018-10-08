@@ -124,7 +124,7 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 	}
 	
 	@SuppressWarnings("null")
-	public final static Block getBlock(final PlayerMoveEvent e) {
+	public static Block getBlock(final PlayerMoveEvent e) {
 		return e.getTo().clone().subtract(0, 0.5, 0).getBlock();
 	}
 	
