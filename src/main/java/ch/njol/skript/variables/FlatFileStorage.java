@@ -404,11 +404,13 @@ public class FlatFileStorage extends VariablesStorage {
 			}
 		} finally {
 			Variables.getReadLock().unlock();
-			try { // Process all writes that we delayed
-				Variables.variablesLock.writeLock().lock();
-				Variables.processChangeQueue();
-			} finally {
-				Variables.variablesLock.writeLock().unlock();
+			boolean gotLock = Variables.variablesLock.writeLock().tryLock();
+			if (gotLock) { // Only process queue now if it doesn't require us to wait
+				try {
+					Variables.processChangeQueue();
+				} finally {
+					Variables.variablesLock.writeLock().unlock();
+				}
 			}
 		}
 	}
