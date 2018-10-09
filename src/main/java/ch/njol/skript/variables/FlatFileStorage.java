@@ -197,13 +197,8 @@ public class FlatFileStorage extends VariablesStorage {
 			@Override
 			public void run() {
 				if (changes.get() >= REQUIRED_CHANGES_FOR_RESAVE) {
-					try {
-						Variables.getReadLock().lock();
-						saveVariables(false);
-						changes.set(0);
-					} finally {
-						Variables.getReadLock().unlock();
-					}
+					saveVariables(false);
+					changes.set(0);
 				}
 			}
 		};
