@@ -155,21 +155,6 @@ public abstract class SkriptEventHandler {
 			logTriggerEnd(t);
 		}
 		
-		// Clear local variables
-		Variables.removeLocals(e);
-		/*
-		 * Local variables can be used in delayed effects by backing reference
-		 * of VariablesMap up. Basically:
-		 * 
-		 * Object localVars = Variables.removeLocals(e);
-		 * 
-		 * ... and when you want to continue execution:
-		 * 
-		 * Variables.setLocalVariables(e, localVars);
-		 * 
-		 * See Delay effect for reference.
-		 */
-		
 		logEventEnd();
 	}
 	
