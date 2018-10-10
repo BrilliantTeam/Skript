@@ -70,6 +70,9 @@ And, additionally:
   - Remember the basic grammar rules
   - Fun is allowed, if that does not hurt the readability
 * No matter if a comment contains a sentence or not, capitalize the first letter
+* For single line comments
+  - Always start with a space; it improves readability
+  - You *may* put them at ends of lines, if the line doesn't get too wide due to that
 
 Your comments should look something like these:
 ```java
