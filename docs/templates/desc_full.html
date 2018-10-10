@@ -8,8 +8,8 @@
   <table>
 
     <tr class="item-details">
-      <td class="item-table-label">Pattern:</td>
-      <td>
+      <td class="item-table-label">Patterns:</td>
+      <td class="noleftpad">
         <ul>
           ${generate element.patterns pattern_element.html}
         </ul>
@@ -20,6 +20,20 @@
       <td class="item-table-label">Since:</td>
       <td>${element.since}</td>
     </tr>
+    
+    ${if events}
+    <tr class="item-details">
+      <td class="item-table-label">Usable in events:</td>
+      <td>${element.events}</td>
+    </tr> 
+    ${end}
+    
+    ${if required-plugins}
+    <tr class="item-details">
+      <td class="item-table-label">Requirements:</td>
+      <td>${element.required-plugins}</td>
+    </tr> 
+    ${end}
 
   </table>
 
