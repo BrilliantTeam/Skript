@@ -434,7 +434,7 @@ public class SimpleEvents {
 					.examples("on language change:",
 							"	if player's language starts with \"en\":",
 							"		send \"Hello!\"")
-					.since("INSERT VERSION");
+					.since("2.3");
 		}
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerJumpEvent")) {
 			Skript.registerEvent("Jump", SimpleEvent.class, PlayerJumpEvent.class, "[player] jump[ing]")
@@ -443,7 +443,7 @@ public class SimpleEvents {
 					.examples("on jump:",
 							"	event-player does not have permission \"jump\"",
 							"	cancel event")
-					.since("INSERT VERSION");
+					.since("2.3");
 		}
 		if (Skript.classExists("org.bukkit.event.player.PlayerSwapHandItemsEvent")) {
 			Skript.registerEvent("Hand Item Swap", SimpleEvent.class, PlayerSwapHandItemsEvent.class, "swap[ping of] [(hand|held)] item[s]")
@@ -456,7 +456,7 @@ public class SimpleEvents {
 					.examples("on swap hand items:",
 							"	event-player's tool is a diamond sword",
 							"	cancel event")
-					.since("INSERT VERSION");
+					.since("2.3");
 		}
 	}
 }

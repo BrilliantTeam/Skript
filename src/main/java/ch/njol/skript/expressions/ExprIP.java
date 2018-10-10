@@ -44,7 +44,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Description("The IP address in a <a href='events.html#connect'>connect</a> event.")
 @Examples({"on connect:",
 		"log \"[%now%] %IP% joined the server.\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprIP extends SimpleExpression<String> {
 	
 	static {

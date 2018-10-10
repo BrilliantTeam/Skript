@@ -1389,7 +1389,7 @@ public class BukkitClasses {
 				.name("Spawn Reason")
 				.description("The spawn reason in a <a href='events.html#spawn'>spawn</a> event.")
 				.examples(spawnReasons.getAllNames())
-				.since("INSERT VERSION")
+				.since("2.3")
 				.parser(new Parser<SpawnReason>() {
 					@Override
 					public String toString(SpawnReason spawnReason, int flags) {
