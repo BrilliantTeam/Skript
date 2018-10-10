@@ -32,12 +32,12 @@ help you with addon issues here, unless we get a lot of technical information
 about the addon in question. Usually only developers of them know addons'
 Java code well enough.
 
-If the issue still persists persists, search the issue tracker for similar
+If the issue still persists, search the issue tracker for similar
 errors and check if your issue might have been already reported.
 Only if you can't find anything, open a new issue.
 
 Now, what would you fill to the issue report?
-* An useful title (tl;dr for us busy and/or lazy developers)
+* A useful title (tl;dr for us busy and/or lazy developers)
 * Description of the issue, aka what does *not* work
 * Any error messages in the console (please use a paste service for lenghty errors)
 * Whether you tested without addons or not
