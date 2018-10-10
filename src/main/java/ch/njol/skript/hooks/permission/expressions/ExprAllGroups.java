@@ -23,6 +23,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.hooks.VaultHook;
 import ch.njol.skript.lang.Expression;
@@ -40,6 +41,7 @@ import org.eclipse.jdt.annotation.Nullable;
 		"       if argument is \"list\":",
 		"           send \"%all groups%\""})
 @Since("2.2-dev35")
+@RequiredPlugins({"Vault", "a permission plugin that supports Vault"})
 public class ExprAllGroups extends SimpleExpression<String> {
 
 	static {

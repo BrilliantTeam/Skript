@@ -24,6 +24,7 @@ import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.hooks.VaultHook;
@@ -48,6 +49,7 @@ import java.util.List;
 			"broadcast \"%group of player%\" # this is the player's primary group",
 			"broadcast \"%groups of player%\" # this is all of the player's groups"})
 @Since("2.2-dev35")
+@RequiredPlugins({"Vault", "a permission plugin that supports Vault"})
 public class ExprGroup extends SimpleExpression<String> {
 
 	static {
