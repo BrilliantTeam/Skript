@@ -193,7 +193,7 @@ public class Variable<T> implements Expression<T> {
 				for (int i = 0; i < types.length; i++) {
 					infos[i] = Classes.getExactClassInfo(types[i]);
 				}
-				Skript.warning("Local variable '" + name + "' is " + Classes.toString(Classes.getExactClassInfo(hint))
+				Skript.warning("Variable '{_" + name + "}' is " + Classes.toString(Classes.getExactClassInfo(hint))
 						+ ", not " + Classes.toString(infos, false));
 				// Fall back to not having any type hints
 			}
@@ -567,10 +567,15 @@ public class Variable<T> implements Expression<T> {
 								final Class<?> c = d.getClass();
 								assert c != null;
 								ci = Classes.getSuperClassInfo(c);
-								//Mirre Start
-								if (ci.getMath() != null || d instanceof Number)
+								
+								if (ci.getMath() != null)
 									o = d;
-								//Mirre End
+								if (d instanceof Number) { // Nonexistent variable: add/subtract
+									if (mode == ChangeMode.REMOVE) // Variable is delta negated
+										o = -((Number) d).doubleValue(); // Hopefully enough precision
+									else // Variable is now what was added to it
+										o = d;
+								}
 								changed = true;
 								continue;
 							}
