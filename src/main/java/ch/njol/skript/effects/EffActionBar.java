@@ -62,7 +62,7 @@ public class EffActionBar extends Effect {
 	@Override
 	protected void execute(final Event e) {
 		String msg = message.getSingle(e);
-		for (Player player : recipients.getAll(e)) {
+		for (Player player : recipients.getArray(e)) {
 			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
 		}
 	}
