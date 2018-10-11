@@ -222,6 +222,54 @@ public class AliasesProvider {
 	}
 	
 	/**
+	 * Gets singular and plural forms for given name. This might work
+	 * slightly differently from {@link Noun#getPlural(String)}, to ensure
+	 * it meets specification of aliases.
+	 * @param name Name to get forms from.
+	 * @return Singular form, plural form.
+	 */
+	public NonNullPair<String, String> getAliasPlural(String name) {
+		int marker = name.indexOf('¦');
+		if (marker == -1) { // No singular/plural forms
+			name = name.trim();
+			return new NonNullPair<>(name, name);
+		}
+		int pluralEnd = -1;
+		for (int i = marker; i < name.length(); i++) {
+			int c = name.codePointAt(i);
+			if (Character.isWhitespace(c)) {
+				pluralEnd = i;
+				break;
+			}
+			
+			i += Character.charCount(c);
+		}
+		
+		// No whitespace after marker, so creating forms is simple
+		if (pluralEnd == -1) {
+			String singular = name.substring(0, marker);
+			String plural = singular + name.substring(marker + 1);
+			
+			singular = singular.trim();
+			plural = plural.trim();
+			assert singular != null;
+			assert plural != null;
+			return new NonNullPair<>(singular, plural);
+		}
+		
+		// Need to stitch both singular and plural together
+		String base = name.substring(0, marker);
+		String singular = base + name.substring(pluralEnd);
+		String plural = base + name.substring(marker + 1);
+		
+		singular = singular.trim();
+		plural = plural.trim();
+		assert singular != null;
+		assert plural != null;
+		return new NonNullPair<>(singular, plural);
+	}
+	
+	/**
 	 * Adds an alias to this provider.
 	 * @param name Name of alias without any patterns or variation blocks.
 	 * @param id Id of material.
@@ -258,7 +306,7 @@ public class AliasesProvider {
 		
 		// Create plural form of the alias (warning: I don't understand it either)
 		NonNullPair<String, Integer> plain = Noun.stripGender(name, name); // Name without gender and its gender token
-		NonNullPair<String, String> forms = Noun.getPlural(plain.getFirst()); // Singular and plural forms
+		NonNullPair<String, String> forms = getAliasPlural(plain.getFirst()); // Singular and plural forms
 		
 		// Check if there is item type with this name already, create otherwise
 		ItemType type = aliases.get(forms.getFirst());
@@ -276,6 +324,7 @@ public class AliasesProvider {
 		
 		// Make datas subtypes of the type we have here and handle Minecraft ids
 		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
+			data.strictEquality = true;
 			Set<ItemData> subs = subtypes.get(data);
 			if (subs == null) {
 				subs = new HashSet<>(datas.size());
@@ -283,7 +332,6 @@ public class AliasesProvider {
 			}
 			subs.addAll(datas); // Add all datas (the ones we have here)
 			
-			data.strictEquality = true;
 			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
 				minecraftIds.put(data, id); // Register Minecraft id for the data, too
 			
