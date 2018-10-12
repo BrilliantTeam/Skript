@@ -44,11 +44,11 @@ import ch.njol.skript.doc.Since;
 		"\t\t\tsend \"Nope, it isn't\""})
 @Since("2.3")
 public class CondIsSlimeChunk extends PropertyCondition<Chunk> {
-
+	
 	static {
 		register(CondIsSlimeChunk.class, "([a] slime chunk|slime chunks|slimey)", "chunk");
 	}
-
+	
 	@Override
 	public boolean check(Chunk chunk) {
 		Random random = new Random(chunk.getWorld().getSeed() +
@@ -58,9 +58,10 @@ public class CondIsSlimeChunk extends PropertyCondition<Chunk> {
 				(long) (chunk.getZ() * 0x5f24f) ^ 0x3ad8025f);
 		return random.nextInt(10) == 0;
 	}
-
+	
 	@Override
 	protected String getPropertyName() {
 		return "slime chunk";
 	}
+	
 }

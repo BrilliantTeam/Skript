@@ -49,6 +49,7 @@ import ch.njol.util.Kleenean;
 		"		# ... actual command trigger here ..."})
 @Since("2.0")
 public class CondDate extends Condition {
+	
 	static {
 		Skript.registerCondition(CondDate.class,
 				"%date% (was|were)( more|(n't| not) less) than %timespan% [ago]",
@@ -58,7 +59,7 @@ public class CondDate extends Condition {
 	@SuppressWarnings("null")
 	private Expression<Date> date;
 	@SuppressWarnings("null")
-	Expression<Timespan> delta;
+	private Expression<Timespan> delta;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
@@ -72,17 +73,10 @@ public class CondDate extends Condition {
 	@Override
 	public boolean check(final Event e) {
 		final long now = System.currentTimeMillis();
-		return date.check(e, new Checker<Date>() {
-			@Override
-			public boolean check(final Date d) {
-				return delta.check(e, new Checker<Timespan>() {
-					@Override
-					public boolean check(final Timespan t) {
-						return now - d.getTimestamp() >= t.getMilliSeconds();
-					}
-				}, isNegated());
-			}
-		});
+		return date.check(e,
+				date -> delta.check(e,
+						timespan -> now - date.getTimestamp() >= timespan.getMilliSeconds()
+				), isNegated());
 	}
 	
 	@Override

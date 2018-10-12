@@ -19,9 +19,6 @@
  */
 package ch.njol.skript.conditions;
 
-import java.util.Arrays;
-
-import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -32,12 +29,9 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionList;
-import ch.njol.skript.lang.ParseContext;
-import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.log.RetainingLogHandler;
@@ -64,7 +58,7 @@ import ch.njol.util.Kleenean;
 @Since("1.0")
 public class CondCompare extends Condition {
 	
-	private final static Patterns<Relation> patterns = new Patterns<>(new Object[][] {
+	private final static Patterns<Relation> patterns = new Patterns<>(new Object[][]{
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) ((greater|more|higher|bigger|larger) than|above)|\\>) %objects%", Relation.GREATER},
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) (greater|more|higher|bigger|larger|above) [than] or (equal to|the same as)|\\>=) %objects%", Relation.GREATER_OR_EQUAL},
 			{"(1¦neither|) %objects% ((is|are)(|2¦(n't| not|4¦ neither)) ((less|smaller) than|below)|\\<) %objects%", Relation.SMALLER},
@@ -100,14 +94,14 @@ public class CondCompare extends Condition {
 	@SuppressWarnings("null")
 	private Expression<?> first;
 	@SuppressWarnings("null")
-	Expression<?> second;
+	private Expression<?> second;
 	@Nullable
-	Expression<?> third;
+	private Expression<?> third;
 	@SuppressWarnings("null")
-	Relation relation;
+	private Relation relation;
 	@SuppressWarnings("rawtypes")
 	@Nullable
-	Comparator comp;
+	private Comparator comp;
 	
 	@SuppressWarnings("null")
 	@Override
@@ -121,7 +115,7 @@ public class CondCompare extends Condition {
 			setNegated(true);
 		if ((parser.mark & 0x1) != 0) // "neither" on the left side
 			setNegated(!isNegated());
-		if ((parser.mark & 0x4) != 0) {// "neither" on the right side
+		if ((parser.mark & 0x4) != 0) { // "neither" on the right side
 			if (second instanceof ExpressionList)
 				((ExpressionList<?>) second).invertAnd();
 			if (third instanceof ExpressionList)
@@ -252,29 +246,20 @@ public class CondCompare extends Condition {
 	 * neither a nor b # x and y === a !# x and y && b !# x and y		// nor = and
 	 * neither a nor b # x or y === a !# x or y && b !# x or y			// nor = and
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean check(final Event e) {
 		final Expression<?> third = this.third;
-		return first.check(e, new Checker<Object>() {
-			@Override
-			public boolean check(final Object o1) {
-				return second.check(e, new Checker<Object>() {
-					@Override
-					public boolean check(final Object o2) {
-						if (third == null)
-							return relation.is(comp != null ? comp.compare(o1, o2) : Comparators.compare(o1, o2));
-						return third.check(e, new Checker<Object>() {
-							@Override
-							public boolean check(final Object o3) {
-								return relation == Relation.NOT_EQUAL ^
-										(Relation.GREATER_OR_EQUAL.is(comp != null ? comp.compare(o1, o2) : Comparators.compare(o1, o2))
-										&& Relation.SMALLER_OR_EQUAL.is(comp != null ? comp.compare(o1, o3) : Comparators.compare(o1, o3)));
-							}
-						});
-					}
-				});
-			}
-		}, isNegated());
+		return first.check(e,
+				(Checker<Object>) o1 -> second.check(e,
+						(Checker<Object>) o2 -> {
+							if (third == null)
+								return relation.is(comp != null ? comp.compare(o1, o2) : Comparators.compare(o1, o2));
+							return third.check(e,
+									(Checker<Object>) o3 -> relation == Relation.NOT_EQUAL ^
+											(Relation.GREATER_OR_EQUAL.is(comp != null ? comp.compare(o1, o2) : Comparators.compare(o1, o2))
+													&& Relation.SMALLER_OR_EQUAL.is(comp != null ? comp.compare(o1, o3) : Comparators.compare(o1, o3))));
+						}), isNegated());
 	}
 	
 	@Override
