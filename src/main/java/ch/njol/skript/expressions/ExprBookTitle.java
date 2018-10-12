@@ -19,6 +19,8 @@
  */
 package ch.njol.skript.expressions;
 
+import ch.njol.skript.aliases.Aliases;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -44,6 +46,8 @@ public class ExprBookTitle extends SimplePropertyExpression<ItemStack,String> {
 		register(ExprBookTitle.class, String.class, "(book name|title)", "itemstack");
 	}
 	
+	private static final ItemType book = Aliases.javaItemType("book with text");
+	
 	@Override
 	protected String getPropertyName() {
 		return "title";
@@ -52,9 +56,8 @@ public class ExprBookTitle extends SimplePropertyExpression<ItemStack,String> {
 	@Nullable
 	@Override
 	public String convert(ItemStack itemStack) {
-		if (itemStack.getType() != Material.BOOK_AND_QUILL && itemStack.getType() != Material.WRITTEN_BOOK){
+		if (!book.isOfType(itemStack))
 			return null;
-		}
 		return ((BookMeta) itemStack.getItemMeta()).getTitle();
 	}
 	
@@ -75,9 +78,8 @@ public class ExprBookTitle extends SimplePropertyExpression<ItemStack,String> {
 	@Override
 	public void change(Event e, @Nullable Object[] delta, Changer.ChangeMode mode) {
 		ItemStack itemStack = getExpr().getSingle(e);
-		if (itemStack == null || (itemStack.getType() != Material.WRITTEN_BOOK && itemStack.getType() != Material.BOOK_AND_QUILL)){
+		if (itemStack == null || !book.isOfType(itemStack))
 			return;
-		}
 		BookMeta bookMeta = (BookMeta) itemStack.getItemMeta();
 		switch (mode){
 			case SET:

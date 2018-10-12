@@ -42,7 +42,7 @@ import ch.njol.util.Kleenean;
 @Examples("loop all players:\n" +
 		"\tif loop-value does not have permission \"moderator\":\n" +
 		"\t\tcontinue # filter out non moderators\n" +
-		"\tbroadcast \"%loop-player% is a moderator!\" # only moderators get broadcast")
+		"\tbroadcast \"%loop-player% is a moderator!\" # Only moderators get broadcast")
 @Since("2.2-dev37")
 public class EffContinue extends Effect {
 
@@ -77,7 +77,9 @@ public class EffContinue extends Effect {
 			Skript.error("Continue may only be used in loops");
 			return false;
 		}
-		loop = loops.get(loops.size() - 1); // the most recent loop
+		Loop loop = loops.get(loops.size() - 1); // The most recent loop
+		assert loop != null;
+		this.loop = loop;
 		return true;
 	}
 

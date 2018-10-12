@@ -38,20 +38,18 @@ import org.eclipse.jdt.annotation.Nullable;
 public class ExprHighestSolidBlock extends SimplePropertyExpression<Location, Block> {
 
 	static {
-		Skript.registerExpression(ExprHighestSolidBlock.class, Block.class, ExpressionType.PROPERTY,
-				"[the] highest [(solid|non-air)] block[s] at %locations%"
-		);
+		Skript.registerExpression(ExprHighestSolidBlock.class, Block.class, ExpressionType.PROPERTY, "highest [(solid|non-air)] block at %locations%");
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return "highest block";
+		return "highest [(solid|non-air)] block";
 	}
 
 	@Nullable
 	@Override
 	public Block convert(Location location) {
-		return location.getWorld().getHighestBlockAt(location).getRelative(0, -1, 0);
+		return location.getWorld().getHighestBlockAt(location);
 	}
 
 	@Override

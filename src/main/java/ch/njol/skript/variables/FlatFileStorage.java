@@ -100,7 +100,9 @@ public class FlatFileStorage extends VariablesStorage {
 		final Version v2_1 = new Version(2, 1);
 		boolean update2_1 = false;
 		
-		try (BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8))) {
+		BufferedReader r = null;
+		try {
+			r = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
 			String line = null;
 			int lineNum = 0;
 			while ((line = r.readLine()) != null) {
@@ -149,6 +151,12 @@ public class FlatFileStorage extends VariablesStorage {
 		} catch (final IOException e) {
 			loadError = true;
 			ioEx = e;
+		} finally {
+			if (r != null) {
+				try {
+					r.close();
+				} catch (final IOException e) {}
+			}
 		}
 		
 		final File file = this.file;
@@ -189,13 +197,8 @@ public class FlatFileStorage extends VariablesStorage {
 			@Override
 			public void run() {
 				if (changes.get() >= REQUIRED_CHANGES_FOR_RESAVE) {
-					try {
-						Variables.getReadLock().lock();
-						saveVariables(false);
-						changes.set(0);
-					} finally {
-						Variables.getReadLock().unlock();
-					}
+					saveVariables(false);
+					changes.set(0);
 				}
 			}
 		};
@@ -258,7 +261,6 @@ public class FlatFileStorage extends VariablesStorage {
 		return r.toArray(new String[r.size()]);
 	}
 	
-	@SuppressWarnings("resource")
 	@Override
 	protected boolean save(final String name, final @Nullable String type, final @Nullable byte[] value) {
 		synchronized (connectionLock) {
@@ -300,7 +302,6 @@ public class FlatFileStorage extends VariablesStorage {
 		pw.println();
 	}
 	
-	@SuppressWarnings("null")
 	@Override
 	protected final void disconnect() {
 		synchronized (connectionLock) {
@@ -315,18 +316,17 @@ public class FlatFileStorage extends VariablesStorage {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	protected final boolean connect() {
 		synchronized (connectionLock) {
 			synchronized (changesWriter) {
 				if (changesWriter.get() != null)
 					return true;
-				try {
-					changesWriter.set(new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, true), UTF_8)));
+				try (FileOutputStream fos = new FileOutputStream(file, true)){
+					changesWriter.set(new PrintWriter(new OutputStreamWriter(fos, UTF_8)));
 					loaded = true;
 					return true;
-				} catch (final FileNotFoundException e) {
+				} catch (IOException e) { // close() might throw ANY IOException
 					Skript.exception(e);
 					return false;
 				}
@@ -377,7 +377,9 @@ public class FlatFileStorage extends VariablesStorage {
 						}
 					}
 					final File tempFile = new File(Skript.getInstance().getDataFolder(), "variables.csv.temp");
-					try (PrintWriter pw = new PrintWriter(tempFile, "UTF-8")) {
+					PrintWriter pw = null;
+					try {
+						pw = new PrintWriter(tempFile, "UTF-8");
 						pw.println("# === Skript's variable storage ===");
 						pw.println("# Please do not modify this file manually!");
 						pw.println("#");
@@ -390,6 +392,9 @@ public class FlatFileStorage extends VariablesStorage {
 						FileUtils.move(tempFile, f, true);
 					} catch (final IOException e) {
 						Skript.error("Unable to make a final save of the database '" + databaseName + "' (no variables are lost): " + ExceptionUtils.toString(e)); // FIXME happens at random - check locks/threads
+					} finally {
+						if (pw != null)
+							pw.close();
 					}
 				} finally {
 					if (!finalSave) {
@@ -399,6 +404,14 @@ public class FlatFileStorage extends VariablesStorage {
 			}
 		} finally {
 			Variables.getReadLock().unlock();
+			boolean gotLock = Variables.variablesLock.writeLock().tryLock();
+			if (gotLock) { // Only process queue now if it doesn't require us to wait
+				try {
+					Variables.processChangeQueue();
+				} finally {
+					Variables.variablesLock.writeLock().unlock();
+				}
+			}
 		}
 	}
 	

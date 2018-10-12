@@ -34,5 +34,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Name {
 	
-	String value();
+	public String value();
 }

@@ -75,7 +75,7 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 			final Converter<? super F, ? extends T> conv = (Converter<? super F, ? extends T>) Converters.getConverter(v.getReturnType(), c);
 			if (conv == null)
 				continue;
-			return new ConvertedExpression<>(v, c, conv);
+			return new ConvertedExpression<F, T>(v, c, conv);
 		}
 		return null;
 	}

@@ -19,8 +19,6 @@
  */
 package ch.njol.skript.util.chat;
 
-import java.util.List;
-
 import ch.njol.skript.Skript;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -64,11 +62,7 @@ public class BungeeConverter {
 		
 		return base;
 	}
-
-	public static BaseComponent[] convert(List<MessageComponent> origins) {
-		return convert(origins.toArray(new MessageComponent[0]));
-	}
-
+	
 	@SuppressWarnings("null") // For origins[i] access
 	public static BaseComponent[] convert(MessageComponent[] origins) {
 		BaseComponent[] bases = new BaseComponent[origins.length];

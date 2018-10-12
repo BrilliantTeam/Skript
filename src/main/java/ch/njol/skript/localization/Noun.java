@@ -223,7 +223,7 @@ public class Noun extends Message {
 		int i = StringUtils.count(s, '¦');
 		int last = 0, c = -1;
 		while ((c = s.indexOf('¦', c + 1)) != -1) {
-			final String x = s.substring(last, c);
+			final String x = s.substring(last, c).trim();
 			if ((part & 1) != 0)
 				r.setFirst(r.getFirst() + x);
 			if ((part & 2) != 0)
@@ -294,10 +294,11 @@ public class Noun extends Message {
 	}
 	
 	/**
-	 * For use by {@link Aliases}
+	 * Strips the gender identifier from given string and returns the used
+	 * gender. Used for aliases.
 	 * 
-	 * @param s String
-	 * @param key Key to report in case of error
+	 * @param s String.
+	 * @param key Key to report in case of error.
 	 * @return (stripped string, gender or -1 if none)
 	 */
 	public static NonNullPair<String, Integer> stripGender(String s, final String key) {

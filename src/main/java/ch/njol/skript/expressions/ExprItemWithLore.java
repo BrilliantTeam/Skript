@@ -41,17 +41,17 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
 
-@Name("Item with a lore")
+@Name("Item with Lore")
 @Description({"Returns the given item type with the specified lore added to it.",
 		"If multiple strings are passed, each of them will be a separate line in the lore."})
 @Examples({"set {_test} to stone with lore \"line 1\" and \"line 2\"",
 		"give {_test} to player"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprItemWithLore extends PropertyExpression<ItemType, ItemType> {
 
 	static {
 		Skript.registerExpression(ExprItemWithLore.class, ItemType.class, ExpressionType.PROPERTY,
-				"%itemtypes% with lore %strings%");
+				"%itemtypes% with [(a|the)] lore %strings%");
 	}
 
 	@SuppressWarnings("null")
@@ -76,7 +76,6 @@ public class ExprItemWithLore extends PropertyExpression<ItemType, ItemType> {
 			if (meta == null) {
 				meta = Bukkit.getItemFactory().getItemMeta(Material.STONE);
 			}
-			Bukkit.getItemFactory().getItemMeta(Material.STONE);
 			meta.setLore(Arrays.asList(StringUtils.join(lore, "\n").split("\n")));
 			itemType.setItemMeta(meta);
 			return itemType;

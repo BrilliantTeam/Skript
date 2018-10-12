@@ -30,5 +30,6 @@ import org.bukkit.event.Event;
  */
 public interface Testable {
 	
-	boolean test(Event e);
+	public boolean test(Event e);
+	
 }

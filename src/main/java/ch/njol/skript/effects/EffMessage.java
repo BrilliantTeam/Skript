@@ -57,13 +57,13 @@ public class EffMessage extends Effect {
 		Skript.registerEffect(EffMessage.class, "(message|send [message[s]]) %strings% [to %commandsenders%]");
 	}
 
-	@Nullable
+	@SuppressWarnings("null")
 	private Expression<String>[] messages;
 
 	/**
 	 * Used for {@link EffMessage#toString(Event, boolean)}
 	 */
-	@Nullable
+	@SuppressWarnings("null")
 	private Expression<String> messageExpr;
 
 	@SuppressWarnings("null")
@@ -85,11 +85,11 @@ public class EffMessage extends Effect {
 			for (CommandSender sender : recipients.getArray(e)) {
 				if (message instanceof VariableString && sender instanceof Player) { // this could contain json formatting
 					List<MessageComponent> components = ((VariableString) message).getMessageComponents(e);
-					((Player) sender).spigot().sendMessage(BungeeConverter.convert(components));
+					((Player) sender).spigot().sendMessage(BungeeConverter.convert(components.toArray(new MessageComponent[components.size()])));
 				} else {
-					String string = message.getSingle(e);
-					if (string != null)
+					for (String string : message.getArray(e)) {
 						sender.sendMessage(string);
+					}
 				}
 			}
 		}

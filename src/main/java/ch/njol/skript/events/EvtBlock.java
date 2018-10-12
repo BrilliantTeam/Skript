@@ -105,20 +105,16 @@ public class EvtBlock extends SkriptEvent {
 		}
 		if (types == null)
 			return true;
-		int id = 0;
-		short durability = 0;
-		if (e instanceof BlockEvent) {
-			id = ((BlockEvent) e).getBlock().getTypeId();
-			durability = ((BlockEvent) e).getBlock().getData();
-		} else if (e instanceof BlockFormEvent) {
-			id = ((BlockFormEvent) e).getNewState().getTypeId();
-			durability = ((BlockFormEvent) e).getNewState().getRawData();
+		
+		ItemType item;
+		if (e instanceof BlockFormEvent) {
+			item = new ItemType(((BlockFormEvent) e).getNewState());
+		} else if (e instanceof BlockEvent) {
+			item = new ItemType(((BlockEvent) e).getBlock());
 		} else if (e instanceof PlayerBucketFillEvent) {
-			id = ((PlayerBucketEvent) e).getBlockClicked().getRelative(((PlayerBucketEvent) e).getBlockFace()).getTypeId();
-			durability = ((PlayerBucketEvent) e).getBlockClicked().getRelative(((PlayerBucketEvent) e).getBlockFace()).getData();
+			item = new ItemType(((PlayerBucketEvent) e).getBlockClicked().getRelative(((PlayerBucketEvent) e).getBlockFace()));
 		} else if (e instanceof PlayerBucketEmptyEvent) {
-			id = ((PlayerBucketEmptyEvent) e).getBucket() == Material.WATER_BUCKET ? Material.STATIONARY_WATER.getId() : Material.STATIONARY_LAVA.getId();
-			durability = 0;
+			item = new ItemType(((PlayerBucketEmptyEvent) e).getBucket());
 		} else if (Skript.isRunningMinecraft(1, 4, 3) && e instanceof HangingEvent) {
 			final EntityData<?> d = EntityData.fromEntity(((HangingEvent) e).getEntity());
 			return types.check(e, new Checker<ItemType>() {
@@ -132,14 +128,12 @@ public class EvtBlock extends SkriptEvent {
 			return false;
 		}
 		
-		//Hacky code to fix Java 8 compilation problems... TODO maybe use lambdas instead and break Java 7?
-		final int idFinal = id;
-		final short durFinal = durability;
+		final ItemType itemF = item;
 		
 		return types.check(e, new Checker<ItemType>() {
 			@Override
 			public boolean check(final @Nullable ItemType t) {
-				return t != null && t.isOfType(idFinal, durFinal);
+				return t != null && itemF.isSupertypeOf(t);
 			}
 		});
 	}

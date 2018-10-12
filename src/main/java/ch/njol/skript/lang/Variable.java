@@ -39,7 +39,6 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.SkriptConfig;
@@ -157,7 +156,7 @@ public class Variable<T> implements Expression<T> {
 		name = "" + name.trim();
 		if (!isValidVariableName(name, true, true))
 			return null;
-		VariableString vs = VariableString.newInstance(name.startsWith(LOCAL_VARIABLE_TOKEN) ? "" + name.substring(LOCAL_VARIABLE_TOKEN.length()).trim() : name, StringMode.VARIABLE_NAME);
+		final VariableString vs = VariableString.newInstance(name.startsWith(LOCAL_VARIABLE_TOKEN) ? "" + name.substring(LOCAL_VARIABLE_TOKEN.length()).trim() : name, StringMode.VARIABLE_NAME);
 		if (vs == null)
 			return null;
 		
@@ -200,7 +199,7 @@ public class Variable<T> implements Expression<T> {
 				for (int i = 0; i < types.length; i++) {
 					infos[i] = Classes.getExactClassInfo(types[i]);
 				}
-				Skript.warning("Local variable '" + name + "' is " + Classes.toString(Classes.getExactClassInfo(hint))
+				Skript.warning("Variable '{_" + name + "}' is " + Classes.toString(Classes.getExactClassInfo(hint))
 						+ ", not " + Classes.toString(infos, false));
 				// Fall back to not having any type hints
 			}
@@ -248,16 +247,12 @@ public class Variable<T> implements Expression<T> {
 	public <R> Variable<R> getConvertedExpression(final Class<R>... to) {
 		return new Variable<>(name, to, local, list, this);
 	}
-
+	
 	/**
 	 * Gets the value of this variable as stored in the variables map.
-	 *
-	 * This is mostly for internal usage, if you want to get the value(s)
-	 * the variable holds then use {@link Variable#getArray(Event)},
-	 * {@link Variable#getAll(Event)} or {@link Variable#getSingle(Event)}
 	 */
 	@Nullable
-	public Object getRaw(final Event e) {
+	private Object getRaw(final Event e) {
 		final String n = name.toString(e);
 		if (n.endsWith(Variable.SEPARATOR + "*") != list) // prevents e.g. {%expr%} where "%expr%" ends with "::*" from returning a Map
 			return null;
@@ -578,10 +573,15 @@ public class Variable<T> implements Expression<T> {
 								final Class<?> c = d.getClass();
 								assert c != null;
 								ci = Classes.getSuperClassInfo(c);
-								//Mirre Start
-								if (ci.getMath() != null || d instanceof Number)
+								
+								if (ci.getMath() != null)
 									o = d;
-								//Mirre End
+								if (d instanceof Number) { // Nonexistent variable: add/subtract
+									if (mode == ChangeMode.REMOVE) // Variable is delta negated
+										o = -((Number) d).doubleValue(); // Hopefully enough precision
+									else // Variable is now what was added to it
+										o = d;
+								}
 								changed = true;
 								continue;
 							}

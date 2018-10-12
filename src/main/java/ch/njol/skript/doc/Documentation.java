@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,12 +62,16 @@ public class Documentation {
 		if (!generate)
 			return;
 		try {
-			final PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(Skript.getInstance().getDataFolder(), "doc.sql")), StandardCharsets.UTF_8));
+			final PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(Skript.getInstance().getDataFolder(), "doc.sql")), "UTF-8"));
 			asSql(pw);
 			pw.flush();
 			pw.close();
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
+			return;
+		} catch (final UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return;
 		}
 	}
 	
@@ -189,7 +193,7 @@ public class Documentation {
 					final NonNullPair<String, Boolean> p = Utils.getEnglishPlural(c);
 					final ClassInfo<?> ci = Classes.getClassInfoNoError(p.getFirst());
 					if (ci != null && ci.getDocName() != null && ci.getDocName() != ClassInfo.NO_DOC) {
-						b.append("<a href='../classes/#").append(p.getFirst()).append("'>").append(ci.getName().toString(p.getSecond())).append("</a>");
+						b.append("<a href='../classes.html#").append(p.getFirst()).append("'>").append(ci.getName().toString(p.getSecond())).append("</a>");
 					} else {
 						b.append(c);
 						if (ci != null && ci.getDocName() != ClassInfo.NO_DOC)

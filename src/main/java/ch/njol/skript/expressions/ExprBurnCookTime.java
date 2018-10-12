@@ -31,6 +31,8 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.Aliases;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Arithmetic;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.ClassInfo;
@@ -53,7 +55,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Examples({"on fuel burn:",
 		"	if fuel slot is coal:",
 		"		set burning time to 1 tick"})
-@Since("2.2-dev37")
+@Since("2.3")
 public class ExprBurnCookTime extends PropertyExpression<Block, Timespan> {
 
 	static {
@@ -62,6 +64,8 @@ public class ExprBurnCookTime extends PropertyExpression<Block, Timespan> {
 				"[the] (burn|1¦cook)[ing] time of %blocks%",
 				"%blocks%'[s] (burn|1¦cook)[ing] time");
 	}
+	
+	static final ItemType anyFurnace = Aliases.javaItemType("any furnace");
 
 	private boolean cookTime;
 	private boolean isEvent;
@@ -83,19 +87,22 @@ public class ExprBurnCookTime extends PropertyExpression<Block, Timespan> {
 	protected Timespan[] get(Event e, Block[] source) {
 		if (isEvent)
 			return CollectionUtils.array(Timespan.fromTicks_i(((FurnaceBurnEvent) e).getBurnTime()));
-		else
-			return Arrays.stream(source)
-					.filter(block -> block.getType() == Material.FURNACE || block.getType() == Material.BURNING_FURNACE)
+		else {
+			Timespan[] result = Arrays.stream(source)
+					.filter(block -> anyFurnace.isOfType(block))
 					.map(furnace -> {
 						Furnace state = (Furnace) furnace.getState();
 						return Timespan.fromTicks_i(cookTime ? state.getCookTime() : state.getBurnTime());
 					})
 					.toArray(Timespan[]::new);
+			assert result != null;
+			return result;
+		}
 	}
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return isEvent ? "the burning time" : String.format("the %sing time of %s", cookTime ? "cook" : "burn", getExpr().toString(e, debug));
+		return isEvent ? "the burning time" : "" + String.format("the %sing time of %s", cookTime ? "cook" : "burn", getExpr().toString(e, debug));
 	}
 
 	@Override
@@ -134,6 +141,11 @@ public class ExprBurnCookTime extends PropertyExpression<Block, Timespan> {
 				break;
 			case SET:
 				value = (original) -> changed;
+				break;
+			//$CASES-OMITTED$
+			default:
+				assert false;
+				break;
 		}
 
 		assert value != null; // It isn't going to be null but the compiler complains so
@@ -145,7 +157,7 @@ public class ExprBurnCookTime extends PropertyExpression<Block, Timespan> {
 		}
 
 		for (Block block : getExpr().getArray(e)) {
-			if (block.getType() != Material.FURNACE || block.getType() != Material.BURNING_FURNACE)
+			if (!anyFurnace.isOfType(block))
 				continue;
 			Furnace furnace = (Furnace) block.getState();
 			long time = value.apply(Timespan.fromTicks_i(cookTime ? furnace.getCookTime() : furnace.getBurnTime())).getTicks_i();

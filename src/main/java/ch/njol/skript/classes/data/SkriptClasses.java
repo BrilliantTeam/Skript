@@ -36,6 +36,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemData;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.EnchantmentIds;
 import ch.njol.skript.classes.Arithmetic;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.ClassInfo;
@@ -225,22 +226,20 @@ public class SkriptClasses {
 						return t.getDebugMessage();
 					}
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public String toVariableNameString(final ItemType t) {
 						final StringBuilder b = new StringBuilder("itemtype:");
 						b.append(t.getInternalAmount());
 						b.append("," + t.isAll());
+						// TODO this is missing information
 						for (final ItemData d : t.getTypes()) {
-							b.append("," + d.getId());
-							b.append(":" + d.dataMin);
-							b.append("/" + d.dataMax);
+							b.append("," + d.getType());
 						}
 						final Map<Enchantment, Integer> enchs = t.getEnchantments();
 						if (enchs != null && !enchs.isEmpty()) {
 							b.append("|");
 							for (final Entry<Enchantment, Integer> e : enchs.entrySet()) {
-								b.append("#" + e.getKey().getId());
+								b.append("#" + EnchantmentIds.ids.get(e.getKey()));
 								b.append(":" + e.getValue());
 							}
 						}
@@ -252,84 +251,7 @@ public class SkriptClasses {
 						return "itemtype:.+";
 					}
 				})
-				.serializer(new YggdrasilSerializer<ItemType>() {
-//						final StringBuilder b = new StringBuilder();
-//						b.append(t.getInternalAmount());
-//						b.append("," + t.isAll());
-//						for (final ItemData d : t.getTypes()) {
-//							b.append("," + d.getId());
-//							b.append(":" + d.dataMin);
-//							b.append("/" + d.dataMax);
-//						}
-//						if (t.getEnchantments() != null) {
-//							b.append("|");
-//							for (final Entry<Enchantment, Integer> e : t.getEnchantments().entrySet()) {
-//								b.append("#" + e.getKey().getId());
-//								b.append(":" + e.getValue());
-//							}
-//						}
-//						if (t.getItemMeta() != null) {
-//							b.append("¦");
-//							b.append(ConfigurationSerializer.serializeCS((ItemMeta) t.getItemMeta()).replace("¦", "¦¦"));
-//						}
-//						return b.toString();
-					@Override
-					@Deprecated
-					@Nullable
-					public ItemType deserialize(final String s) {
-						final String[] ss = s.split("\\|");
-						if (ss.length > 2)
-							return null;
-						final String[] split = ss[0].split("[,:/]");
-						if (split.length < 5 || (split.length - 2) % 3 != 0)
-							return null;
-						final ItemType t = new ItemType();
-						try {
-							t.setAmount(Integer.parseInt(split[0]));
-							if (split[1].equals("true"))
-								t.setAll(true);
-							else if (split[1].equals("false"))
-								t.setAll(false);
-							else
-								return null;
-							for (int i = 2; i < split.length; i += 3) {
-								t.add(new ItemData(Integer.parseInt(split[i]), Short.parseShort(split[i + 1]), Short.parseShort(split[i + 2])));
-							}
-						} catch (final NumberFormatException e) {
-							return null;
-						}
-						if (ss.length == 2) {
-							final String[] sss = ss[1].split("¦", 2);
-							if (!sss[0].isEmpty()) {
-								final String[] es = sss[0].split("#");
-								for (final String e : es) {
-									if (e.isEmpty())
-										continue;
-									final String[] en = e.split(":");
-									if (en.length != 2)
-										return null;
-									try {
-										final Enchantment ench = Enchantment.getById(Integer.parseInt(en[0]));
-										if (ench == null)
-											return null;
-										t.addEnchantment(ench, Integer.parseInt(en[1]));
-									} catch (final NumberFormatException ex) {
-										return null;
-									}
-								}
-							}
-							if (sss.length == 2) {
-								if (!ItemType.itemMetaSupported)
-									return null;
-								final ItemMeta m = ConfigurationSerializer.deserializeCSOld("" + sss[1].replace("¦¦", "¦"), ItemMeta.class);
-								if (m == null)
-									return null;
-								t.setItemMeta(m);
-							}
-						}
-						return t;
-					}
-				}));
+				.serializer(new YggdrasilSerializer<>()));
 		
 		Classes.registerClass(new ClassInfo<>(Time.class, "time")
 				.user("times?")
@@ -536,7 +458,7 @@ public class SkriptClasses {
 		Classes.registerClass(new ClassInfo<>(Date.class, "date")
 				.user("dates?")
 				.name("Date")
-				.description("A date is a certain point in the real world's time which can currently only be obtained with <a href='../expressions/#ExprNow'>now</a>.",
+				.description("A date is a certain point in the real world's time which can currently only be obtained with <a href='../expressions.html#ExprNow'>now</a>.",
 						"See <a href='#time'>time</a> and <a href='#timespan'>timespan</a> for the other time types of Skript.")
 				.usage("")
 				.examples("set {_yesterday} to now",
@@ -592,7 +514,7 @@ public class SkriptClasses {
 				.description("A direction, e.g. north, east, behind, 5 south east, 1.3 meters to the right, etc.",
 						"<a href='#location'>Locations</a> and some <a href='#block'>blocks</a> also have a direction, but without a length.",
 						"Please note that directions have changed extensively in the betas and might not work perfectly. They can also not be used as command arguments.")
-				.usage("see <a href='../expressions/#ExprDirection'>direction (expression)</a>")
+				.usage("see <a href='../expressions.html#ExprDirection'>direction (expression)</a>")
 				.examples("set the block below the victim to a chest",
 						"loop blocks from the block infront of the player to the block 10 below the player:",
 						"	set the block behind the loop-block to water")
@@ -639,11 +561,11 @@ public class SkriptClasses {
 				.user("(inventory )?slots?")
 				.name("Inventory Slot")
 				.description("Represents a single slot of an <a href='#inventory'>inventory</a>. " +
-						"Notable slots are the <a href='../expressions/#ExprArmorSlot'>armour slots</a> and <a href='../expressions/#ExprFurnaceSlot'>furnace slots</a>. ",
+						"Notable slots are the <a href='../expressions.html#ExprArmorSlot'>armour slots</a> and <a href='../expressions/#ExprFurnaceSlot'>furnace slots</a>. ",
 						"The most important property that distinguishes a slot from an <a href='#itemstack'>item</a> is its ability to be changed, e.g. it can be set, deleted, enchanted, etc. " +
 								"(Some item expressions can be changed as well, e.g. items stored in variables. " +
 								"For that matter: slots are never saved to variables, only the items they represent at the time when the variable is set).",
-						"Please note that <a href='../expressions/#ExprTool'>tool</a> can be regarded a slot, but it can actually change it's position, i.e. doesn't represent always the same slot.")
+						"Please note that <a href='../expressions.html#ExprTool'>tool</a> can be regarded a slot, but it can actually change it's position, i.e. doesn't represent always the same slot.")
 				.usage("")
 				.examples("set tool of player to dirt",
 						"delete helmet of the victim",
@@ -753,7 +675,7 @@ public class SkriptClasses {
 		Classes.registerClass(new ClassInfo<>(StructureType.class, "structuretype")
 				.user("tree ?types?", "trees?")
 				.name("Tree Type")
-				.description("A tree type represents a tree species or a huge mushroom species. These can be generated in a world with the <a href='../effects/#EffTree'>generate tree</a> effect.")
+				.description("A tree type represents a tree species or a huge mushroom species. These can be generated in a world with the <a href='../effects.html#EffTree'>generate tree</a> effect.")
 				.usage("<code>[any] &lt;general tree/mushroom type&gt;</code>, e.g. tree/any jungle tree/etc.", "<code>&lt;specific tree/mushroom species&gt;</code>, e.g. red mushroom/small jungle tree/big regular tree/etc.")
 				.examples("grow any regular tree at the block",
 						"grow a huge red mushroom above the block")
@@ -822,7 +744,7 @@ public class SkriptClasses {
 						if (split.length != 2)
 							return null;
 						try {
-							final Enchantment ench = Enchantment.getById(Integer.parseInt(split[0]));
+							final Enchantment ench = EnchantmentIds.enchantments[Integer.parseInt(split[0])];
 							if (ench == null)
 								return null;
 							return new EnchantmentType(ench, Integer.parseInt(split[1]));
@@ -835,7 +757,7 @@ public class SkriptClasses {
 		Classes.registerClass(new ClassInfo<>(Experience.class, "experience")
 				.name("Experience")
 				.description("Experience points. Please note that Bukkit only allows to give XP, but not remove XP from players. " +
-						"You can however change a player's <a href='../expressions/#ExprLevel'>level</a> and <a href='../expressions/#ExprLevelProgress'>level progress</a> freely.")
+						"You can however change a player's <a href='../expressions.html#ExprLevel'>level</a> and <a href='../expressions/#ExprLevelProgress'>level progress</a> freely.")
 				.usage("<code>[&lt;number&gt;] ([e]xp|experience [point[s]])</code>")
 				.examples("give 10 xp to the player")
 				.since("2.0")
@@ -913,7 +835,7 @@ public class SkriptClasses {
 							return ".*";
 						}
 					})
-					.serializer(new YggdrasilSerializer<>()));
+					.serializer(new YggdrasilSerializer<VisualEffect>()));
 		} else {
 			Classes.registerClass(new ClassInfo<>(VisualEffectDummy.class, "visualeffect"));
 		}

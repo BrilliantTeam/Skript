@@ -39,7 +39,8 @@ public enum Color implements YggdrasilSerializable {
 	
 	BLACK(DyeColor.BLACK, ChatColor.BLACK, org.bukkit.Color.fromRGB(0x191919)),
 	DARK_GREY(DyeColor.GRAY, ChatColor.DARK_GRAY, org.bukkit.Color.fromRGB(0x4C4C4C)),
-	LIGHT_GREY(DyeColor.SILVER, ChatColor.GRAY, org.bukkit.Color.fromRGB(0x999999)),
+	// DyeColor.LIGHT_GRAY on 1.13, DyeColor.SILVER on earlier
+	LIGHT_GREY(DyeColor.getByColor(org.bukkit.Color.fromRGB(0x9D9D97)), ChatColor.GRAY, org.bukkit.Color.fromRGB(0x999999)),
 	WHITE(DyeColor.WHITE, ChatColor.WHITE, org.bukkit.Color.fromRGB(0xFFFFFF)),
 	
 	DARK_BLUE(DyeColor.BLUE, ChatColor.DARK_BLUE, org.bukkit.Color.fromRGB(0x334CB2)),

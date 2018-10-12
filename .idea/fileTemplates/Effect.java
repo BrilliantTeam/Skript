@@ -17,7 +17,7 @@ import ch.njol.util.Kleenean;
 @Name("${Effect_Name}")
 @Description("${Description}")
 @Examples("")
-@Since("2.2-dev37")
+@Since("INSERT VERSION")
 public class Eff${NAME} extends Effect {
 	
 	static {

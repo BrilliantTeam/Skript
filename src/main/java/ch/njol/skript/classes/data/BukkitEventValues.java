@@ -52,6 +52,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -108,6 +110,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.command.CommandEvent;
 import ch.njol.skript.events.EvtMoveOn;
@@ -290,11 +293,12 @@ public final class BukkitEventValues {
 				return new DelayedChangeBlock(e.getBlock());
 			}
 		}, 0);
+		ItemType stationaryWater = Aliases.javaItemType("stationary water");
 		EventValues.registerEventValue(BlockBreakEvent.class, Block.class, new Getter<Block, BlockBreakEvent>() {
 			@Override
 			public Block get(final BlockBreakEvent e) {
 				final BlockState s = e.getBlock().getState();
-				s.setType(s.getType() == Material.ICE ? Material.STATIONARY_WATER : Material.AIR);
+				s.setType(s.getType() == Material.ICE ? stationaryWater.getMaterial() : Material.AIR);
 				s.setRawData((byte) 0);
 				return new BlockStateBlock(s, true);
 			}
@@ -342,8 +346,7 @@ public final class BukkitEventValues {
 			@Override
 			public Block get(final BlockCanBuildEvent e) {
 				final BlockState s = e.getBlock().getState();
-				s.setTypeId(e.getMaterialId());
-				s.setRawData((byte) 0);
+				s.setType(e.getMaterial());
 				return new BlockStateBlock(s, true);
 			}
 		}, 0);
@@ -517,7 +520,7 @@ public final class BukkitEventValues {
 			@Nullable
 			public Block get(final PlayerBucketFillEvent e) {
 				final BlockState s = e.getBlockClicked().getRelative(e.getBlockFace()).getState();
-				s.setTypeId(0);
+				s.setType(Material.AIR);
 				s.setRawData((byte) 0);
 				return new BlockStateBlock(s, true);
 			}
@@ -529,11 +532,12 @@ public final class BukkitEventValues {
 				return e.getBlockClicked().getRelative(e.getBlockFace());
 			}
 		}, -1);
+		ItemType stationaryLava = Aliases.javaItemType("stationary lava");
 		EventValues.registerEventValue(PlayerBucketEmptyEvent.class, Block.class, new Getter<Block, PlayerBucketEmptyEvent>() {
 			@Override
 			public Block get(final PlayerBucketEmptyEvent e) {
 				final BlockState s = e.getBlockClicked().getRelative(e.getBlockFace()).getState();
-				s.setType(e.getBucket() == Material.WATER_BUCKET ? Material.STATIONARY_WATER : Material.STATIONARY_LAVA);
+				s.setType(e.getBucket() == Material.WATER_BUCKET ? stationaryWater.getMaterial() : stationaryLava.getMaterial());
 				s.setRawData((byte) 0);
 				return new BlockStateBlock(s, true);
 			}
@@ -925,6 +929,15 @@ public final class BukkitEventValues {
 			@Override
 			public Player get(PlayerToggleFlightEvent e) {
 				return e.getPlayer();
+			}
+		}, 0);
+
+		//CreatureSpawnEvent
+		EventValues.registerEventValue(CreatureSpawnEvent.class, SpawnReason.class, new Getter<SpawnReason, CreatureSpawnEvent>() {
+			@Nullable
+			@Override
+			public SpawnReason get(CreatureSpawnEvent e) {
+				return e.getSpawnReason();
 			}
 		}, 0);
 

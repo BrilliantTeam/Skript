@@ -40,12 +40,14 @@ import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jdt.annotation.NonNull;
 
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.bukkitutil.CommandReloader;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.command.CommandEvent;
 import ch.njol.skript.command.Commands;
@@ -133,7 +135,7 @@ final public class ScriptLoader {
 	 * @param state The new value for {@link ScriptLoader#callPreLoadEvent}
 	 * @param addon A non-null SkriptAddon
 	 */
-	public static void setCallPreloadEvent(boolean state, SkriptAddon addon) {
+	public static void setCallPreloadEvent(boolean state, @NonNull SkriptAddon addon) {
 		Validate.notNull(addon);
 		callPreLoadEvent = state;
 		if (state)
@@ -188,14 +190,13 @@ final public class ScriptLoader {
 		currentEventName = null;
 		currentEvents = null;
 		hasDelayBefore = Kleenean.FALSE;
-		TypeHints.clear(); // Local variables are local to event
 	}
 	
 	public static List<TriggerSection> currentSections = new ArrayList<>();
 	public static List<Loop> currentLoops = new ArrayList<>();
 	private final static Map<String, ItemType> currentAliases = new HashMap<>();
 	final static HashMap<String, String> currentOptions = new HashMap<>();
-		
+	
 	public static Map<String, ItemType> getScriptAliases() {
 		return currentAliases;
 	}
@@ -401,6 +402,12 @@ final public class ScriptLoader {
 			loadQueue.add(task);
 		else
 			task.run();
+		
+		// After we've loaded everything, refresh commands
+		// TODO only sync if new were defined
+		Server server = Bukkit.getServer();
+		assert server != null;
+		CommandReloader.syncCommands(server);
 		
 		// If task was ran asynchronously, returned stats may be wrong
 		// This is probably ok, since loadScripts() will go async if needed
@@ -777,6 +784,7 @@ final public class ScriptLoader {
 	public static List<Config> loadStructures(final File directory) {
 		if (!directory.isDirectory())
 			return loadStructures(new File[]{directory});
+		
 		final File[] files = directory.listFiles(scriptFilter);
 		Arrays.sort(files);
 		
@@ -865,6 +873,8 @@ final public class ScriptLoader {
 						final Signature<?> func = Functions.loadSignature(config.getFileName(), node);
 						
 						deleteCurrentEvent();
+						
+						continue;
 					}
 				}
 				

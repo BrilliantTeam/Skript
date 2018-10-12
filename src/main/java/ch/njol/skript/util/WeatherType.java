@@ -124,7 +124,6 @@ public enum WeatherType {
 			case RAIN:
 			case THUNDER:
 				player.setPlayerWeather(org.bukkit.WeatherType.DOWNFALL);
-				break;
 			case CLEAR:
 				player.setPlayerWeather(org.bukkit.WeatherType.CLEAR);
 				break;

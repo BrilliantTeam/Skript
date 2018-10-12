@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.NotSerializableException;
 import java.io.SequenceInputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -76,10 +75,10 @@ public abstract class Classes {
 	
 	@Nullable
 	private static ClassInfo<?>[] classInfos = null;
-	private final static List<ClassInfo<?>> tempClassInfos = new ArrayList<>();
-	private final static HashMap<Class<?>, ClassInfo<?>> exactClassInfos = new HashMap<>();
-	private final static HashMap<Class<?>, ClassInfo<?>> superClassInfos = new HashMap<>();
-	private final static HashMap<String, ClassInfo<?>> classInfosByCodeName = new HashMap<>();
+	private final static List<ClassInfo<?>> tempClassInfos = new ArrayList<ClassInfo<?>>();
+	private final static HashMap<Class<?>, ClassInfo<?>> exactClassInfos = new HashMap<Class<?>, ClassInfo<?>>();
+	private final static HashMap<Class<?>, ClassInfo<?>> superClassInfos = new HashMap<Class<?>, ClassInfo<?>>();
+	private final static HashMap<String, ClassInfo<?>> classInfosByCodeName = new HashMap<String, ClassInfo<?>>();
 	
 	/**
 	 * @param info info about the class to register
@@ -163,7 +162,7 @@ public abstract class Classes {
 		
 		// remove unresolvable dependencies (and print a warning if testing)
 		for (final ClassInfo<?> ci : tempClassInfos) {
-			final Set<String> s = new HashSet<>();
+			final Set<String> s = new HashSet<String>();
 			final Set<String> before = ci.before();
 			if (before != null) {
 				for (final String b : before) {
@@ -183,7 +182,7 @@ public abstract class Classes {
 				Skript.warning(s.size() + " dependency/ies could not be resolved for " + ci + ": " + StringUtils.join(s, ", "));
 		}
 		
-		final List<ClassInfo<?>> classInfos = new ArrayList<>(tempClassInfos.size());
+		final List<ClassInfo<?>> classInfos = new ArrayList<ClassInfo<?>>(tempClassInfos.size());
 		
 		boolean changed = true;
 		while (changed) {
@@ -649,11 +648,14 @@ public abstract class Classes {
 	 */
 	private final static byte[] YGGDRASIL_START = {(byte) 'Y', (byte) 'g', (byte) 'g', 0, (Variables.YGGDRASIL_VERSION >>> 8) & 0xFF, Variables.YGGDRASIL_VERSION & 0xFF};
 	
+	@SuppressWarnings("null")
+	private final static Charset UTF_8 = Charset.forName("UTF-8");
+	
 	private static byte[] getYggdrasilStart(final ClassInfo<?> c) throws NotSerializableException {
 		assert Enum.class.isAssignableFrom(Kleenean.class) && Tag.getType(Kleenean.class) == Tag.T_ENUM : Tag.getType(Kleenean.class); // TODO why is this check here?
 		final Tag t = Tag.getType(c.getC());
 		assert t.isWrapper() || t == Tag.T_STRING || t == Tag.T_OBJECT || t == Tag.T_ENUM;
-		final byte[] cn = t == Tag.T_OBJECT || t == Tag.T_ENUM ? Variables.yggdrasil.getID(c.getC()).getBytes(StandardCharsets.UTF_8) : null;
+		final byte[] cn = t == Tag.T_OBJECT || t == Tag.T_ENUM ? Variables.yggdrasil.getID(c.getC()).getBytes(UTF_8) : null;
 		final byte[] r = new byte[YGGDRASIL_START.length + 1 + (cn == null ? 0 : 1 + cn.length)];
 		int i = 0;
 		for (; i < YGGDRASIL_START.length; i++)

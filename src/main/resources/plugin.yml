@@ -29,6 +29,7 @@ website: https://bensku.github.io/Skript
 main: ch.njol.skript.Skript
 
 version: @version@
+api-version: 1.13
 
 commands:
     skript:

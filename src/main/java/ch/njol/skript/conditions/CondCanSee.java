@@ -38,7 +38,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Description("Checks whether the given players can see another players.")
 @Examples({"if the player can't see the player-argument:",
 		"	message \"<light red>The player %player-argument% is not online!\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class CondCanSee extends Condition {
 
 	static {

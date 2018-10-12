@@ -20,6 +20,8 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.Aliases;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -52,6 +54,8 @@ public class ExprBookPages extends SimpleExpression<String> {
 		Skript.registerExpression(ExprBookPages.class, String.class, ExpressionType.PROPERTY, "[all] [the] [book] (pages|content) of %itemstack%", "%itemstack%'s [book] (pages|content)", "[book] page %number% of %itemstack%", "%itemstack%'s [book] page %number%");
 	}
 	
+	private static final ItemType bookItem = Aliases.javaItemType("book with text");
+	
 	@SuppressWarnings("null")
 	private Expression<ItemStack> book;
 	@Nullable
@@ -61,9 +65,8 @@ public class ExprBookPages extends SimpleExpression<String> {
 	@Override
 	protected String[] get(Event e) {
 		ItemStack itemStack = book.getSingle(e);
-		if (itemStack == null || (itemStack.getType() != Material.BOOK_AND_QUILL && itemStack.getType() != Material.WRITTEN_BOOK)){
+		if (itemStack == null || !bookItem.isOfType(itemStack))
 			return null;
-		}
 		List<String> pages = ((BookMeta) itemStack.getItemMeta()).getPages();
 		if (page != null){
 			Number pageNumber = page.getSingle(e);

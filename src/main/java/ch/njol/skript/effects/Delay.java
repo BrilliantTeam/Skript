@@ -42,7 +42,6 @@ import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
-import edu.umd.cs.findbugs.ba.bcp.New;
 
 /**
  * @author Peter Güttinger
@@ -81,7 +80,6 @@ public class Delay extends Effect {
 		final long start = Skript.debug() ? System.nanoTime() : 0;
 		final TriggerItem next = getNext();
 		if (next != null) {
-			
 			delayed.add(e);
 			final Timespan d = duration.getSingle(e);
 			if (d == null)
@@ -118,8 +116,8 @@ public class Delay extends Effect {
 	}
 
 	@SuppressWarnings("null")
-	protected final static Set<Event> delayed = Collections.newSetFromMap(new WeakHashMap<>());
-	
+	protected final static Set<Event> delayed = Collections.newSetFromMap(new WeakHashMap<Event, Boolean>());
+
 	public static boolean isDelayed(final Event e) {
 		return delayed.contains(e);
 	}

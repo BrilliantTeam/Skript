@@ -39,6 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.SkriptEventHandler;
+import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemData;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.lang.Literal;
@@ -47,53 +48,24 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.registrations.Classes;
 
-/**
- * @author Peter Güttinger
- */
-@SuppressWarnings("deprecation")
-public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 
-//	private final static class BlockLocation {
-//		final World world;
-//		final int x, y, z;
-//
-//		BlockLocation(final World world, final int x, final int y, final int z) {
-//			this.world = world;
-//			this.x = x;
-//			this.y = y;
-//			this.z = z;
-//		}
-//
-//		@Override
-//		public boolean equals(final Object obj) {
-//			if (obj == this)
-//				return true;
-//			if (!(obj instanceof BlockLocation))
-//				return false;
-//			final BlockLocation other = (BlockLocation) obj;
-//			return world == other.world && x == other.x && y == other.y && z == other.z;
-//		}
-//
-//		@Override
-//		public int hashCode() {
-//			return world.hashCode() + 29 * (x + 17 * (y + 31 * z));
-//		}
-//	}
+public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 	
 	static {
-//		Skript.registerEvent(EvtMoveOn.class, PlayerMoveEvent.class, "(step|walk) on <.+>");
 		Skript.registerEvent("Move On", EvtMoveOn.class, PlayerMoveEvent.class, "(step|walk)[ing] (on|over) %*itemtypes%")
 				.description("Called when a player moves onto a certain type of block. Please note that using this event can cause lag if there are many players online.")
 				.examples("on walking on dirt or grass", "on stepping on stone")
 				.since("2.0");
 	}
 	
-//	private final static HashMap<BlockLocation, List<Trigger>> blockTriggers = new HashMap<BlockLocation, List<Trigger>>();
-	final static HashMap<Integer, List<Trigger>> itemTypeTriggers = new HashMap<>();
+	/**
+	 * Actual fence blocks and fence gates.
+	 */
+	private static final ItemType fencePart = Aliases.javaItemType("fence part");
+	
+	final static HashMap<Material, List<Trigger>> itemTypeTriggers = new HashMap<>();
 	@SuppressWarnings("null")
 	ItemType[] types = null;
-//	private World world;
-//	private int x, y, z;
 	
 	private static boolean registeredExecutor = false;
 	private final static EventExecutor executor = new EventExecutor() {
@@ -104,32 +76,24 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 				return;
 			final PlayerMoveEvent e = (PlayerMoveEvent) event;
 			final Location from = e.getFrom(), to = e.getTo();
-//			if (!blockTriggers.isEmpty()) {
-//				final List<Trigger> ts = blockTriggers.get(new BlockLocation(to.getWorld(), to.getBlockX(), to.getBlockY(), to.getBlockZ()));
-//				if (ts != null) {
-//					for (final Trigger t : ts) {
-//						SkriptEventHandler.logTriggerStart(t);
-//						t.start(e);
-//						SkriptEventHandler.logTriggerEnd(t);
-//					}
-//				}
-//			}
+			
 			if (!itemTypeTriggers.isEmpty()) {
-				final int id = getOnBlock(to);
-				if (id == 0)
+				final Block block = getOnBlock(to);
+				if (block == null || block.getType() == Material.AIR)
 					return;
+				final Material id = block.getType();
 				final List<Trigger> ts = itemTypeTriggers.get(id);
 				if (ts == null)
 					return;
 				final int y = getBlockY(to.getY(), id);
-				if (to.getWorld().equals(from.getWorld()) && to.getBlockX() == from.getBlockX() && to.getBlockZ() == from.getBlockZ() && y == getBlockY(from.getY(), getOnBlock(from)) && getOnBlock(from) == id)
+				if (to.getWorld().equals(from.getWorld()) && to.getBlockX() == from.getBlockX() && to.getBlockZ() == from.getBlockZ()
+						&& y == getBlockY(from.getY(), getOnBlock(from).getType()) && getOnBlock(from).getType() == id)
 					return;
 				SkriptEventHandler.logEventStart(e);
-				final byte data = to.getWorld().getBlockAt(to.getBlockX(), y, to.getBlockZ()).getData();
 				triggersLoop: for (final Trigger t : ts) {
 					final EvtMoveOn se = (EvtMoveOn) t.getEvent();
 					for (final ItemType i : se.types) {
-						if (i.isOfType(id, data)) {
+						if (i.isOfType(block)) {
 							SkriptEventHandler.logTriggerStart(t);
 							t.execute(e);
 							SkriptEventHandler.logTriggerEnd(t);
@@ -142,18 +106,19 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 		}
 	};
 	
-	static int getOnBlock(final Location l) {
-		int id = l.getWorld().getBlockTypeIdAt(l.getBlockX(), (int) Math.ceil(l.getY()) - 1, l.getBlockZ());
-		if (id == 0 && Math.abs((l.getY() - l.getBlockY()) - 0.5) < Skript.EPSILON) { // fences
-			id = l.getWorld().getBlockTypeIdAt(l.getBlockX(), l.getBlockY() - 1, l.getBlockZ());
-			if (id != Material.FENCE.getId() && id != 107 && id != 113) // fence gate // nether fence
-				return 0;
+	@Nullable
+	final static Block getOnBlock(final Location l) {
+		Block block = l.getWorld().getBlockAt(l.getBlockX(), (int) (Math.ceil(l.getY()) - 1), l.getBlockZ());
+		if (block.getType() == Material.AIR && Math.abs((l.getY() - l.getBlockY()) - 0.5) < Skript.EPSILON) { // Fences
+			block = l.getWorld().getBlockAt(l.getBlockX(), l.getBlockY() - 1, l.getBlockZ());
+			if (!fencePart.isOfType(block))
+				return null;
 		}
-		return id;
+		return block;
 	}
 	
-	static int getBlockY(final double y, final int id) {
-		if ((id == Material.FENCE.getId() || id == 107 || id == 113) && Math.abs((y - Math.floor(y)) - 0.5) < Skript.EPSILON) // fence gate // nether fence
+	final static int getBlockY(final double y, final Material id) {
+		if (fencePart.isOfType(id) && Math.abs((y - Math.floor(y)) - 0.5) < Skript.EPSILON)
 			return (int) Math.floor(y) - 1;
 		return (int) Math.ceil(y) - 1;
 	}
@@ -183,13 +148,13 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 			return false;
 		types = l.getAll();
 		for (final ItemType t : types) {
+			if (t.isAll()) {
+				Skript.error("Can't use an 'on walk' event with an alias that matches all blocks");
+				return false;
+			}
 			boolean hasBlock = false;
 			for (final ItemData d : t) {
-				if (d.getId() == -1) {
-					Skript.error("Can't use an 'on walk' event with an alias that matches all blocks");
-					return false;
-				}
-				if (d.getId() <= Skript.MAXBLOCKID && d.getId() != 0) // don't allow air
+				if (d.getType().isBlock() && d.getType() != Material.AIR) // don't allow air
 					hasBlock = true;
 			}
 			if (!hasBlock) {
@@ -218,11 +183,11 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 //		} else {
 		for (final ItemType t : types) {
 			for (final ItemData d : t) {
-				if (d.getId() > Skript.MAXBLOCKID)
+				if (!d.getType().isBlock())
 					continue;
-				List<Trigger> ts = itemTypeTriggers.get(d.getId());
+				List<Trigger> ts = itemTypeTriggers.get(d.getType());
 				if (ts == null)
-					itemTypeTriggers.put(d.getId(), ts = new ArrayList<>());
+					itemTypeTriggers.put(d.getType(), ts = new ArrayList<>());
 				ts.add(trigger);
 			}
 		}
@@ -242,7 +207,7 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 //			if (ts.isEmpty())
 //				i.remove();
 //		}
-		final Iterator<Entry<Integer, List<Trigger>>> i2 = itemTypeTriggers.entrySet().iterator();
+		final Iterator<Entry<Material, List<Trigger>>> i2 = itemTypeTriggers.entrySet().iterator();
 		while (i2.hasNext()) {
 			final List<Trigger> ts = i2.next().getValue();
 			ts.remove(t);

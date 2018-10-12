@@ -111,13 +111,28 @@ public abstract class FileUtils {
 		if (!RUNNINGJAVA6) {
 			Files.copy(from.toPath(), to.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
 		} else {
-			try (FileInputStream in = new FileInputStream(from); FileOutputStream out = new FileOutputStream(to)) {
+			FileInputStream in = null;
+			FileOutputStream out = null;
+			try {
+				in = new FileInputStream(from);
+				out = new FileOutputStream(to);
 				final byte[] buffer = new byte[4096];
 				int bytesRead;
 				while ((bytesRead = in.read(buffer)) != -1)
 					out.write(buffer, 0, bytesRead);
 			} catch (final Exception e) {
 				throw new IOException("Can't copy " + from.getName() + " to " + to.getName() + ": " + e.getLocalizedMessage(), e);
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (final IOException e) {}
+				}
+				if (out != null) {
+					try {
+						out.close();
+					} catch (final IOException e) {}
+				}
 			}
 		}
 	}
@@ -157,12 +172,17 @@ public abstract class FileUtils {
 	 */
 	public static void save(final InputStream in, final File file) throws IOException {
 		file.getParentFile().mkdirs();
-		try (FileOutputStream out = new FileOutputStream(file)) {
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
 			final byte[] buffer = new byte[16 * 1024];
 			int read;
 			while ((read = in.read(buffer)) > 0) {
 				out.write(buffer, 0, read);
 			}
+		} finally {
+			if (out != null)
+				out.close();
 		}
 	}
 	
