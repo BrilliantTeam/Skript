@@ -31,6 +31,8 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.util.chat.BungeeConverter;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -59,11 +61,13 @@ public class EffActionBar extends Effect {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void execute(final Event e) {
 		String msg = message.getSingle(e);
+		assert msg != null;
 		for (Player player : recipients.getArray(e)) {
-			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
+			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, BungeeConverter.convert(ChatMessages.parseToArray(msg)));
 		}
 	}
 
