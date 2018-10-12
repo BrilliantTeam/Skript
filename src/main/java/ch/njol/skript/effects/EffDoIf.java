@@ -17,7 +17,7 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.conditions;
+package ch.njol.skript.effects;
 
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
@@ -28,59 +28,53 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
+import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.util.Checker;
+import ch.njol.skript.lang.TriggerItem;
 import ch.njol.util.Kleenean;
+import org.eclipse.jdt.annotation.Nullable;
 
-@Name("Starts/Ends With")
-@Description("Checks if a text starts or ends with another.")
-@Examples({"if the argument starts with \"test\":",
-		"	send \"Stop!\""})
-@Since("2.2-dev36")
-public class CondStartsEndsWith extends Condition {
-	
+@Name("Do If")
+@Description("Execute an effect if a condition is true.")
+@Examples({"on join:",
+		"\tgive a diamond to the player if the player has permission \"rank.vip\""})
+@Since("INSERT VERSION")
+public class EffDoIf extends Effect  {
+
 	static {
-		Skript.registerCondition(CondStartsEndsWith.class,
-				"%strings% (start|1¦end)[s] with %string%",
-				"%strings% (doesn't|does not|do not|don't) (start|1¦end) with %string%");
+		Skript.registerEffect(EffDoIf.class, "<.+> if <.+>");
 	}
-	
+
 	@SuppressWarnings("null")
-	private Expression<String> strings;
+	private Effect effect;
+
 	@SuppressWarnings("null")
-	private Expression<String> affix;
-	private boolean usingEnds;
-	
-	@SuppressWarnings({"unchecked", "null"})
+	private Condition condition;
+
+	@SuppressWarnings("null")
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-		strings = (Expression<String>) exprs[0];
-		affix = (Expression<String>) exprs[1];
-		usingEnds = parseResult.mark == 1;
-		setNegated(matchedPattern == 1);
-		return true;
-	}
-	
-	@Override
-	public boolean check(Event e) {
-		String affix = this.affix.getSingle(e);
-		
-		if (affix == null) {
+		String eff = parseResult.regexes.get(0).group();
+		String cond = parseResult.regexes.get(1).group();
+		effect = Effect.parse(eff, "Can't understand this effect: " + eff);
+		if (effect instanceof EffDoIf) {
+			Skript.error("Do if effects may not be nested!");
 			return false;
 		}
-		
-		return strings.check(e,
-				string -> usingEnds ? string.endsWith(affix) : string.endsWith(affix),
-				isNegated());
+		condition = Condition.parse(cond, "Can't understand this condition: " + cond);
+		return effect != null && condition != null;
 	}
-	
+
+	@Override
+	protected void execute(Event e) {
+		if (condition.check(e))
+			effect.run(e);
+	}
+
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		if (isNegated())
-			return strings.toString(e, debug) + " doesn't " + (usingEnds ? "end" : "start") + " with " + affix.toString(e, debug);
-		else
-			return strings.toString(e, debug) + (usingEnds ? " ends" : " starts") + " with " + affix.toString(e, debug);
+		return effect.toString(e, debug) + " if " + condition.toString(e, debug);
 	}
-	
+
 }

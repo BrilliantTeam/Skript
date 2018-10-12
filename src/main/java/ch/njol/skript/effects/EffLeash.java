@@ -17,65 +17,67 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.conditions;
-
-import java.util.Arrays;
-import java.util.List;
+package ch.njol.skript.effects;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.conditions.base.PropertyCondition;
-import ch.njol.skript.conditions.base.PropertyCondition.PropertyType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Condition;
+import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
-@Name("Has Scoreboard Tag")
-@Description("Checks whether the given entities has the given <a href='expressions.html#ExprScoreboardTags'>scoreboard tags</a>.")
-@Examples("if the targeted armor stand has the scoreboard tag \"test tag\":")
+@Name("Leash entities")
+@Description("Leash living entities to other entities.")
+@Examples("leash the player to the target entity")
 @Since("2.3")
-public class CondHasScoreboardTag extends Condition {
-	
+public class EffLeash extends Effect {
+
 	static {
-		if (Skript.isRunningMinecraft(1, 11))
-			PropertyCondition.register(CondHasScoreboardTag.class, PropertyType.HAVE, "[the] score[ ]board tag[s] %strings%", "entities");
+		Skript.registerEffect(EffLeash.class,
+				"(leash|lead) %livingentities% to %entity%",
+				"make %entity% (leash|lead) %livingentities%",
+				"un(leash|lead) [holder of] %livingentities%");
 	}
 	
 	@SuppressWarnings("null")
-	private Expression<Entity> entities;
+	private Expression<Entity> holder;
 	@SuppressWarnings("null")
-	private Expression<String> tags;
-	
-	@SuppressWarnings("unchecked")
+	private Expression<LivingEntity> targets;
+	private boolean unleash;
+
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		entities = (Expression<Entity>) exprs[0];
-		tags = (Expression<String>) exprs[1];
-		setNegated(matchedPattern == 1);
+		unleash = matchedPattern == 2;
+		if (!unleash) {
+			holder = (Expression<Entity>) exprs[1 - matchedPattern];
+			targets = (Expression<LivingEntity>) exprs[matchedPattern];
+		} else 
+			targets = (Expression<LivingEntity>) exprs[0];
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public boolean check(Event e) {
-		List<String> tagsList = Arrays.asList(tags.getArray(e));
-		return entities.check(e,
-				entity -> entity.getScoreboardTags().containsAll(tagsList),
-				isNegated());
+	protected void execute(Event e) {
+		Entity holder = this.holder.getSingle(e);
+		if (holder == null && !unleash)
+			return;
+		for (LivingEntity target : targets.getArray(e)) {
+			target.setLeashHolder(!unleash ? holder : null);
+		}
 	}
-	
+
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return PropertyCondition.toString(this, PropertyType.HAVE, e, debug, entities,
-				"the scoreboard " + (tags.isSingle() ? "tag " : "tags ") + tags.toString(e, debug));
+		return unleash ? "un" : "leash " + targets.toString(e, debug) + (unleash ? "" : " to ") + holder.toString(e, debug);
 	}
-	
+
 }

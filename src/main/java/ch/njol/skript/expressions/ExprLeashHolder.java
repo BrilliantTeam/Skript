@@ -19,10 +19,9 @@
  */
 package ch.njol.skript.expressions;
 
-import java.net.InetSocketAddress;
-
-import org.bukkit.entity.Player;
-import org.eclipse.jdt.annotation.Nullable;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -30,32 +29,30 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
-@Name("Player IP")
-@Description({"The IP address of a player.", "",
-			"Note: you may use the '<a href='expressions.html#ExprIP'>IP</a>' expression for getting the IP in a " +
-			"<a href='events.html#connect>connect</a> event."})
-@Examples("ban IP of the player")
-@Since("1.4")
-public class ExprPlayerIP extends SimplePropertyExpression<Player, String> {
+@Name("Leash Holder")
+@Description("Leash holder of a living entity.")
+@Examples("set {_example} to the leash holder of the target mob")
+@Since("2.3")
+public class ExprLeashHolder extends SimplePropertyExpression<LivingEntity, Entity> {
 
 	static {
-		register(ExprPlayerIP.class, String.class, "IP[(-| )address[es]]", "players");
+		register(ExprLeashHolder.class, Entity.class, "leash holder", "livingentity");
 	}
 
-	@Nullable
+	@SuppressWarnings("null")
 	@Override
-	public String convert(final Player player) {
-		InetSocketAddress address = player.getAddress();
-		return address == null ? "unknown" : address.getAddress().toString();
+	public Entity convert(final LivingEntity entity) {
+		return entity.getLeashHolder();
 	}
-
+	
 	@Override
 	protected String getPropertyName() {
-		return "IP-address";
+		return "leash holder";
+	}
+	
+	@Override
+	public Class<Entity> getReturnType() {
+		return Entity.class;
 	}
 
-	@Override
-	public Class<? extends String> getReturnType() {
-		return String.class;
-	}
 }

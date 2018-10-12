@@ -537,7 +537,7 @@ public abstract class Aliases {
 	 */
 	@Nullable
 	public static String getMinecraftId(ItemData data) {
-		return provider.getMinecraftId(data);
+		return provider.getMinecraftId(data.aliasCopy());
 	}
 	
 	private static final Map<String, ItemType> trackedTypes = new HashMap<>();

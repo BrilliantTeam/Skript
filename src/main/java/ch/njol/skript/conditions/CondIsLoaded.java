@@ -24,6 +24,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -33,11 +34,11 @@ import org.bukkit.World;
 @Examples("if chunk at {home::%player's uuid%} is loaded:")
 @Since("2.3")
 public class CondIsLoaded extends PropertyCondition<Object> {
-
+	
 	static {
 		register(CondIsLoaded.class, "loaded", "worlds/chunks");
 	}
-
+	
 	@Override
 	public boolean check(Object o) {
 		if (o instanceof Chunk)
@@ -46,10 +47,10 @@ public class CondIsLoaded extends PropertyCondition<Object> {
 			return Bukkit.getWorld(((World) o).getName()) != null;
 		return false;
 	}
-
+	
 	@Override
 	protected String getPropertyName() {
 		return "loaded";
 	}
-
+	
 }

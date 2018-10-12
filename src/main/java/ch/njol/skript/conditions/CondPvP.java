@@ -50,7 +50,7 @@ public class CondPvP extends Condition {
 	
 	@SuppressWarnings("null")
 	private Expression<World> worlds;
-	boolean enabled;
+	private boolean enabled;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
@@ -61,18 +61,12 @@ public class CondPvP extends Condition {
 	}
 	
 	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		return "is PvP " + (enabled ? "enabled" : "disabled") + " in " + worlds.toString(e, debug);
+	public boolean check(final Event e) {
+		return worlds.check(e, w -> w.getPVP() == enabled, isNegated());
 	}
 	
 	@Override
-	public boolean check(final Event e) {
-		return worlds.check(e, new Checker<World>() {
-			@Override
-			public boolean check(final World w) {
-				return w.getPVP() == enabled;
-			}
-		}, isNegated());
+	public String toString(final @Nullable Event e, final boolean debug) {
+		return "PvP is " + (enabled ? "enabled" : "disabled") + " in " + worlds.toString(e, debug);
 	}
-	
 }

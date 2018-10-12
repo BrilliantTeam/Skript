@@ -24,6 +24,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+
 import org.bukkit.inventory.ItemStack;
 
 @Name("Is Flammable")
@@ -31,19 +32,19 @@ import org.bukkit.inventory.ItemStack;
 @Examples({"wood is flammable", "player's tool is flammable"})
 @Since("2.2-dev36")
 public class CondIsFlammable extends PropertyCondition<ItemStack> {
-
+	
 	static {
-		PropertyCondition.register(CondIsFlammable.class, "flammable", "itemstacks");
+		register(CondIsFlammable.class, "flammable", "itemstacks");
 	}
-
+	
 	@Override
 	public boolean check(ItemStack i) {
 		return i.getType().isFlammable();
 	}
-
+	
 	@Override
 	protected String getPropertyName() {
 		return "flammable";
 	}
-
+	
 }

@@ -20,50 +20,38 @@
 package ch.njol.skript.conditions;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.Skript;
+import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Condition;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Kleenean;
 
 @Name("Has Client Weather")
 @Description("Checks whether the given players have a custom client weather")
 @Examples({"if the player has custom weather:",
 		"\tmessage \"Your custom weather is %player's weather%\""})
 @Since("2.3")
-public class CondHasClientWeather extends Condition {
 
+public class CondHasClientWeather extends PropertyCondition<Player> {
+	
 	static {
-		Skript.registerCondition(CondHasClientWeather.class,
-				"%players% (has|have) [a] (client|custom) weather [set]",
-				"%players% do[es](n't| not) have [a] (client|custom) weather [set]");
+		register(CondHasClientWeather.class, PropertyType.HAVE, "[a] (client|custom) weather [set]", "players");
 	}
 	
-	@SuppressWarnings("null")
-	private Expression<Player> players;
-
-	@SuppressWarnings("unchecked")
 	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		setNegated(matchedPattern == 1);
-		this.players = (Expression<Player>) exprs[0];
-		return true;
+	public boolean check(Player player) {
+		return player.getPlayerWeather() != null;
 	}
-
+	
 	@Override
-	public boolean check(Event e) {
-		return players.check(e, player -> player.getPlayerWeather() != null, isNegated());
+	protected PropertyType getPropertyType() {
+		return PropertyType.HAVE;
 	}
-
+	
 	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return players.toString(e, debug) + (isNegated() ? " have " : " don't have ") + " custom weather";
+	protected String getPropertyName() {
+		return "custom weather set";
 	}
+	
 }
