@@ -135,11 +135,10 @@ public class Variable<T> implements Expression<T> {
 			if (printErrors)
 				Skript.error("A variable's name must not contain the separator '" + SEPARATOR + "' multiple times in a row (error in variable {" + name + "})");
 			return false;
-		} else if (org.apache.commons.lang3.StringUtils.remove(name, SEPARATOR).contains(SINGLE_SEPARATOR_CHAR)) {
+		} else if (name.contains(SINGLE_SEPARATOR_CHAR) && !name.contains(SEPARATOR)) {
 			if (printErrors)
-				Skript.warning("'" + SINGLE_SEPARATOR_CHAR + "' is a part of the separator '" + SEPARATOR + "', although you put only one '"
-						+ SINGLE_SEPARATOR_CHAR + "' - please either use the whole separator if that's what you intended, or otherwise don't use the '"
-						+ SINGLE_SEPARATOR_CHAR + "' at all to prevent confusion");
+				Skript.warning("If you meant to make the variable {" + name + "} a list, its name should contain '"
+						+ SEPARATOR + "'. Having a single '" + SINGLE_SEPARATOR_CHAR + "' does nothing!");
 		}
 		return true;
 	}
