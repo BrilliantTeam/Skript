@@ -47,7 +47,7 @@ import ch.njol.util.Kleenean;
 @Examples({"hide player info",
 		"hide player related information in the server list",
 		"reveal all player related info"})
-@Since("INSERT VERSION")
+@Since("2.3")
 @RequiredPlugins("Paper 1.12.2 or newer")
 @Events("server list ping")
 public class EffPlayerInfoVisibility extends Effect {

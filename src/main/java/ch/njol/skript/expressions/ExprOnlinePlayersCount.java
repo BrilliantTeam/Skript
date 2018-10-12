@@ -48,7 +48,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Examples({"on server list ping:",
 		"	# This will make the max players count 5 if there are 4 players online.",
 		"	set the fake max players count to (online players count + 1)"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprOnlinePlayersCount extends SimpleExpression<Number> {
 
 	static {

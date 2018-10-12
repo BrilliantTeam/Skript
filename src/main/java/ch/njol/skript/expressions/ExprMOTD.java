@@ -45,7 +45,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"'default MOTD' returns the default MOTD always and can't be changed."})
 @Examples({"on server list ping:",
 		"	set the motd to \"Join now!\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprMOTD extends SimpleExpression<String> {
 
 	static {

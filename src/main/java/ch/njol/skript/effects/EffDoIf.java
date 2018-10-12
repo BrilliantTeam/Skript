@@ -39,7 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Description("Execute an effect if a condition is true.")
 @Examples({"on join:",
 		"\tgive a diamond to the player if the player has permission \"rank.vip\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class EffDoIf extends Effect  {
 
 	static {

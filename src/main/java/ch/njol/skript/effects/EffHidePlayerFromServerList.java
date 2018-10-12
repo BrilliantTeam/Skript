@@ -46,7 +46,7 @@ import ch.njol.util.Kleenean;
 		"and decreases the <a href='expressions.html#ExprOnlinePlayersCount'>online players count</a> (only if the player count wasn't changed before)."})
 @Examples({"on server list ping:",
 		"	hide {vanished::*} from the server list"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class EffHidePlayerFromServerList extends Effect {
 
 	static {

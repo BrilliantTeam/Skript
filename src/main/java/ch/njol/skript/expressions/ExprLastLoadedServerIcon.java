@@ -40,7 +40,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Last Loaded Server Icon")
 @Description({"Returns the last loaded server icon with the <a href='effects.html#EffLoadServerIcon'>load server icon</a> effect."})
 @Examples("set {server-icon} to the last loaded server icon")
-@Since("INSERT VERSION")
+@Since("2.3")
 @RequiredPlugins("Paper 1.12.2 or newer")
 public class ExprLastLoadedServerIcon extends SimpleExpression<CachedServerIcon> {
 

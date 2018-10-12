@@ -47,7 +47,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"'default server icon' returns the default server icon (server-icon.png) always and cannot be changed.",})
 @Examples({"on script load:",
 		"	set {server-icons::default} to the default server icon"})
-@Since("INSERT VERSION")
+@Since("2.3")
 @RequiredPlugins("Paper 1.12.2 or newer")
 public class ExprServerIcon extends SimpleExpression<CachedServerIcon> {
 

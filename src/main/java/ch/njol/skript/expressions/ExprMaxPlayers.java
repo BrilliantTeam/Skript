@@ -44,7 +44,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"'real max players' returns the real count of max players of the server always and can't be changed."})
 @Examples({"on server list ping:",
 		"	set the max players count to (online players count + 1)"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprMaxPlayers extends SimpleExpression<Number> {
 
 	static {

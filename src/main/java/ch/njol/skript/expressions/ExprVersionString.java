@@ -47,7 +47,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Examples({"on server list ping:",
 		"	set the protocol version to 0 # 13w41a (1.7), so it will show the version string always",
 		"	set the version string to \"<light green>Version: <orange>%minecraft version%\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 @RequiredPlugins("Paper 1.12.2 or newer")
 @Events("server list ping")
 public class ExprVersionString extends SimpleExpression<String> {

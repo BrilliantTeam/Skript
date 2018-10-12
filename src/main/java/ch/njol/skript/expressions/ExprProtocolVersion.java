@@ -55,7 +55,7 @@ import org.eclipse.jdt.annotation.Nullable;
 		"(increase and decrease effects cannot be used because that wouldn't make sense).",})
 @Examples({"on server list ping:",
 		"	set the protocol version to 0 # 13w41a (1.7), so it will show that version string"})
-@Since("INSERT VERSION")
+@Since("2.3")
 @RequiredPlugins("Paper 1.12.2 or newer")
 @Events("server list ping")
 public class ExprProtocolVersion extends SimpleExpression<Number> {

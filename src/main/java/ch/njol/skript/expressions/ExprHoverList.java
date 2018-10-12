@@ -58,7 +58,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"	add \"<light green>Welcome to the <orange>Minecraft <light green>server!\" to the hover list",
 		"	add \"\" to the hover list # A blank line",
 		"	add \"<light red>There are <orange>%online players count% <light red>online players!\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 @RequiredPlugins("Paper 1.12.2 or newer")
 @Events("server list ping")
 public class ExprHoverList extends SimpleExpression<String> {

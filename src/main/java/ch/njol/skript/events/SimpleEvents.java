@@ -473,6 +473,6 @@ public class SimpleEvents {
 						"	set the motd to \"Welcome %{player-by-IP::%ip%}%! Join now!\" if {player-by-IP::%ip%} is set, else \"Join now!\"",
 						"	set the fake max players count to (online players count + 1)",
 						"	set the shown icon to a random server icon out of {server-icons::*}")
-				.since("INSERT VERSION");
+				.since("2.3");
 	}
 }

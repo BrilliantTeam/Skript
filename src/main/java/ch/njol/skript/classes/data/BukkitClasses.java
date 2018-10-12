@@ -1421,7 +1421,7 @@ public class BukkitClasses {
 					.name("Server Icon")
 					.description("A server icon that was loaded using the <a href='effects.html#EffLoadServerIcon'>load server icon</a> effect.")
 					.examples("")
-					.since("INSERT VERSION")
+					.since("2.3")
 					.parser(new Parser<CachedServerIcon>() {
 						@Override
 						@Nullable

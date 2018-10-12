@@ -40,7 +40,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 @Name("Action Bar")
 @Description("Sends an action bar message to the given player(s).")
 @Examples("send action bar \"Hello player!\" to player")
-@Since("INSERT VERSION")
+@Since("2.3")
 public class EffActionBar extends Effect {
 
 	static {

@@ -51,7 +51,7 @@ import ch.njol.util.Kleenean;
 		"",
 		"on server list ping:",
 		"	set the icon to a random server icon out of {server-icons::*}"})
-@Since("INSERT VERSION")
+@Since("2.3")
 @RequiredPlugins("Paper 1.12.2 or newer")
 public class EffLoadServerIcon extends AsyncEffect {
 
