@@ -28,8 +28,10 @@ import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Events;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -41,13 +43,13 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Version String")
 @Description({"The text to show if protocol version of the server doesn't match with protocol version of the client. " +
 		"You can check the <a href='#ExprProtocolVersion'>protocol version</a> expression for more information about this.",
-		"This can be set in a <a href='events.html#server_list_ping'>server list ping</a> event only.",
-		"",
-		"Requires PaperSpigot 1.12.2+."})
+		"This can be set in a <a href='events.html#server_list_ping'>server list ping</a> event only."})
 @Examples({"on server list ping:",
 		"	set the protocol version to 0 # 13w41a (1.7), so it will show the version string always",
 		"	set the version string to \"<light green>Version: <orange>%minecraft version%\""})
 @Since("INSERT VERSION")
+@RequiredPlugins("Paper 1.12.2 or newer")
+@Events("server list ping")
 public class ExprVersionString extends SimpleExpression<String> {
 
 	static {
@@ -56,11 +58,10 @@ public class ExprVersionString extends SimpleExpression<String> {
 
 	private static final boolean PAPER_EVENT_EXISTS = Skript.classExists("com.destroystokyo.paper.event.server.PaperServerListPingEvent");
 
-	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (ScriptLoader.isCurrentEvent(ServerListPingEvent.class)) {
-			Skript.error("The version string expression requires PaperSpigot 1.12.2+");
+			Skript.error("The version string expression requires Paper 1.12.2 or newer");
 			return false;
 		} else if (!(PAPER_EVENT_EXISTS && ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class))) {
 			Skript.error("The version string expression can't be used outside of a server list ping event");

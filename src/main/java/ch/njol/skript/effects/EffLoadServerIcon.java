@@ -32,6 +32,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
@@ -39,10 +40,9 @@ import ch.njol.skript.util.AsyncEffect;
 import ch.njol.util.Kleenean;
 
 @Name("Load Server Icon")
-@Description({"Loads server icons from the given files. You can get the loaded icon using the <a href='expressions.html#ExprLastLoadedServerIcon'>last loaded server icon</a> expression.",
-		"Please note that the image must be 64x64 and the file path starts from the server folder.",
-		"",
-		"Server icon stuff requires PaperSpigot 1.12.2+."})
+@Description({"Loads server icons from the given files. You can get the loaded icon using the",
+		"<a href='expressions.html#ExprLastLoadedServerIcon'>last loaded server icon</a> expression.",
+		"Please note that the image must be 64x64 and the file path starts from the server folder.",})
 @Examples({"on load:",
 		"	clear {server-icons::*}",
 		"	loop 5 times:",
@@ -52,6 +52,7 @@ import ch.njol.util.Kleenean;
 		"on server list ping:",
 		"	set the icon to a random server icon out of {server-icons::*}"})
 @Since("INSERT VERSION")
+@RequiredPlugins("Paper 1.12.2 or newer")
 public class EffLoadServerIcon extends AsyncEffect {
 
 	static {
@@ -70,7 +71,7 @@ public class EffLoadServerIcon extends AsyncEffect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		if (!PAPER_EVENT_EXISTS) {
-			Skript.error("The load server icon effect requires PaperSpigot 1.12.2+");
+			Skript.error("The load server icon effect requires Paper 1.12.2 or newer");
 			return false;
 		}
 		path = (Expression<String>) exprs[0];

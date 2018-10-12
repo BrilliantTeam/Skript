@@ -27,8 +27,10 @@ import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Events;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
@@ -37,15 +39,17 @@ import ch.njol.util.Kleenean;
 
 @Name("Player Info Visibility")
 @Description({"Sets whether all player related information is hidden in the server list.",
-		"The Vanilla Minecraft client will display ??? (dark gray) instead of player counts and will not show the <a href='expressions.html#ExprHoverList'>hover hist</a when hiding player info.",
+		"The Vanilla Minecraft client will display ??? (dark gray) instead of player counts and will not show the",
+		"<a href='expressions.html#ExprHoverList'>hover hist</a when hiding player info.",
 		"<a href='expressions.html#ExprVersionString'>The version string</a> can override the ???.",
-		"Also the <a href='expressions.html#ExprOnlinePlayersCount'>Online Players Count</a> and <a href='expressions.html#ExprMaxPlayers'>Max Players</a> expressions will return -1 when hiding player info.",
-		"",
-		"Requires PaperSpigot 1.12.2+."})
+		"Also the <a href='expressions.html#ExprOnlinePlayersCount'>Online Players Count</a> and",
+		"<a href='expressions.html#ExprMaxPlayers'>Max Players</a> expressions will return -1 when hiding player info."})
 @Examples({"hide player info",
 		"hide player related information in the server list",
 		"reveal all player related info"})
 @Since("INSERT VERSION")
+@RequiredPlugins("Paper 1.12.2 or newer")
+@Events("server list ping")
 public class EffPlayerInfoVisibility extends Effect {
 
 	static {
@@ -58,11 +62,10 @@ public class EffPlayerInfoVisibility extends Effect {
 
 	private boolean shouldHide;
 
-	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!PAPER_EVENT_EXISTS) {
-			Skript.error("The player info visibility effect requires PaperSpigot 1.12.2+");
+			Skript.error("The player info visibility effect requires Paper 1.12.2 or newer");
 			return false;
 		} else if (!ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class)) {
 			Skript.error("The player info visibility effect can't be used outside of a server list ping event");

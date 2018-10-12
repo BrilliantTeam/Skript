@@ -35,8 +35,10 @@ import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Events;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -50,15 +52,15 @@ import ch.njol.util.coll.CollectionUtils;
 		"This can be changed using texts or players in a <a href='events.html#server_list_ping'>server list ping</a> event only. " +
 		"Adding players to the list means adding name of the players.",
 		"And note that, for example if there are 5 online players (includes <a href='#ExprOnlinePlayersCount'>fake online count</a>) " +
-		"in the server and the hover list is set to 3 values, Minecraft will show \"... and 2 more ...\" at end of the list.",
-		"",
-		"Requires PaperSpigot 1.12.2+."})
+		"in the server and the hover list is set to 3 values, Minecraft will show \"... and 2 more ...\" at end of the list."})
 @Examples({"on server list ping:",
 		"	clear the hover list",
 		"	add \"<light green>Welcome to the <orange>Minecraft <light green>server!\" to the hover list",
 		"	add \"\" to the hover list # A blank line",
 		"	add \"<light red>There are <orange>%online players count% <light red>online players!\""})
 @Since("INSERT VERSION")
+@RequiredPlugins("Paper 1.12.2 or newer")
+@Events("server list ping")
 public class ExprHoverList extends SimpleExpression<String> {
 
 	static {
@@ -69,11 +71,10 @@ public class ExprHoverList extends SimpleExpression<String> {
 
 	private static final boolean PAPER_EVENT_EXISTS = Skript.classExists("com.destroystokyo.paper.event.server.PaperServerListPingEvent");
 
-	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!PAPER_EVENT_EXISTS) {
-			Skript.error("The hover list expression requires PaperSpigot 1.12.2+");
+			Skript.error("The hover list expression requires Paper 1.12.2 or newer");
 			return false;
 		} else if (!ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class)) {
 			Skript.error("The hover list expression can't be used outside of a server list ping event");

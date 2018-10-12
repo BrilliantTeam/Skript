@@ -39,11 +39,12 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-@Name("Online Players Count")
-@Description({"The count of online players. This can be changed in a <a href='events.html#server_list_ping'>server list ping</a> event only to show fake online players count.",
-		"'real online players count' returns the real count of online players always and can't be changed.",
+@Name("Online Player Count")
+@Description({"The amount of online players. This can be changed in a",
+		"<a href='events.html#server_list_ping'>server list ping</a> event only to show fake online player amount.",
+		"'real online player count' returns the real count of online players always and can't be changed.",
 		"",
-		"Fake online players count requires PaperSpigot 1.12.2+."})
+		"Fake online player count requires PaperSpigot 1.12.2+."})
 @Examples({"on server list ping:",
 		"	# This will make the max players count 5 if there are 4 players online.",
 		"	set the fake max players count to (online players count + 1)"})
@@ -60,13 +61,12 @@ public class ExprOnlinePlayersCount extends SimpleExpression<Number> {
 
 	private boolean isReal;
 
-	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		boolean isPaperEvent = PAPER_EVENT_EXISTS && ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class);
 		if (parseResult.mark == 2) {
 			if (ScriptLoader.isCurrentEvent(ServerListPingEvent.class)) {
-				Skript.error("The 'fake' online players count expression requires PaperSpigot 1.12.2+");
+				Skript.error("The 'fake' online players count expression requires Paper 1.12.2 or newer");
 				return false;
 			} else if (!isPaperEvent) {
 				Skript.error("The 'fake' online players count expression can't be used outside of a server list ping event");

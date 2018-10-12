@@ -31,6 +31,7 @@ import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -40,14 +41,14 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("Server Icon")
-@Description({"Icon of the server in the server list. Can be set to an icon that loaded using the <a href='effects.html#EffLoadServerIcon'>load server icon</a> effect, " +
+@Description({"Icon of the server in the server list. Can be set to an icon that loaded using the",
+		"<a href='effects.html#EffLoadServerIcon'>load server icon</a> effect,",
 		"or can be reset to the default icon in a <a href='events.html#server_list_ping'>server list ping</a>.",
-		"'default server icon' returns the default server icon (server-icon.png) always and cannot be changed.",
-		"",
-		"Server icon stuff requires PaperSpigot 1.12.2+."})
+		"'default server icon' returns the default server icon (server-icon.png) always and cannot be changed.",})
 @Examples({"on script load:",
 		"	set {server-icons::default} to the default server icon"})
 @Since("INSERT VERSION")
+@RequiredPlugins("Paper 1.12.2 or newer")
 public class ExprServerIcon extends SimpleExpression<CachedServerIcon> {
 
 	static {
@@ -59,11 +60,10 @@ public class ExprServerIcon extends SimpleExpression<CachedServerIcon> {
 
 	private boolean isServerPingEvent, isDefault;
 
-	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!PAPER_EVENT_EXISTS) {
-			Skript.error("The server icon expression requires PaperSpigot 1.12.2+");
+			Skript.error("The server icon expression requires Paper 1.12.2 or newer");
 			return false;
 		}
 		isServerPingEvent = ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class);
