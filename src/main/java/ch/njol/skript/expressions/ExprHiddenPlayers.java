@@ -39,7 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Hidden Players")
 @Description({"The players hidden from a player that hidden using the <a href='effects.html#EffPlayerVisibility'>player visibility</a> effect."})
 @Examples({"message \"<light red>You are currently hiding: <light gray>%hidden players of the player%\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprHiddenPlayers extends SimpleExpression<Player> {
 
 	static {

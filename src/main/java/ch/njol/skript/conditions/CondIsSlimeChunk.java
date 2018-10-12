@@ -42,7 +42,7 @@ import ch.njol.skript.doc.Since;
 		"\t\t\tsend \"Yeah, it is!\"",
 		"\t\telse:",
 		"\t\t\tsend \"Nope, it isn't\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class CondIsSlimeChunk extends PropertyCondition<Chunk> {
 
 	static {

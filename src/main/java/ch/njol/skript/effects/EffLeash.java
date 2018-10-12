@@ -17,9 +17,10 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.conditions;
+package ch.njol.skript.effects;
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -28,42 +29,55 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Condition;
+import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
-@Name("Has Client Weather")
-@Description("Checks whether the given players have a custom client weather")
-@Examples({"if the player has custom weather:",
-		"\tmessage \"Your custom weather is %player's weather%\""})
+@Name("Leash entities")
+@Description("Leash living entities to other entities.")
+@Examples("leash the player to the target entity")
 @Since("2.3")
-public class CondHasClientWeather extends Condition {
+public class EffLeash extends Effect {
 
 	static {
-		Skript.registerCondition(CondHasClientWeather.class,
-				"%players% (has|have) [a] (client|custom) weather [set]",
-				"%players% do[es](n't| not) have [a] (client|custom) weather [set]");
+		Skript.registerEffect(EffLeash.class,
+				"(leash|lead) %livingentities% to %entity%",
+				"make %entity% (leash|lead) %livingentities%",
+				"un(leash|lead) [holder of] %livingentities%");
 	}
 	
 	@SuppressWarnings("null")
-	private Expression<Player> players;
+	private Expression<Entity> holder;
+	@SuppressWarnings("null")
+	private Expression<LivingEntity> targets;
+	private boolean unleash;
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		setNegated(matchedPattern == 1);
-		this.players = (Expression<Player>) exprs[0];
+		unleash = matchedPattern == 2;
+		if (!unleash) {
+			holder = (Expression<Entity>) exprs[1 - matchedPattern];
+			targets = (Expression<LivingEntity>) exprs[matchedPattern];
+		} else 
+			targets = (Expression<LivingEntity>) exprs[0];
 		return true;
 	}
-
+	
 	@Override
-	public boolean check(Event e) {
-		return players.check(e, player -> player.getPlayerWeather() != null, isNegated());
+	protected void execute(Event e) {
+		Entity holder = this.holder.getSingle(e);
+		if (holder == null && !unleash)
+			return;
+		for (LivingEntity target : targets.getArray(e)) {
+			target.setLeashHolder(!unleash ? holder : null);
+		}
 	}
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return players.toString(e, debug) + (isNegated() ? " have " : " don't have ") + " custom weather";
+		return unleash ? "un" : "leash " + targets.toString(e, debug) + (unleash ? "" : " to ") + holder.toString(e, debug);
 	}
+
 }

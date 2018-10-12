@@ -55,7 +55,7 @@ import ch.njol.util.coll.CollectionUtils;
         "    if the attacker is a player:",
         "        if the victim doesn't have the scoreboard tag \"spawned by a spawner\":",
         "            add 1$ to attacker's balance"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprScoreboardTags extends SimpleExpression<String> {
 
 	static {

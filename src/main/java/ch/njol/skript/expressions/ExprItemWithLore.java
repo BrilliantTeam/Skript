@@ -46,7 +46,7 @@ import ch.njol.util.StringUtils;
 		"If multiple strings are passed, each of them will be a separate line in the lore."})
 @Examples({"set {_test} to stone with lore \"line 1\" and \"line 2\"",
 		"give {_test} to player"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprItemWithLore extends PropertyExpression<ItemType, ItemType> {
 
 	static {

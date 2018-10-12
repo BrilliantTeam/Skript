@@ -35,7 +35,7 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("Make Say")
 @Description("Forces a player to send a message to the chat. If the message starts with a slash it will force the player to use command.")
 @Examples({"make the player say \"Hello.\"", "force all players to send the message \"I love this server\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class EffMakeSay extends Effect {
 
 	static {
