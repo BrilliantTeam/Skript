@@ -20,12 +20,15 @@
 package ch.njol.skript.expressions;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
+import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
@@ -41,35 +44,88 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("IP")
-@Description("The IP address in a <a href='events.html#connect'>connect</a> event.")
-@Examples({"on connect:",
-		"log \"[%now%] %IP% joined the server.\""})
-@Since("INSERT VERSION")
+@Description("The IP address of a player, or the connected player in a <a href='events.html#connect'>connect</a>> event, " +
+		"or the pinger in a <a href='events.html#server_list_ping'>server list ping</a> event.")
+@Examples({"ban the IP address of the player",
+		"broadcast \"Banned the IP %IP of player%\"",
+		"",
+		"on connect:",
+		"\tlog \"[%now%] %player% (%ip%) is connected to the server.\"",
+		"",
+		"on server list ping:",
+		"\tsend \"%IP-address%\" to the console"})
+@Since("1.4, 2.2-dev26 (when used in connect event), INSERT VERSION (when used in server list ping event)")
 public class ExprIP extends SimpleExpression<String> {
-	
+
 	static {
-		Skript.registerExpression(ExprIP.class, String.class, ExpressionType.SIMPLE, "[the] IP[(-| )address]");
+		Skript.registerExpression(ExprIP.class, String.class, ExpressionType.PROPERTY,
+				"IP[s][( |-)address[es]] of %players%",
+				"%players%'[s] IP[s][( |-)address[es]]",
+				"IP[( |-)address]");
 	}
-	
+
+	private static final boolean PAPER_EVENT_EXISTS = Skript.classExists("com.destroystokyo.paper.event.server.PaperServerListPingEvent");
+
+	@SuppressWarnings("null")
+	private Expression<Player> players;
+
+	private boolean isConnectEvent, isProperty;
+
 	@SuppressWarnings({"null", "unchecked"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!ScriptLoader.isCurrentEvent(PlayerLoginEvent.class)) {
-			Skript.error("The 'IP' expression can only be used in a connect event.");
+		isProperty = matchedPattern < 2;
+		isConnectEvent = ScriptLoader.isCurrentEvent(PlayerLoginEvent.class);
+		boolean isServerPingEvent = ScriptLoader.isCurrentEvent(ServerListPingEvent.class) ||
+				(PAPER_EVENT_EXISTS && ScriptLoader.isCurrentEvent(PaperServerListPingEvent.class));
+		if (isProperty) {
+			players = (Expression<Player>) exprs[0];
+		} else if (!isConnectEvent && !isServerPingEvent) {
+			Skript.error("You must specify players whose IP addresses to get outside of server list ping and connect events.");
 			return false;
 		}
 		return true;
 	}
-	
+
 	@Override
 	@Nullable
 	protected String[] get(Event e) {
-		return CollectionUtils.array(((PlayerLoginEvent) e).getAddress().toString());
+		if (!isProperty) {
+			InetAddress address;
+			if (isConnectEvent)
+				// Return IP address of the connected player in connect event
+				address = ((PlayerLoginEvent) e).getAddress();
+			else
+				// Return IP address of the pinger in server list ping event
+				address = ((ServerListPingEvent) e).getAddress();
+			return CollectionUtils.array(address == null ? "unknown" : address.getHostAddress());
+		}
+
+		return Stream.of(players.getArray(e))
+				.map(player -> {
+					assert player != null;
+					return getIP(player, e);
+				})
+				.toArray(String[]::new);
+	}
+
+	private String getIP(Player player, Event e) {
+		InetAddress address;
+		// The player has no IP yet in a connect event, but the event has it
+		// It is a "feature" of Spigot, apparently
+		if (isConnectEvent && ((PlayerLoginEvent) e).getPlayer().equals(player))
+			address = ((PlayerLoginEvent) e).getAddress();
+		else
+			address = player.getAddress().getAddress();
+		
+		String hostAddress = address == null ? "unknown" : address.getHostAddress();
+		assert hostAddress != null;
+		return hostAddress;
 	}
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return !isProperty || players.isSingle();
 	}
 
 	@Override
@@ -79,7 +135,9 @@ public class ExprIP extends SimpleExpression<String> {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "the ip";
+		if (e == null || !isProperty)
+			return "the IP address";
+		return "the IP address of " + players.toString(e, debug);
 	}
-	
+
 }

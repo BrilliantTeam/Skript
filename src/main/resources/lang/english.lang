@@ -964,6 +964,37 @@ entities:
 	animal:
 		name: animal¦s
 		pattern: animal(|1¦s)
+	water mob:
+		name: water mob¦s
+		pattern: water mob(|1¦s)
+	cod:
+		name: cod¦s
+		pattern: cod(|1¦s)
+	salmon:
+		name: salmon¦s
+		pattern: salmon(|1¦s)
+	puffer fish:
+		name: puffer fish¦es
+		pattern: puffer fish(|1¦es)
+	tropical fish:
+		name: tropical fish¦es
+		pattern: tropical fish(|1¦es)
+	drowned:
+		name: drowned¦s
+		pattern: <age> drowned(|1¦s)|(4¦)drowned (kid(|1¦s)|child(|1¦ren))
+	dolphin:
+		name: dolphin¦s
+		pattern: dolphin(|1¦s)
+	phantom:
+		name: phantom¦s
+		pattern: phantom(|1¦s)
+	turtle:
+		name: turtle¦s
+		pattern: <age> turtle(|1¦s)|(4¦)turtle (kid(|1¦s)|child(|1¦ren))
+	trident:
+		name: trident¦s
+		pattern: trident(|1¦s)
+
 
 # -- Damage Causes --
 damage causes:

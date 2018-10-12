@@ -31,9 +31,9 @@ import ch.njol.skript.doc.Since;
 @Description("Checks whether the given players have a custom client weather")
 @Examples({"if the player has custom weather:",
 		"\tmessage \"Your custom weather is %player's weather%\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class CondHasClientWeather extends PropertyCondition<Player> {
-
+	
 	static {
 		register(CondHasClientWeather.class, PropertyType.HAVE, "[a] (client|custom) weather [set]", "players");
 	}

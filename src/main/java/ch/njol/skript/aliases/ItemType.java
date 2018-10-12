@@ -410,8 +410,9 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * @param type Some ItemData. Only a copy of it will be stored.
 	 */
 	public void add(@Nullable ItemData type) {
-		if (type != null)
+		if (type != null) {
 			add_(type.clone());
+		}
 	}
 	
 	/**

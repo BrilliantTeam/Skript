@@ -55,6 +55,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.Metadatable;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.CachedServerIcon;
 import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -91,9 +92,9 @@ import ch.njol.yggdrasil.Fields;
  */
 // TODO vectors
 public class BukkitClasses {
-	
+
 	public BukkitClasses() {}
-	
+
 	static {
 		Classes.registerClass(new ClassInfo<>(Entity.class, "entity")
 				.user("entit(y|ies)")
@@ -136,7 +137,7 @@ public class BukkitClasses {
 					}
 				})
 				.changer(DefaultChangers.entityChanger));
-		
+
 		Classes.registerClass(new ClassInfo<>(LivingEntity.class, "livingentity")
 				.user("living ?entit(y|ies)")
 				.name("Living Entity")
@@ -147,7 +148,7 @@ public class BukkitClasses {
 				.since("1.0")
 				.defaultExpression(new EventValueExpression<>(LivingEntity.class))
 				.changer(DefaultChangers.entityChanger));
-		
+
 		Classes.registerClass(new ClassInfo<>(Projectile.class, "projectile")
 				.user("projectiles?")
 				.name("Projectile")
@@ -158,12 +159,12 @@ public class BukkitClasses {
 				.since("1.0")
 				.defaultExpression(new EventValueExpression<>(Projectile.class))
 				.changer(DefaultChangers.nonLivingEntityChanger));
-		
+
 		Classes.registerClass(new ClassInfo<>(Block.class, "block")
 				.user("blocks?")
 				.name("Block")
 				.description("A block in a <a href='#world'>world</a>. It has a <a href='#location'>location</a> and a <a href='#itemstack'>type</a>, " +
-						"and can also have a <a href='#direction'>direction</a> (mostly a <a href='../expressions/#ExprFacing'>facing</a>), an <a href='#inventory'>inventory</a>, or other special properties.")
+						"and can also have a <a href='#direction'>direction</a> (mostly a <a href='../expressions.html#ExprFacing'>facing</a>), an <a href='#inventory'>inventory</a>, or other special properties.")
 				.usage("")
 				.examples("")
 				.since("1.0")
@@ -260,7 +261,7 @@ public class BukkitClasses {
 						}
 					}
 				}));
-		
+
 		Classes.registerClass(new ClassInfo<>(Location.class, "location")
 				.user("locations?")
 				.name("Location")
@@ -356,6 +357,7 @@ public class BukkitClasses {
 						}
 					}
 				}));
+
 		Classes.registerClass(new ClassInfo<>(Vector.class, "vector")
 				.user("vectors?")
 				.name("Vector")
@@ -429,7 +431,7 @@ public class BukkitClasses {
 					
 				})
 				);
-		
+
 		// FIXME update doc
 		Classes.registerClass(new ClassInfo<>(World.class, "world")
 				.user("worlds?")
@@ -510,13 +512,13 @@ public class BukkitClasses {
 						return true;
 					}
 				}));
-		
+
 		Classes.registerClass(new ClassInfo<>(Inventory.class, "inventory")
 				.user("inventor(y|ies)")
 				.name("Inventory")
 				.description("An inventory of a <a href='#player'>player</a> or <a href='#block'>block</a>. Inventories have many effects and conditions regarding the items contained.",
 						"An inventory has a fixed amount of <a href='#slot'>slots</a> which represent a specific place in the inventory, " +
-								"e.g. the <a href='../expressions/#ExprArmorSlot'>helmet slot</a> for players (Please note that slot support is still very limited but will be improved eventually).")
+						"e.g. the <a href='../expressions.html#ExprArmorSlot'>helmet slot</a> for players (Please note that slot support is still very limited but will be improved eventually).")
 				.usage("")
 				.examples("")
 				.since("1.0")
@@ -553,7 +555,7 @@ public class BukkitClasses {
 						return "inventory of .+";
 					}
 				}).changer(DefaultChangers.inventoryChanger));
-		
+
 		Classes.registerClass(new ClassInfo<>(InventoryAction.class, "inventoryaction")
 				.user("inventory actions?")
 				.name("Inventory Action")
@@ -587,7 +589,7 @@ public class BukkitClasses {
 					}
 					
 				}));
-		
+
 		final EnumUtils<ClickType> invClicks = new EnumUtils<>(ClickType.class, "click types"); // Less boilerplate code!
 		Classes.registerClass(new ClassInfo<>(ClickType.class, "clicktype")
 				.user("click types?")
@@ -621,7 +623,7 @@ public class BukkitClasses {
 					}
 					
 				}));
-		
+
 		final EnumUtils<InventoryType> invTypes = new EnumUtils<>(InventoryType.class, "inventory types");
 		Classes.registerClass(new ClassInfo<>(InventoryType.class, "inventorytype")
 				.user("inventory types?")
@@ -655,15 +657,15 @@ public class BukkitClasses {
 					}
 					
 				}));
-		
+
 		Classes.registerClass(new ClassInfo<>(Player.class, "player")
 				.user("players?")
 				.name("Player")
 				.description("A player. Depending on whether a player is online or offline several actions can be performed with them, " +
 						"though you won't get any errors when using effects that only work if the player is online (e.g. changing his inventory) on an offline player.",
 						"You have two possibilities to use players as command arguments: &lt;player&gt; and &lt;offline player&gt;. " +
-								"The first requires that the player is online and also accepts only part of the name, " +
-								"while the latter doesn't require that the player is online, but the player's name has to be entered exactly.")
+						"The first requires that the player is online and also accepts only part of the name, " +
+						"while the latter doesn't require that the player is online, but the player's name has to be entered exactly.")
 				.usage("")
 				.examples("")
 				.since("1.0")
@@ -724,7 +726,7 @@ public class BukkitClasses {
 				})
 				.changer(DefaultChangers.playerChanger)
 				.serializeAs(OfflinePlayer.class));
-		
+
 		Classes.registerClass(new ClassInfo<>(OfflinePlayer.class, "offlineplayer")
 				.user("offline ?players?")
 				.name("Offlineplayer")
@@ -841,12 +843,12 @@ public class BukkitClasses {
 						return true;
 					}
 				}));
-		
+
 		Classes.registerClass(new ClassInfo<>(CommandSender.class, "commandsender")
 				.user("(commands?)? ?(sender|executor)s?")
 				.name("Command Sender")
 				.description("A player or the console.")
-				.usage("use <a href='../expressions/#LitConsole'>the console</a> for the console",
+				.usage("use <a href='../expressions.html#LitConsole'>the console</a> for the console",
 						"see <a href='#player'>player</a> for players.")
 				.examples("on command /pm:",
 						"	command sender is not the console",
@@ -882,12 +884,12 @@ public class BukkitClasses {
 						return "\\S+";
 					}
 				}));
-		
+
 		Classes.registerClass(new ClassInfo<>(InventoryHolder.class, "inventoryholder")
 				.name(ClassInfo.NO_DOC)
 				.defaultExpression(new EventValueExpression<>(InventoryHolder.class))
 				.after("entity"));
-		
+
 		Classes.registerClass(new ClassInfo<>(GameMode.class, "gamemode")
 				.user("game ?modes?")
 				.name("Game Mode")
@@ -931,7 +933,7 @@ public class BukkitClasses {
 						return "[a-z]+";
 					}
 				}).serializer(new EnumSerializer<>(GameMode.class)));
-		
+
 		Classes.registerClass(new ClassInfo<>(ItemStack.class, "itemstack")
 				.user("item", "material")
 				.name("Item / Material")
@@ -997,13 +999,12 @@ public class BukkitClasses {
 						return "item:.+";
 					}
 				}).serializer(new ConfigurationSerializer<ItemStack>()));
-		
+
 		Classes.registerClass(new ClassInfo<>(Item.class, "itementity")
 				.name(ClassInfo.NO_DOC)
 				.since("2.0")
 				.changer(DefaultChangers.itemChanger));
-		
-		
+
 		Classes.registerClass(new ClassInfo<>(Biome.class, "biome")
 				.user("biomes?")
 				.name("Biome")
@@ -1035,7 +1036,7 @@ public class BukkitClasses {
 					}
 				})
 				.serializer(new EnumSerializer<>(Biome.class)));
-		
+
 //		PotionEffect is not used; ItemType is used instead
 		Classes.registerClass(new ClassInfo<>(PotionEffectType.class, "potioneffecttype")
 				.user("potion( ?effect)?( ?type)?s?")
@@ -1107,12 +1108,12 @@ public class BukkitClasses {
 						return false;
 					}
 				}));
-		
+
 		// REMIND make my own damage cause class (that e.g. stores the attacker entity, the projectile, or the attacking block)
 		Classes.registerClass(new ClassInfo<>(DamageCause.class, "damagecause")
 				.user("damage causes?")
 				.name("Damage Cause")
-				.description("The cause/type of a <a href='../events/#damage'>damage event</a>, e.g. lava, fall, fire, drowning, explosion, poison, etc.",
+				.description("The cause/type of a <a href='../events.html#damage'>damage event</a>, e.g. lava, fall, fire, drowning, explosion, poison, etc.",
 						"Please note that support for this type is very rudimentary, e.g. lava, fire and burning, as well as projectile and attack are considered different types.")
 				.usage(DamageCauseUtils.getAllNames())
 				.examples("")
@@ -1142,7 +1143,7 @@ public class BukkitClasses {
 					}
 				})
 				.serializer(new EnumSerializer<>(DamageCause.class)));
-		
+
 		Classes.registerClass(new ClassInfo<>(Chunk.class, "chunk")
 				.user("chunks?")
 				.name("Chunk")
@@ -1233,7 +1234,7 @@ public class BukkitClasses {
 						return true;
 					}
 				}));
-		
+
 		Classes.registerClass(new ClassInfo<>(Enchantment.class, "enchantment")
 				.user("enchantments?")
 				.name("Enchantment")
@@ -1307,7 +1308,7 @@ public class BukkitClasses {
 						return false;
 					}
 				}));
-		
+
 		Material[] allMaterials = Material.values();
 		Classes.registerClass(new ClassInfo<>(Material.class, "material")
 				.name(ClassInfo.NO_DOC)
@@ -1389,7 +1390,7 @@ public class BukkitClasses {
 				.name("Spawn Reason")
 				.description("The spawn reason in a <a href='events.html#spawn'>spawn</a> event.")
 				.examples(spawnReasons.getAllNames())
-				.since("INSERT VERSION")
+				.since("2.3")
 				.parser(new Parser<SpawnReason>() {
 					@Override
 					public String toString(SpawnReason spawnReason, int flags) {
@@ -1413,6 +1414,43 @@ public class BukkitClasses {
 					}
 				})
 				.serializer(new EnumSerializer<>(SpawnReason.class)));
+
+		if (Skript.classExists("com.destroystokyo.paper.event.server.PaperServerListPingEvent")) {
+			Classes.registerClass(new ClassInfo<>(CachedServerIcon.class, "cachedservericon")
+					.user("server ?icons?")
+					.name("Server Icon")
+					.description("A server icon that was loaded using the <a href='effects.html#EffLoadServerIcon'>load server icon</a> effect.")
+					.examples("")
+					.since("INSERT VERSION")
+					.parser(new Parser<CachedServerIcon>() {
+						@Override
+						@Nullable
+						public CachedServerIcon parse(final String s, final ParseContext context) {
+							return null;
+						}
+
+						@Override
+						public boolean canParse(final ParseContext context) {
+							return false;
+						}
+
+						@Override
+						public String toString(final CachedServerIcon o, int flags) {
+							return "server icon";
+						}
+
+						@SuppressWarnings("null")
+						@Override
+						public String toVariableNameString(final CachedServerIcon o) {
+							return "server icon";
+						}
+
+						@Override
+						public String getVariableNamePattern() {
+							return "server icon";
+						}
+					}));
+		}
 
 	}
 

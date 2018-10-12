@@ -36,7 +36,7 @@ import ch.njol.skript.lang.ExpressionType;
 @Description("The <a href='classes.html#spawnreason'>spawn reason</a> in a <a href='events.html#spawn'>spawn</a> event.")
 @Examples({"on spawn:",
 	"\tspawn reason is reinforcements or breeding"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprSpawnReason extends EventValueExpression<SpawnReason> {
 
 	static {

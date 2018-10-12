@@ -37,7 +37,7 @@ import ch.njol.util.Kleenean;
 @Description("Checks whether the given players can see another players.")
 @Examples({"if the player can't see the player-argument:",
 		"\tmessage \"<light red>The player %player-argument% is not online!\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class CondCanSee extends Condition {
 
 	static {

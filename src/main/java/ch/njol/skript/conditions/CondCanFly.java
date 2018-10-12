@@ -30,7 +30,7 @@ import ch.njol.skript.doc.Since;
 @Name("Can Fly")
 @Description("Whether a player is allowed to fly.")
 @Examples("player can fly")
-@Since("INSERT VERSION")
+@Since("2.3")
 public class CondCanFly extends PropertyCondition<Player> {
 	
 	static {
