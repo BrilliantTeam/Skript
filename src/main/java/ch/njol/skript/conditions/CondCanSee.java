@@ -24,6 +24,8 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.conditions.base.PropertyCondition;
+import ch.njol.skript.conditions.base.PropertyCondition.PropertyType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -77,7 +79,8 @@ public class CondCanSee extends Condition {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return players.toString(e, debug) + (isNegated() ? " can't see " : " can see ") + targetPlayers.toString(e, debug);
+		return PropertyCondition.toString(this, PropertyType.CAN, e, debug, players,
+				"see" + targetPlayers.toString(e, debug));
 	}
 
 }
