@@ -20,50 +20,35 @@
 package ch.njol.skript.conditions;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.Skript;
+import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Condition;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Checker;
-import ch.njol.util.Kleenean;
 
 @Name("Can Fly")
 @Description("Whether a player is allowed to fly.")
 @Examples("player can fly")
 @Since("INSERT VERSION")
-public class CondCanFly extends Condition {
-
+public class CondCanFly extends PropertyCondition<Player> {
+	
 	static {
-		Skript.registerCondition(CondCanFly.class,
-			"%players% can fly",
-			"%players% (can't|can[ ]not) fly");
+		register(CondCanFly.class, PropertyType.CAN, "fly", "players");
 	}
-
-	@SuppressWarnings("null")
-	private Expression<Player> players;
-
-	@SuppressWarnings("unchecked")
+	
 	@Override
-	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		players = (Expression<Player>) exprs[0];
-		setNegated(matchedPattern == 1);
-		return true;
+	public boolean check(Player player) {
+		return player.getAllowFlight();
 	}
-
+	
 	@Override
-	public boolean check(final Event e) {
-		return players.check(e, Player::getAllowFlight, isNegated());
+	protected PropertyType getPropertyType() {
+		return PropertyType.CAN;
 	}
-
+	
 	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		return players.toString(e, debug) + (isNegated() ? " can " : " cannot ") + "fly";
+	protected String getPropertyName() {
+		return "fly";
 	}
 }

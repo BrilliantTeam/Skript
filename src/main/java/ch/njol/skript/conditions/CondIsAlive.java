@@ -38,6 +38,7 @@ import ch.njol.util.Kleenean;
 @Examples({"{villager-buddy::%player's uuid%} is dead"})
 @Since("2.0")
 public class CondIsAlive extends PropertyCondition<LivingEntity> {
+	
 	static {
 		register(CondIsAlive.class, "(1¦alive|0¦dead)", "livingentities");
 	}

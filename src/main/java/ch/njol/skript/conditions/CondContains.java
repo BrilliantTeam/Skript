@@ -51,6 +51,7 @@ import ch.njol.util.StringUtils;
 		"player has 4 flint and 2 iron ingots"})
 @Since("1.0")
 public class CondContains extends Condition {
+	
 	static {
 		Skript.registerCondition(CondContains.class,
 				"%inventories% ha(s|ve) %itemtypes% [in [(the[ir]|his|her|its)] inventory]",
@@ -60,9 +61,9 @@ public class CondContains extends Condition {
 	}
 	
 	@SuppressWarnings("null")
-	Expression<?> containers;
+	private Expression<?> containers;
 	@SuppressWarnings("null")
-	Expression<?> items;
+	private Expression<?> items;
 	
 	@SuppressWarnings({"unchecked", "null", "unused"})
 	@Override
@@ -98,69 +99,55 @@ public class CondContains extends Condition {
 	public boolean check(final Event e) {
 		boolean caseSensitive = SkriptConfig.caseSensitive.value();
 		
-		return containers.check(e, new Checker<Object>() {
-			@Override
-			public boolean check(final Object container) {
-				if (containers instanceof Variable && !containers.isSingle()) { // List variable
-					Object[] all = containers.getAll(e); // Compare all items to all entries in list
-					return items.check(e, new Checker<Object>() {
-						@Override
-						public boolean check(final Object item) {
-							for (Object o : all) {
-								if (Relation.EQUAL.is(Comparators.compare(o, item)))
-									return true; // Found equal, success!
-							}
-							return false; // Not found
-						}
-					}, isNegated());
-				} else {
-					if (container instanceof Inventory) {
-						final Inventory invi = (Inventory) container;
-						return items.check(e, new Checker<Object>() {
-							@Override
-							public boolean check(final Object type) {
-								return type instanceof ItemType && ((ItemType) type).isContainedIn(invi);
-							}
-						}, isNegated());
-					} else if (container instanceof String) {
-						final String s = (String) container;
-						return items.check(e, new Checker<Object>() {
-							@Override
-							public boolean check(final Object type) {
-								if (type instanceof Variable) {
-									@SuppressWarnings("unchecked")
-									String toFind = ((Variable<String>) type).getSingle(e);
-									if (toFind != null)
-										return StringUtils.contains(s, toFind, caseSensitive);
-								}
-								return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
-							}
-						}, isNegated());
-					} else if (container instanceof Variable) { // Ok, so we have a variable...
-						Object val = ((Variable<?>) container).getSingle(e);
-						if (val instanceof String) {
-							final String s = (String) val;
-							return items.check(e, new Checker<Object>() {
-	
-								@Override
-								public boolean check(final Object type) {
-									if (type instanceof Variable) {
-										@SuppressWarnings("unchecked")
-										String toFind = ((Variable<String>) type).getSingle(e);
-										if (toFind != null)
-											return StringUtils.contains(s, toFind, caseSensitive);
+		return containers.check(e,
+				(Checker<Object>) container -> {
+					if (containers instanceof Variable && !containers.isSingle()) { // List variable
+						Object[] all = containers.getAll(e); // Compare all items to all entries in list
+						return items.check(e,
+								(Checker<Object>) item -> {
+									for (Object o : all) {
+										if (Relation.EQUAL.is(Comparators.compare(o, item)))
+											return true; // Found equal, success!
 									}
-									return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
-								}
-								
-							});
+									return false; // Not found
+								});
+					} else {
+						if (container instanceof Inventory) {
+							final Inventory invi = (Inventory) container;
+							return items.check(e,
+									(Checker<Object>) type -> type instanceof ItemType && ((ItemType) type).isContainedIn(invi));
+						} else if (container instanceof String) {
+							final String s = (String) container;
+							return items.check(e,
+									(Checker<Object>) type -> {
+										if (type instanceof Variable) {
+											@SuppressWarnings("unchecked")
+											String toFind = ((Variable<String>) type).getSingle(e);
+											if (toFind != null)
+												return StringUtils.contains(s, toFind, caseSensitive);
+										}
+										return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
+									});
+						} else if (container instanceof Variable) { // Ok, so we have a variable...
+							Object val = ((Variable<?>) container).getSingle(e);
+							if (val instanceof String) {
+								final String s = (String) val;
+								return items.check(e,
+										(Checker<Object>) type -> {
+											if (type instanceof Variable) {
+												@SuppressWarnings("unchecked")
+												String toFind = ((Variable<String>) type).getSingle(e);
+												if (toFind != null)
+													return StringUtils.contains(s, toFind, caseSensitive);
+											}
+											return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
+										});
+							}
+							// TODO support similar odd contains checks for inventories
 						}
-						// TODO support similar odd contains checks for inventories
 					}
-				}
-				return false;
-			}
-		});
+					return false;
+				}, isNegated());
 	}
 	
 	@Override
