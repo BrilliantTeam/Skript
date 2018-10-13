@@ -339,7 +339,7 @@ public class HTMLGenerator {
 		return sb.toString();
 	}
 	
-	private String handleIf(String desc, String start, boolean value) {
+	private static String handleIf(String desc, String start, boolean value) {
 		int ifStart = desc.indexOf(start);
 		while (ifStart != -1) {
 			int ifEnd = desc.indexOf("${end}", ifStart);
@@ -374,7 +374,7 @@ public class HTMLGenerator {
 		Since since = c.getAnnotation(Since.class);
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since.value());
 		Description description = c.getAnnotation(Description.class);
-		desc = desc.replace("${element.desc}", description == null ? "missing description" : Joiner.on("\n").join(description.value()));
+		desc = desc.replace("${element.desc}", description == null ? "missing description" : Joiner.on("\n").join(description.value()).replace("\n\n", "<p>"));
 		desc = desc.replace("${element.desc-safe}", description == null ? "missing description" : Joiner.on("\n").join(description.value())
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		Examples examples = c.getAnnotation(Examples.class);
@@ -446,7 +446,7 @@ public class HTMLGenerator {
 		String since = info.getSince();
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since);
 		String[] description = info.getDescription();
-		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description));
+		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description).replace("\n\n", "<p>"));
 		desc = desc.replace("${element.desc-safe}", Joiner.on("\\n").join(description == null ? new String[0] : description)
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		String[] examples = info.getExamples();
@@ -497,7 +497,7 @@ public class HTMLGenerator {
 		String since = info.getSince();
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since);
 		String[] description = info.getDescription();
-		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description));
+		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description).replace("\n\n", "<p>"));
 		desc = desc.replace("${element.desc-safe}", Joiner.on("\\n").join(description == null ? new String[0] : description)
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		String[] examples = info.getExamples();

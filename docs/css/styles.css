@@ -181,6 +181,10 @@ td ul {
   text-rendering: optimizelegibility;
 }
 
+.item-description > p {
+  margin-top: 0.7em;
+}
+
 .skript-code-block {
   padding: 0.52em;
   font-family: monospace;
