@@ -39,10 +39,10 @@ import ch.njol.util.Kleenean;
 
 @Name("Continue")
 @Description("Skips the value currently being looped, moving on to the next value if it exists.")
-@Examples("loop all players:\n" +
-		"\tif loop-value does not have permission \"moderator\":\n" +
-		"\t\tcontinue # filter out non moderators\n" +
-		"\tbroadcast \"%loop-player% is a moderator!\" # Only moderators get broadcast")
+@Examples({"loop all players:",
+		"\tif loop-value does not have permission \"moderator\":",
+		"\t\tcontinue # filter out non moderators",
+		"\tbroadcast \"%loop-player% is a moderator!\" # Only moderators get broadcast"})
 @Since("2.2-dev37")
 public class EffContinue extends Effect {
 

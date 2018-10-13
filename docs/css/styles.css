@@ -123,13 +123,6 @@ table {
   border-collapse: collapse;
 }
 
-.item-anchor {
-  display: block;
-  position: relative;
-  top: -3em;
-  visibility: hidden;
-}
-
 .item-title {
   font-size: 130%;
   padding: 0.2em;
