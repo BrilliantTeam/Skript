@@ -45,7 +45,7 @@ dependencies {
 	implementation 'com.github.marcelo-mason:PreciousStones:24e3d4bf67b7240ae36b32be10e99d4091938c5c'
 
 	testImplementation 'junit:junit:4.12'
-	testImplementation 'org.easymock:easymock:3.4'
+	testImplementation 'org.easymock:easymock:3.6'
 
 	implementation fileTree(dir: 'lib', include: '*.jar')
 }
