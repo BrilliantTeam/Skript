@@ -184,7 +184,16 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		
 		// 1.11 particles
 		TOTEM("TOTEM"),
-		SPIT("SPIT");
+		SPIT("SPIT"),
+		
+		// 1.13 particles
+		SQUID_INK("SQUID INK"),
+		BUBBLE_POP("BUBBLE POP"),
+		CURRENT_DOWN("CURRENT_DOWN"),
+		BUBBLE_COLUMN_UP("BUBBLE_COLUMN_UP"),
+		NAUTILUS("NAUTILUS"),
+		DOLPHIN("DOLPHIN");
+		
 		
 		@Nullable
 		final Object effect;
