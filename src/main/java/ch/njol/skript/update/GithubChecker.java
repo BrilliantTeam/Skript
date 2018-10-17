@@ -2,6 +2,7 @@ package ch.njol.skript.update;
 
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -11,7 +12,7 @@ import ch.njol.skript.Updater.ResponseEntry.Author;
 /**
  * Uses Github API to check for updates.
  */
-public class GithubChecker {
+public class GithubChecker implements UpdateChecker {
 	
 	/**
 	 * Github API response for GSON deserialization.
@@ -53,13 +54,11 @@ public class GithubChecker {
 	    
 	    public Author author;
 	}
-	
-	/**
-	 * API endpoint URL.
-	 */
-	private final URL url;
-	
-	public GithubChecker(URL url) {
-		this.url = url;
+
+	@Override
+	public CompletableFuture<UpdateManifest> check(String updateSource, String releaseChannel) {
+		return CompletableFuture.completedFuture(null); // TODO
 	}
+	
+	
 }

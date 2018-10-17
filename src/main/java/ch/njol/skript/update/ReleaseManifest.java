@@ -22,14 +22,21 @@ public class ReleaseManifest {
 	public final String flavor;
 	
 	/**
-	 * URL where updates for this release might be found.
+	 * Type of update checker to use for this release.
 	 */
-	public final String updateUrl;
+	public final Class<? extends UpdateChecker> updateCheckerType;
 	
-	public ReleaseManifest(String id, String date, String flavor, String updateUrl) {
+	/**
+	 * Source where updates for this release can be found,
+	 * if there are updates.
+	 */
+	public final String updateSource;
+	
+	public ReleaseManifest(String id, String date, String flavor, Class<? extends UpdateChecker> updateCheckerType, String updateSource) {
 		this.id = id;
 		this.date = date;
 		this.flavor = flavor;
-		this.updateUrl = updateUrl;
+		this.updateCheckerType = updateCheckerType;
+		this.updateSource = updateSource;
 	}
 }
