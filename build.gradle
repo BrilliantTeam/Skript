@@ -97,7 +97,7 @@ configurations {
 }
 
 dependencies {
-	ecj 'org.eclipse.jdt:ecj:3.14.0'
+	ecj 'org.eclipse.jdt:ecj:3.15.0'
 }
 
 sourceCompatibility = 1.8
