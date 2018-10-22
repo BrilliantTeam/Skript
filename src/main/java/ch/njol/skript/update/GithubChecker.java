@@ -1,13 +1,17 @@
 package ch.njol.skript.update;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
-import ch.njol.skript.Updater.ResponseEntry.AssetsEntry;
-import ch.njol.skript.Updater.ResponseEntry.Author;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 
 /**
  * Uses Github API to check for updates.
@@ -54,11 +58,99 @@ public class GithubChecker implements UpdateChecker {
 	    
 	    public Author author;
 	}
-
-	@Override
-	public CompletableFuture<UpdateManifest> check(String updateSource, String releaseChannel) {
-		return CompletableFuture.completedFuture(null); // TODO
+	
+	/**
+	 * Used for deserializing Github API output.
+	 */
+	private final Gson gson;
+	
+	public GithubChecker(Gson gson) {
+		this.gson = gson;
 	}
 	
+	private List<ResponseEntry> deserialize(String str) {
+		assert str != null : "Cannot deserialize null string";
+		@SuppressWarnings("serial")
+		Type listType = new TypeToken<List<ResponseEntry>>() {}.getType();
+		List<ResponseEntry> responses = gson.fromJson(str, listType);
+		assert responses != null;
+		
+		return responses;
+	}
+
+	@Override
+	public CompletableFuture<UpdateManifest> check(ReleaseManifest manifest, ReleaseChannel channel) {
+		CompletableFuture<UpdateManifest> future = CompletableFuture.supplyAsync(() -> {
+			URL url;
+			try {
+				url = new URL(manifest.updateSource);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+			try (Scanner scan = new Scanner(url.openStream(), "UTF-8")) {
+				// Get list of releases from Github API
+				String out = scan.useDelimiter("\\A").next();
+				assert out != null;
+				return deserialize(out);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}).thenApply((releases) -> {
+			/**
+			 * Latest release in the channel we're using.
+			 */
+			ResponseEntry latest = null;
+			
+			/**
+			 * Current release, if found.
+			 */
+			ResponseEntry current = null;
+
+			// Go through all releases, attempting to find current one
+			for (ResponseEntry release : releases) {
+				String name = release.name;
+				assert name != null;
+				
+				// Check if this is a suitable latest release
+				if (latest == null && channel.check(name)) {
+					latest = release;
+				}
+				
+				// Check whether this is a current release
+				if (manifest.id.equals(name)) {
+					current = release;
+					break; // Update can't be older than current release
+				}
+			}
+			
+			if (latest == null) {
+				return null; // No updates for this channel available
+			}
+			
+			if (current != null && latest.id == current.id) {
+				return null; // Already running latest in this channel
+			}
+			
+			// Validate the latest release
+			if (latest.assets.isEmpty()) {
+				return null; // Update not (yet?) downloadable
+			}
+			
+			try {
+				String name = latest.name;
+				assert name != null;
+				String createdAt = latest.created_at;
+				assert createdAt != null;
+				String patchNotes = latest.body;
+				assert patchNotes != null;
+				URL download = new URL(latest.assets.get(0).browser_download_url);
+				return new UpdateManifest(name, createdAt, patchNotes, download);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+		});
+		assert future != null;
+		return future;
+	}
 	
 }
