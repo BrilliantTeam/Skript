@@ -51,6 +51,7 @@ import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.localization.Message;
@@ -385,10 +386,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		if (stack.hasItemMeta()) {
 			ItemMeta meta = stack.getItemMeta(); // Creates a copy
 			meta.setDisplayName(null); // Clear display name
-			if (meta instanceof Damageable) // TODO MC<1.13 support
-				((Damageable) meta).setDamage(0);
 			data.stack.setItemMeta(meta);
 		}
+		ItemUtils.setDamage(data.stack, 0); // Set to undamaged
 		
 		data.type = type;
 		data.blockValues = blockValues;
