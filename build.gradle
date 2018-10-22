@@ -104,7 +104,8 @@ sourceCompatibility = 1.8
 compileJava {
 	options.fork = true
 	options.encoding = 'UTF-8'
-	options.compilerArgs = ['-properties', '.settings/org.eclipse.jdt.core.prefs', '-encoding', 'UTF-8']
+	options.compilerArgs = ['-properties', '.settings/org.eclipse.jdt.core.prefs', '-encoding', 'UTF-8',
+			'-warn:-tasks(TODO|FIXME|REMIND)']
 	options.forkOptions.with {
 		executable = 'java'
 		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main']
