@@ -51,20 +51,24 @@ import ch.njol.skript.bukkitutil.block.BlockCompat;
 @NonNullByDefault(false)
 public class BlockStateBlock implements Block {
 	
-	private static final boolean minecraft113 = Skript.isRunningMinecraft(1, 13);
+	private static final boolean IS_RUNNING_1_13 = Skript.isRunningMinecraft(1, 13);
+	private static final boolean ISPASSABLE_METHOD_EXISTS = Skript.methodExists(Block.class, "isPassable");
 	
 	final BlockState state;
 	private final boolean delayChanges;
+	private final boolean isPassable;
 	
 	public BlockStateBlock(final BlockState state) {
-		assert state != null;
-		this.state = state;
-		delayChanges = false;
+		this(state, false);
 	}
 	
 	public BlockStateBlock(final BlockState state, final boolean delayChanges) {
 		assert state != null;
 		this.state = state;
+		if (ISPASSABLE_METHOD_EXISTS)
+			this.isPassable = state.getBlock().isPassable();
+		else
+			this.isPassable = false;
 		this.delayChanges = delayChanges;
 	}
 	
@@ -316,7 +320,7 @@ public class BlockStateBlock implements Block {
 	
 	@Override
 	public void setType(Material type, boolean applyPhysics) {
-		if (!minecraft113) {
+		if (!IS_RUNNING_1_13) {
 			throw new IllegalStateException("not on 1.13");
 		}
 		
@@ -334,7 +338,7 @@ public class BlockStateBlock implements Block {
 
 	@Override
 	public BlockData getBlockData() {
-		if (!minecraft113) {
+		if (!IS_RUNNING_1_13) {
 			throw new IllegalStateException("not on 1.13");
 		}
 		
@@ -343,7 +347,7 @@ public class BlockStateBlock implements Block {
 
 	@Override
 	public void setBlockData(BlockData data) {
-		if (!minecraft113) {
+		if (!IS_RUNNING_1_13) {
 			throw new IllegalStateException("not on 1.13");
 		}
 		
@@ -361,7 +365,7 @@ public class BlockStateBlock implements Block {
 
 	@Override
 	public void setBlockData(BlockData data, boolean applyPhysics) {
-		if (!minecraft113) {
+		if (!IS_RUNNING_1_13) {
 			throw new IllegalStateException("not on 1.13");
 		}
 		
@@ -377,4 +381,8 @@ public class BlockStateBlock implements Block {
 		}
 	}
 	
+	@Override
+	public boolean isPassable() {
+		return isPassable;
+	}
 }

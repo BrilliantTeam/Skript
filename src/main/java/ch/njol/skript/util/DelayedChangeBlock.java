@@ -51,20 +51,25 @@ import ch.njol.skript.bukkitutil.block.BlockCompat;
 @NonNullByDefault(false)
 public class DelayedChangeBlock implements Block {
 	
+	private static final boolean ISPASSABLE_METHOD_EXISTS = Skript.methodExists(Block.class, "isPassable");
+	
 	final Block b;
 	@Nullable
 	private final BlockState newState;
+	private final boolean isPassable;
 	
 	public DelayedChangeBlock(final Block b) {
-		assert b != null;
-		this.b = b;
-		newState = null;
+		this(b, null);
 	}
 	
 	public DelayedChangeBlock(final Block b, final BlockState newState) {
 		assert b != null;
 		this.b = b;
 		this.newState = newState;
+		if (ISPASSABLE_METHOD_EXISTS && newState != null)
+			this.isPassable = newState.getBlock().isPassable();
+		else
+			this.isPassable = false;
 	}
 	
 	@Override
@@ -342,4 +347,8 @@ public class DelayedChangeBlock implements Block {
 		}
 	}
 	
+	@Override
+	public boolean isPassable() {
+		return isPassable;
+	}
 }
