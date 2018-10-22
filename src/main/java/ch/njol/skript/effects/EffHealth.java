@@ -27,6 +27,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.HealthUtils;
+import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.Changer.ChangerUtils;
 import ch.njol.skript.doc.Description;
@@ -95,12 +96,12 @@ public class EffHealth extends Effect {
 			ItemStack i = (ItemStack) damageables.getSingle(e);
 			if (i == null)
 				return;
-			// TODO migrate to use ItemType and durability methods there
+			
 			if (this.damage == null) {
-				i.setDurability((short) 0);
+				ItemUtils.setDamage(i, 0);
 			} else {
-				i.setDurability((short) Math.max(0, i.getDurability() + (heal ? -damage : damage)));
-				if (i.getDurability() >= i.getType().getMaxDurability())
+				ItemUtils.setDamage(i, (int) Math.max(0, ItemUtils.getDamage(i) + (heal ? -damage : damage)));
+				if (ItemUtils.getDamage(i) >= i.getType().getMaxDurability())
 					i = null;
 			}
 			damageables.change(e, new ItemStack[] {i}, ChangeMode.SET);
@@ -111,11 +112,12 @@ public class EffHealth extends Effect {
 				ItemStack is = ((Slot) damageable).getItem();
 				if (is == null)
 					continue;
+				
 				if (this.damage == null) {
-					is.setDurability((short) 0);
+					ItemUtils.setDamage(is, 0);
 				} else {
-					is.setDurability((short) Math.max(0, is.getDurability() + (heal ? -damage : damage)));
-					if (is.getDurability() >= is.getType().getMaxDurability())
+					ItemUtils.setDamage(is, (int) Math.max(0, ItemUtils.getDamage(is) + (heal ? -damage : damage)));
+					if (ItemUtils.getDamage(is) >= is.getType().getMaxDurability())
 						is = null;
 				}
 				((Slot) damageable).setItem(is);
