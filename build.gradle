@@ -45,7 +45,7 @@ repositories {
 }
 
 dependencies {
-	implementation 'com.destroystokyo.paper:paper-api:1.13.1-R0.1-SNAPSHOT'
+	implementation 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
 	implementation 'org.eclipse.jdt:org.eclipse.jdt.annotation:1.1.0'
 	implementation 'com.google.code.findbugs:findbugs:2.0.3'
 	implementation 'com.sk89q.worldguard:worldguard-legacy:7.0.0-SNAPSHOT'
@@ -60,7 +60,7 @@ dependencies {
 
 configurations.all {
 	resolutionStrategy.dependencySubstitution {
-		substitute module('org.bukkit:bukkit') with module('com.destroystokyo.paper:paper-api:1.11.2-R0.1-SNAPSHOT')
+		substitute module('org.bukkit:bukkit') with module('com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT')
 	}
 }
 
