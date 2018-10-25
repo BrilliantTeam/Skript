@@ -67,7 +67,7 @@ public class EffFireworkLaunch extends Effect {
 		Number power = lifetime.getSingle(e);
 		if (power == null)
 			power = 1;
-		for (Location location : locations.getArray(e)){
+		for (Location location : locations.getArray(e)) {
 			Firework firework = location.getWorld().spawn(location, Firework.class);
 			FireworkMeta meta = firework.getFireworkMeta();
 			meta.addEffects(effects.getArray(e));
