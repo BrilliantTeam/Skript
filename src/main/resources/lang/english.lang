@@ -1297,6 +1297,14 @@ spawn reasons:
 	trap: trap
 	village_defense: village defense, golem defense, iron golem defense
 	village_invasion: village invasion, village invading
+	
+# -- Firework types --
+firework types:
+	ball_large: large ball, ball large, large
+	creeper: creeper, creeper face
+	ball: ball, small, small ball
+	star: star, star shaped
+	burst: burst
 
 # -- Boolean --
 boolean:
@@ -1348,6 +1356,8 @@ types:
 	inventorytype: inventory type¦s @an
 	metadataholder: metadata holder¦s @a
 	spawnreason: spawn reason¦s @a
+	fireworkeffect: firework effect¦s @a
+	fireworktype: firework type¦s @a
 	
 	# Skript
 	weathertype: weather type¦s @a

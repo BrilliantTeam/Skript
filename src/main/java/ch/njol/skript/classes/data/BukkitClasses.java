@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -1450,8 +1451,74 @@ public class BukkitClasses {
 							return "server icon";
 						}
 					}));
-		}
 
+		}
+		EnumUtils<FireworkEffect.Type> fireworktypes = new EnumUtils<>(FireworkEffect.Type.class, "firework types");
+		Classes.registerClass(new ClassInfo<>(FireworkEffect.Type.class, "fireworktype")
+				.user("fireworktypes?")
+				.name("Firework type")
+				.description("The type of a <a href='#fireworkeffect'>fireworkeffect</a>.")
+				.examples(fireworktypes.getAllNames())
+				.since("INSERT VERSION")
+				.parser(new Parser<FireworkEffect.Type>() {
+					
+					@Override
+					@Nullable
+					public FireworkEffect.Type parse(String input, ParseContext context) {
+						return fireworktypes.parse(input);
+					}
+					
+					@Override
+					public String toString(FireworkEffect.Type type, int flags) {
+						return fireworktypes.toString(type, flags);
+					}
+					
+					@SuppressWarnings("null")
+					@Override
+					public String toVariableNameString(FireworkEffect.Type type) {
+						return type.name();
+					}
+					
+					@Override
+					public String getVariableNamePattern() {
+						return "\\S+";
+					}
+				})
+				.serializer(new EnumSerializer<>(FireworkEffect.Type.class)));
+		
+		Classes.registerClass(new ClassInfo<>(FireworkEffect.class, "fireworkeffect")
+				.user("fireworkeffects?")
+				.name("Firework effect")
+				.description("A configuration of effects that defines the firework when exploded.")
+				.since("INSERT VERSION")
+				.parser(new Parser<FireworkEffect>() {
+					
+					@Override
+					@Nullable
+					public FireworkEffect parse(String input, ParseContext context) {
+						return null;
+					}
+
+					@Override
+					public boolean canParse(ParseContext context) {
+						return false;
+					}
+
+					@Override
+					public String toString(FireworkEffect effect, int flags) {
+						return "Firework effect " + effect.toString();
+					}
+
+					@Override
+					public String toVariableNameString(FireworkEffect effect) {
+						return "Firework effect " + effect.toString();
+					}
+
+					@Override
+					public String getVariableNamePattern() {
+						return "\\S+";
+					}
+				}));
 	}
 
 }
