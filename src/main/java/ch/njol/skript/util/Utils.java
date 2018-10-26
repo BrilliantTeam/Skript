@@ -22,6 +22,7 @@ package ch.njol.skript.util;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -392,9 +393,9 @@ public abstract class Utils {
 	
 	@Nullable
 	public static String getChatStyle(final String s) {
-		final Color c = Color.byName(s);
-		if (c != null)
-			return c.getChat();
+		Optional<SkriptColor> optional = SkriptColor.fromName(s);
+		if (optional.isPresent())
+			return optional.get().getFormattedChat();
 		return chat.get(s);
 	}
 	
@@ -412,9 +413,9 @@ public abstract class Utils {
 		String m = StringUtils.replaceAll("" + message.replace("<<none>>", ""), stylePattern, new Callback<String, Matcher>() {
 			@Override
 			public String run(final Matcher m) {
-				final Color c = Color.byName("" + m.group(1));
-				if (c != null)
-					return c.getChat();
+				Optional<SkriptColor> optional = SkriptColor.fromName("" + m.group(1));
+				if (optional.isPresent())
+					return optional.get().getFormattedChat();
 				final String f = chat.get(m.group(1).toLowerCase());
 				if (f != null)
 					return f;
@@ -439,9 +440,9 @@ public abstract class Utils {
 		String m = StringUtils.replaceAll(message, stylePattern, new Callback<String, Matcher>() {
 			@Override
 			public String run(final Matcher m) {
-				final Color c = Color.byEnglishName("" + m.group(1));
-				if (c != null)
-					return c.getChat();
+				Optional<SkriptColor> optional = SkriptColor.fromName("" + m.group(1));
+				if (optional.isPresent())
+					return optional.get().getFormattedChat();
 				final String f = englishChat.get(m.group(1).toLowerCase());
 				if (f != null)
 					return f;

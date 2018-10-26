@@ -22,6 +22,7 @@ package ch.njol.skript.expressions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -47,6 +48,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.Getter;
+import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
@@ -79,8 +81,9 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 			List<Color> colors = new ArrayList<>();
 			for (FireworkEffect effect : (FireworkEffect[])source) {
 				effect.getColors().stream()
-						.map(color -> Color.byWoolColor(DyeColor.getByColor(color))) //TODO: Skript's color only supports 16 colors, not a plethora of RGB from fireworks.
-						.forEach(colour -> colors.add(colour));
+						.map(color -> SkriptColor.fromDyeColor(DyeColor.getByColor(color)))//TODO: Skript's color only supports 16 colors, not a plethora of RGB from fireworks.
+						.filter(optional -> optional.isPresent())
+						.forEach(colour -> colors.add(colour.get()));
 			}
 			if (colors.size() == 0)
 				return null;
@@ -93,10 +96,17 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 				if (o instanceof ItemStack || o instanceof Item) {
 					final ItemStack is = o instanceof ItemStack ? (ItemStack) o : ((Item) o).getItemStack();
 					final MaterialData d = is.getData();
-					if (d instanceof Colorable)
-						return Color.byWoolColor(((Colorable) d).getColor());
+					if (d instanceof Colorable) {
+						Optional<SkriptColor> color = SkriptColor.fromDyeColor(((Colorable) d).getColor());
+						if (!color.isPresent())
+							return null;
+						return color.get();
+					}
 				} else if (o instanceof Colorable) { // Sheep
-					return Color.byWoolColor(((Colorable) o).getColor());
+					Optional<SkriptColor> color = SkriptColor.fromDyeColor(((Colorable) o).getColor());
+					if (!color.isPresent())
+						return null;
+					return color.get();
 				}
 				return null;
 			}
@@ -144,7 +154,7 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 				ItemStack is = o instanceof ItemStack ? (ItemStack) o : ((Item) o).getItemStack();
 				MaterialData d = is.getData();
 				if (d instanceof Colorable)
-					((Colorable) d).setColor(c.getWoolColor());
+					((Colorable) d).setColor(c.asDyeColor());
 				else
 					continue;
 				
@@ -157,19 +167,19 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 					((Item) o).setItemStack(is);
 				}
 			} else if (o instanceof Colorable) {
-				((Colorable) o).setColor(c.getWoolColor());
+				((Colorable) o).setColor(c.asDyeColor());
 			} else if (o instanceof FireworkEffect) {
 				Color[] input = (Color[])delta;
 				FireworkEffect effect = ((FireworkEffect) o);
 				switch (mode) {
 					case ADD:
 						for (Color color : input)
-							effect.getColors().add(color.getBukkitColor());
+							effect.getColors().add(color.asBukkitColor());
 						break;
 					case REMOVE:
 					case REMOVE_ALL:
 						for (Color color : input)
-							effect.getColors().remove(color.getBukkitColor());
+							effect.getColors().remove(color.asBukkitColor());
 						break;
 					case DELETE:
 					case RESET:
@@ -178,7 +188,7 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 					case SET:
 						effect.getColors().clear();
 						for (Color color : input)
-							effect.getColors().add(color.getBukkitColor());
+							effect.getColors().add(color.asBukkitColor());
 						break;
 					default:
 						break;

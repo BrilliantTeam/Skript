@@ -74,7 +74,7 @@ public class EvtFirework extends SkriptEvent {
 		if (colors == null)
 			return true;
 		List<org.bukkit.Color> colours = Arrays.stream(colors.getArray(e))
-				.map(color -> color.getBukkitColor())
+				.map(color -> color.asBukkitColor())
 				.collect(Collectors.toList());
 		FireworkMeta meta = ((FireworkExplodeEvent)e).getEntity().getFireworkMeta();
 		for (FireworkEffect effect : meta.getEffects()) {
