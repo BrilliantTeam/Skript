@@ -37,13 +37,13 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
 @Name("Launch firework")
-@Description("Leash firework effects at the given location(s).")
-@Examples("leash the player to the target entity")
+@Description("Launch firework effects at the given location(s).")
+@Examples("launch ball large coloured red, purple and white fading to light green and black at player's location with duration 1")
 @Since("INSERT VERSION")
 public class EffFireworkLaunch extends Effect {
 	
 	static {
-		Skript.registerEffect(EffFireworkLaunch.class, "(launch|deploy) [[a] firework [with effect[s]]] %fireworkeffects% at %locations% [(with duration|timed) %number%]");
+		Skript.registerEffect(EffFireworkLaunch.class, "(launch|deploy) [[a] firework [with effect[s]]] %fireworkeffects% at %locations% [([with] (duration|power)|timed) %number%]");
 	}
 
 	@SuppressWarnings("null")
@@ -78,7 +78,9 @@ public class EffFireworkLaunch extends Effect {
 	
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "Launch firework " + effects.toString(e, debug) + " at " + locations.toString(e, debug);
+		return "Launch firework(s) " + effects.toString(e, debug) +
+				" at location(s) " + locations.toString(e, debug) +
+				" timed " + lifetime.toString(e, debug);
 	}
-	
+
 }
