@@ -673,7 +673,7 @@ public class SkriptClasses {
 					public String getVariableNamePattern() {
 						return "[a-z ]+";
 					}
-				}).serializer(new YggdrasilSerializer<Color>()));
+				}).serializeAs(SkriptColor.class));
 		
 		Classes.registerClass(new ClassInfo<>(StructureType.class, "structuretype")
 				.user("tree ?types?", "trees?")
