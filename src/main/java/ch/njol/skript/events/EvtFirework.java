@@ -53,7 +53,7 @@ public class EvtFirework extends SkriptEvent {
 					.examples("on firework explode",
 							"on firework exploding colored red, light green and black",
 							"on firework explosion coloured light green:",
-							"	broadcast \"A firework colored %colors% was exploded at %location%!\"")
+							"	broadcast \"A firework colored %colors% was exploded at %location%!\"")//TODO fix 
 					.since("INSERT VERSION");
 	}
 	

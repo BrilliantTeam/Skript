@@ -22,8 +22,6 @@ package ch.njol.skript.expressions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -32,14 +30,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Colorable;
 import org.bukkit.material.MaterialData;
 import org.eclipse.jdt.annotation.Nullable;
-
-import com.google.common.collect.Lists;
 
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -85,7 +79,7 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 			List<Color> colors = new ArrayList<>();
 			for (FireworkEffect effect : (FireworkEffect[])source) {
 				effect.getColors().stream()
-						.map(color -> Color.byWoolColor(DyeColor.getByColor(color)))
+						.map(color -> Color.byWoolColor(DyeColor.getByColor(color))) //TODO: Skript's color only supports 16 colors, not a plethora of RGB from fireworks.
 						.forEach(colour -> colors.add(colour));
 			}
 			if (colors.size() == 0)
@@ -192,5 +186,5 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 			}
 		}
 	}
-	
+
 }
