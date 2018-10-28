@@ -632,7 +632,7 @@ entities:
 		pattern: [(ghast|big)] fire[ ]ball(|1¦s)
 	dragon fireball:
 		name: dragon fireball¦s
-		patter: dragon fire[ ]ball(|1¦s)
+		pattern: dragon fire[ ]ball(|1¦s)
 	small fireball:
 		name: small fireball¦s
 		pattern: (small|blaze) fire[ ]ball(|1¦s)
