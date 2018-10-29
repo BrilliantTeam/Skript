@@ -36,7 +36,7 @@ import ch.njol.util.Math2;
  * @author Peter Güttinger
  */
 @Name("Level Progress")
-@Description({"The progress a player has made until the next level. Remember that this value is between 0 and 1, not 0 and 100!",
+@Description({"The progress a player has made until he reaches the next level. Remember that this value is between 0 and 1, not 0 and 100!",
 		"Changing this value can cause a player's level to change if the resulting level progess is negative or larger than 1, e.g." +
 				"<code>increase the player's level progress by 0.5</code> will make the player gain a level if his progress was more than 50%."})
 @Examples({"# use the exp bar as mana",

@@ -37,9 +37,9 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Book Author")
-@Description("The author of a book")
+@Description("The author of a book.")
 @Examples({"on book sign:",
-			"	message \"Book Title: %author of event-item%\""})
+			"\tmessage \"Book Title: %author of event-item%\""})
 @Since("2.2-dev31")
 public class ExprBookAuthor extends SimplePropertyExpression<ItemStack, String> {
 	

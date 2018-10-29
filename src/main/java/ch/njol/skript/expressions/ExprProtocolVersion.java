@@ -48,13 +48,14 @@ import org.eclipse.jdt.annotation.Nullable;
 		"For example if the server uses PaperSpigot 1.12.2, and you make the protocol version 107 (1.9),",
 		"the version string will not be \"Paper 1.9\", it will still be \"Paper 1.12.2\".",
 		"But then you can customize the <a href='#ExprVersionString'>version string</a> as you wish.",
-		"Also if protocol version of the player is higher than protocol version of the server, it will say",
+		"Also if the protocol version of the player is higher than protocol version of the server, it will say",
 		"\"Server out of date!\", and if vice-versa \"Client out of date!\" when you hover on the ping bars.",
 		"",
 		"This can be set in a <a href='events.html#server_list_ping'>server list ping</a> event only",
 		"(increase and decrease effects cannot be used because that wouldn't make sense).",})
 @Examples({"on server list ping:",
-		"	set the protocol version to 0 # 13w41a (1.7), so it will show that version string"})
+		"\tset the version string to \"<light green>Version: <orange>%minecraft version%\"",
+		"\tset the protocol version to 0 # 13w41a (1.7) - so the player will see the custom version string almost always"})
 @Since("2.3")
 @RequiredPlugins("Paper 1.12.2 or newer")
 @Events("server list ping")

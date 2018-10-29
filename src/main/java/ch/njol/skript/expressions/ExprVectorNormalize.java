@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Normalize")
-@Description("Normalizes a vector")
+@Description("Normalizes a vector.")
 @Examples({"set {_v} to {_v} normalized"})
 @Since("2.2-dev28")
 public class ExprVectorNormalize extends SimpleExpression<Vector> {

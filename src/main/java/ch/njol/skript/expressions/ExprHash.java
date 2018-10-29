@@ -47,14 +47,14 @@ import ch.njol.util.Kleenean;
 		"<p>Please note that a hash cannot be reversed under normal circumstanses. You will not be able to get original value from a hash with Skript."})
 @Examples({
 		"command /setpass <text>:",
-		"	trigger:",
-		"		set {password.%player%} to text-argument hashed with SHA-256",
+		"\ttrigger:",
+		"\t\tset {password::%player%} to text-argument hashed with SHA-256",
 		"command /login <text>:",
-		"	trigger:",
-		"		{password.%player%} is text-argument hashed with SHA-256:",
-		"			message \"Login successful.\"",
-		"		else:",
-		"			message \"Wrong password!\""})
+		"\ttrigger:",
+		"\t\t{password::%player%} is text-argument hashed with SHA-256:",
+		"\t\t\tmessage \"Login successful.\"",
+		"\t\telse:",
+		"\t\t\tmessage \"Wrong password!\""})
 @Since("2.0, 2.2-dev32 (SHA-256 algorithm)")
 public class ExprHash extends PropertyExpression<String, String> {
 	static {

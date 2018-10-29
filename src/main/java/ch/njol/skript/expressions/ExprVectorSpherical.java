@@ -39,7 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Spherical shape")
-@Description("Forms a 'spherical shaped' vector using yaw and pitch to manipulate the current point")
+@Description("Forms a 'spherical shaped' vector using yaw and pitch to manipulate the current point.")
 @Examples({"loop 360 times:",
 		"	set {_v} to spherical vector radius 1, yaw loop-value, pitch loop-value",
 		"set {_v} to spherical vector radius 1, yaw 45, pitch 90"})

@@ -38,7 +38,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Create from location")
-@Description("Creates a vector from a location")
+@Description("Creates a vector from a location.")
 @Examples({"set {_v} to vector of {_loc}"})
 @Since("2.2-dev28")
 public class ExprVectorOfLocation extends SimpleExpression<Vector> {

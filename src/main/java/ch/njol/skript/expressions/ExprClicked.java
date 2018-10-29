@@ -58,17 +58,17 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("Clicked Block/Entity/Inventory/Slot")
-@Description("The clicked block, entity, inventory slot, inventory, type or action.")
+@Description("The clicked block, entity, inventory slot, inventory and the inventory type or action.")
 @Examples({"message \"You clicked on a %type of clicked entity%!\"",
 		"clicked block is a chest:",
-		"	show the inventory of the clicked block to the player"})
+		"\tshow the inventory of the clicked block to the player"})
 @Since("1.0, 2.2-dev35 (more clickable things)")
 @Events({"click", "inventory click"})
 public class ExprClicked extends SimpleExpression<Object> {
 
 	private static enum ClickableType {
 		
-		BLOCK_AND_ITEMS(1, Block.class, "clicked block/itemtype/entity", " clicked (block|%-*itemtype/entitydata%)"),
+		BLOCK_AND_ITEMS(1, Block.class, "clicked block/itemtype/entity", "clicked (block|%-*itemtype/entitydata%)"),
 		SLOT(2, Slot.class, "clicked slot", "clicked slot"),
 		INVENTORY(3, Inventory.class, "clicked inventory", "clicked inventory"),
 		TYPE(4, ClickType.class, "click type", "click (type|action)"),

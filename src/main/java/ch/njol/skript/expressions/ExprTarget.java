@@ -50,8 +50,8 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Target")
 @Description("For players this is the entity at the crosshair, while for mobs and experience orbs it represents the entity they are attacking/following (if any).")
 @Examples({"on entity target:",
-		"    entity's target is a player",
-		"    send \"You're being followed by an %entity%!\" to target of entity"})
+			"\tentity's target is a player",
+			"\tsend \"You're being followed by an %entity%!\" to target of entity"})
 @Since("<i>unknown</i> (before 2.1)")
 public class ExprTarget extends PropertyExpression<LivingEntity, Entity> {
 	static {
@@ -73,18 +73,14 @@ public class ExprTarget extends PropertyExpression<LivingEntity, Entity> {
 	
 	@Override
 	protected Entity[] get(final Event e, final LivingEntity[] source) {
-		return get(source, new Converter<LivingEntity, Entity>() {
-			@Override
-			@Nullable
-			public Entity convert(final LivingEntity en) {
-				if (getTime() >= 0 && e instanceof EntityTargetEvent && en.equals(((EntityTargetEvent) e).getEntity()) && !Delay.isDelayed(e)) {
-					final Entity t = ((EntityTargetEvent) e).getTarget();
-					if (t == null || type != null && !type.isInstance(t))
-						return null;
-					return t;
-				}
-				return Utils.getTarget(en, type);
+		return get(source, en -> {
+			if (getTime() >= 0 && e instanceof EntityTargetEvent && en.equals(((EntityTargetEvent) e).getEntity()) && !Delay.isDelayed(e)) {
+				final Entity t = ((EntityTargetEvent) e).getTarget();
+				if (t == null || type != null && !type.isInstance(t))
+					return null;
+				return t;
 			}
+			return Utils.getTarget(en, type);
 		});
 	}
 	

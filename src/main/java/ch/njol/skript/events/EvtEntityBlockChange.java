@@ -43,8 +43,10 @@ public class EvtEntityBlockChange extends SkriptEvent {
 	static {
 		Skript.registerEvent("Enderman/Sheep/Silverfish", EvtEntityBlockChange.class, EntityChangeBlockEvent.class, ChangeEvent.patterns)
 				.description("Called when an enderman places or picks up a block, a sheep eats grass or a silverfish boops into/out of a block respectively.")
-				.examples("")
-				.since("");
+				.examples("on sheep eat:",
+						"\tkill entity",
+						"\tbroadcast \"A sheep stole some grass!\"")
+				.since("<i>unknown</i>");
 	}
 	
 	static final ItemType monsterEgg = Aliases.javaItemType("any spawn egg");

@@ -36,7 +36,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Length")
-@Description("Gets or sets the length of a vector")
+@Description("Gets or sets the length of a vector.")
 @Examples({"send \"%standard length of vector 1, 2, 3%\"",
 		"set {_v} to vector 1, 2, 3",
 		"set standard length of {_v} to 2",

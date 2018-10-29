@@ -42,8 +42,8 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("Enchantment Level")
-@Description("The level of a particular <a href='classes.html#enchantment'>enchantment</a> on an item")
-@Examples({"player' tool is a sword of sharpness:",
+@Description("The level of a particular <a href='classes.html#enchantment'>enchantment</a> on an item.")
+@Examples({"player's tool is a sword of sharpness:",
 		"	message \"You have a sword of sharpness %level of sharpness of the player's tool% equipped\""})
 @Since("2.0")
 public class ExprEnchantmentLevel extends PropertyExpression<ItemType, Integer> {
@@ -69,16 +69,12 @@ public class ExprEnchantmentLevel extends PropertyExpression<ItemType, Integer> 
 		final Enchantment ench = enchantment.getSingle(e);
 		if (ench == null)
 			return new Integer[0];
-		return get(source, new Converter<ItemType, Integer>() {
-			@Override
-			@Nullable
-			public Integer convert(final ItemType i) {
-				final Map<Enchantment, Integer> enchs = i.getEnchantments();
-				if (enchs == null)
-					return Integer.valueOf(0);
-				final Integer l = enchs.get(ench);
-				return l == null ? Integer.valueOf(0) : l;
-			}
+		return get(source, i -> {
+			final Map<Enchantment, Integer> enchs = i.getEnchantments();
+			if (enchs == null)
+				return Integer.valueOf(0);
+			final Integer l = enchs.get(ench);
+			return l == null ? Integer.valueOf(0) : l;
 		});
 	}
 	

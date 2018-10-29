@@ -38,7 +38,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
  * @author Peter Güttinger
  */
 @Name("Max Health")
-@Description("The maximum health of an entity, e.g. 10 for a player")
+@Description("The maximum health of an entity, e.g. 10 for a player.")
 @Examples({"on join:",
 		"	set the maximum health of the player to 100",
 		"spawn a giant",

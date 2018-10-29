@@ -42,7 +42,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Online Player Count")
 @Description({"The amount of online players. This can be changed in a",
 		"<a href='events.html#server_list_ping'>server list ping</a> event only to show fake online player amount.",
-		"'real online player count' returns the real count of online players always and can't be changed.",
+		"'real online player count' always returns the real count of online players and can't be changed.",
 		"",
 		"Fake online player count requires PaperSpigot 1.12.2+."})
 @Examples({"on server list ping:",

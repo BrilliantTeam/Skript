@@ -44,7 +44,7 @@ import ch.njol.util.coll.CollectionUtils;
  * @author Peter Güttinger
  */
 @Name("Spawn")
-@Description("The spawnpoint of a world.")
+@Description("The spawning point of a world.")
 @Examples({"teleport all players to spawn",
 		"set the spawn point of \"world\" to the player's location"})
 @Since("1.4.2")

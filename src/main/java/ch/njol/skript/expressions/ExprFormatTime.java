@@ -40,7 +40,7 @@ import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
 
 @Name("Formatted time")
-@Description("Converts date to human-readable text format. By default, yyyy-MM-dd HH:mm:ss z will be used. For reference, see this "
+@Description("Converts date to human-readable text format. By default, yyyy-MM-dd HH:mm:ss (e.g. '2018-03-30 16:03:12') will be used. For reference, see this "
 		+ "<a href=\"https://en.wikipedia.org/wiki/ISO_8601\">Wikipedia article</a>.")
 @Examples("now formatted human-readable")
 @Since("2.2-dev31")

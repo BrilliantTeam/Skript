@@ -42,17 +42,17 @@ public class EvtPeriodical extends SelfRegisteringSkriptEvent {
 	static {
 		Skript.registerEvent("*Periodical", EvtPeriodical.class, ScheduledNoWorldEvent.class, "every %timespan%")
 				.description("An event that is called periodically.")
-				.examples("every 2 seconds",
-						"every minecraft hour",
-						"every ticks #can cause lag (depends on the code in this trigger)",
-						"every minecraft days")
+				.examples("every 2 seconds:",
+						"every minecraft hour:",
+						"every tick: #can cause lag (depends on the code in this trigger)",
+						"every minecraft days:")
 				.since("1.0");
 		Skript.registerEvent("*Periodical", EvtPeriodical.class, ScheduledEvent.class, "every %timespan% in [world[s]] %worlds%")
 				.description("An event that is called periodically.")
-				.examples("every 2 seconds in \"world\"",
-						"every minecraft hour in \"flatworld\"",
-						"every ticks in \"world\" #can cause lag (depends on the code in this trigger)",
-						"every minecraft days in \"plots\"")
+				.examples("every 2 seconds in \"world\":",
+						"every minecraft hour in \"flatworld\":",
+						"every tick in \"world\": #can cause lag (depends on the code in this trigger)",
+						"every minecraft days in \"plots\":")
 				.since("1.0")
 				.documentationID("eventperiodical");
 	}
