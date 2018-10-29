@@ -37,7 +37,7 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 
 @Name("Is Script Loaded")
-@Description("Check if the current script, or another script, is current loaded.")
+@Description("Checks whether a script is loaded.")
 @Examples({"script is loaded", "script \"example.sk\" is loaded"})
 @Since("2.2-dev31")
 public class CondScriptLoaded extends Condition {
