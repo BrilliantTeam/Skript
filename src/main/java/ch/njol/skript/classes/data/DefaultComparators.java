@@ -59,6 +59,7 @@ import org.bukkit.inventory.ItemStack;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.Aliases;
+import ch.njol.skript.aliases.ItemData;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Comparator;
@@ -225,49 +226,6 @@ public class DefaultComparators {
 	}
 	
 	// EntityData - ItemType
-	// TODO use aliases for this, somehow
-	final static LinkedHashMap<Class<? extends Entity>, Material> entityMaterials = new LinkedHashMap<>();
-	static {
-//		// to fix comparisons of eggs, arrows, etc. (e.g. 'projectile is an arrow')
-//		// TODO !Update with every version [entities]
-//		entityMaterials.put(Boat.class, Material.BOAT);
-//		entityMaterials.put(Painting.class, Material.PAINTING);
-//		entityMaterials.put(Arrow.class, Material.ARROW);
-//		entityMaterials.put(Egg.class, Material.EGG);
-//		entityMaterials.put(Chicken.class, Material.RAW_CHICKEN);
-//		entityMaterials.put(EnderPearl.class, Material.ENDER_PEARL);
-//		entityMaterials.put(Snowball.class, Material.SNOW_BALL);
-//		entityMaterials.put(ThrownExpBottle.class, Material.EXP_BOTTLE);
-////		entityMaterials.put(Fish.class, Material.RAW_FISH); // TODO 1.7
-//		entityMaterials.put(TNTPrimed.class, Material.TNT);
-//		entityMaterials.put(Slime.class, Material.SLIME_BALL);
-//		if (Skript.classExists("org.bukkit.entity.ItemFrame"))
-//			entityMaterials.put(ItemFrame.class, Material.ITEM_FRAME);
-//		if (Skript.classExists("org.bukkit.entity.Firework"))
-//			entityMaterials.put(Firework.class, Material.FIREWORK);
-//		if (Skript.classExists("org.bukkit.entity.minecart.StorageMinecart")) {
-//			entityMaterials.put(org.bukkit.entity.minecart.StorageMinecart.class, Material.STORAGE_MINECART);
-//			entityMaterials.put(org.bukkit.entity.minecart.PoweredMinecart.class, Material.POWERED_MINECART);
-//			entityMaterials.put(RideableMinecart.class, Material.MINECART);
-//			entityMaterials.put(HopperMinecart.class, Material.HOPPER_MINECART);
-//			entityMaterials.put(ExplosiveMinecart.class, Material.EXPLOSIVE_MINECART);
-//			entityMaterials.put(Minecart.class, Material.MINECART);
-//		} else { // 1.11 does not have these classes, and we compile against 1.11+ API now
-//			try {
-//				@SuppressWarnings("unchecked")
-//				Class<Entity> storageCart = (Class<Entity>) Class.forName("org.bukkit.entity.StorageMinecart");
-//				entityMaterials.put(storageCart, Material.STORAGE_MINECART);
-//				@SuppressWarnings("unchecked")
-//				Class<Entity> poweredCart = (Class<Entity>) Class.forName("org.bukkit.entity.PoweredMinecart");
-//				entityMaterials.put(poweredCart, Material.POWERED_MINECART);
-//				entityMaterials.put(Minecart.class, Material.MINECART);
-//			} catch (ClassNotFoundException e) {
-//				Skript.exception(e, "Cannot initialize material support for minecarts");
-//			}
-//		}
-//		if (Skript.classExists("org.bukkit.entity.ArmorStand"))
-//			entityMaterials.put(ArmorStand.class, Material.ARMOR_STAND);
-	}
 	public final static Comparator<EntityData, ItemType> entityItemComparator = new Comparator<EntityData, ItemType>() {
 		@Override
 		public Relation compare(final EntityData e, final ItemType i) {
@@ -281,12 +239,12 @@ public class DefaultComparators {
 //				return Relation.get(i.isOfType(Material.SKULL_ITEM.getId(), (short) 1));
 			if (e instanceof BoatData)
 				return Relation.get(((BoatData)e).isOfItemType(i));
-//			if (entityMaterials.containsKey(e.getType()))
-//				return Relation.get(i.isOfType(entityMaterials.get(e.getType()).getId(), (short) 0));
-//			for (final Entry<Class<? extends Entity>, Material> m : entityMaterials.entrySet()) {
-//				if (m.getKey().isAssignableFrom(e.getType()))
-//					return Relation.get(i.isOfType(m.getValue().getId(), (short) 0));
-//			}
+			for (ItemData data : i.getTypes()) {
+				assert data != null;
+				EntityData<?> entity = Aliases.getRelatedEntity(data);
+				if (entity != null && entity.getType().isAssignableFrom(e.getType()))
+					return Relation.EQUAL;
+			}
 			return Relation.NOT_EQUAL;
 		}
 		

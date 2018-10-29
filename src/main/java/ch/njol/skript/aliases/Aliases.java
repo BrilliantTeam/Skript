@@ -53,6 +53,8 @@ import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.config.validate.SectionValidator;
+import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
@@ -533,11 +535,22 @@ public abstract class Aliases {
 	/**
 	 * Gets a Vanilla Minecraft material id for given item data.
 	 * @param data Item data.
-	 * @return Minecraft item id.
+	 * @return Minecraft item id or null.
 	 */
 	@Nullable
 	public static String getMinecraftId(ItemData data) {
 		return provider.getMinecraftId(data.aliasCopy());
+	}
+	
+	/**
+	 * Gets an entity type related to given item. For example, an armor stand
+	 * item is related with armor stand entity.
+	 * @param data Item data.
+	 * @return Entity type or null.
+	 */
+	@Nullable
+	public static EntityData<?> getRelatedEntity(ItemData data) {
+		return provider.getRelatedEntity(data.aliasCopy());
 	}
 	
 	private static final Map<String, ItemType> trackedTypes = new HashMap<>();

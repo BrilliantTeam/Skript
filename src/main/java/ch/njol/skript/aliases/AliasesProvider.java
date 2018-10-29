@@ -36,7 +36,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.bekvon.bukkit.residence.commands.command;
 import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
@@ -47,6 +46,8 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.Noun;
@@ -60,18 +61,18 @@ public class AliasesProvider {
 	/**
 	 * All aliases that are currently loaded by this provider.
 	 */
-	private Map<String, ItemType> aliases;
+	private final Map<String, ItemType> aliases;
 	
 	/**
 	 * Material names for aliases this provider has.
 	 */
-	private Map<ItemData, MaterialName> materialNames;
+	private final Map<ItemData, MaterialName> materialNames;
 	
 	/**
 	 * Tags are in JSON format. We may need GSON when merging tags
 	 * (which might be done if variations are used).
 	 */
-	private Gson gson;
+	private final Gson gson;
 	
 	/**
 	 * Represents a variation of material. It could, for example, define one
@@ -165,27 +166,33 @@ public class AliasesProvider {
 	/**
 	 * Contains all variations. {@link #loadVariedAlias} uses this.
 	 */
-	private Map<String, VariationGroup> variations;
+	private final Map<String, VariationGroup> variations;
 	
 	/**
 	 * Subtypes of materials.
 	 */
-	private Map<ItemData, Set<ItemData>> subtypes;
+	private final Map<ItemData, Set<ItemData>> subtypes;
 	
 	/**
 	 * Maps item datas back to Minecraft ids.
 	 */
-	private Map<ItemData, String> minecraftIds;
+	private final Map<ItemData, String> minecraftIds;
+	
+	/**
+	 * Entities related to the items. Most items won't have any.
+	 */
+	private final Map<ItemData, EntityData<?>> relatedEntities;
 	
 	/**
 	 * Constructs a new aliases provider with no data.
 	 */
 	public AliasesProvider() {
-		aliases = new HashMap<>(3000);
-		materialNames = new HashMap<>(3000);
+		aliases = new HashMap<>(10000);
+		materialNames = new HashMap<>(10000);
 		variations = new HashMap<>(500);
 		subtypes = new HashMap<>(1000);
 		minecraftIds = new HashMap<>(3000);
+		relatedEntities = new HashMap<>(10);
 		
 		gson = new Gson();
 	}
@@ -280,6 +287,7 @@ public class AliasesProvider {
 		// First, try to find if aliases already has a type with this id
 		// (so that aliases can refer to each other)
 		ItemType typeOfId = aliases.get(id);
+		EntityData<?> related = null;
 		List<ItemData> datas;
 		if (typeOfId != null) { // If it exists, use datas from it
 			datas = typeOfId.getTypes();
@@ -288,6 +296,12 @@ public class AliasesProvider {
 			Material material = BukkitUnsafe.getMaterialFromMinecraftId(id);
 			if (material == null) { // If server doesn't recognize id, do not proceed
 				throw new InvalidMinecraftIdException(id);
+			}
+			
+			// Hacky: get related entity from block states
+			String entityName = blockStates.remove("relatedEntity");
+			if (entityName != null) {
+				related = EntityData.parse(entityName);
 			}
 			
 			// Parse block state to block values
@@ -335,7 +349,13 @@ public class AliasesProvider {
 			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
 				minecraftIds.put(data, id); // Register Minecraft id for the data, too
 			
+			// Material name, including both singular and plural forms
 			materialNames.putIfAbsent(data, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond()));
+			
+			// Related entity type
+			if (related != null)
+				relatedEntities.put(data, related);
+			
 			data.strictEquality = false;
 		}
 	}
@@ -381,6 +401,11 @@ public class AliasesProvider {
 
 	public int getAliasCount() {
 		return aliases.size();
+	}
+	
+	@Nullable
+	public EntityData<?> getRelatedEntity(ItemData type) {
+		return relatedEntities.get(type);
 	}
 
 }
