@@ -26,12 +26,13 @@ import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 
 @Name("Is Swimming")
-@Description({"Checks whether a living entity is swimming.",
-		"Note: Only supported on Minecraft 1.13+"})
+@Description("Checks whether a living entity is swimming.")
 @Examples("player is swimming")
+@RequiredPlugins("1.13 or newer")
 @Since("INSERT VERSION")
 public class CondIsSwimming extends PropertyCondition<LivingEntity> {
 	

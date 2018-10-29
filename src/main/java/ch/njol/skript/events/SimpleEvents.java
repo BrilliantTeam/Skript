@@ -477,10 +477,11 @@ public class SimpleEvents {
 				.since("2.3");
 		
 		if (Skript.classExists("org.bukkit.event.entity.EntityToggleSwimEvent")) {
-			Skript.registerEvent("Swim", SimpleEvent.class, EntityToggleSwimEvent.class, "[entity] swim[ing]")
-					.description("Called when an entity swims or stops swimming",
-							"Note: Only supported on Minecraft 1.13+")
-					.examples("on swim:",
+			Skript.registerEvent("Swim Toggle", SimpleEvent.class, EntityToggleSwimEvent.class, "[entity] toggl(e|ing) swim",
+					"[entity] swim toggl(e|ing)")
+					.description("Called when an entity swims or stops swimming")
+					.requiredPlugins("1.13 or newer")
+					.examples("on swim toggle:",
 							"	event-entity does not have permission \"swim\"",
 							"	cancel event")
 					.since("INSERT VERSION");
