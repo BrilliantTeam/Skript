@@ -73,14 +73,18 @@ public class ExprTarget extends PropertyExpression<LivingEntity, Entity> {
 	
 	@Override
 	protected Entity[] get(final Event e, final LivingEntity[] source) {
-		return get(source, en -> {
-			if (getTime() >= 0 && e instanceof EntityTargetEvent && en.equals(((EntityTargetEvent) e).getEntity()) && !Delay.isDelayed(e)) {
-				final Entity t = ((EntityTargetEvent) e).getTarget();
-				if (t == null || type != null && !type.isInstance(t))
-					return null;
-				return t;
+		return get(source, new Converter<LivingEntity, Entity>() {
+			@Override
+			@Nullable
+			public Entity convert(final LivingEntity en) {
+				if (getTime() >= 0 && e instanceof EntityTargetEvent && en.equals(((EntityTargetEvent) e).getEntity()) && !Delay.isDelayed(e)) {
+					final Entity t = ((EntityTargetEvent) e).getTarget();
+					if (t == null || type != null && !type.isInstance(t))
+						return null;
+					return t;
+				}
+				return Utils.getTarget(en, type);
 			}
-			return Utils.getTarget(en, type);
 		});
 	}
 	

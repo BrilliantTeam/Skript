@@ -48,10 +48,10 @@ import ch.njol.util.Kleenean;
 @Examples({
 		"command /setpass <text>:",
 		"\ttrigger:",
-		"\t\tset {password::%player%} to text-argument hashed with SHA-256",
+		"\t\tset {password::%uuid of player%} to text-argument hashed with SHA-256",
 		"command /login <text>:",
 		"\ttrigger:",
-		"\t\t{password::%player%} is text-argument hashed with SHA-256:",
+		"\t\t{password::%uuid of player%} is text-argument hashed with SHA-256:",
 		"\t\t\tmessage \"Login successful.\"",
 		"\t\telse:",
 		"\t\t\tmessage \"Wrong password!\""})
