@@ -51,7 +51,7 @@ public class EvtPeriodical extends SelfRegisteringSkriptEvent {
 				.description("An event that is called periodically.")
 				.examples("every 2 seconds in \"world\":",
 						"every minecraft hour in \"flatworld\":",
-						"every tick in \"world\":# can cause lag depending on the code inside the event",
+						"every tick in \"world\": # can cause lag depending on the code inside the event",
 						"every minecraft days in \"plots\":")
 				.since("1.0")
 				.documentationID("eventperiodical");

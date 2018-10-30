@@ -81,7 +81,6 @@ public class ExprGroup extends SimpleExpression<String> {
 				groups.add(VaultHook.permission.getPrimaryGroup(null, player));
 			else
 				Collections.addAll(groups, VaultHook.permission.getPlayerGroups(null, player));
-			
 		}
 		return groups.toArray(new String[0]);
 	}
