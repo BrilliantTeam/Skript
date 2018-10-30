@@ -60,7 +60,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Clicked Block/Entity/Inventory/Slot")
 @Description("The clicked block, entity, inventory slot, inventory and the inventory type or action.")
 @Examples({"message \"You clicked on a %type of clicked entity%!\"",
-		"clicked block is a chest:",
+		"if the clicked block is a chest:",
 		"\tshow the inventory of the clicked block to the player"})
 @Since("1.0, 2.2-dev35 (more clickable things)")
 @Events({"click", "inventory click"})

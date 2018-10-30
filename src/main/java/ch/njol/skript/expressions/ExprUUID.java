@@ -43,7 +43,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 @Examples({"# prevents people from joining the server if they use the name of a player",
 		"# who has played on this server at least once since this script has been added",
 		"on login:",
-		"	{uuid::%name of player%} exists:",
+		"	if {uuid::%name of player%} exists:",
 		"		{uuid::%name of player%} is not uuid of player",
 		"		kick player due to \"Someone with your name has played on this server before\"",
 		"	else:",

@@ -42,7 +42,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("Ban")
-@Description({"Bans/unbans a player or an IP.",
+@Description({"Bans/unbans a player or an IP address.",
 		"Starting with Skript 2.1.1 and Bukkit 1.7.2 R0.4, one can also ban players with a reason."})
 @Examples({"unban player",
 		"ban \"127.0.0.1\"",

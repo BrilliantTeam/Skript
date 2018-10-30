@@ -41,7 +41,7 @@ import ch.njol.util.Math2;
 @Name("Rounding")
 @Description("Rounds numbers normally, up (ceiling) or down (floor) respectively.")
 @Examples({"set {var} to rounded health of player",
-		"set line 1 of the block to rounded (1.5 * player's level)",
+		"set line 1 of the block to rounded \"%(1.5 * player's level)%\"",
 		"add rounded down argument to the player's health"})
 @Since("2.0")
 public class ExprRound extends PropertyExpression<Number, Long> {

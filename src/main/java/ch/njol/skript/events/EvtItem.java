@@ -81,7 +81,7 @@ public class EvtItem extends SkriptEvent {
 		// TODO brew event
 //		Skript.registerEvent("Brew", EvtItem.class, BrewEvent.class, "brew[ing] [[of] %itemtypes%]")
 //				.description("Called when a potion finished brewing.")
-//				.examples("on brew")
+//				.examples("on brew:")
 //				.since("2.0");
 		if (hasConsumeEvent) {
 			Skript.registerEvent("Consume", EvtItem.class, PlayerItemConsumeEvent.class, "[player] ((eat|drink)[ing]|consum(e|ing)) [[of] %itemtypes%]")

@@ -44,8 +44,8 @@ import ch.njol.util.Kleenean;
 @Description("The command that caused an 'on command' event (excluding the leading slash and all arguments)")
 @Examples({"# prevent any commands except for the /exit command during some game",
 		"on command:",
-		"\t{game::%player%::playing} is true:",
-		"\t\t\tcommand is not \"exit\":",
+		"\tif {game::%player%::playing} is true:",
+		"\t\tif the command is not \"exit\":",
 		"\t\t\tmessage \"You're not allowed to use commands during the game\"",
 		"\t\t\tcancel the event"})
 @Since("2.0")

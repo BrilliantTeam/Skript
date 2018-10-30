@@ -47,7 +47,7 @@ import ch.njol.util.Kleenean;
 @Description("Sends a message to the given player.")
 @Examples({"message \"A wild %player% appeared!\"",
 		"message \"This message is a distraction. Mwahaha!\"",
-		"send \"Your kill streak is %{killstreak::%uuid of player%}%.\" to player",
+		"send \"Your kill streak is %{kill streak::%uuid of player%}%.\" to player",
 		"if the targeted entity exists:",
 		"	message \"You're currently looking at a %type of the targeted entity%!\""})
 @Since("1.0, 2.2-dev26 (advanced features)")

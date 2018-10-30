@@ -329,7 +329,7 @@ public class SimpleEvents {
 								"to be able to use the <a href='../expressions.html#ExprAttacked'>entity that got hit</a> in the case when the projectile hit a living entity.",
 						"A damage event will even be fired if the damage is 0, e.g. when throwing snowballs at non-nether mobs.")
 				.examples("on projectile hit:",
-						"\tevent-projectile is snowball",
+						"\tevent-projectile is arrow",
 						"\tkill event-projectile")
 				.since("1.0");
 		Skript.registerEvent("Shoot", SimpleEvent.class, ProjectileLaunchEvent.class, "[projectile] shoot")

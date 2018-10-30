@@ -77,11 +77,11 @@ public class ExprGroup extends SimpleExpression<String> {
 	protected String[] get(Event e) {
 		List<String> groups = new ArrayList<>();
 		for (OfflinePlayer player : players.getArray(e)) {
-			if (primary) {
+			if (primary)
 				groups.add(VaultHook.permission.getPrimaryGroup(null, player));
-			} else {
+			else
 				Collections.addAll(groups, VaultHook.permission.getPlayerGroups(null, player));
-			}
+			
 		}
 		return groups.toArray(new String[0]);
 	}
