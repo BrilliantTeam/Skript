@@ -66,6 +66,7 @@ import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.ClickType;
@@ -659,38 +660,45 @@ public final class BukkitEventValues {
 		}, 0);
 		
 		// --- HangingEvents ---
-		// 1.4.3
-		if (Skript.classExists("org.bukkit.event.hanging.HangingEvent")) {
-			EventValues.registerEventValue(HangingEvent.class, Hanging.class, new Getter<Hanging, HangingEvent>() {
-				@Override
-				@Nullable
-				public Hanging get(final HangingEvent e) {
-					return e.getEntity();
-				}
-			}, 0);
-			EventValues.registerEventValue(HangingEvent.class, World.class, new Getter<World, HangingEvent>() {
-				@Override
-				@Nullable
-				public World get(final HangingEvent e) {
-					return e.getEntity().getWorld();
-				}
-			}, 0);
-			EventValues.registerEventValue(HangingEvent.class, Location.class, new Getter<Location, HangingEvent>() {
-				@Override
-				@Nullable
-				public Location get(final HangingEvent e) {
-					return e.getEntity().getLocation();
-				}
-			}, 0);
-			// HangingPlaceEvent
-			EventValues.registerEventValue(HangingPlaceEvent.class, Player.class, new Getter<Player, HangingPlaceEvent>() {
-				@Override
-				@Nullable
-				public Player get(final HangingPlaceEvent e) {
-					return e.getPlayer();
-				}
-			}, 0);
-		} // Finally removed old painting support - Spigot 1.9 removed the events
+		
+		EventValues.registerEventValue(HangingEvent.class, Hanging.class, new Getter<Hanging, HangingEvent>() {
+			@Override
+			@Nullable
+			public Hanging get(final HangingEvent e) {
+				return e.getEntity();
+			}
+		}, 0);
+		EventValues.registerEventValue(HangingEvent.class, World.class, new Getter<World, HangingEvent>() {
+			@Override
+			@Nullable
+			public World get(final HangingEvent e) {
+				return e.getEntity().getWorld();
+			}
+		}, 0);
+		EventValues.registerEventValue(HangingEvent.class, Location.class, new Getter<Location, HangingEvent>() {
+			@Override
+			@Nullable
+			public Location get(final HangingEvent e) {
+				return e.getEntity().getLocation();
+			}
+		}, 0);
+			
+		// HangingBreakByEntityEvent
+		EventValues.registerEventValue(HangingBreakByEntityEvent.class, Entity.class, new Getter<Entity, HangingBreakByEntityEvent>() {
+			@Nullable
+			@Override
+			public Entity get(HangingBreakByEntityEvent e) {
+				return e.getRemover();
+			}
+		}, 0);
+		// HangingPlaceEvent
+		EventValues.registerEventValue(HangingPlaceEvent.class, Player.class, new Getter<Player, HangingPlaceEvent>() {
+			@Override
+			@Nullable
+			public Player get(final HangingPlaceEvent e) {
+				return e.getPlayer();
+			}
+		}, 0);
 		
 		// --- VehicleEvents ---
 		EventValues.registerEventValue(VehicleEvent.class, Vehicle.class, new Getter<Vehicle, VehicleEvent>() {
