@@ -19,19 +19,12 @@
  */
 package ch.njol.skript.events;
 
-import java.lang.invoke.MethodHandle;
-
-import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Painting;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingEvent;
@@ -49,7 +42,6 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.util.Checker;
 
@@ -114,7 +106,7 @@ public class EvtBlock extends SkriptEvent {
 		} else if (e instanceof PlayerBucketFillEvent) {
 			item = new ItemType(((PlayerBucketEvent) e).getBlockClicked().getRelative(((PlayerBucketEvent) e).getBlockFace()));
 		} else if (e instanceof PlayerBucketEmptyEvent) {
-			item = new ItemType(((PlayerBucketEmptyEvent) e).getBucket());
+			item = new ItemType(((PlayerBucketEmptyEvent) e).getItemStack());
 		} else if (Skript.isRunningMinecraft(1, 4, 3) && e instanceof HangingEvent) {
 			final EntityData<?> d = EntityData.fromEntity(((HangingEvent) e).getEntity());
 			return types.check(e, new Checker<ItemType>() {
