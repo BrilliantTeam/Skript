@@ -277,7 +277,9 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 				if (myType.type == Material.AIR)
 					return true; // Both items AIR/null
 			} else if (myType.isAlias) {
-				return myType.type.equals(item.getType());
+				if (!myType.type.equals(item.getType()))
+					continue;
+				return true;
 			} else {
 				return item.isSimilar(myType.stack);
 			}

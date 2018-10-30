@@ -147,6 +147,19 @@ public class DefaultComparators {
 			
 		});
 		
+		// Slot - ItemType
+		Comparators.registerComparator(Slot.class, ItemType.class, new Comparator<Slot, ItemType>() {
+			@Override
+			public Relation compare(Slot slot, ItemType item) {
+				return Relation.get(item.isOfType(slot.getItem()));
+			}
+			
+			@Override
+			public boolean supportsOrdering() {
+				return false;
+			}
+		});
+		
 		// ItemStack - ItemType
 		Comparators.registerComparator(ItemStack.class, ItemType.class, new Comparator<ItemStack, ItemType>() {
 			@Override
