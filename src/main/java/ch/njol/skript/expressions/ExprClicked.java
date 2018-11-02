@@ -58,7 +58,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("Clicked Block/Entity/Inventory/Slot")
-@Description("The clicked block, entity, inventory slot, inventory and the inventory type or action.")
+@Description("The clicked block, entity, inventory, inventory slot, inventory click type or inventory action.")
 @Examples({"message \"You clicked on a %type of clicked entity%!\"",
 		"if the clicked block is a chest:",
 		"\tshow the inventory of the clicked block to the player"})
