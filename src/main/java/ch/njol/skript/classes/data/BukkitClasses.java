@@ -1452,7 +1452,7 @@ public class BukkitClasses {
 					}));
 		}
 
-		EnumUtils<Difficulty> difficulties = new EnumUtils<>(Difficulty.class, "difficulty");
+		EnumUtils<Difficulty> difficulties = new EnumUtils<>(Difficulty.class, "difficulties");
 		Classes.registerClass(new ClassInfo<>(Difficulty.class, "difficulty")
 				.user("difficult(y|ies)")
 				.name("Difficulty")

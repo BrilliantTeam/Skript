@@ -1314,7 +1314,7 @@ spawn reasons:
 	village_invasion: village invasion, village invading
 	
 # -- Difficulties --
-difficulty:
+difficulties:
 	easy: easy
 	normal: medium, normal
 	hard: hard
