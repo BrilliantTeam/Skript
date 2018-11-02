@@ -125,7 +125,7 @@ public class EvtBlock extends SkriptEvent {
 		return types.check(e, new Checker<ItemType>() {
 			@Override
 			public boolean check(final @Nullable ItemType t) {
-				return t != null && itemF.isSupertypeOf(t);
+				return t != null && t.isSupertypeOf(itemF);
 			}
 		});
 	}

@@ -216,9 +216,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		return item.isSimilar(stack);
 	}
 	
-	public boolean isSupertypeOf(ItemData o) {
+	public boolean hasCommonSupertype(ItemData o) {
 		// Since numeric ids are not used anymore, supertype-ness is based on aliases
-		return Aliases.isSupertypeOf(this, o);
+		return Aliases.hasCommonSupertype(this, o);
 	}
 	
 	/**

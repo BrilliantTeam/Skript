@@ -525,7 +525,7 @@ public abstract class Aliases {
 	 * @param second Second item data.
 	 * @return If first is supertype of second.
 	 */
-	public static boolean isSupertypeOf(ItemData first, ItemData second) {
+	public static boolean hasCommonSupertype(ItemData first, ItemData second) {
 		Set<ItemData> subtypes = provider.getSubtypes(first);
 		if (subtypes != null)
 			return subtypes.contains(second);

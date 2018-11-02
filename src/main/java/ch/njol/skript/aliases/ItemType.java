@@ -328,7 +328,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		outer: for (final ItemData o : other.types) {
 			assert o != null;
 			for (final ItemData t : types) {
-				if (t.isSupertypeOf(o))
+				if (t.hasCommonSupertype(o))
 					continue outer;
 			}
 			return false;
