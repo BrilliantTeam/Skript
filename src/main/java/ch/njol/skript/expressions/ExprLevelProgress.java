@@ -36,25 +36,27 @@ import ch.njol.util.Math2;
  * @author Peter Güttinger
  */
 @Name("Level Progress")
-@Description({"The amount of experience the player needs to level up. Remember that this value is between 0 and 1, not 0 and 100!",
-		"Changing this value can cause a player's level to change if the resulting level progess is negative or larger than 1, e.g." +
+@Description({"The player's progress in reaching the next level, this represents the experience bar in the game. " +
+		"Please note that this value is between 0 and 1 (e.g. 0.5 = half experience bar).",
+		"Changing this value can cause the player's level to change if the resulting level progess is negative or larger than 1, e.g. " +
 				"<code>increase the player's level progress by 0.5</code> will make the player gain a level if his progress was more than 50%."})
 @Examples({"# use the exp bar as mana",
 		"on rightclick with a blaze rod:",
-		"	player's level progress is larger than 0.2",
-		"	shoot a fireball from the player",
-		"	reduce the player's level progress by 0.2",
+		"\tplayer's level progress is larger than 0.2",
+		"\tshoot a fireball from the player",
+		"\treduce the player's level progress by 0.2",
 		"every 2 seconds:",
-		"	loop all players:",
-		"		level progress of loop-player is smaller than 0.9:",
-		"			increase level progress of the loop-player by 0.1",
-		"		else:",
-		"			set level progress of the loop-player to 0.99",
+		"\tloop all players:",
+		"\t\tlevel progress of loop-player is smaller than 0.9:",
+		"\t\t\tincrease level progress of the loop-player by 0.1",
+		"\t\telse:",
+		"\t\t\tset level progress of the loop-player to 0.99",
 		"on xp spawn:",
-		"	cancel event"})
+		"\tcancel event"})
 @Since("2.0")
 @Events("level change")
 public class ExprLevelProgress extends SimplePropertyExpression<Player, Float> {
+	
 	static {
 		register(ExprLevelProgress.class, Float.class, "level progress", "players");
 	}
