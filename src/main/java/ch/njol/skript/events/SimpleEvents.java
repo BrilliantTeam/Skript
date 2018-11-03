@@ -40,6 +40,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
+import org.bukkit.event.entity.EntityToggleSwimEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
@@ -504,5 +505,16 @@ public class SimpleEvents {
 						"	set the fake max players count to (online players count + 1)",
 						"	set the shown icon to a random server icon out of {server-icons::*}")
 				.since("2.3");
+		
+		if (Skript.classExists("org.bukkit.event.entity.EntityToggleSwimEvent")) {
+			Skript.registerEvent("Swim Toggle", SimpleEvent.class, EntityToggleSwimEvent.class, "[entity] toggl(e|ing) swim",
+					"[entity] swim toggl(e|ing)")
+					.description("Called when an entity swims or stops swimming")
+					.requiredPlugins("1.13 or newer")
+					.examples("on swim toggle:",
+							"	event-entity does not have permission \"swim\"",
+							"	cancel event")
+					.since("INSERT VERSION");
+		}
 	}
 }
