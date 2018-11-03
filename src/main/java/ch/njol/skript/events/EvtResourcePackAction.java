@@ -52,20 +52,20 @@ public class EvtResourcePackAction extends SkriptEvent {
 	}
 
 	@Nullable
-	private Literal<Status> status;
+	private Literal<Status> action;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Literal<?>[] args, final int matchedPattern, final ParseResult parser) {
 		if (matchedPattern == 1)
-			status = (Literal<Status>) args[0];
+			action = (Literal<Status>) args[0];
 		return true;
 	}
 
 	@Override
 	public boolean check(final Event e) {
-		if (status != null) {
-			return status.check(e, new Checker<Status>() {
+		if (action != null) {
+			return action.check(e, new Checker<Status>() {
 				@Override
 				public boolean check(final Status m) {
 					return ((PlayerResourcePackStatusEvent) e).getStatus().equals(m);
@@ -77,7 +77,7 @@ public class EvtResourcePackAction extends SkriptEvent {
 
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return status != null ? "resource pack " + status.toString(e, debug) : "resource pack status";
+		return action != null ? "resource pack " + action.toString(e, debug) : "resource pack action";
 	}
 
 }
