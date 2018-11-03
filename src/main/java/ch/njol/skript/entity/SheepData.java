@@ -103,7 +103,8 @@ public class SheepData extends EntityData<Sheep> {
 		if (adjectives == null) {
 			this.adjectives = adjectives = new Adjective[colors.length];
 			for (int i = 0; i < colors.length; i++)
-				adjectives[i] = colors[i].getAdjective();
+				if (colors[i] instanceof SkriptColor)
+					adjectives[i] = ((SkriptColor)colors[i]).getAdjective();
 		}
 		final Noun name = getName();
 		final Adjective age = getAgeAdjective();
