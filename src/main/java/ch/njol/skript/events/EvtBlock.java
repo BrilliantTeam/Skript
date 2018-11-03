@@ -56,23 +56,23 @@ public class EvtBlock extends SkriptEvent {
 		// REMIND attacking an item frame first removes its item; include this in on block damage?
 		Skript.registerEvent("Break / Mine", EvtBlock.class, new Class[] {BlockBreakEvent.class, PlayerBucketFillEvent.class, HangingBreakEvent.class}, "[block] (break[ing]|1¦min(e|ing)) [[of] %itemtypes%]")
 				.description("Called when a block is broken by a player. If you use 'on mine', only events where the broken block dropped something will call the trigger.")
-				.examples("on mine", "on break of stone", "on mine of any ore")
+				.examples("on mine:", "on break of stone:", "on mine of any ore:")
 				.since("1.0 (break), <i>unknown</i> (mine)");
 		Skript.registerEvent("Burn", EvtBlock.class, BlockBurnEvent.class, "[block] burn[ing] [[of] %itemtypes%]")
 				.description("Called when a block is destroyed by fire.")
-				.examples("on burn", "on burn of wood, fences, or chests")
+				.examples("on burn:", "on burn of wood, fences, or chests:")
 				.since("1.0");
 		Skript.registerEvent("Place", EvtBlock.class, new Class[] {BlockPlaceEvent.class, PlayerBucketEmptyEvent.class, HangingPlaceEvent.class}, "[block] (plac(e|ing)|build[ing]) [[of] %itemtypes%]")
 				.description("Called when a player places a block.")
-				.examples("on place", "on place of a furnace, workbench or chest")
+				.examples("on place:", "on place of a furnace, workbench or chest:")
 				.since("1.0");
 		Skript.registerEvent("Fade", EvtBlock.class, BlockFadeEvent.class, "[block] fad(e|ing) [[of] %itemtypes%]")
 				.description("Called when a block 'fades away', e.g. ice or snow melts.")
-				.examples("on fade of snow or ice")
+				.examples("on fade of snow or ice:")
 				.since("1.0");
 		Skript.registerEvent("Form", EvtBlock.class, BlockFormEvent.class, "[block] form[ing] [[of] %itemtypes%]")
 				.description("Called when a block is created, but not by a player, e.g. snow forms due to snowfall, water freezes in cold biomes. This isn't called when block spreads (mushroom growth, water physics etc.), as it has its own event (see <a href='#spread'>spread event</a>).")
-				.examples("on form of snow", "on form of a mushroom")
+				.examples("on form of snow:", "on form of a mushroom:")
 				.since("1.0");
 	}
 	

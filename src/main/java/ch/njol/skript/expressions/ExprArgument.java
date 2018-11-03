@@ -48,7 +48,7 @@ import ch.njol.util.StringUtils;
  * @author Peter Güttinger
  */
 @Name("Argument")
-@Description({"Only usable in command events. Holds the value of the nth argument given to the command, " +
+@Description({"Only usable in command events. Holds the value of an argument given to the command, " +
 		"e.g. if the command \"/tell &lt;player&gt; &lt;text&gt;\" is used like \"/tell Njol Hello Njol!\" argument 1 is the player named \"Njol\" and argument 2 is \"Hello Njol!\".",
 		"One can also use the type of the argument instead of its index to address the argument, e.g. in the above example 'player-argument' is the same as 'argument 1'."})
 @Examples({"give the item-argument to the player-argument",

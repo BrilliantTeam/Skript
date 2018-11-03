@@ -66,7 +66,7 @@ import ch.njol.util.Kleenean;
 		"increase the data value of the clicked block by 1",
 		"# remove:",
 		"remove 2 pickaxes from the victim",
-		"subtract 2.5 from {points.%player%}",
+		"subtract 2.5 from {points::%uuid of player%}",
 		"# remove all:",
 		"remove every iron tool from the player",
 		"remove all minecarts from {entitylist::*}",

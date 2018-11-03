@@ -33,7 +33,7 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Event Cancelled")
-@Description("Checks whether or not the event is cancelled")
+@Description("Checks whether or not the event is cancelled.")
 @Examples({"on click:",
 		"\tif event is cancelled:",
 		"\t\tbroadcast \"no clicks allowed!\""

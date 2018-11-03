@@ -41,8 +41,8 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("Enchantment Level")
-@Description("The level of a particular <a href='classes.html#enchantment'>enchantment</a> on an item")
-@Examples({"player' tool is a sword of sharpness:",
+@Description("The level of a particular <a href='classes.html#enchantment'>enchantment</a> on an item.")
+@Examples({"player's tool is a sword of sharpness:",
 		"	message \"You have a sword of sharpness %level of sharpness of the player's tool% equipped\""})
 @Since("2.0")
 public class ExprEnchantmentLevel extends SimpleExpression<Integer> {

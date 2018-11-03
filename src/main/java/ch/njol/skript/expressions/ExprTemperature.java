@@ -28,7 +28,7 @@ import org.bukkit.block.Block;
 
 @Name("Temperature")
 @Description("Temperature at given block.")
-@Examples("")
+@Examples("message \"%temperature of the targeted block%\"")
 @Since("2.2-dev35")
 public class ExprTemperature extends SimplePropertyExpression<Block, Double> {
 

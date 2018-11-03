@@ -40,8 +40,8 @@ import ch.njol.util.Kleenean;
 		"Valid values are between 0% and 100%, or if the percent sign is omitted between 0 and 1."})
 @Examples({"chance of 50%:",
 		"\tdrop a diamond",
-		"chance of {var}% # {var} between 0 and 100",
-		"chance of {var} # {var} between 0 and 1"})
+		"chance of {chance}% # {chance} between 0 and 100",
+		"chance of {chance} # {chance} between 0 and 1"})
 @Since("1.0")
 public class CondChance extends Condition {
 	

@@ -38,7 +38,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Coordinate")
-@Description("Gets or sets the x, y or z coordinate of a vector")
+@Description("Gets or sets the x, y or z coordinate of a vector.")
 @Examples({"set {_v} to vector 1, 2, 3",
 		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
 		"add 1 to x of {_v}",

@@ -40,7 +40,7 @@ import java.lang.reflect.Array;
  * @author bi0qaw
  */
 @Name("Vectors - Arithmetic")
-@Description("Arithmetic expressions for vectors")
+@Description("Arithmetic expressions for vectors.")
 @Examples({"set {_v} to vector 1, 2, 3 // 5",
 		"set {_v} to {_v} ++ {_v}",
 		"set {_v} to {_v} ++ 5",

@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 @Name("TPS (ticks per second)")
 @Description("Returns the 3 most recent TPS readings, like the /tps command. " +
-			"This expression is only supported on some server software.")
+			"This expression is only supported on some server software (PaperSpigot).")
 @Examples("broadcast \"%tps%\"")
 @Since("2.2-dev36")
 public class ExprTPS extends SimpleExpression<Double> {

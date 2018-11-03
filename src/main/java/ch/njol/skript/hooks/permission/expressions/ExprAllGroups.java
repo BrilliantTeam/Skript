@@ -37,9 +37,9 @@ import org.eclipse.jdt.annotation.Nullable;
 @Name("All Groups")
 @Description("All the groups a player can have. This expression requires Vault and a compatible permissions plugin to be installed.")
 @Examples({"command /group <text>:",
-		"   trigger:",
-		"       if argument is \"list\":",
-		"           send \"%all groups%\""})
+		"\ttrigger:",
+		"\t\tif argument is \"list\":",
+		"\t\t\tsend \"%all groups%\""})
 @Since("2.2-dev35")
 @RequiredPlugins({"Vault", "a permission plugin that supports Vault"})
 public class ExprAllGroups extends SimpleExpression<String> {

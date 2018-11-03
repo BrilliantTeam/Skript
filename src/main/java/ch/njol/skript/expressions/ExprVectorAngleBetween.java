@@ -39,7 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Angle between")
-@Description("Gets the angle between two vectors")
+@Description("Gets the angle between two vectors.")
 @Examples({"send \"%angle between vector 1, 0, 0 and vector 0, 1, 1%\""})
 @Since("2.2-dev28")
 public class ExprVectorAngleBetween extends SimpleExpression<Float> {
