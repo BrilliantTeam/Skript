@@ -1312,13 +1312,20 @@ spawn reasons:
 	trap: trap
 	village_defense: village defense, golem defense, iron golem defense
 	village_invasion: village invasion, village invading
-	
+
 # -- Difficulties --
 difficulties:
 	easy: easy
 	normal: medium, normal
 	hard: hard
 	peaceful: peaceful
+
+# -- Resource Pack Status --
+resource pack actions:
+    accepted: accept
+    declined: decline, refuse, reject
+    failed_download: download fail, fail
+    successfully_loaded: successfully load, successfully install, success
 
 # -- Boolean --
 boolean:
@@ -1371,7 +1378,8 @@ types:
 	metadataholder: metadata holder¦s @a
 	spawnreason: spawn reason¦s @a
 	difficulty: (difficulty|difficulties) @a
-	
+	resourcepackaction: resource pack action¦s @a
+
 	# Skript
 	weathertype: weather type¦s @a
 	entitytype: entity type¦s @an
@@ -1390,7 +1398,6 @@ types:
 	experience.pattern: (e?xp|experience( points?)?)
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
-
 	
 	# Hooks
 	money: money
@@ -1400,4 +1407,3 @@ types:
 io exceptions:
 	unknownhostexception: Cannot connect to %s
 	accessdeniedexception: Access denied for %s
-
