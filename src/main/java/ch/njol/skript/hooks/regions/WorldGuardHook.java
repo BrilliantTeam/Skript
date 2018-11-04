@@ -37,21 +37,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.hooks.regions.classes.Region;
 import ch.njol.skript.util.AABB;
 import ch.njol.skript.variables.Variables;
 import ch.njol.yggdrasil.Fields;
 import ch.njol.yggdrasil.YggdrasilID;
 
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
@@ -134,7 +131,7 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		
 		@Override
 		public Iterator<Block> getBlocks() {
-			final BlockVector min = region.getMinimumPoint(), max = region.getMaximumPoint();
+			final BlockVector3 min = region.getMinimumPoint(), max = region.getMaximumPoint();
 			return new AABB(world, new Vector(min.getBlockX(), min.getBlockY(), min.getBlockZ()),
 					new Vector(max.getBlockX() + 1, max.getBlockY() + 1, max.getBlockZ() + 1)).iterator();
 		}
@@ -200,12 +197,11 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		RegionManager manager = platform.getRegionContainer().get(BukkitAdapter.adapt(l.getWorld()));
 		if (manager == null)
 			return r;
-		ApplicableRegionSet applicable = manager.getApplicableRegions(BukkitAdapter.asVector(l));
+		ApplicableRegionSet applicable = manager.getApplicableRegions(BukkitAdapter.asBlockVector(l));
 		if (applicable == null)
 			return r;
-		final Iterator<ProtectedRegion> i = applicable.iterator();
-		while (i.hasNext())
-			r.add(new WorldGuardRegion(l.getWorld(), i.next()));
+		for (ProtectedRegion region : applicable)
+			r.add(new WorldGuardRegion(l.getWorld(), region));
 		return r;
 	}
 	
