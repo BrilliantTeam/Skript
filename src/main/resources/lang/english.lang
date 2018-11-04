@@ -1320,12 +1320,12 @@ difficulties:
 	hard: hard
 	peaceful: peaceful
 
-# -- Resource Pack Status --
-resource pack actions:
-    accepted: accept
-    declined: decline, refuse, reject
-    failed_download: download fail, fail
-    successfully_loaded: successfully load, successfully install, success
+# -- Resource Pack States --
+resource pack states:
+    accepted: accept, accepted
+    declined: decline, refuse, reject, declined, refused, rejected
+    failed_download: download fail, fail, failed to download, failed
+    successfully_loaded: successfully load, successfully install, success, successfully loaded, successfully installed
 
 # -- Boolean --
 boolean:

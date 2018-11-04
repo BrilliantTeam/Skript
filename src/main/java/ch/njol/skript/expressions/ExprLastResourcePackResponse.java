@@ -30,16 +30,16 @@ import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
-@Name("Last Resource Pack Action")
-@Description("Returns the last resource pack action received from a player.")
-@Examples("if player's last resource pack action is deny or download fail:")
+@Name("Last Resource Pack Response")
+@Description("Returns the last resource pack response received from a player.")
+@Examples("if player's last resource pack response is deny or download fail:")
 @Since("INSERT VERSION")
 @RequiredPlugins("Paper 1.9 or newer")
-public class ExprLastResourcePackAction extends SimplePropertyExpression<Player, Status> {
+public class ExprLastResourcePackResponse extends SimplePropertyExpression<Player, Status> {
 
 	static {
 		if (Skript.methodExists(Player.class, "getResourcePackStatus"))
-			register(ExprLastResourcePackAction.class, Status.class, "[last] resource pack action[s]", "players");
+			register(ExprLastResourcePackResponse.class, Status.class, "[last] resource pack response[s]", "players");
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class ExprLastResourcePackAction extends SimplePropertyExpression<Player,
 
 	@Override
 	protected String getPropertyName() {
-		return "resource pack action";
+		return "resource pack response";
 	}
 
 	@Override

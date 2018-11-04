@@ -28,56 +28,51 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Checker;
 
-public class EvtResourcePackAction extends SkriptEvent {
+public class EvtResourcePackResponse extends SkriptEvent {
 
 	static {
-		Skript.registerEvent("Resource Pack Request Action", EvtResourcePackAction.class, PlayerResourcePackStatusEvent.class,
-				"resource pack [request] action",
-				"resource pack [request] %resourcepackactions%")
+		Skript.registerEvent("Resource Pack Request Response", EvtResourcePackResponse.class, PlayerResourcePackStatusEvent.class,
+				"resource pack [request] response",
+				"resource pack [request] %resourcepackstates%")
 				.description("Called when a player takes action on a resource pack request sent via the ",
 						"<a href='effects.html#EffSendResourcePack'>send resource pack</a> effect. ",
-						"The <a href='expressions.html#ExprEventAction'>event action</a> expression can be used ",
-						"to get the resource pack action.",
+						"The <a href='conditions.html#CondResourcePack'>resource pack</a> condition can be used ",
+						"to check the resource pack state.",
 						"",
 						"This event will be triggered once when the player accepts or declines the resource pack request, ",
-						"and once when the resource pack is successfully installed or failed.")
-				.examples("on resource pack request action:",
-						"	if the action is decline or download fail:",
+						"and once when the resource pack is successfully installed or failed to download.")
+				.examples("on resource pack request response:",
+						"	if the resource pack was declined or failed to download:",
 						"",
 						"on resource pack deny:",
 						"	kick the player due to \"You have to install the resource pack to play in this server!\"")
 				.since("INSERT VERSION");
 	}
 
-	@Nullable
-	private Literal<Status> action;
+	@SuppressWarnings("null")
+	private Literal<Status> states;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Literal<?>[] args, final int matchedPattern, final ParseResult parser) {
 		if (matchedPattern == 1)
-			action = (Literal<Status>) args[0];
+			states = (Literal<Status>) args[0];
 		return true;
 	}
 
 	@Override
 	public boolean check(final Event e) {
-		if (action != null) {
-			return action.check(e, new Checker<Status>() {
-				@Override
-				public boolean check(final Status m) {
-					return ((PlayerResourcePackStatusEvent) e).getStatus().equals(m);
-				}
-			});
+		if (states != null) {
+			Status state = ((PlayerResourcePackStatusEvent) e).getStatus();
+			return states.check(e, state::equals);
 		}
 		return true;
 	}
 
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return action != null ? "resource pack " + action.toString(e, debug) : "resource pack action";
+		return states != null ? "resource pack " + states.toString(e, debug) : "resource pack request response";
 	}
 
 }

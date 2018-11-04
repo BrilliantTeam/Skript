@@ -1486,29 +1486,29 @@ public class BukkitClasses {
 				})
 				.serializer(new EnumSerializer<>(Difficulty.class)));
 
-		EnumUtils<PlayerResourcePackStatusEvent.Status> resourcePackStatus = new EnumUtils<>(PlayerResourcePackStatusEvent.Status.class, "resource pack actions");
-		Classes.registerClass(new ClassInfo<>(PlayerResourcePackStatusEvent.Status.class, "resourcepackaction")
-				.user("resource ?pack ?actions?")
-				.name("Resource Pack Action")
-				.description("The action in a <a href='events.html#resource_pack_request_action'>resource pack request action</a> event.")
-				.examples(resourcePackStatus.getAllNames())
+		EnumUtils<PlayerResourcePackStatusEvent.Status> resourcePackStates = new EnumUtils<>(PlayerResourcePackStatusEvent.Status.class, "resource pack states");
+		Classes.registerClass(new ClassInfo<>(PlayerResourcePackStatusEvent.Status.class, "resourcepackstate")
+				.user("resource ?pack ?states?")
+				.name("Resource Pack State")
+				.description("The state in a <a href='events.html#resource_pack_request_action'>resource pack request response</a> event.")
+				.examples(resourcePackStates.getAllNames())
 				.since("INSERT VERSION")
 				.parser(new Parser<PlayerResourcePackStatusEvent.Status>() {
 					@Override
-					public String toString(PlayerResourcePackStatusEvent.Status status, int flags) {
-						return resourcePackStatus.toString(status, flags);
+					public String toString(PlayerResourcePackStatusEvent.Status state, int flags) {
+						return resourcePackStates.toString(state, flags);
 					}
 					
 					@Override
 					@Nullable
 					public PlayerResourcePackStatusEvent.Status parse(final String s, final ParseContext context) {
-						return resourcePackStatus.parse(s);
+						return resourcePackStates.parse(s);
 					}
 					
 					@SuppressWarnings("null")
 					@Override
-					public String toVariableNameString(PlayerResourcePackStatusEvent.Status status) {
-						return status.name();
+					public String toVariableNameString(PlayerResourcePackStatusEvent.Status state) {
+						return state.name();
 					}
 					
 					@Override
