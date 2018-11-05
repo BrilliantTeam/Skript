@@ -74,7 +74,7 @@ public class CondResourcePack extends Condition {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "resource pack was " + (isNegated() ? " not" : "") + states.toString(e, debug);
+		return "resource pack was " + (isNegated() ? "not " : "") + states.toString(e, debug);
 	}
 	
 }
