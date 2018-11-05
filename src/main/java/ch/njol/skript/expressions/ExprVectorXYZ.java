@@ -46,15 +46,15 @@ import ch.njol.util.coll.CollectionUtils;
 		"add 2 to y of {_v}",
 		"add 3 to z of {_v}",
 		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
-		"set x-axis of {_v} to 1",
-		"set y-axis of {_v} to 2",
-		"set z-axis of {_v} to 3",
-		"send \"%x axis of {_v}%, %y axis of {_v}%, %z axis of {_v}%\"",})
+		"set x component of {_v} to 1",
+		"set y component of {_v} to 2",
+		"set z component of {_v} to 3",
+		"send \"%x component of {_v}%, %y component of {_v}%, %z component of {_v}%\"",})
 @Since("2.2-dev28")
 public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	
 	static {
-		register(ExprVectorXYZ.class, Number.class, "[vector] (0¦x|1¦y|2¦z)[(-| )ax(is|es)]]", "vectors");
+		register(ExprVectorXYZ.class, Number.class, "[vector] (0¦x|1¦y|2¦z) [component[s]]", "vectors");
 	}
 	
 	private final static Character[] axes = new Character[] {'x', 'y', 'z'};
@@ -115,7 +115,7 @@ public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	
 	@Override
 	protected String getPropertyName() {
-		return axes[axis] + "-axis";
+		return axes[axis] + " component";
 	}
 	
 	@Override
