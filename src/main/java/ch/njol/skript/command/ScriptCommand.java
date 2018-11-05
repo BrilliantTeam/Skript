@@ -43,6 +43,7 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.skript.variables.Variables;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -530,7 +531,8 @@ public class ScriptCommand implements TabExecutor {
 		if (argIndex >= arguments.size())
 			return Collections.emptyList(); // Too many arguments, nothing to complete
 		Argument<?> arg = arguments.get(argIndex);
-		if (arg.getType().equals(Player.class)) {
+		Class<?> argType = arg.getType();
+		if (argType.equals(Player.class) || argType.equals(OfflinePlayer.class)) {
 			return null; // Default completion
 		}
 		
