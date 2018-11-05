@@ -38,23 +38,23 @@ import ch.njol.util.coll.CollectionUtils;
 /**
  * @author bi0qaw
  */
-@Name("Vectors - Coordinate")
-@Description("Gets or sets the x, y or z coordinate of a vector.")
+@Name("Vectors - Axis")
+@Description("Gets or sets the x, y or z axis of a vector.")
 @Examples({"set {_v} to vector 1, 2, 3",
 		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
 		"add 1 to x of {_v}",
 		"add 2 to y of {_v}",
 		"add 3 to z of {_v}",
 		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
-		"set x of {_v} to 1",
-		"set y of {_v} to 2",
-		"set z of {_v} to 3",
-		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",})
+		"set x-axis of {_v} to 1",
+		"set y-axis of {_v} to 2",
+		"set z-axis of {_v} to 3",
+		"send \"%x axis of {_v}%, %y axis of {_v}%, %z axis of {_v}%\"",})
 @Since("2.2-dev28")
 public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	
 	static {
-		register(ExprVectorXYZ.class, Number.class, "[vector] (0¦x|1¦y|2¦z)[(-| )coord[inate][s]]", "vectors");
+		register(ExprVectorXYZ.class, Number.class, "[vector] (0¦x|1¦y|2¦z)[(-| )ax(is|es)]]", "vectors");
 	}
 	
 	private final static Character[] axes = new Character[] {'x', 'y', 'z'};
@@ -69,7 +69,7 @@ public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	}
 	
 	@Override
-	public Double convert(Vector v) {
+	public Number convert(Vector v) {
 		return axis == 0 ? v.getX() : (axis == 1 ? v.getY() : v.getZ());
 	}
 	
@@ -115,7 +115,7 @@ public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	
 	@Override
 	protected String getPropertyName() {
-		return axes[axis] + " coordinate";
+		return axes[axis] + "-axis";
 	}
 	
 	@Override
