@@ -38,8 +38,8 @@ import ch.njol.util.coll.CollectionUtils;
 /**
  * @author bi0qaw
  */
-@Name("Vectors - Axis")
-@Description("Gets or sets the x, y or z axis of a vector.")
+@Name("Vectors - XYZ Component")
+@Description("Gets or changes the x, y or z component of a vector.")
 @Examples({"set {_v} to vector 1, 2, 3",
 		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
 		"add 1 to x of {_v}",
