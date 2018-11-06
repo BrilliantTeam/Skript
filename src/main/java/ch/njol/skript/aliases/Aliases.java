@@ -185,7 +185,7 @@ public abstract class Aliases {
 	private final static Pattern numberWordPattern = Pattern.compile("\\d+\\s+.+");
 	
 	public static final String getMaterialName(ItemData type, boolean plural) {
-		MaterialName name = provider.getMaterialName(type.aliasCopy());
+		MaterialName name = provider.getMaterialName(type.type);
 		if (name == null) {
 			return "" + type.type;
 		}
@@ -196,7 +196,7 @@ public abstract class Aliases {
 	 * @return The ietm's gender or -1 if no name is found
 	 */
 	public final static int getGender(ItemData item) {
-		final MaterialName n = provider.getMaterialName(item);
+		final MaterialName n = provider.getMaterialName(item.type);
 		if (n != null)
 			return n.gender;
 		return -1;
@@ -211,8 +211,8 @@ public abstract class Aliases {
 		for (final Material m : Material.values()) {
 			assert m != null;
 			ItemData data = new ItemData(m);
-			if (provider.getMaterialName(data) == null) { // Material name is missing
-				provider.setMaterialName(data, new MaterialName(m, "" + m.toString().toLowerCase().replace('_', ' '), "" + m.toString().toLowerCase().replace('_', ' '), 0));
+			if (provider.getMaterialName(data.type) == null) { // Material name is missing
+				provider.setMaterialName(data.type, new MaterialName(m, "" + m.toString().toLowerCase().replace('_', ' '), "" + m.toString().toLowerCase().replace('_', ' '), 0));
 				missing.append(m.getId() + ", ");
 				r++;
 			}

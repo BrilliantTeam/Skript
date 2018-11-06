@@ -66,7 +66,7 @@ public class AliasesProvider {
 	/**
 	 * Material names for aliases this provider has.
 	 */
-	private final Map<ItemData, MaterialName> materialNames;
+	private final Map<Material, MaterialName> materialNames;
 	
 	/**
 	 * Tags are in JSON format. We may need GSON when merging tags
@@ -350,7 +350,7 @@ public class AliasesProvider {
 				minecraftIds.put(data, id); // Register Minecraft id for the data, too
 			
 			// Material name, including both singular and plural forms
-			materialNames.putIfAbsent(data, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond()));
+			materialNames.putIfAbsent(data.type, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond()));
 			
 			// Related entity type
 			if (related != null)
@@ -380,11 +380,11 @@ public class AliasesProvider {
 	}
 	
 	@Nullable
-	public MaterialName getMaterialName(ItemData type) {
+	public MaterialName getMaterialName(Material type) {
 		return materialNames.get(type);
 	}
 
-	public void setMaterialName(ItemData data, MaterialName materialName) {
+	public void setMaterialName(Material data, MaterialName materialName) {
 		materialNames.put(data, materialName);
 	}
 
