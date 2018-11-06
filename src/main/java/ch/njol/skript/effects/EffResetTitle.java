@@ -37,7 +37,7 @@ import ch.njol.util.Kleenean;
 @Description("Resets the title of the player to the default values.")
 @Examples({"reset the titles of all players",
 		"reset the title"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class EffResetTitle extends Effect {
 	
 	static {

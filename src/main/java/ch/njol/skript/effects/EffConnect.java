@@ -37,7 +37,7 @@ import ch.njol.util.Kleenean;
 @Name("Connect")
 @Description("Connects a player to another bungeecord server")
 @Examples("connect all players to \"hub\"")
-@Since("INSERT VERSION")
+@Since("2.3")
 public class EffConnect extends Effect {
 
 	public static final String BUNGEE_CHANNEL = "BungeeCord";

@@ -514,7 +514,7 @@ public class SimpleEvents {
 					.examples("on swim toggle:",
 							"	event-entity does not have permission \"swim\"",
 							"	cancel event")
-					.since("INSERT VERSION");
+					.since("2.3");
 		}
 	}
 }

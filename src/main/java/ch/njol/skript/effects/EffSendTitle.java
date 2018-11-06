@@ -42,7 +42,7 @@ import ch.njol.util.Kleenean;
 		"send title \"Hi %player%\" to player", "send title \"Loot Drop\" with subtitle \"starts in 3 minutes\" to all players",
 		"send title \"Hello %player%!\" with subtitle \"Welcome to our server\" to player for 5 seconds with fadein 1 second and fade out 1 second",
 		"send subtitle \"Party!\" to all players"})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class EffSendTitle extends Effect {
 	
 	private final static boolean TIME_SUPPORTED = Skript.methodExists(Player.class,"sendTitle", String.class, String.class, int.class, int.class, int.class);
