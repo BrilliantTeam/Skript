@@ -40,7 +40,7 @@ repositories {
 	}
 	
 	maven {
-	    url = 'https://repo.bstats.org/content/repositories/releases/'
+	    url = 'https://repo.codemc.org/repository/maven-public'
 	}
 }
 
