@@ -213,6 +213,9 @@ public class AliasesProvider {
 	 * @param tags Tags.
 	 */
 	public ItemStack applyTags(ItemStack stack, Map<String, Object> tags) {
+		if (tags.isEmpty()) // No tags to apply
+			return stack;
+		
 		Object damage = tags.get("Damage");
 		if (damage instanceof Number) { // Set durability manually, not NBT tag before 1.13
 			stack = new ItemStack(stack.getType(), 1, ((Number) damage).shortValue());

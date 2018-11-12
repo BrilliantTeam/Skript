@@ -54,6 +54,11 @@ public class BukkitUnsafe {
 	 */
 	private static final UnsafeValues unsafe;
 	
+	/**
+	 * 1.9 Spigot has some "fun" bugs.
+	 */
+	private static final boolean knownNullPtr = !Skript.isRunningMinecraft(1, 10);
+	
 	static {
 		UnsafeValues values = Bukkit.getUnsafe();
 		if (values == null)
@@ -167,6 +172,15 @@ public class BukkitUnsafe {
 	}
 	
 	public static void modifyItemStack(ItemStack stack, String arguments) {
-		unsafe.modifyItemStack(stack, arguments);
+		try {
+			unsafe.modifyItemStack(stack, arguments);
+		} catch (NullPointerException e) {
+			if (knownNullPtr) { // Probably known 1.9 bug
+				// So we continue doing whatever we were doing and hope it works
+				Skript.warning("Item " + stack.getType() + arguments + " failed modifyItemStack. This is Spigot bug on 1.9.");
+			} else { // Not known null pointer, don't just swallow
+				throw e;
+			}
+		}
 	}
 }
