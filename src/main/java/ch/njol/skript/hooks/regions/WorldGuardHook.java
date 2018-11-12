@@ -37,6 +37,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.hooks.regions.classes.Region;
 import ch.njol.skript.util.AABB;
 import ch.njol.skript.variables.Variables;
@@ -59,6 +60,13 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	
 	@Override
 	protected boolean init() {
+		if (!Skript.classExists("com.sk89q.worldguard.WorldGuard")) {
+			Skript.error("Skript does not support WorldGuard 6. WorldGuard region support has been disabled!");
+			return false;
+		} else if (!Skript.classExists("com.sk89q.worldedit.math.BlockVector")) {
+			Skript.error("WorldEdit you're using is not compatible with Skript. Disabling WorldGuard support!");
+			return false;
+		}
 		return super.init();
 	}
 	

@@ -413,10 +413,9 @@ public final class Skript extends JavaPlugin implements Listener {
 			public void run() {
 				assert Bukkit.getWorlds().get(0).getFullTime() == tick;
 				
-				// load hooks
+				// Load hooks from Skript jar
 				try {
-					final JarFile jar = new JarFile(getFile());
-					try {
+					try (JarFile jar = new JarFile(getFile())) {
 						for (final JarEntry e : new EnumerationIterable<>(jar.entries())) {
 							if (e.getName().startsWith("ch/njol/skript/hooks/") && e.getName().endsWith("Hook.class") && StringUtils.count("" + e.getName(), '/') <= 5) {
 								final String c = e.getName().replace('/', '.').substring(0, e.getName().length() - ".class".length());
@@ -434,10 +433,6 @@ public final class Skript extends JavaPlugin implements Listener {
 								continue;
 							}
 						}
-					} finally {
-						try {
-							jar.close();
-						} catch (final IOException e) {}
 					}
 				} catch (final Exception e) {
 					error("Error while loading plugin hooks" + (e.getLocalizedMessage() == null ? "" : ": " + e.getLocalizedMessage()));
