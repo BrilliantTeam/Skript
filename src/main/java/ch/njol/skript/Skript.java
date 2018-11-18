@@ -1212,10 +1212,10 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @param patterns Skript patterns to match this event
 	 * @return A SkriptEventInfo representing the registered event. Used to generate Skript's documentation.
 	 */
-	@SuppressWarnings({"unchecked"})
 	public static <E extends SkriptEvent> SkriptEventInfo<E> registerEvent(final String name, final Class<E> c, final Class<? extends Event> event, final String... patterns) {
 		checkAcceptRegistrations();
 		String originClassPath = Thread.currentThread().getStackTrace()[2].getClassName();
+		assert originClassPath != null;
 		final SkriptEventInfo<E> r = new SkriptEventInfo<>(name, patterns, c, originClassPath, CollectionUtils.array(event));
 		events.add(r);
 		return r;
@@ -1425,17 +1425,20 @@ public final class Skript extends JavaPlugin implements Listener {
 		}
 		
 		// Check if server platform is supported
-		if (!isRunningMinecraft(1, 9) || !serverPlatform.supported) {
-			logEx("Your Minecraft version or server software appears to be unsupported by Skript (bensku's version).");
-			logEx("Currently only supported servers are Spigot and its forks for Minecraft 1.9 or newer.");
-			logEx("Other versions might work, but since you're getting this error message something is NOT working,");
-			logEx("nor it will work, unless you switch to supported platform.");
-			logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
+		if (!isRunningMinecraft(1, 9)) {
+			logEx("You are running an outdated Minecraft version not supported by Skript.");
+			logEx("Please update to Minecraft 1.9 or later or fix this yourself send us a pull request.");
+			logEx("Alternatively, use an older Skript version; do note that those are also unsupported by us.");
+			logEx("");
+			logEx("Again, we do not support Minecraft versions this old.");
+		} else if (!serverPlatform.supported){
+			logEx("Your server platform appears to be unsupported by Skript. It might not work reliably.");
+			logEx("You can report this at " + issuesUrl + ". However, we may be unable to fix the issue.");
+			logEx("It is recommended that you switch to Paper or Spigot, should you encounter problems.");
 		} else if (Updater.state == UpdateState.UPDATE_AVAILABLE) {
 			logEx("You're running outdated version of Skript! Please try updating it NOW; it might fix this.");
-			logEx("You may download new version of Skript at https://github.com/bensku/Skript/releases");
+			logEx("You may download new version of Skript at https://github.com/SkriptLang/Skript/releases");
 			logEx("You will be given instructions how to report this error if it persists with latest Skript.");
-			logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
 		} else {
 			if (pluginPackages.isEmpty()) {
 				logEx("You should report it at " + issuesUrl + ". Please copy paste this report there (or use paste service).");
@@ -1471,8 +1474,7 @@ public final class Skript extends JavaPlugin implements Listener {
 				logEx("If the error doesn't disappear even after disabling all listed plugins, it is probably Skript issue.");
 				logEx("In that case, you will be given instruction on how should you report it.");
 				logEx("On the other hand, if the error disappears when disabling some plugin, report it to author of that plugin.");
-				logEx("Only if the author tells you to do so, report it as Skript issue (url below)");
-				logEx("Issue tracker: " + issuesUrl + " (only if you know what you're doing!)");
+				logEx("Only if the author tells you to do so, report it to Skript's issue tracker.");
 			}
 		}
 		

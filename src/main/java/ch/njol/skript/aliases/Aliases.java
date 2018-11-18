@@ -551,7 +551,16 @@ public abstract class Aliases {
 		return provider.getRelatedEntity(data.aliasCopy());
 	}
 	
+	/**
+	 * Go through these whenever aliases are reloaded, and update them.
+	 */
 	private static final Map<String, ItemType> trackedTypes = new HashMap<>();
+	
+	/**
+	 * If user had an obscure config option set, don't crash due to missing
+	 * Java item types.
+	 */
+	private static final boolean noHardExceptions = SkriptConfig.apiSoftExceptions.value();
 	
 	/**
 	 * Gets an item type that matches the given name.
@@ -566,8 +575,14 @@ public abstract class Aliases {
 	 */
 	public static ItemType javaItemType(String name) {
 		ItemType type = parseItemType(name);
-		if (type == null)
-			throw new IllegalArgumentException("type " + name + " not found");
+		if (type == null) {
+			if (noHardExceptions) {
+				Skript.error("type " + name + " not found");
+				type = new ItemType(); // Return garbage
+			} else {
+				throw new IllegalArgumentException("type " + name + " not found");
+			}
+		}
 		trackedTypes.put(name, type);
 		return type;
 	}
