@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.config.Config;
@@ -213,15 +214,15 @@ public class AliasesProvider {
 	 * @param tags Tags.
 	 */
 	public ItemStack applyTags(ItemStack stack, Map<String, Object> tags) {
-		if (tags.isEmpty()) // No tags to apply
-			return stack;
-		
+		// Hack damage tag into item
 		Object damage = tags.get("Damage");
-		if (damage instanceof Number) { // Set durability manually, not NBT tag before 1.13
-			stack = new ItemStack(stack.getType(), 1, ((Number) damage).shortValue());
-			// Bukkit makes this work on 1.13+ too, which is nice
+		if (damage instanceof Number) { // Use helper for version compatibility
+			ItemUtils.setDamage(stack, ((Number) damage).shortValue());
 			tags.remove("Damage");
 		}
+		
+		if (tags.isEmpty()) // No real tags to apply
+			return stack;
 		
 		// Apply random tags using JSON
 		String json = gson.toJson(tags);
@@ -241,8 +242,9 @@ public class AliasesProvider {
 	public NonNullPair<String, String> getAliasPlural(String name) {
 		int marker = name.indexOf('¦');
 		if (marker == -1) { // No singular/plural forms
-			name = name.trim();
-			return new NonNullPair<>(name, name);
+			String trimmed = name.trim();
+			assert trimmed != null;
+			return new NonNullPair<>(trimmed, trimmed);
 		}
 		int pluralEnd = -1;
 		for (int i = marker; i < name.length(); i++) {
