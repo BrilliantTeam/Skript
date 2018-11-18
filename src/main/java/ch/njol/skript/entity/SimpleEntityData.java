@@ -162,8 +162,10 @@ public class SimpleEntityData extends EntityData<Entity> {
 	private final static List<SimpleEntityDataInfo> types = new ArrayList<>();
 	static {
 		types.add(new SimpleEntityDataInfo("arrow", Arrow.class));
-		types.add(new SimpleEntityDataInfo("spectral arrow", SpectralArrow.class));
-		types.add(new SimpleEntityDataInfo("tipped arrow", TippedArrow.class));
+		if (Skript.classExists("org.bukkit.entity.SpectralArrow"))
+			types.add(new SimpleEntityDataInfo("spectral arrow", SpectralArrow.class));
+		if (Skript.classExists("org.bukkit.entity.TippedArrow"))
+			types.add(new SimpleEntityDataInfo("tipped arrow", TippedArrow.class));
 		if (!Skript.methodExists(Boat.class, "getWoodType")) // Only for 1.9 and lower. See BoatData instead
 			types.add(new SimpleEntityDataInfo("boat", Boat.class));
 		types.add(new SimpleEntityDataInfo("blaze", Blaze.class));
@@ -171,7 +173,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("mooshroom", MushroomCow.class));
 		types.add(new SimpleEntityDataInfo("cow", Cow.class));
 		types.add(new SimpleEntityDataInfo("cave spider", CaveSpider.class));
-		types.add(new SimpleEntityDataInfo("dragon fireball", DragonFireball.class));
+		if (Skript.classExists("org.bukkit.entity.DragonFireball"))
+			types.add(new SimpleEntityDataInfo("dragon fireball", DragonFireball.class));
 		types.add(new SimpleEntityDataInfo("egg", Egg.class));
 		types.add(new SimpleEntityDataInfo("ender crystal", EnderCrystal.class));
 		types.add(new SimpleEntityDataInfo("ender dragon", EnderDragon.class));
