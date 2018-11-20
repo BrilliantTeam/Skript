@@ -6,46 +6,21 @@ for prototyping etc.
 
 This Github fork of Skript is based on Mirreski's improvements which was built
 on Njol's original Skript. It is supported for **Spigot** (not Bukkit) versions of
-Minecraft 1.9-1.12. Other versions might work, but no guarantees. **Paper** is
+Minecraft 1.9-1.13. Other versions might work, but no guarantees. **Paper** is
 recommended, but not mandatory - without it, some features such as timings
 will be not available.
 
 ## Documentation
-Documentation is available [here](http://skriptlang.github.io/Skript/) for the
+Documentation is available [here](https://skriptlang.github.io/Skript/) for the
 latest version of Skript.
 
 ## Reporting Issues
-You should use Github [issue tracker](https://github.com/SkriptLang/Skript/issues)
-for all bug reports, feature requests and such. If you are not sure if something
-is a bug, please still report it.
-
-Please use the search to see if an issue has been reported already. Duplicates will be
-closed and ignored. If the issue is indeed not yet reported, please use
-common sense: what might a Skript developer need to know to solve your issue?
-
-If issue has been reported before, and is open, you can comment to it to ask if there
-has been progress or provide more information. If it has been closed, you can do
-same thing, but then it might be good idea to ping `@bensku` and/or `@Snow-Pyon`
-since closed issues are not often checked.
-
-Finally, there is no guarantee that an issue will be resolved. Sometimes it might be
-harder than it sounds to you; in other cases, no one has time to take a look at it.
-
-If your having an aliases issue please report that
-[here](https://github.com/tim740/skAliases/issues) instead.
+Please see our [contribution guidelines](https://github.com/SkriptLang/Skript/blob/master/.github/CONTRIBUTING.md)
+before reporting issues.
 
 ## A Note About Addons
-Skript developers cannot provide support for third-party addons of Skript. If you encounter issues
-with them, contact the author of that addon. Also, when reporting issues which seem
-to be unrelated to addons, you may be asked to test without any addons
-(and you should do so to get your issue resolved).
-
-That being said, if the **addon developer** thinks that some bug is caused by Skript,
-they should report it. We just do not want everyone who has an issue with an addon to
-clutter Skript's issue tracker; in *most* cases, we cannot do anything to help.
-
-As a side note, I really, really, discourage making addons closed-source. After all,
-Skript has been licensed under GPLv3 for ages...
+We don't support addons here, even though some of Skript developers have also
+developed their own addons.
 
 ## Compiling
 Skript uses Gradle for compilation. Use your command prompt of preference and
@@ -57,8 +32,8 @@ and package Skript for you:
 gradlew clean build # on Windows
 ```
 
-You can get source code from the [releases](https://github.com/SkriptLang/Skript/releases) page. You may also clone this
-repository, but that code may or may not be stable.
+You can get source code from the [releases](https://github.com/SkriptLang/Skript/releases) page.
+You may also clone this repository, but that code may or may not be stable.
 
 ### Importing to Eclipse
 With new Eclipse versions, there is integrated Gradle support, and it actually works now.
@@ -71,31 +46,16 @@ new Gradle version (starting from dev26) does not work very well with older Ecli
 versions. Also, do *not* use Gradle STS; it is outdated.
 
 ### Importing to IDEA
-Skript relies heavily on use of nullness annotations and the way how Eclipse
-interprets them. Thus, using IDEA is not easy. However, if you have truly
-exceptional new features, I might be able to complete the code
-with applicable nullness rules. Note that this really means *exceptional*;
-adding some expressions and stuff like that do not count.
+You'll need to make sure that nullness annotations are working correctly. Also,
+when sending pull requests, make sure not to change IDEA configuration files
+that may have been stored in the repository.
 
 ## Contributing
-Code guidelines can be found below. You should also see CONTRIBUTING.md for
-a lot of useful information.
+Please review our [contribution guidelines](https://github.com/SkriptLang/Skript/blob/master/.github/CONTRIBUTING.md).
+In addition to that, if you are contributing Java code, check our
+[coding conventions](https://github.com/SkriptLang/Skript/blob/master/CODING_CONVENTIONS.md).
 
-## Code Guidelines
-So, you want to work with Skript's codebase? There are a few guidelines for you:
-* Understand Java as a language (Skript is not good learning project)
-* Use Eclipse as your IDE for Skript *or* get your own IDE to support Eclipse's nullness annotations
-* Not to alter Eclipse's nullness annotation settings; they affect even the compiler
-* Use tabs as indentation (provided Eclipse settings will do this)
-* Try to write code that looks similar to Skript's
-* **DO NOT** use NMS code (Net Minecraft Server)
-
-Of course, these are just recommendations. However, not following them may get
-your pull requests rejected.
-
-More clear code style guidelines are probably coming in future.
-
-### Maven repository
+## Maven repository
 If you use Skript as (soft) dependency for your plugin, and use maven or Gradle,
 this is for you.
 
@@ -156,8 +116,6 @@ Or, if you use Maven:
 </dependency>
 ```
 
-> Note that these repositories are provided as-is, for now. I cannot currently spend time to add nice, but not mandatory, features like Javadoc.
-
 ## Relevant Links
 * [SkUnity Forums](https://forums.skunity.com/)
 * [Original Skript at BukkitDev](https://dev.bukkit.org/bukkit-plugins/skript/) (inactive)
@@ -174,13 +132,13 @@ Current team behind Skript:
 * [Snow-Pyon](https://github.com/Snow-Pyon) (Skript developer)
 * [Pikachu920](https://github.com/Pikachu920) (Skript developer)
 * [Nicofisi](https://github.com/Nicofisi) (Skript developer)
-* [TheBentoBox](https://github.com/TheBentoBox) (issue tracker manager)
+* [TheBentoBox](https://github.com/TheBentoBox) (issue tracker manager, aliases developer)
 
 Also, of course, we should thank [Njol](https://github.com/Njol) for creating
 Skript and [Mirreski](https://github.com/Mirreski) for maintaining it for a
 long time.
 
-In addition to that, Skript has received a lot of pull requests over time.
+And of course, Skript has received lots of pull requests over time.
 You can find all contributors [here](https://github.com/SkriptLang/Skript/graphs/contributors).
 
 All code is owned by it's writer, licensed for others under GPLv3 (see LICENSE)
