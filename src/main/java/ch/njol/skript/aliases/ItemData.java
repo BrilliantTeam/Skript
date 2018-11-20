@@ -283,7 +283,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	
 	@Override
 	public int hashCode() {
-		int hash = stack.hashCode();
+		int hash = type.hashCode(); // Has collisions, but probably not too many of them
 		// TODO need a reliable BlockValues hashCode
 //		BlockValues values = blockValues;
 //		if (values != null)
