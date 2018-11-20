@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -31,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.hooks.Hook;
 import ch.njol.skript.hooks.regions.classes.Region;
 import ch.njol.skript.variables.Variables;
@@ -88,8 +90,16 @@ public abstract class RegionsPlugin<P extends Plugin> extends Hook<P> {
 	
 	public static Set<? extends Region> getRegionsAt(final Location l) {
 		final Set<Region> r = new HashSet<>();
-		for (final RegionsPlugin<?> pl : plugins) {
-			r.addAll(pl.getRegionsAt_i(l));
+		Iterator<RegionsPlugin<?>> it = plugins.iterator();
+		while (it.hasNext()) {
+			RegionsPlugin<?> pl = it.next();
+			try {
+				r.addAll(pl.getRegionsAt_i(l));
+			} catch (Throwable e) { // Unstable WorldGuard API
+				Skript.error(pl.getName() + " hook crashed and was removed to prevent future errors.");
+				e.printStackTrace();
+				it.remove();
+			}
 		}
 		return r;
 	}

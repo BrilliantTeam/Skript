@@ -39,7 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Cylindrical shape")
-@Description("Forms a 'cylindrical shaped' vector using yaw to manipulate the current point")
+@Description("Forms a 'cylindrical shaped' vector using yaw to manipulate the current point.")
 @Examples({"loop 360 times:",
 		"	set {_v} to cylindrical vector radius 1, yaw loop-value, height 2",
 		"set {_v} to cylindrical vector radius 1, yaw 90, height 2"})

@@ -19,34 +19,32 @@
  */
 package ch.njol.skript.conditions;
 
+import org.bukkit.inventory.ItemStack;
+
 import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
-import ch.njol.util.Kleenean;
-import org.bukkit.inventory.ItemStack;
 
 @Name("Is Solid")
 @Description("Checks whether an item is solid.")
 @Examples({"grass block is solid", "player's tool isn't solid"})
 @Since("2.2-dev36")
 public class CondIsSolid extends PropertyCondition<ItemStack> {
-
+	
 	static {
-		PropertyCondition.register(CondIsSolid.class, "solid", "itemstacks");
+		register(CondIsSolid.class, "solid", "itemstacks");
 	}
-
+	
 	@Override
 	public boolean check(ItemStack i) {
 		return i.getType().isSolid();
 	}
-
+	
 	@Override
 	protected String getPropertyName() {
 		return "solid";
 	}
-
+	
 }

@@ -41,7 +41,7 @@ import ch.njol.util.Kleenean;
  * @author Peter Güttinger
  */
 @Name("Enchant/Disenchant")
-@Description("Enchant or disenchant an existing item")
+@Description("Enchant or disenchant an existing item.")
 @Examples({"enchant the player's tool with sharpness 5",
 		"disenchant the player's tool"})
 @Since("2.0")

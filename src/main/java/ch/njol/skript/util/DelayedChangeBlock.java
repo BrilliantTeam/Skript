@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -36,6 +37,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -51,20 +54,25 @@ import ch.njol.skript.bukkitutil.block.BlockCompat;
 @NonNullByDefault(false)
 public class DelayedChangeBlock implements Block {
 	
+	private static final boolean ISPASSABLE_METHOD_EXISTS = Skript.methodExists(Block.class, "isPassable");
+	
 	final Block b;
 	@Nullable
 	private final BlockState newState;
+	private final boolean isPassable;
 	
 	public DelayedChangeBlock(final Block b) {
-		assert b != null;
-		this.b = b;
-		newState = null;
+		this(b, null);
 	}
 	
 	public DelayedChangeBlock(final Block b, final BlockState newState) {
 		assert b != null;
 		this.b = b;
 		this.newState = newState;
+		if (ISPASSABLE_METHOD_EXISTS && newState != null)
+			this.isPassable = newState.getBlock().isPassable();
+		else
+			this.isPassable = false;
 	}
 	
 	@Override
@@ -342,4 +350,13 @@ public class DelayedChangeBlock implements Block {
 		}
 	}
 	
+	@Override
+	public RayTraceResult rayTrace(Location start, Vector direction, double maxDistance, FluidCollisionMode fluidCollisionMode) {
+		return b.rayTrace(start, direction, maxDistance, fluidCollisionMode);
+	}
+	
+	@Override
+	public boolean isPassable() {
+		return isPassable;
+	}
 }

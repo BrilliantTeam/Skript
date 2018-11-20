@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Cross product")
-@Description("Gets the cross product between two vectors")
+@Description("Gets the cross product between two vectors.")
 @Examples({"send \"%vector 1, 0, 0 cross vector 0, 1, 0%\""})
 @Since("2.2-dev28")
 public class ExprVectorCrossProduct extends SimpleExpression<Vector> {

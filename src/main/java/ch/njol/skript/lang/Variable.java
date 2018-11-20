@@ -68,8 +68,9 @@ import ch.njol.util.coll.iterator.EmptyIterator;
  * @author Peter Güttinger
  */
 public class Variable<T> implements Expression<T> {
-	
-	public final static String SEPARATOR = "::";
+
+	private final static String SINGLE_SEPARATOR_CHAR = ":";
+	public final static String SEPARATOR = SINGLE_SEPARATOR_CHAR + SINGLE_SEPARATOR_CHAR;
 	public final static String LOCAL_VARIABLE_TOKEN = "_";
 	
 	/**
@@ -134,6 +135,10 @@ public class Variable<T> implements Expression<T> {
 			if (printErrors)
 				Skript.error("A variable's name must not contain the separator '" + SEPARATOR + "' multiple times in a row (error in variable {" + name + "})");
 			return false;
+		} else if (name.replace(SEPARATOR, "").contains(SINGLE_SEPARATOR_CHAR)) {
+			if (printErrors)
+				Skript.warning("If you meant to make the variable {" + name + "} a list, its name should contain '"
+						+ SEPARATOR + "'. Having a single '" + SINGLE_SEPARATOR_CHAR + "' does nothing!");
 		}
 		return true;
 	}
@@ -193,7 +198,7 @@ public class Variable<T> implements Expression<T> {
 				for (int i = 0; i < types.length; i++) {
 					infos[i] = Classes.getExactClassInfo(types[i]);
 				}
-				Skript.warning("Local variable '" + name + "' is " + Classes.toString(Classes.getExactClassInfo(hint))
+				Skript.warning("Variable '{_" + name + "}' is " + Classes.toString(Classes.getExactClassInfo(hint))
 						+ ", not " + Classes.toString(infos, false));
 				// Fall back to not having any type hints
 			}
@@ -567,10 +572,15 @@ public class Variable<T> implements Expression<T> {
 								final Class<?> c = d.getClass();
 								assert c != null;
 								ci = Classes.getSuperClassInfo(c);
-								//Mirre Start
-								if (ci.getMath() != null || d instanceof Number)
+								
+								if (ci.getMath() != null)
 									o = d;
-								//Mirre End
+								if (d instanceof Number) { // Nonexistent variable: add/subtract
+									if (mode == ChangeMode.REMOVE) // Variable is delta negated
+										o = -((Number) d).doubleValue(); // Hopefully enough precision
+									else // Variable is now what was added to it
+										o = d;
+								}
 								changed = true;
 								continue;
 							}

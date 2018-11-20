@@ -63,17 +63,14 @@ public class CondPlayedBefore extends Condition {
 	
 	@Override
 	public boolean check(final Event e) {
-		return player.check(e, new Checker<OfflinePlayer>() {
-			@Override
-			public boolean check(final OfflinePlayer p) {
-				return p.hasPlayedBefore();
-			}
-		}, isNegated());
+		return player.check(e,
+				OfflinePlayer::hasPlayedBefore,
+				isNegated());
 	}
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return player.toString(e, debug) + " " + (isNegated() ? "hasn't" : "has") + " played on this server before";
+		return player.toString(e, debug) + (isNegated() ? " hasn't" : " has") + " played on this server before";
 	}
 	
 }

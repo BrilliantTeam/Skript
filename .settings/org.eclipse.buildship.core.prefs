@@ -1,6 +1,3 @@
-=\=\=\=\=\=\=
-<<<<<<<=HEAD
->>>>>>>=master
 build.commands=org.eclipse.jdt.core.javabuilder
 connection.arguments=
 connection.java.home=null

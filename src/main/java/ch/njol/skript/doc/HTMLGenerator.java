@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -310,10 +311,51 @@ public class HTMLGenerator {
 			String name = f.getName();
 			if (name.endsWith(".html")) { // Fix some stuff specially for HTML
 				page = page.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;"); // Tab to 4 non-collapsible spaces
+				assert page != null;
+				page = minifyHtml(page);
 			}
 			assert page != null;
 			writeFile(new File(output + File.separator + name), page);
 		}
+	}
+	
+	private static String minifyHtml(String page) {
+		StringBuilder sb = new StringBuilder(page.length());
+		boolean space = false;
+		for (int i = 0; i < page.length();) {
+			int c = page.codePointAt(i);
+			if ((c == '\n' || c == ' ')) {
+				if (!space) {
+					sb.append(' ');
+					space = true;
+				}
+			} else {
+				space = false;
+				sb.appendCodePoint(c);
+			}
+			
+			i += Character.charCount(c);
+		}
+		return sb.toString();
+	}
+	
+	private static String handleIf(String desc, String start, boolean value) {
+		int ifStart = desc.indexOf(start);
+		while (ifStart != -1) {
+			int ifEnd = desc.indexOf("${end}", ifStart);
+			String data = desc.substring(ifStart + start.length() + 1, ifEnd);
+			
+			String before = desc.substring(0, ifStart);
+			String after = desc.substring(ifEnd + 6);
+			if (value)
+				desc = before + data + after;
+			else
+				desc = before + after;
+			
+			ifStart = desc.indexOf(start, ifEnd);
+		}
+		
+		return desc;
 	}
 	
 	/**
@@ -332,14 +374,33 @@ public class HTMLGenerator {
 		Since since = c.getAnnotation(Since.class);
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since.value());
 		Description description = c.getAnnotation(Description.class);
-		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description.value()));
-		desc = desc.replace("${element.desc-safe}", Joiner.on("\\n").join(description == null ? new String[0] : description.value())
+		desc = desc.replace("${element.desc}", description == null ? "missing description" : Joiner.on("\n").join(description.value()).replace("\n\n", "<p>"));
+		desc = desc.replace("${element.desc-safe}", description == null ? "missing description" : Joiner.on("\n").join(description.value())
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		Examples examples = c.getAnnotation(Examples.class);
-		desc = desc.replace("${element.examples}", Joiner.on("\n<br>").join(examples == null ? new String[0] : examples.value()));
-		desc = desc.replace("${element.examples-safe}", Joiner.on("\\n").join(examples == null ? new String[0] : examples.value())
+		desc = desc.replace("${element.examples}", examples == null ? "no examples available" : Joiner.on("<br>").join(examples.value()));
+		desc = desc.replace("${element.examples-safe}", examples == null ? "no examples available" : Joiner.on("\\n").join(examples.value())
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		desc = desc.replace("${element.id}", info.c.getSimpleName());
+		
+		Events events = c.getAnnotation(Events.class);
+		assert desc != null;
+		desc = handleIf(desc, "${if events}", events != null);
+		if (events != null) {
+			String[] eventNames = events.value();
+			String[] eventLinks = new String[eventNames.length];
+			for (int i = 0; i < eventNames.length; i++) {
+				String eventName = eventNames[i];
+				eventLinks[i] = "<a href=\"classes.html#" + eventName + "\">" + eventName + "</a>";
+			}
+			desc = desc.replace("${element.events}", Joiner.on(", ").join(eventLinks));
+		}
+		desc = desc.replace("${element.events-safe}", events == null ? "" : Joiner.on(", ").join(events.value()));
+		
+		RequiredPlugins plugins = c.getAnnotation(RequiredPlugins.class);
+		assert desc != null;
+		desc = handleIf(desc, "${if required-plugins}", plugins != null);
+		desc = desc.replace("${element.required-plugins}", plugins == null ? "" : Joiner.on(", ").join(plugins.value()));
 		
 		List<String> toGen = Lists.newArrayList();
 		int generate = desc.indexOf("${generate");
@@ -385,7 +446,7 @@ public class HTMLGenerator {
 		String since = info.getSince();
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since);
 		String[] description = info.getDescription();
-		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description));
+		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description).replace("\n\n", "<p>"));
 		desc = desc.replace("${element.desc-safe}", Joiner.on("\\n").join(description == null ? new String[0] : description)
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		String[] examples = info.getExamples();
@@ -393,6 +454,10 @@ public class HTMLGenerator {
 		desc = desc.replace("${element.examples-safe}", Joiner.on("\\n").join(examples == null ? new String[0] : examples)
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		desc = desc.replace("${element.id}", info.getId());
+		
+		assert desc != null;
+		desc = handleIf(desc, "${if events}", false);
+		desc = handleIf(desc, "${if required-plugins}", false);
 		
 		List<String> toGen = Lists.newArrayList();
 		int generate = desc.indexOf("${generate");
@@ -432,7 +497,7 @@ public class HTMLGenerator {
 		String since = info.getSince();
 		desc = desc.replace("${element.since}", since == null ? "unknown" : since);
 		String[] description = info.getDescription();
-		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description));
+		desc = desc.replace("${element.desc}", Joiner.on("\n").join(description == null ? new String[0] : description).replace("\n\n", "<p>"));
 		desc = desc.replace("${element.desc-safe}", Joiner.on("\\n").join(description == null ? new String[0] : description)
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		String[] examples = info.getExamples();
@@ -440,6 +505,10 @@ public class HTMLGenerator {
 		desc = desc.replace("${element.examples-safe}", Joiner.on("\\n").join(examples == null ? new String[0] : examples)
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		desc = desc.replace("${element.id}", info.getCodeName());
+		
+		assert desc != null;
+		desc = handleIf(desc, "${if events}", false);
+		desc = handleIf(desc, "${if required-plugins}", false);
 		
 		List<String> toGen = Lists.newArrayList();
 		int generate = desc.indexOf("${generate");
@@ -490,6 +559,10 @@ public class HTMLGenerator {
 		desc = desc.replace("${element.examples-safe}", Joiner.on("\\n").join(examples == null ? new String[0] : examples)
 				.replace("\\", "\\\\").replace("\"", "\\\"").replace("\t", "    "));
 		desc = desc.replace("${element.id}", info.getName());
+		
+		assert desc != null;
+		desc = handleIf(desc, "${if events}", false);
+		desc = handleIf(desc, "${if required-plugins}", false);
 		
 		List<String> toGen = Lists.newArrayList();
 		int generate = desc.indexOf("${generate");

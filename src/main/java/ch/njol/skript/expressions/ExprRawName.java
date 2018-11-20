@@ -50,14 +50,13 @@ public class ExprRawName extends SimpleExpression<String> {
 	@SuppressWarnings("null")
 	private Expression<ItemType> types;
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		this.types = (Expression<ItemType>) exprs[0];
 		return true;
 	}
 	
-	@SuppressWarnings("null")
 	@Override
 	@Nullable
 	protected String[] get(final Event e) {

@@ -48,10 +48,8 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
@@ -62,6 +60,13 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	
 	@Override
 	protected boolean init() {
+		if (!Skript.classExists("com.sk89q.worldguard.WorldGuard")) {
+			Skript.error("Skript does not support WorldGuard 6. WorldGuard region support has been disabled!");
+			return false;
+		} else if (!Skript.classExists("com.sk89q.worldedit.math.BlockVector")) {
+			Skript.error("WorldEdit you're using is not compatible with Skript. Disabling WorldGuard support!");
+			return false;
+		}
 		return super.init();
 	}
 	
@@ -203,9 +208,8 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		ApplicableRegionSet applicable = manager.getApplicableRegions(BukkitAdapter.asVector(l));
 		if (applicable == null)
 			return r;
-		final Iterator<ProtectedRegion> i = applicable.iterator();
-		while (i.hasNext())
-			r.add(new WorldGuardRegion(l.getWorld(), i.next()));
+		for (ProtectedRegion region : applicable)
+			r.add(new WorldGuardRegion(l.getWorld(), region));
 		return r;
 	}
 	

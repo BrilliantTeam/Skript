@@ -35,20 +35,20 @@ import ch.njol.skript.doc.Since;
 @Name("Is Slime Chunk")
 @Description({"Tests whether a chunk is a so-called slime chunk.",
 		"Slimes can generally spawn in the swamp biome and in slime chunks.",
-		"For more info, see https://minecraft.gamepedia.com/Slime#.22Slime_chunks.22"})
+		"For more info, see <a href='https://minecraft.gamepedia.com/Slime#.22Slime_chunks.22'>the Minecraft wiki</a>."})
 @Examples({"command /slimey:",
 		"\ttrigger:",
 		"\t\tif chunk at player is a slime chunk:",
 		"\t\t\tsend \"Yeah, it is!\"",
 		"\t\telse:",
 		"\t\t\tsend \"Nope, it isn't\""})
-@Since("INSERT VERSION")
+@Since("2.3")
 public class CondIsSlimeChunk extends PropertyCondition<Chunk> {
-
+	
 	static {
 		register(CondIsSlimeChunk.class, "([a] slime chunk|slime chunks|slimey)", "chunk");
 	}
-
+	
 	@Override
 	public boolean check(Chunk chunk) {
 		Random random = new Random(chunk.getWorld().getSeed() +
@@ -58,9 +58,10 @@ public class CondIsSlimeChunk extends PropertyCondition<Chunk> {
 				(long) (chunk.getZ() * 0x5f24f) ^ 0x3ad8025f);
 		return random.nextInt(10) == 0;
 	}
-
+	
 	@Override
 	protected String getPropertyName() {
 		return "slime chunk";
 	}
+	
 }

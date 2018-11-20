@@ -40,7 +40,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Yaw and pitch")
-@Description("Gets or sets the yaw or pitch value of a vector")
+@Description("Gets or sets the yaw or pitch value of a vector.")
 @Examples({"set {_v} to vector -1, 1, 1",
 		"send \"%vector yaw of {_v}%, %vector pitch of {_v}%\"",
 		"add 45 to vector yaw of {_v}",

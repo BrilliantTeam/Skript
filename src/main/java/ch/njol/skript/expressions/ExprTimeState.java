@@ -48,8 +48,8 @@ import ch.njol.util.Kleenean;
 		"	past tool is an axe",
 		"	the tool after the event will be air",
 		"on weather change:",
-		"	set {weather.%world%.old} to past weather",
-		"	set {weather.%world%.current} to the new weather"})
+		"	set {weather::%world%::old} to past weather",
+		"	set {weather::%world%::current} to the new weather"})
 @Since("1.1")
 public class ExprTimeState extends WrapperExpression<Object> {
 	static {

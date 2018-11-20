@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
 
 @Name("Filter")
 @Description("Filters a list based on a condition. " +
-		"For example, if you ran 'broadcast \"something\" and \"something else\" where [string input is \"something\"]" +
+		"For example, if you ran 'broadcast \"something\" and \"something else\" where [string input is \"something\"] " +
 		"only \"something\" would be broadcast as it is the only string that matched the condition.")
 @Examples("send \"congrats on being staff!\" to all players where [player input has permission \"staff\"]")
 @Since("2.2-dev36")
@@ -167,7 +167,7 @@ public class ExprFilter<T> extends SimpleExpression<T> {
 
 	@Name("Filter Input")
 	@Description("Represents the input in a filter expression. " +
-			"For example, if you ran 'broadcast \"something\" and \"something else\" where [string input is \"something\"]" +
+			"For example, if you ran 'broadcast \"something\" and \"something else\" where [string input is \"something\"] " +
 			"the condition would be checked twice, using \"something\" and \"something else\" as the inputs.")
 	@Examples("send \"congrats on being staff!\" to all players where [player input has permission \"staff\"]")
 	@Since("2.2-dev36")

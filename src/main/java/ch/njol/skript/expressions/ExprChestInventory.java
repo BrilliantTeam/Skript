@@ -36,7 +36,7 @@ import org.bukkit.inventory.Inventory;
 import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Custom Chest Inventory")
-@Description("Returns a chest inventory with the given amount of rows and the name. Use the <a href=effects.html#EffOpenInventory>open inventory</a>effect to open it.")
+@Description("Returns a chest inventory with the given amount of rows and the name. Use the <a href=effects.html#EffOpenInventory>open inventory</a> effect to open it.")
 @Examples({"open chest inventory with 1 rows named \"test\"",
            "set {_inventory} to chest inventory with 1 row"})
 @Since("2.2-dev34")

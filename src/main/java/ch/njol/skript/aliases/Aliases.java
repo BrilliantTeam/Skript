@@ -53,6 +53,8 @@ import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.config.validate.SectionValidator;
+import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
@@ -300,15 +302,13 @@ public abstract class Aliases {
 			}
 			if (t2.numTypes() == 0)
 				continue;
-			final Map<Enchantment, Integer> enchantments = new HashMap<>();
-			final String[] enchs = lc.substring(c + of.length(), lc.length()).split("\\s*(,|" + Pattern.quote(Language.get("and")) + ")\\s*");
+			final String[] enchs = lc.substring(c + of.length()).split("\\s*(,|" + Pattern.quote(Language.get("and")) + ")\\s*");
 			for (final String ench : enchs) {
 				final EnchantmentType e = EnchantmentType.parse("" + ench);
 				if (e == null)
 					continue outer;
-				enchantments.put(e.getType(), e.getLevel());
+				t2.addEnchantments(e);
 			}
-			t2.addEnchantments(enchantments);
 			return t2;
 		}
 		
@@ -523,7 +523,7 @@ public abstract class Aliases {
 	 * @param second Second item data.
 	 * @return If first is supertype of second.
 	 */
-	public static boolean isSupertypeOf(ItemData first, ItemData second) {
+	public static boolean hasCommonSupertype(ItemData first, ItemData second) {
 		Set<ItemData> subtypes = provider.getSubtypes(first);
 		if (subtypes != null)
 			return subtypes.contains(second);
@@ -533,14 +533,34 @@ public abstract class Aliases {
 	/**
 	 * Gets a Vanilla Minecraft material id for given item data.
 	 * @param data Item data.
-	 * @return Minecraft item id.
+	 * @return Minecraft item id or null.
 	 */
 	@Nullable
 	public static String getMinecraftId(ItemData data) {
-		return provider.getMinecraftId(data);
+		return provider.getMinecraftId(data.aliasCopy());
 	}
 	
+	/**
+	 * Gets an entity type related to given item. For example, an armor stand
+	 * item is related with armor stand entity.
+	 * @param data Item data.
+	 * @return Entity type or null.
+	 */
+	@Nullable
+	public static EntityData<?> getRelatedEntity(ItemData data) {
+		return provider.getRelatedEntity(data.aliasCopy());
+	}
+	
+	/**
+	 * Go through these whenever aliases are reloaded, and update them.
+	 */
 	private static final Map<String, ItemType> trackedTypes = new HashMap<>();
+	
+	/**
+	 * If user had an obscure config option set, don't crash due to missing
+	 * Java item types.
+	 */
+	private static final boolean noHardExceptions = SkriptConfig.apiSoftExceptions.value();
 	
 	/**
 	 * Gets an item type that matches the given name.
@@ -555,8 +575,14 @@ public abstract class Aliases {
 	 */
 	public static ItemType javaItemType(String name) {
 		ItemType type = parseItemType(name);
-		if (type == null)
-			throw new IllegalArgumentException("type " + name + " not found");
+		if (type == null) {
+			if (noHardExceptions) {
+				Skript.error("type " + name + " not found");
+				type = new ItemType(); // Return garbage
+			} else {
+				throw new IllegalArgumentException("type " + name + " not found");
+			}
+		}
 		trackedTypes.put(name, type);
 		return type;
 	}

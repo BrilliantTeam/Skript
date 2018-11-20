@@ -27,8 +27,8 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import org.bukkit.block.Block;
 
 @Name("Humidity")
-@Description("Humidity of given blocks")
-@Examples("")
+@Description("Humidity of given blocks.")
+@Examples("set {_humidity} to event-block's humidity")
 @Since("2.2-dev35")
 public class ExprHumidity extends SimplePropertyExpression<Block, Double> {
 

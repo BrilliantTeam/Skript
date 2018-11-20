@@ -102,10 +102,10 @@ public class EvtClick extends SkriptEvent {
 				.description("Called when a user clicks on a block, an entity or air with or without an item in their hand.",
 						"Please note that rightclick events with an empty hand while not looking at a block are not sent to the server, so there's no way to detect them.")
 				.examples("on click",
-						"on rightclick holding a fishing rod",
-						"on leftclick on a stone or obsidian",
-						"on rightclick on a creeper",
-						"on click with a sword")
+						"on rightclick holding a fishing rod:",
+						"on leftclick on a stone or obsidian:",
+						"on rightclick on a creeper:",
+						"on click with a sword:")
 				.since("1.0");
 	}
 	

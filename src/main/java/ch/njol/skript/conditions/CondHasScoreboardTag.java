@@ -27,6 +27,8 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.conditions.base.PropertyCondition;
+import ch.njol.skript.conditions.base.PropertyCondition.PropertyType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -39,21 +41,19 @@ import ch.njol.util.Kleenean;
 @Name("Has Scoreboard Tag")
 @Description("Checks whether the given entities has the given <a href='expressions.html#ExprScoreboardTags'>scoreboard tags</a>.")
 @Examples("if the targeted armor stand has the scoreboard tag \"test tag\":")
-@Since("INSERT VERSION")
+@Since("2.3")
 public class CondHasScoreboardTag extends Condition {
-
+	
 	static {
 		if (Skript.isRunningMinecraft(1, 11))
-			Skript.registerCondition(CondHasScoreboardTag.class,
-					"%entities% ha(s|ve) [the] score[ ]board tag[s] %strings%",
-					"%entities% (do[es]n't|don't|do[es] not) have [the] score[ ]board tag[s] %strings%");
+			PropertyCondition.register(CondHasScoreboardTag.class, PropertyType.HAVE, "[the] score[ ]board tag[s] %strings%", "entities");
 	}
 	
 	@SuppressWarnings("null")
 	private Expression<Entity> entities;
 	@SuppressWarnings("null")
 	private Expression<String> tags;
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
@@ -62,17 +62,20 @@ public class CondHasScoreboardTag extends Condition {
 		setNegated(matchedPattern == 1);
 		return true;
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean check(Event e) {
-		List<String> tagsList = (List) Arrays.asList(tags.getArray(e));
-		return entities.check(e, entity -> entity.getScoreboardTags().containsAll(tagsList), isNegated());
+		List<String> tagsList = Arrays.asList(tags.getArray(e));
+		return entities.check(e,
+				entity -> entity.getScoreboardTags().containsAll(tagsList),
+				isNegated());
 	}
-
+	
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return entities.toString(e, debug) + (isNegated() ? " doesn't have " : " has ") + "the scoreboard tags " + tags.toString(e, debug);
+		return PropertyCondition.toString(this, PropertyType.HAVE, e, debug, entities,
+				"the scoreboard " + (tags.isSingle() ? "tag " : "tags ") + tags.toString(e, debug));
 	}
-
+	
 }

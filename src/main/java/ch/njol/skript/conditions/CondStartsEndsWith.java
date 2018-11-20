@@ -39,19 +39,19 @@ import ch.njol.util.Kleenean;
 		"	send \"Stop!\""})
 @Since("2.2-dev36")
 public class CondStartsEndsWith extends Condition {
-
+	
 	static {
 		Skript.registerCondition(CondStartsEndsWith.class,
 				"%strings% (start|1¦end)[s] with %string%",
 				"%strings% (doesn't|does not|do not|don't) (start|1¦end) with %string%");
 	}
-
+	
 	@SuppressWarnings("null")
 	private Expression<String> strings;
 	@SuppressWarnings("null")
 	private Expression<String> affix;
 	private boolean usingEnds;
-
+	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
@@ -61,18 +61,20 @@ public class CondStartsEndsWith extends Condition {
 		setNegated(matchedPattern == 1);
 		return true;
 	}
-
+	
 	@Override
 	public boolean check(Event e) {
-		String a = affix.getSingle(e);
-		return strings.check(e, new Checker<String>() {
-			@Override
-			public boolean check(String s) {
-				return usingEnds ? s.endsWith(a) : s.startsWith(a);
-			}
-		}, isNegated());
+		String affix = this.affix.getSingle(e);
+		
+		if (affix == null) {
+			return false;
+		}
+		
+		return strings.check(e,
+				string -> usingEnds ? string.endsWith(affix) : string.endsWith(affix),
+				isNegated());
 	}
-
+	
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
 		if (isNegated())
@@ -80,6 +82,5 @@ public class CondStartsEndsWith extends Condition {
 		else
 			return strings.toString(e, debug) + (usingEnds ? " ends" : " starts") + " with " + affix.toString(e, debug);
 	}
-
-
+	
 }

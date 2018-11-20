@@ -59,7 +59,7 @@ import ch.njol.util.coll.iterator.NonNullIterator;
  * @author Peter Güttinger
  */
 @Name("Entities")
-@Description("all entities in all world, in a specific world or in a radius around a certain location, e.g. 'all players', 'all creepers in the player's world', or 'players in radius 100 of the player'.")
+@Description("All entities in all worlds, in a specific world or in a radius around a certain location, e.g. 'all players', 'all creepers in the player's world', or 'players in radius 100 of the player'.")
 @Examples({"kill all creepers in the player's world",
 		"send \"Psst!\" to all players witin 100 meters of the player",
 		"give a diamond to all ops",

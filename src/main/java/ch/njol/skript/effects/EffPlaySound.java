@@ -40,12 +40,12 @@ import java.util.Locale;
 
 @Name("Play Sound")
 @Description("Plays a sound at given location for everyone or just for given players. Playing sounds from resource packs is supported.")
-@Examples("")
+@Examples("play sound \"block.note.pling\" with volume 0.3 at player")
 @Since("2.2-dev28")
 public class EffPlaySound extends Effect {
 
 	static {
-		Skript.registerEffect(EffPlaySound.class, "play sound %string% [with volume %number%] [(and|with) pitch %number%] at %location% [for %players%]");
+		Skript.registerEffect(EffPlaySound.class, "play sound %string% [with volume %-number%] [(and|with) pitch %-number%] at %location% [for %-players%]");
 	}
 
 	@SuppressWarnings("null")
@@ -83,8 +83,8 @@ public class EffPlaySound extends Effect {
 		String s = sound.getSingle(e);
 
 		if (s != null) {
-			float vol = volume != null ? volume.getSingle(e).floatValue() : 0;
-			float pi = pitch != null ? pitch.getSingle(e).floatValue() : 0;
+			float vol = volume != null ? volume.getSingle(e).floatValue() : 1;
+			float pi = pitch != null ? pitch.getSingle(e).floatValue() : 1;
 
 			try {
 				soundEnum = Sound.valueOf(s.toUpperCase(Locale.ENGLISH));
