@@ -47,11 +47,11 @@ import ch.njol.util.Kleenean;
 @Since("2.0, 2.1.1 (closing), 2.2-Fixes-V10 (anvil)")
 public class EffOpenInventory extends Effect {
 	
-	private final static int WORKBENCH = 0, CHEST = 1, ANVIL = 2, HOPPER = 3, DROPPER = 4;
+	private final static int WORKBENCH = 0, CHEST = 1, ANVIL = 2, HOPPER = 3, DROPPER = 4, DISPENSER = 5, FURNACE = 6;
 	
 	static {
 		Skript.registerEffect(EffOpenInventory.class,
-				"(0¦open|1¦show) ((2¦(crafting [table]|workbench)|3¦chest|4¦anvil|5¦hopper|6¦dropper) (view|window|inventory|)|%-inventory%) (to|for) %players%",
+				"(0¦open|1¦show) ((2¦(crafting [table]|workbench)|3¦chest|4¦anvil|5¦hopper|6¦dropper|7¦dispenser|8¦furnace) (view|window|inventory|)|%-inventory%) (to|for) %players%",
 				"close [the] inventory [view] (to|of|for) %players%", "close %players%'[s] inventory [view]");
 	}
 	
@@ -68,7 +68,13 @@ public class EffOpenInventory extends Effect {
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		int openFlag = 0;
-		if(parseResult.mark >= 6) {
+		if(parseResult.mark >= 8) {
+			openFlag = parseResult.mark ^ 8;
+			invType = FURNACE;
+		} else if(parseResult.mark >= 7) {
+			openFlag = parseResult.mark ^ 7;
+			invType = DISPENSER;
+		} else if(parseResult.mark >= 6) {
 			openFlag = parseResult.mark ^ 6;
 			invType = DROPPER;
 		} else if(parseResult.mark >= 5) {
@@ -127,6 +133,13 @@ public class EffOpenInventory extends Effect {
 							break;
 						case DROPPER:
 							p.openInventory(Bukkit.createInventory(p, InventoryType.DROPPER));
+							break;
+						case DISPENSER:
+							p.openInventory(Bukkit.createInventory(p, InventoryType.DISPENSER));
+							break;
+						case FURNACE:
+							p.openInventory(Bukkit.createInventory(p, InventoryType.FURNACE));
+							
 					}
 				} else
 					p.closeInventory();
