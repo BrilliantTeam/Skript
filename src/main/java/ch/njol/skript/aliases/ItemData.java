@@ -216,11 +216,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		return item.isSimilar(stack);
 	}
 	
-	public boolean hasCommonSupertype(ItemData o) {
-		// Since numeric ids are not used anymore, supertype-ness is based on aliases
-		return Aliases.hasCommonSupertype(this, o);
-	}
-	
 	/**
 	 * Returns <code>Aliases.{@link Aliases#getMaterialName(ItemData, boolean) getMaterialName}(ItemData, boolean)</code>
 	 * called with this object and relevant plurarily setting.
@@ -305,7 +300,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			return null;
 		
 		// TODO implement meta intersection
-		return null;
+		return this;
 	}
 	
 	/**

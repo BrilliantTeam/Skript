@@ -516,19 +516,6 @@ public abstract class Aliases {
 			parser.load((SectionNode) n);
 		}
 	}
-	
-	/**
-	 * Checks if the first parameter is supertype of second.
-	 * @param first First item data.
-	 * @param second Second item data.
-	 * @return If first is supertype of second.
-	 */
-	public static boolean hasCommonSupertype(ItemData first, ItemData second) {
-		Set<ItemData> subtypes = provider.getSubtypes(first);
-		if (subtypes != null)
-			return subtypes.contains(second);
-		return false;
-	}
 
 	/**
 	 * Gets a Vanilla Minecraft material id for given item data.

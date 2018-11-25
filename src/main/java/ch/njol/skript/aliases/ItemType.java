@@ -324,18 +324,14 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return isOfType(new ItemData(id, null));
 	}
 	
-	public boolean isSupertypeOf(final ItemType other) {
-		if (amount != -1 && other.amount != amount)
-			return false;
-		outer: for (final ItemData o : other.types) {
-			assert o != null;
-			for (final ItemData t : types) {
-				if (t.hasCommonSupertype(o))
-					continue outer;
-			}
-			return false;
-		}
-		return true;
+	/**
+	 * Checks if this type represents all the items represented by given
+	 * item type. This type may of course also represent other items.
+	 * @param other Another item type.
+	 * @return Whether this is supertype of the given item type.
+	 */
+	public boolean isSupertypeOf(ItemType other) {
+		return types.containsAll(other.types);
 	}
 	
 	public ItemType getItem() {
@@ -722,7 +718,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public boolean removeFrom(Inventory invi) {
 		ItemStack[] buf = getCopiedContents(invi);
 		
-		@SuppressWarnings("unchecked")
 		final boolean ok = removeFrom(Arrays.asList(buf));
 		
 		invi.setContents(buf);

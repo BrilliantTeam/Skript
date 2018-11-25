@@ -170,11 +170,6 @@ public class AliasesProvider {
 	private final Map<String, VariationGroup> variations;
 	
 	/**
-	 * Subtypes of materials.
-	 */
-	private final Map<ItemData, Set<ItemData>> subtypes;
-	
-	/**
 	 * Maps item datas back to Minecraft ids.
 	 */
 	private final Map<ItemData, String> minecraftIds;
@@ -191,7 +186,6 @@ public class AliasesProvider {
 		aliases = new HashMap<>(10000);
 		materialNames = new HashMap<>(10000);
 		variations = new HashMap<>(500);
-		subtypes = new HashMap<>(1000);
 		minecraftIds = new HashMap<>(3000);
 		relatedEntities = new HashMap<>(10);
 		
@@ -344,13 +338,6 @@ public class AliasesProvider {
 		// Make datas subtypes of the type we have here and handle Minecraft ids
 		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
 			data.strictEquality = true;
-			Set<ItemData> subs = subtypes.get(data);
-			if (subs == null) {
-				subs = new HashSet<>(datas.size());
-				subtypes.put(data, subs);
-			}
-			subs.addAll(datas); // Add all datas (the ones we have here)
-			
 			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
 				minecraftIds.put(data, id); // Register Minecraft id for the data, too
 			
@@ -397,11 +384,6 @@ public class AliasesProvider {
 		aliases.clear();
 		materialNames.clear();
 		variations.clear();
-	}
-	
-	@Nullable
-	public Set<ItemData> getSubtypes(ItemData supertype) {
-		return subtypes.get(supertype);
 	}
 
 	public int getAliasCount() {
