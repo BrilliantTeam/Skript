@@ -66,6 +66,9 @@ public class TropicalFishData extends EntityData<TropicalFish> {
 
 	@Override
 	protected boolean init(Literal<?>[] exprs, int matchedPattern, ParseResult parseResult) {
+		if (exprs.length == 0)
+			return true; // FIXME aliases reloading must work
+		
 		if (exprs[2] != null) {
 			bodyColor = ((Literal<Color>) exprs[2]).getSingle().getWoolColor();
 			patternColor = bodyColor;

@@ -302,8 +302,15 @@ public class NewBlockCompat implements BlockCompat {
 	@Override
 	@Nullable
 	public BlockValues createBlockValues(Material type, Map<String, String> states) {
-		if (states.isEmpty())
-			return null; // Block values not needed
+		if (states.isEmpty()) {
+			if (type.isBlock()) { // Still need default block values
+				BlockData data =  Bukkit.createBlockData(type, "[]");
+				assert data != null;
+				return new NewBlockValues(type, data);
+			} else { // Items cannot have block data
+				return null;
+			}
+		}
 		
 		StringBuilder combined = new StringBuilder("[");
 		boolean first = true;
