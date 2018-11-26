@@ -69,26 +69,37 @@ import ch.njol.skript.util.Version;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.Setter;
 
-@SuppressWarnings("deprecation")
 public abstract class Aliases {
-		
-	private final static AliasesProvider provider = createProvider();
-	private final static AliasesParser parser = createParser(provider);
+
+	private static final AliasesProvider provider = createProvider(10000);
+	private static final AliasesParser parser = createParser(provider);
+	
+	/**
+	 * Current script aliases.
+	 */
+	@Nullable
+	private static ScriptAliases scriptAliases;
 	
 	@Nullable
 	private static ItemType getAlias_i(final String s) {
-		final ItemType t = ScriptLoader.getScriptAliases().get(s);
-		if (t != null)
-			return t;
+		// Check script aliases first
+		ScriptAliases aliases = scriptAliases;
+		if (aliases != null) {
+			ItemType alias = aliases.provider.getAlias(s);
+			if (alias != null)
+				return alias;
+		}
+			
 		return provider.getAlias(s);
 	}
 	
 	/**
 	 * Creates an aliases provider with Skript's default configuration.
+	 * @param expectedCount Expected alias count.
 	 * @return Aliases provider.
 	 */
-	private static AliasesProvider createProvider() {
-		return new AliasesProvider();
+	private static AliasesProvider createProvider(int expectedCount) {
+		return new AliasesProvider(expectedCount);
 	}
 	
 	/**
@@ -184,8 +195,24 @@ public abstract class Aliases {
 	@SuppressWarnings("null")
 	private final static Pattern numberWordPattern = Pattern.compile("\\d+\\s+.+");
 	
-	public static final String getMaterialName(ItemData type, boolean plural) {
-		MaterialName name = provider.getMaterialName(type.aliasCopy());
+	@Nullable
+	private static MaterialName getMaterialNameData(ItemData type) {
+		ItemData aliasCopy = type.aliasCopy();
+		
+		// Check script aliases first
+		ScriptAliases aliases = scriptAliases;
+		if (aliases != null) {
+			MaterialName name = aliases.provider.getMaterialName(aliasCopy);
+			if (name != null)
+				return name;
+		}
+		
+		// Then global aliases
+		return provider.getMaterialName(aliasCopy);
+	}
+	
+	public static String getMaterialName(ItemData type, boolean plural) {
+		MaterialName name = getMaterialNameData(type);
 		if (name == null) {
 			return "" + type.type;
 		}
@@ -195,8 +222,8 @@ public abstract class Aliases {
 	/**
 	 * @return The ietm's gender or -1 if no name is found
 	 */
-	public final static int getGender(ItemData item) {
-		final MaterialName n = provider.getMaterialName(item);
+	public static int getGender(ItemData item) {
+		MaterialName n = getMaterialNameData(item);
 		if (n != null)
 			return n.gender;
 		return -1;
@@ -213,7 +240,7 @@ public abstract class Aliases {
 			ItemData data = new ItemData(m);
 			if (provider.getMaterialName(data) == null) { // Material name is missing
 				provider.setMaterialName(data, new MaterialName(m, "" + m.toString().toLowerCase().replace('_', ' '), "" + m.toString().toLowerCase().replace('_', ' '), 0));
-				missing.append(m.getId() + ", ");
+				missing.append(m + ", ");
 				r++;
 			}
 		}
@@ -524,6 +551,12 @@ public abstract class Aliases {
 	 */
 	@Nullable
 	public static String getMinecraftId(ItemData data) {
+		ScriptAliases aliases = scriptAliases;
+		if (aliases != null) {
+			String id = aliases.provider.getMinecraftId(data);
+			if (id != null)
+				return id;
+		}
 		return provider.getMinecraftId(data.aliasCopy());
 	}
 	
@@ -535,6 +568,12 @@ public abstract class Aliases {
 	 */
 	@Nullable
 	public static EntityData<?> getRelatedEntity(ItemData data) {
+		ScriptAliases aliases = scriptAliases;
+		if (aliases != null) {
+			EntityData<?> entity = aliases.provider.getRelatedEntity(data);
+			if (entity != null)
+				return entity;
+		}
 		return provider.getRelatedEntity(data.aliasCopy());
 	}
 	
@@ -587,5 +626,23 @@ public abstract class Aliases {
 		
 		// TODO in future, maybe record and allow unloading addon-provided aliases?
 		return provider; // For now, just allow loading aliases easily
+	}
+	
+	/**
+	 * Creates script aliases.
+	 * @return Script aliases, ready to be added to.
+	 */
+	public static ScriptAliases createScriptAliases() {
+		AliasesProvider provider = createProvider(10);
+		return new ScriptAliases(provider, createParser(provider));
+	}
+	
+	/**
+	 * Sets script aliases to be used for lookups. Remember to set them to
+	 * null when the script changes.
+	 * @param aliases Script aliases.
+	 */
+	public static void setScriptAliases(@Nullable ScriptAliases aliases) {
+		scriptAliases = aliases;
 	}
 }

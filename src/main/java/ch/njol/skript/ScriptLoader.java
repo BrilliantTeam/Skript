@@ -47,6 +47,7 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.aliases.ScriptAliases;
 import ch.njol.skript.bukkitutil.CommandReloader;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.command.CommandEvent;
@@ -135,7 +136,7 @@ final public class ScriptLoader {
 	 * @param state The new value for {@link ScriptLoader#callPreLoadEvent}
 	 * @param addon A non-null SkriptAddon
 	 */
-	public static void setCallPreloadEvent(boolean state, @NonNull SkriptAddon addon) {
+	public static void setCallPreloadEvent(boolean state, SkriptAddon addon) {
 		Validate.notNull(addon);
 		callPreLoadEvent = state;
 		if (state)
@@ -153,6 +154,7 @@ final public class ScriptLoader {
 	 * that have called {@link ScriptLoader#setCallPreloadEvent(boolean, SkriptAddon)}
 	 * with true.
 	 */
+	@SuppressWarnings("null")
 	public static Set<SkriptAddon> getPreloadListeners() {
 		return Collections.unmodifiableSet(preloadListeners);
 	}
@@ -180,6 +182,7 @@ final public class ScriptLoader {
 	 * @param name
 	 * @param events
 	 */
+	@SafeVarargs
 	public static void setCurrentEvent(final String name, final @Nullable Class<? extends Event>... events) {
 		currentEventName = name;
 		currentEvents = events;
@@ -194,12 +197,7 @@ final public class ScriptLoader {
 	
 	public static List<TriggerSection> currentSections = new ArrayList<>();
 	public static List<Loop> currentLoops = new ArrayList<>();
-	private final static Map<String, ItemType> currentAliases = new HashMap<>();
 	final static HashMap<String, String> currentOptions = new HashMap<>();
-	
-	public static Map<String, ItemType> getScriptAliases() {
-		return currentAliases;
-	}
 	
 	/**
 	 * must be synchronized
@@ -480,7 +478,6 @@ final public class ScriptLoader {
 	 * @param config Config for script to be loaded.
 	 * @return Info about script that is loaded
 	 */
-	@SuppressWarnings("unchecked")
 	private static ScriptInfo loadScript(final @Nullable Config config) {
 		if (config == null) { // Something bad happened, hopefully got logged to console
 			return new ScriptInfo();
@@ -500,7 +497,6 @@ final public class ScriptLoader {
 			if (SkriptConfig.keepConfigsLoaded.value())
 				SkriptConfig.configs.add(config);
 			
-			currentAliases.clear();
 			currentOptions.clear();
 			currentScript = config;
 
@@ -530,16 +526,11 @@ final public class ScriptLoader {
 					
 					if (event.equalsIgnoreCase("aliases")) {
 						node.convertToEntries(0, "=");
-						for (final Node n : node) {
-							if (!(n instanceof EntryNode)) {
-								Skript.error("invalid line in aliases section");
-								continue;
-							}
-							final ItemType t = Aliases.parseAlias(((EntryNode) n).getValue());
-							if (t == null)
-								continue;
-							currentAliases.put(((EntryNode) n).getKey().toLowerCase(), t);
-						}
+						
+						// Initialize and load script aliases
+						ScriptAliases aliases = Aliases.createScriptAliases();
+						Aliases.setScriptAliases(aliases);
+						aliases.parser.load(node);
 						continue;
 					} else if (event.equalsIgnoreCase("options")) {
 						node.convertToEntries(0);
@@ -684,6 +675,7 @@ final public class ScriptLoader {
 					Skript.info("loaded " + numTriggers + " trigger" + (numTriggers == 1 ? "" : "s") + " and " + numCommands + " command" + (numCommands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
 				
 				currentScript = null;
+				Aliases.setScriptAliases(null); // These are per-script
 			} finally {
 				numErrors.stop();
 			}

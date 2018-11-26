@@ -182,10 +182,10 @@ public class AliasesProvider {
 	/**
 	 * Constructs a new aliases provider with no data.
 	 */
-	public AliasesProvider() {
-		aliases = new HashMap<>(10000);
-		materialNames = new HashMap<>(10000);
-		variations = new HashMap<>(500);
+	public AliasesProvider(int expectedCount) {
+		aliases = new HashMap<>(expectedCount);
+		materialNames = new HashMap<>(expectedCount);
+		variations = new HashMap<>(expectedCount / 20);
 		minecraftIds = new HashMap<>(3000);
 		relatedEntities = new HashMap<>(10);
 		
