@@ -368,12 +368,24 @@ public class AliasesProvider {
 
 	@Nullable
 	public String getMinecraftId(ItemData data) {
-		return minecraftIds.get(data);
+		String id = minecraftIds.get(data);
+		if (id == null) { // No non-default MC id found
+			ItemData defaultData = data.clone();
+			defaultData.blockValues = null;
+			id = minecraftIds.get(defaultData);
+		}
+		return id;
 	}
 	
 	@Nullable
-	public MaterialName getMaterialName(ItemData type) {
-		return materialNames.get(type);
+	public MaterialName getMaterialName(ItemData data) {
+		MaterialName name = materialNames.get(data);
+		if (name == null) { // No non-default name found
+			ItemData defaultData = data.clone();
+			defaultData.blockValues = null;
+			name = materialNames.get(defaultData);
+		}
+		return name;
 	}
 
 	public void setMaterialName(ItemData data, MaterialName materialName) {

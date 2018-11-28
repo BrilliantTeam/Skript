@@ -51,10 +51,17 @@ public class NewBlockCompat implements BlockCompat {
 
 		Material type;
 		BlockData data;
+		boolean isDefault;
 		
-		public NewBlockValues(Material type, BlockData data) {
+		public NewBlockValues(Material type, BlockData data, boolean isDefault) {
 			this.type = type;
 			this.data = data;
+			this.isDefault = isDefault;
+		}
+		
+		@Override
+		public boolean isDefault() {
+			return isDefault;
 		}
 
 		@Override
@@ -75,10 +82,9 @@ public class NewBlockCompat implements BlockCompat {
 			return result;
 		}
 		
-		@SuppressWarnings("null")
 		@Override
 		public String toString() {
-			return data.toString();
+			return data.toString() + (isDefault ? " (default)" : "");
 		}
 		
 	}
@@ -271,8 +277,8 @@ public class NewBlockCompat implements BlockCompat {
 	@Override
 	public BlockValues getBlockValues(BlockState block) {
 		// If block doesn't have useful data, data field of type is MaterialData
-		if (BlockData.class.isAssignableFrom(block.getType().data))
-			return new NewBlockValues(block.getType(), block.getBlockData());
+		if (block.getType().isBlock())
+			return new NewBlockValues(block.getType(), block.getBlockData(), false);
 		return null;
 	}
 	
@@ -280,9 +286,9 @@ public class NewBlockCompat implements BlockCompat {
 	@Nullable
 	public BlockValues getBlockValues(ItemStack stack) {
 		Material type = stack.getType();
-		if (BlockData.class.isAssignableFrom(type.data)) { // Block has data
+		if (type.isBlock()) { // Block has data
 			// Create default block data for the type
-			return new NewBlockValues(type, Bukkit.createBlockData(type));
+			return new NewBlockValues(type, Bukkit.createBlockData(type), true);
 		}
 		return null;
 	}
@@ -306,7 +312,7 @@ public class NewBlockCompat implements BlockCompat {
 			if (type.isBlock()) { // Still need default block values
 				BlockData data =  Bukkit.createBlockData(type, "[]");
 				assert data != null;
-				return new NewBlockValues(type, data);
+				return new NewBlockValues(type, data, true);
 			} else { // Items cannot have block data
 				return null;
 			}
@@ -326,7 +332,7 @@ public class NewBlockCompat implements BlockCompat {
 		try {
 			BlockData data =  Bukkit.createBlockData(type, combined.toString());
 			assert data != null;
-			return new NewBlockValues(type, data);
+			return new NewBlockValues(type, data, false);
 		} catch (IllegalArgumentException e) {
 			Skript.error("Parsing block state " + combined + " failed!");
 			e.printStackTrace();

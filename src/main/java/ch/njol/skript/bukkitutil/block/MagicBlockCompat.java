@@ -80,6 +80,11 @@ public class MagicBlockCompat implements BlockCompat {
 			this.id = id;
 			this.data = data;
 		}
+		
+		@Override
+		public boolean isDefault() {
+			return true; // Defaultness is mostly 1.13+ concept
+		}
 
 		@Override
 		public boolean equals(@Nullable Object other) {
