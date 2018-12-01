@@ -21,7 +21,6 @@ package ch.njol.skript.effects;
 
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -35,29 +34,29 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 
-@Name("Break Block Naturally")
+@Name("Break Block")
 @Description({"Breaks the block and spawns items as if a player had mined it",
 		"\nYou can add a tool, which will spawn items based on how that tool would break the block ",
 		"(ie: Using a diamond pickaxe of fortune 3 would drop more coal items when breaking a coal ore block)"})
 @Examples({"on right click:", "\tbreak clicked block naturally",
-		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using player's tool",
+		"loop blocks in radius 10 around player:", "\tbreak loop-block using player's tool",
 		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using diamond pickaxe of fortune 3"})
 @Since("INSERT VERSION")
 public class EffBreakNaturally extends Effect {
 	
 	static {
-		Skript.registerEffect(EffBreakNaturally.class, "break %blocks% naturally [using %-itemtype%]");
+		Skript.registerEffect(EffBreakNaturally.class, "break %blocks% [naturally] [using %-itemtype%]");
 	}
 	
 	@SuppressWarnings("null")
-	private Expression<Block> block;
+	private Expression<Block> blocks;
 	@Nullable
 	private Expression<ItemType> tool;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final SkriptParser.ParseResult parser) {
-		block = (Expression<Block>) exprs[0];
+		blocks = (Expression<Block>) exprs[0];
 		tool = (Expression<ItemType>) exprs[1];
 		return true;
 	}
@@ -65,7 +64,7 @@ public class EffBreakNaturally extends Effect {
 	@Override
 	protected void execute(final Event e) {
 		ItemType tool = this.tool != null ? this.tool.getSingle(e) : null;
-		for (Block block : this.block.getArray(e)){
+		for (Block block : this.blocks.getArray(e)){
 			if (tool != null) block.breakNaturally(tool.getRandom());
 			else block.breakNaturally();
 		}
@@ -73,7 +72,7 @@ public class EffBreakNaturally extends Effect {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "break " + block.toString(e, debug) + " naturally" + (tool != null ? " using " + tool : "");
+		return "break " + blocks.toString(e, debug) + " naturally" + (tool != null ? " using " + tool : "");
 	}
 }
 
