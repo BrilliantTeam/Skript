@@ -42,7 +42,7 @@ import ch.njol.util.Kleenean;
 @Examples({"on right click:", "\tbreak clicked block naturally",
 		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using player's tool",
 		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using diamond pickaxe of fortune 3"})
-@Since("{INSERT VERSION}")
+@Since("INSERT VERSION")
 public class EffBreakNaturally extends Effect {
 	
 	static {
