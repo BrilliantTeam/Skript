@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -40,32 +41,32 @@ import ch.njol.util.Kleenean;
 		"(ie: Using a diamond pickaxe of fortune 3 would drop more coal items when breaking a coal ore block)"})
 @Examples({"on right click:", "\tbreak clicked block naturally",
 		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using player's tool",
-		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using diamond pickaxe of furtune 3"})
+		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using diamond pickaxe of fortune 3"})
 @Since("{INSERT VERSION}")
 public class EffBreakNaturally extends Effect {
 	
 	static {
-		Skript.registerEffect(EffBreakNaturally.class, "break %blocks% naturally [using %-itemstack%]");
+		Skript.registerEffect(EffBreakNaturally.class, "break %blocks% naturally [using %-itemtype%]");
 	}
 	
 	@SuppressWarnings("null")
 	private Expression<Block> block;
 	@Nullable
-	private Expression<ItemStack> tool;
+	private Expression<ItemType> tool;
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final SkriptParser.ParseResult parser) {
 		block = (Expression<Block>) exprs[0];
-		tool = (Expression<ItemStack>) exprs[1];
+		tool = (Expression<ItemType>) exprs[1];
 		return true;
 	}
 	
 	@Override
 	protected void execute(final Event e) {
-		ItemStack tool = this.tool != null ? this.tool.getSingle(e) : null;
-		for(Block block : this.block.getArray(e)){
-			if(tool != null) block.breakNaturally(tool);
+		ItemType tool = this.tool != null ? this.tool.getSingle(e) : null;
+		for (Block block : this.block.getArray(e)){
+			if (tool != null) block.breakNaturally(tool.getRandom());
 			else block.breakNaturally();
 		}
 	}
