@@ -40,7 +40,7 @@ import ch.njol.util.Kleenean;
 		"(ie: Using a diamond pickaxe of fortune 3 would drop more coal items when breaking a coal ore block)"})
 @Examples({"on right click:", "\tbreak clicked block naturally",
 		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using player's tool",
-		"loop blocks in radius 10 around player:", "\nbreak loop-block naturally using diamond pickaxe of furtune 3"})
+		"loop blocks in radius 10 around player:", "\tbreak loop-block naturally using diamond pickaxe of furtune 3"})
 @Since("{INSERT VERSION}")
 public class EffBreakNaturally extends Effect {
 	
