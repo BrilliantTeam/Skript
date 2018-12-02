@@ -1,6 +1,7 @@
 package ch.njol.skript.update;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -22,6 +23,18 @@ import com.google.gson.stream.JsonWriter;
  * Describes a Skript release.
  */
 public class ReleaseManifest {
+	
+	/**
+	 * Loads a release manifest from JSON.
+	 * @param json Release manifest.
+	 * @return A release manifest.
+	 * @throws JsonParseException If the given JSON was not valid.
+	 */
+	@SuppressWarnings("null")
+	public static ReleaseManifest load(String json) throws JsonParseException {
+		return new GsonBuilder().registerTypeAdapter(Class.class, new ClassSerializer())
+				.create().fromJson(json, ReleaseManifest.class);
+	}
 	
 	/**
 	 * Release id, for example "2.3".
@@ -60,7 +73,7 @@ public class ReleaseManifest {
 	/**
 	 * Serializes class to JSON and back.
 	 */
-	class ClassSerializer implements JsonSerializer<Class<?>>, JsonDeserializer<Class<?>> {
+	static class ClassSerializer implements JsonSerializer<Class<?>>, JsonDeserializer<Class<?>> {
 
 		@Override
 		public @Nullable Class<?> deserialize(@Nullable JsonElement json, @Nullable Type typeOfT,
@@ -82,16 +95,18 @@ public class ReleaseManifest {
 		}
 		
 	}
-	
+
 	/**
-	 * Loads a release manifest from JSON.
-	 * @param json Release manifest.
-	 * @return A release manifest.
-	 * @throws JsonParseException If the given JSON was not valid.
+	 * Creates an instance of the updater used by this type.
+	 * @return New updater instance.
 	 */
 	@SuppressWarnings("null")
-	public ReleaseManifest load(String json) throws JsonParseException {
-		return new GsonBuilder().registerTypeAdapter(Class.class, new ClassSerializer())
-				.create().fromJson(json, ReleaseManifest.class);
+	public UpdateChecker createUpdateChecker() {
+		try {
+			return updateCheckerType.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			throw new IllegalStateException("updater class cannot be created", e);
+		}
 	}
 }

@@ -86,15 +86,15 @@ public abstract class SkriptConfig {
 			.setter(new Setter<Timespan>() {
 				@Override
 				public void set(final Timespan t) {
-					final Task ct = Updater.checkerTask;
-					if (t.getTicks_i() != 0 && ct != null && !ct.isAlive())
-						ct.setNextExecution(t.getTicks_i());
+					Updater updater = Skript.getInstance().getUpdater();
+					if (updater != null)
+						updater.setCheckFrequency(t.getTicks_i());
 				}
 			});
 	final static Option<Integer> updaterDownloadTries = new Option<Integer>("updater download tries", 7)
 			.optional(true);
-	final static Option<Boolean> updateToPrereleases = new Option<Boolean>("update to pre-releases", true);
-	final static Option<Boolean> automaticallyDownloadNewVersion = new Option<Boolean>("automatically download new version", false);
+	final static Option<Boolean> automaticallyDownloadNewVersion = new Option<Boolean>("automatically download new version", false); // TODO maybe remove
+	final static Option<String> releaseChannel = new Option<String>("update release channel", "none");
 	
 	public final static Option<Boolean> enableEffectCommands = new Option<Boolean>("enable effect commands", false);
 	public final static Option<String> effectCommandToken = new Option<String>("effect command token", "!");
