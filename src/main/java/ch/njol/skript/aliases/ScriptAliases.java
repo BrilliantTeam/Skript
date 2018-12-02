@@ -1,4 +1,4 @@
-/*
+/**
  *   This file is part of Skript.
  *
  *  Skript is free software: you can redistribute it and/or modify
@@ -13,32 +13,31 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * Copyright 2011-2014 Peter Güttinger
- * 
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
  */
+package ch.njol.skript.aliases;
 
-package ch.njol.skript.config;
 
 /**
- * Not used anymore
- * 
- * @author Peter Güttinger
+ * Per-script aliases provider and parser container.
  */
-public class ParseOptionNode extends Node {
+public class ScriptAliases {
 	
-	ParseOptionNode(final String name, final SectionNode parent, final ConfigReader r) {
-		super(name, parent, r);
+	/**
+	 * Aliases provider.
+	 */
+	public final AliasesProvider provider;
+	
+	/**
+	 * Aliases parser linked to our provider.
+	 */
+	public final AliasesParser parser;
+	
+	public ScriptAliases(AliasesProvider provider, AliasesParser parser) {
+		this.provider = provider;
+		this.parser = parser;
 	}
-	
-	@Override
-	String save() {
-		final String option = orig.substring(getOrig().indexOf('[') + 1, orig.indexOf(']'));
-		if (orig.startsWith("!separator[")) {
-			config.separator = option;
-		}
-		return orig.trim();
-	}
-	
+
 }

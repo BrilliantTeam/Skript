@@ -36,17 +36,19 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.bekvon.bukkit.residence.commands.command;
 import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.config.Config;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Message;
 import ch.njol.skript.localization.Noun;
@@ -60,18 +62,18 @@ public class AliasesProvider {
 	/**
 	 * All aliases that are currently loaded by this provider.
 	 */
-	private Map<String, ItemType> aliases;
+	private final Map<String, ItemType> aliases;
 	
 	/**
 	 * Material names for aliases this provider has.
 	 */
-	private Map<ItemData, MaterialName> materialNames;
+	private final Map<ItemData, MaterialName> materialNames;
 	
 	/**
 	 * Tags are in JSON format. We may need GSON when merging tags
 	 * (which might be done if variations are used).
 	 */
-	private Gson gson;
+	private final Gson gson;
 	
 	/**
 	 * Represents a variation of material. It could, for example, define one
@@ -165,27 +167,27 @@ public class AliasesProvider {
 	/**
 	 * Contains all variations. {@link #loadVariedAlias} uses this.
 	 */
-	private Map<String, VariationGroup> variations;
-	
-	/**
-	 * Subtypes of materials.
-	 */
-	private Map<ItemData, Set<ItemData>> subtypes;
+	private final Map<String, VariationGroup> variations;
 	
 	/**
 	 * Maps item datas back to Minecraft ids.
 	 */
-	private Map<ItemData, String> minecraftIds;
+	private final Map<ItemData, String> minecraftIds;
+	
+	/**
+	 * Entities related to the items. Most items won't have any.
+	 */
+	private final Map<ItemData, EntityData<?>> relatedEntities;
 	
 	/**
 	 * Constructs a new aliases provider with no data.
 	 */
-	public AliasesProvider() {
-		aliases = new HashMap<>(3000);
-		materialNames = new HashMap<>(3000);
-		variations = new HashMap<>(500);
-		subtypes = new HashMap<>(1000);
+	public AliasesProvider(int expectedCount) {
+		aliases = new HashMap<>(expectedCount);
+		materialNames = new HashMap<>(expectedCount);
+		variations = new HashMap<>(expectedCount / 20);
 		minecraftIds = new HashMap<>(3000);
+		relatedEntities = new HashMap<>(10);
 		
 		gson = new Gson();
 	}
@@ -206,12 +208,15 @@ public class AliasesProvider {
 	 * @param tags Tags.
 	 */
 	public ItemStack applyTags(ItemStack stack, Map<String, Object> tags) {
+		// Hack damage tag into item
 		Object damage = tags.get("Damage");
-		if (damage instanceof Number) { // Set durability manually, not NBT tag before 1.13
-			stack = new ItemStack(stack.getType(), 1, ((Number) damage).shortValue());
-			// Bukkit makes this work on 1.13+ too, which is nice
+		if (damage instanceof Number) { // Use helper for version compatibility
+			ItemUtils.setDamage(stack, ((Number) damage).shortValue());
 			tags.remove("Damage");
 		}
+		
+		if (tags.isEmpty()) // No real tags to apply
+			return stack;
 		
 		// Apply random tags using JSON
 		String json = gson.toJson(tags);
@@ -231,8 +236,9 @@ public class AliasesProvider {
 	public NonNullPair<String, String> getAliasPlural(String name) {
 		int marker = name.indexOf('¦');
 		if (marker == -1) { // No singular/plural forms
-			name = name.trim();
-			return new NonNullPair<>(name, name);
+			String trimmed = name.trim();
+			assert trimmed != null;
+			return new NonNullPair<>(trimmed, trimmed);
 		}
 		int pluralEnd = -1;
 		for (int i = marker; i < name.length(); i++) {
@@ -280,6 +286,7 @@ public class AliasesProvider {
 		// First, try to find if aliases already has a type with this id
 		// (so that aliases can refer to each other)
 		ItemType typeOfId = aliases.get(id);
+		EntityData<?> related = null;
 		List<ItemData> datas;
 		if (typeOfId != null) { // If it exists, use datas from it
 			datas = typeOfId.getTypes();
@@ -288,6 +295,12 @@ public class AliasesProvider {
 			Material material = BukkitUnsafe.getMaterialFromMinecraftId(id);
 			if (material == null) { // If server doesn't recognize id, do not proceed
 				throw new InvalidMinecraftIdException(id);
+			}
+			
+			// Hacky: get related entity from block states
+			String entityName = blockStates.remove("relatedEntity");
+			if (entityName != null) {
+				related = EntityData.parse(entityName);
 			}
 			
 			// Parse block state to block values
@@ -325,17 +338,16 @@ public class AliasesProvider {
 		// Make datas subtypes of the type we have here and handle Minecraft ids
 		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
 			data.strictEquality = true;
-			Set<ItemData> subs = subtypes.get(data);
-			if (subs == null) {
-				subs = new HashSet<>(datas.size());
-				subtypes.put(data, subs);
-			}
-			subs.addAll(datas); // Add all datas (the ones we have here)
-			
 			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
 				minecraftIds.put(data, id); // Register Minecraft id for the data, too
 			
+			// Material name, including both singular and plural forms
 			materialNames.putIfAbsent(data, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond()));
+			
+			// Related entity type
+			if (related != null)
+				relatedEntities.put(data, related);
+			
 			data.strictEquality = false;
 		}
 	}
@@ -356,12 +368,24 @@ public class AliasesProvider {
 
 	@Nullable
 	public String getMinecraftId(ItemData data) {
-		return minecraftIds.get(data);
+		String id = minecraftIds.get(data);
+		if (id == null) { // No non-default MC id found
+			ItemData defaultData = data.clone();
+			defaultData.blockValues = null;
+			id = minecraftIds.get(defaultData);
+		}
+		return id;
 	}
 	
 	@Nullable
-	public MaterialName getMaterialName(ItemData type) {
-		return materialNames.get(type);
+	public MaterialName getMaterialName(ItemData data) {
+		MaterialName name = materialNames.get(data);
+		if (name == null) { // No non-default name found
+			ItemData defaultData = data.clone();
+			defaultData.blockValues = null;
+			name = materialNames.get(defaultData);
+		}
+		return name;
 	}
 
 	public void setMaterialName(ItemData data, MaterialName materialName) {
@@ -373,14 +397,14 @@ public class AliasesProvider {
 		materialNames.clear();
 		variations.clear();
 	}
-	
-	@Nullable
-	public Set<ItemData> getSubtypes(ItemData supertype) {
-		return subtypes.get(supertype);
-	}
 
 	public int getAliasCount() {
 		return aliases.size();
+	}
+	
+	@Nullable
+	public EntityData<?> getRelatedEntity(ItemData type) {
+		return relatedEntities.get(type);
 	}
 
 }

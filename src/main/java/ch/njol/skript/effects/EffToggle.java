@@ -50,8 +50,8 @@ import ch.njol.util.Kleenean;
 @Description("Toggle the state of a block.")
 @Examples({"# use arrows to toggle switches, doors, etc.",
 		"on projectile hit:",
-		"    projectile is arrow",
-		"    toggle the block at the arrow"})
+		"\tprojectile is arrow",
+		"\ttoggle the block at the arrow"})
 @Since("1.4")
 public class EffToggle extends Effect {
 	

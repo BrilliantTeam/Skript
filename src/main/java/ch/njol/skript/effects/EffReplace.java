@@ -54,7 +54,7 @@ import ch.njol.util.StringUtils;
 		"replace every \"&\" with \"§\" in line 1",
 		"# The following acts as a simple chat censor, but it will e.g. censor mass, hassle, assassin, etc. as well:",
 		"on chat:",
-		"	replace all \"fuck\", \"bitch\" and \"ass\" with \"****\" in the message",
+		"	replace all \"kys\", \"idiot\" and \"noob\" with \"****\" in the message",
 		" ",
 		"replace all stone and dirt in player's inventory and player's top inventory with diamond"})
 @Since("2.0, 2.2-dev24 (replace in muliple strings and replace items in inventory)")

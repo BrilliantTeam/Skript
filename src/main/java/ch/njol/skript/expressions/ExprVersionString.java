@@ -41,9 +41,9 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("Version String")
-@Description({"The text to show if protocol version of the server doesn't match with protocol version of the client. " +
+@Description({"The text to show if the protocol version of the server doesn't match with protocol version of the client. " +
 		"You can check the <a href='#ExprProtocolVersion'>protocol version</a> expression for more information about this.",
-		"This can be set in a <a href='events.html#server_list_ping'>server list ping</a> event only."})
+		"This can only be set in a <a href='events.html#server_list_ping'>server list ping</a> event."})
 @Examples({"on server list ping:",
 		"	set the protocol version to 0 # 13w41a (1.7), so it will show the version string always",
 		"	set the version string to \"<light green>Version: <orange>%minecraft version%\""})

@@ -51,13 +51,13 @@ public class ExprItemWithLore extends PropertyExpression<ItemType, ItemType> {
 
 	static {
 		Skript.registerExpression(ExprItemWithLore.class, ItemType.class, ExpressionType.PROPERTY,
-				"%itemtypes% with [(a|the)] lore %strings%");
+				"%itemtype% with [(a|the)] lore %strings%");
 	}
 
 	@SuppressWarnings("null")
 	private Expression<String> lore;
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean kleenean, ParseResult parseResult) {
 		setExpr((Expression<ItemType>) exprs[0]);
@@ -66,20 +66,14 @@ public class ExprItemWithLore extends PropertyExpression<ItemType, ItemType> {
 	}
 
 	@Override
-	protected ItemType[] get(Event e, ItemType[] itemTypes) {
+	protected ItemType[] get(Event e, ItemType[] source) {
 		String[] lore = this.lore.getArray(e);
-		if (lore == null)
-			return new ItemType[0];
-		return Stream.of(itemTypes).map(itemType -> {
-			itemType = itemType.clone();
-			ItemMeta meta = (ItemMeta) itemType.getItemMeta();
-			if (meta == null) {
-				meta = Bukkit.getItemFactory().getItemMeta(Material.STONE);
-			}
-			meta.setLore(Arrays.asList(StringUtils.join(lore, "\n").split("\n")));
-			itemType.setItemMeta(meta);
-			return itemType;
-		}).toArray(ItemType[]::new);
+		return get(source, item -> {
+			ItemMeta meta = item.getItemMeta();
+			meta.setLore(Arrays.asList(lore));
+			item.setItemMeta(meta);
+			return item;
+		});
 	}
 
 

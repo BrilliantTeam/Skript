@@ -36,6 +36,8 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.RandomAccess;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -277,7 +279,9 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 				if (myType.type == Material.AIR)
 					return true; // Both items AIR/null
 			} else if (myType.isAlias) {
-				return myType.type.equals(item.getType());
+				if (!myType.type.equals(item.getType()))
+					continue;
+				return true;
 			} else {
 				return item.isSimilar(myType.stack);
 			}
@@ -320,18 +324,14 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return isOfType(new ItemData(id, null));
 	}
 	
-	public boolean isSupertypeOf(final ItemType other) {
-		if (amount != -1 && other.amount != amount)
-			return false;
-		outer: for (final ItemData o : other.types) {
-			assert o != null;
-			for (final ItemData t : types) {
-				if (t.isSupertypeOf(o))
-					continue outer;
-			}
-			return false;
-		}
-		return true;
+	/**
+	 * Checks if this type represents all the items represented by given
+	 * item type. This type may of course also represent other items.
+	 * @param other Another item type.
+	 * @return Whether this is supertype of the given item type.
+	 */
+	public boolean isSupertypeOf(ItemType other) {
+		return types.containsAll(other.types);
 	}
 	
 	public ItemType getItem() {
@@ -718,7 +718,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public boolean removeFrom(Inventory invi) {
 		ItemStack[] buf = getCopiedContents(invi);
 		
-		@SuppressWarnings("unchecked")
 		final boolean ok = removeFrom(Arrays.asList(buf));
 		
 		invi.setContents(buf);
@@ -1057,7 +1056,9 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	/**
 	 * Gets all enchantments of this item.
 	 * @return Enchantments.
+	 * @deprecated Use {@link ItemType#getEnchantmentTypes()}
 	 */
+	@Deprecated
 	@Nullable
 	public Map<Enchantment,Integer> getEnchantments() {
 		if (globalMeta == null)
@@ -1068,11 +1069,13 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			return null;
 		return enchants;
 	}
-
+	
 	/**
 	 * Adds enchantments to this item type.
 	 * @param enchantments Enchantments.
+	 * @deprecated Use {@link ItemType#addEnchantments(EnchantmentType...)}
 	 */
+	@Deprecated
 	public void addEnchantments(Map<Enchantment,Integer> enchantments) {
 		if (globalMeta == null)
 			globalMeta = ItemData.itemFactory.getItemMeta(Material.STONE);
@@ -1081,29 +1084,122 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			globalMeta.addEnchant(entry.getKey(), entry.getValue(), true);
 		}
 	}
-
+	
+	/**
+	 * Gets all enchantments of this item.
+	 * @return the enchantments of this item type.
+	 */
+	@Nullable
+	public EnchantmentType[] getEnchantmentTypes() {
+		Set<Entry<Enchantment, Integer>> enchants = getItemMeta().getEnchants().entrySet();
+		
+		return enchants.stream()
+			.map(enchant -> new EnchantmentType(enchant.getKey(), enchant.getValue()))
+			.toArray(EnchantmentType[]::new);
+	}
+	
+	/**
+	 * Checks whether this item type has enchantments.
+	 */
+	public boolean hasEnchantments() {
+		return getItemMeta().hasEnchants();
+	}
+	
+	/**
+	 * Checks whether this item type has the given enchantments.
+	 * @param enchantments the enchantments to be checked.
+	 */
+	public boolean hasEnchantments(Enchantment... enchantments) {
+		if (!hasEnchantments())
+			return false;
+		ItemMeta meta = getItemMeta();
+		
+		for (Enchantment enchantment : enchantments) {
+			if (!meta.hasEnchant(enchantment))
+				return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Checks whether this item type contains at most one of the given enchantments.
+	 * @param enchantments The enchantments to be checked.
+	 */
+	public boolean hasAnyEnchantments(Enchantment... enchantments) {
+		if (!hasEnchantments())
+			return false;
+		ItemMeta meta = getItemMeta();
+		
+		for (Enchantment enchantment : enchantments) {
+			if (meta.hasEnchant(enchantment))
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks whether this item type contains the given enchantments.
+	 * @param enchantments The enchantments to be checked.
+	 */
+	public boolean hasEnchantments(EnchantmentType... enchantments) {
+		if (!hasEnchantments())
+			return false;
+		ItemMeta meta = getItemMeta();
+		
+		for (EnchantmentType enchantment : enchantments) {
+			assert meta != null;
+			if (!meta.hasEnchant(enchantment.getType()))
+				return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Adds the given enchantments to the item type.
+	 * @param enchantments The enchantments to be added.
+	 */
+	public void addEnchantments(EnchantmentType... enchantments) {
+		ItemMeta meta = getItemMeta();
+		
+		for (EnchantmentType enchantment : enchantments) {
+			meta.addEnchant(enchantment.getType(), enchantment.getLevel(), true);
+		}
+		setItemMeta(meta);
+	}
+	
+	/**
+	 * Removes the given enchantments from this item type.
+	 * @param enchantments The enchantments to be removed.
+	 */
+	public void removeEnchantments(EnchantmentType... enchantments) {
+		ItemMeta meta = getItemMeta();
+		
+		for (EnchantmentType enchantment : enchantments) {
+			meta.removeEnchant(enchantment.getType());
+		}
+		setItemMeta(meta);
+	}
+	
 	/**
 	 * Clears all enchantments from this item type except the ones that are
 	 * defined for individual item datas only.
 	 */
 	public void clearEnchantments() {
-		if (globalMeta == null)
-			return; // No enchantments
-		assert globalMeta != null;
-		Set<Enchantment> enchants = globalMeta.getEnchants().keySet();
+		ItemMeta meta = getItemMeta();
+		
+		Set<Enchantment> enchants = meta.getEnchants().keySet();
 		for (Enchantment ench : enchants) {
-			assert globalMeta != null;
-			globalMeta.removeEnchant(ench);
+			meta.removeEnchant(ench);
 		}
+		setItemMeta(meta);
 	}
 	
 	/**
-	 * Gets item meta that applies to this type if it exists.
-	 * @return Item meta or null.
+	 * Gets item meta that applies to all items represented by this type.
+	 * @return Item meta.
 	 */
-	@Nullable
 	public ItemMeta getItemMeta() {
-		return globalMeta;
+		return globalMeta != null ? globalMeta : types.get(0).getItemMeta();
 	}
 
 	/**

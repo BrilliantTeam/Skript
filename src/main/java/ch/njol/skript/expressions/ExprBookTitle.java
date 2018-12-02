@@ -36,9 +36,9 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Book Title")
-@Description("The title of a book")
+@Description("The title of a book.")
 @Examples({"on book sign:",
-			"	message \"Book Title: %title of event-item%\""})
+			"\tmessage \"Book Title: %title of event-item%\""})
 @Since("2.2-dev31")
 public class ExprBookTitle extends SimplePropertyExpression<ItemStack,String> {
 	

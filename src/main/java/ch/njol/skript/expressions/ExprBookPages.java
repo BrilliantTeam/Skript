@@ -43,10 +43,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import java.util.List;
 
 @Name("Book Pages")
-@Description("The pages of a book")
+@Description("The pages of a book.")
 @Examples({"on book sign:",
-			"	message \"Book Pages: %pages of event-item%\"",
-			"   message \"Book Page 1: %page 1 of event-item%\""})
+			"\tmessage \"Book Pages: %pages of event-item%\"",
+			"\tmessage \"Book Page 1: %page 1 of event-item%\""})
 @Since("2.2-dev31")
 public class ExprBookPages extends SimpleExpression<String> {
 	

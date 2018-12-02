@@ -54,6 +54,11 @@ public class BukkitUnsafe {
 	 */
 	private static final UnsafeValues unsafe;
 	
+	/**
+	 * 1.9 Spigot has some "fun" bugs.
+	 */
+	private static final boolean knownNullPtr = !Skript.isRunningMinecraft(1, 11);
+	
 	static {
 		UnsafeValues values = Bukkit.getUnsafe();
 		if (values == null)
@@ -103,7 +108,7 @@ public class BukkitUnsafe {
 				Version version = Skript.getMinecraftVersion();
 				boolean mapExists = loadMaterialMap("materials/" + version.getMajor() + "." +  version.getMinor() + ".json");
 				if (!mapExists) {
-					loadMaterialMap("materials/1.12.json");
+					loadMaterialMap("materials/1.9.json"); // 1.9 is oldest we have mappings for
 					preferMaterialMap = false;
 					Skript.warning("Material mappings for " + version + " are not available.");
 					Skript.warning("Depending on your server software, some aliases may not work.");
@@ -167,6 +172,15 @@ public class BukkitUnsafe {
 	}
 	
 	public static void modifyItemStack(ItemStack stack, String arguments) {
-		unsafe.modifyItemStack(stack, arguments);
+		try {
+			unsafe.modifyItemStack(stack, arguments);
+		} catch (NullPointerException e) {
+			if (knownNullPtr) { // Probably known Spigot bug
+				// So we continue doing whatever we were doing and hope it works
+				Skript.warning("Item " + stack.getType() + arguments + " failed modifyItemStack. This is a bug on old Spigot versions.");
+			} else { // Not known null pointer, don't just swallow
+				throw e;
+			}
+		}
 	}
 }

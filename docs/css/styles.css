@@ -81,6 +81,8 @@ a:visited {
   height: calc(100vh - 3.2em);
   overflow: scroll;
   overflow-x: hidden;
+  position: sticky;
+  top: 3.2em;
 }
 
 #nav-contents > a {

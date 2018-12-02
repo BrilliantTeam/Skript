@@ -33,7 +33,7 @@ import org.bukkit.util.Vector;
  * @author bi0qaw
  */
 @Name("Vectors - Squared length")
-@Description("Gets the squared length of a vector")
+@Description("Gets the squared length of a vector.")
 @Examples({"send \"%squared length of vector 1, 2, 3%\""})
 @Since("2.2-dev28")
 public class ExprVectorSquaredLength extends SimplePropertyExpression<Vector, Double> {

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -37,6 +38,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import ch.njol.skript.Skript;
@@ -379,6 +382,11 @@ public class BlockStateBlock implements Block {
 		} else { // Cannot apply physics to a block state
 			state.setBlockData(data);
 		}
+	}
+	
+	@Override
+	public RayTraceResult rayTrace(Location start, Vector direction, double maxDistance, FluidCollisionMode fluidCollisionMode) {
+		return state.getBlock().rayTrace(start, direction, maxDistance, fluidCollisionMode);
 	}
 	
 	@Override

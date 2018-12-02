@@ -46,8 +46,8 @@ import java.util.List;
 @Name("Group")
 @Description("The primary group or all groups of a player. This expression requires Vault and a compatible permissions plugin to be installed.")
 @Examples({"on join:",
-			"broadcast \"%group of player%\" # this is the player's primary group",
-			"broadcast \"%groups of player%\" # this is all of the player's groups"})
+			"\tbroadcast \"%group of player%\" # this is the player's primary group",
+			"\tbroadcast \"%groups of player%\" # this is all of the player's groups"})
 @Since("2.2-dev35")
 @RequiredPlugins({"Vault", "a permission plugin that supports Vault"})
 public class ExprGroup extends SimpleExpression<String> {

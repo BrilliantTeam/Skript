@@ -51,6 +51,7 @@ import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.localization.Message;
@@ -215,11 +216,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		return item.isSimilar(stack);
 	}
 	
-	public boolean isSupertypeOf(ItemData o) {
-		// Since numeric ids are not used anymore, supertype-ness is based on aliases
-		return Aliases.isSupertypeOf(this, o);
-	}
-	
 	/**
 	 * Returns <code>Aliases.{@link Aliases#getMaterialName(ItemData, boolean) getMaterialName}(ItemData, boolean)</code>
 	 * called with this object and relevant plurarily setting.
@@ -256,15 +252,22 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		ItemData other = (ItemData) obj;
 		if (isAnything || other.isAnything) // First, isAnything check
 			return true;
+		
 		BlockValues values = blockValues;
 		if (itemForm && other.blockValues != null)
-			return false; // We want an item, not a block
+			return other.blockValues.isDefault();
 		if (other.itemForm && blockValues != null)
-			return false;
-		
-		if (strictEquality && !Objects.equals(values, other.blockValues))
-			return false;
-		if (values != null)
+			return blockValues.isDefault();
+		if (strictEquality) {
+			// The two blocks are not exactly same (even though normally they might be same enough to match)
+			if (!Objects.equals(values, other.blockValues))
+				return false;
+			// The two blocks are same, but aliases differ when it comes to item equality
+			if (values != null && other.blockValues != null
+					&& other.blockValues.isDefault() != values.isDefault())
+				return false;
+		}
+		if (values != null && !itemForm && !other.itemForm)
 			return values.equals(other.blockValues);
 		
 		if (!type.equals(other.type))
@@ -282,11 +285,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	
 	@Override
 	public int hashCode() {
-		int hash = stack.hashCode();
-		// TODO need a reliable BlockValues hashCode
-//		BlockValues values = blockValues;
-//		if (values != null)
-//			hash = 37 * hash + values.hashCode();
+		int hash = type.hashCode(); // Has collisions, but probably not too many of them
+		if (blockValues == null || (blockValues != null && blockValues.isDefault()))
+			hash = hash * 37 + 1;
 		return hash;
 	}
 	
@@ -304,7 +305,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			return null;
 		
 		// TODO implement meta intersection
-		return null;
+		return this;
 	}
 	
 	/**
@@ -385,10 +386,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		if (stack.hasItemMeta()) {
 			ItemMeta meta = stack.getItemMeta(); // Creates a copy
 			meta.setDisplayName(null); // Clear display name
-			if (meta instanceof Damageable) // TODO MC<1.13 support
-				((Damageable) meta).setDamage(0);
 			data.stack.setItemMeta(meta);
 		}
+		ItemUtils.setDamage(data.stack, 0); // Set to undamaged
 		
 		data.type = type;
 		data.blockValues = blockValues;

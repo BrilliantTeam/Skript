@@ -274,6 +274,11 @@ potions:
 	levitation: levitation, floating
 	glowing: glowing
 
+	# 1.13 potion effect types
+	slow_falling: slow falling, slow fall
+	dolphins_grace: dolphins grace, dolphin's grace
+	conduit_power: conduit power
+
 # -- Weather --
 weather:
 	clear:
@@ -552,9 +557,15 @@ entities:
 	human:
 		name: human¦s
 		pattern: human(|1¦s)
+	tipped arrow:
+	    name: tipped arrow¦s
+	    pattern: tipped arrow(|1¦s)
 	arrow:
 		name: arrow¦s @an
 		pattern: arrow(|1¦s)
+	spectral arrow:
+		name: spectral arrow
+		pattern: spectral[ ]arrow(|1¦s)
 	bat:
 		name: bat¦s
 		pattern: <age> bat(|1¦s)
@@ -622,15 +633,60 @@ entities:
 	fireball:
 		name: fireball¦s
 		pattern: [(ghast|big)] fire[ ]ball(|1¦s)
+	dragon fireball:
+		name: dragon fireball¦s
+		pattern: dragon fire[ ]ball(|1¦s)
 	small fireball:
 		name: small fireball¦s
 		pattern: (small|blaze) fire[ ]ball(|1¦s)
+	large fireball:
+		name: large fireball¦s
+		pattern: large fire[ ]ball(|1¦s)
 	any fireball:
 		name: any fireball¦s
 		pattern: any fire[ ]ball(|1¦s)
 	fish:
 		name: fish¦es
 		pattern: fish(|1¦es)
+	tropical fish:
+		name: tropical fish¦es
+		pattern: [(%-color%[-%-color%]|fully %-color%)] tropical fish(|1¦es)
+	kob:
+		name: kob¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] kob(|1¦s)
+	sunstreak:
+		name: sunstreak¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] sunstreak(|1¦s)
+	snooper:
+		name: snooper¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] snooper(|1¦s)
+	dasher:
+		name: dasher¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] dasher(|1¦s)
+	brinely:
+		name: brinely¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] brinely(|1¦s)
+	spotty:
+		name: spotty¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] spotty(|1¦s)
+	flopper:
+		name: flopper¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] flopper(|1¦s)
+	stripey:
+		name: stripey¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] stripey(|1¦s)
+	glitter:
+		name: glitter¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] glitter(|1¦s)
+	blockfish:
+		name: blockfish¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] blockfish(|1¦s)
+	betty:
+		name: betty¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] betty(|1¦s)
+	clayfish:
+		name: clayfish¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] clayfish(|1¦s)
 	ghast:
 		name: ghast¦s
 		pattern: ghast(|1¦s)
@@ -876,7 +932,7 @@ entities:
 		pattern: killer <age> rabbit(|1¦s)|killer rabbit <age>(|1¦s)
 	fish hook:
 		name: fish hook¦s
-		pattern: fish hook(|1¦s)
+		pattern: fish[ ]hook(|1¦s)
 	armor stand:
 		name: armor stand¦s
 		pattern: armor stand(|1¦s)
@@ -964,6 +1020,9 @@ entities:
 	animal:
 		name: animal¦s
 		pattern: animal(|1¦s)
+	damageable:
+		name: damageable mob¦s
+		pattern: damageable mob(|1¦s)
 	water mob:
 		name: water mob¦s
 		pattern: water mob(|1¦s)
@@ -994,6 +1053,9 @@ entities:
 	trident:
 		name: trident¦s
 		pattern: trident(|1¦s)
+	leash hitch:
+		name: leash hitch¦es
+		pattern: leash hitch(|1¦es)
 
 
 # -- Damage Causes --
@@ -1024,6 +1086,7 @@ damage causes:
 	fly_into_wall: hitting wall while flying, flying into a wall
 	hot_floor: magma, hot floor
 	cramming: cramming
+	dryout: dryout
 	custom: unknown, custom, plugin, a plugin
 
 # -- Teleport Causes --
@@ -1185,6 +1248,24 @@ visual effects:
 	spit:
 		name: spit @-
 		pattern: spit
+	squid_ink:
+		name: squid ink @-
+		pattern: squid ink
+	bubble_pop:
+		name: bubble pop @-
+		pattern: bubble pop
+	current_down:
+		name: current down @-
+		pattern: (current|bubble column) down
+	bubble_column_up:
+		name: bubble column up @-
+		pattern: (current|bubble column) up
+	nautilus:
+		name: nautilus @-
+		pattern: nautilus
+	dolphin:
+		name: dolphin @-
+		pattern: dolphin
 	area_expression: [with [offset of %number%, %number%(,| and) %number%][[and ]speed %number%]]
 
 # -- Inventory Actions --
@@ -1208,7 +1289,7 @@ inventory actions:
 	clone_stack: clone stack
 	collect_to_cursor: collect to cursor, collect items to cursor
 	unknown: unknown, unsupported, custom
-	
+
 # -- Inventory Click Types --
 click types:
 	left: left mouse button, left mouse, LMB
@@ -1224,7 +1305,7 @@ click types:
 	control_drop: drop key with control, drop stack, Ctrl+Q
 	creative: creative action
 	unknown: unknown, unsupported, custom
-	
+
 # -- Inventory Types --
 inventory types:
 	chest: chest inventory
@@ -1246,34 +1327,42 @@ inventory types:
 
 # -- Spawn Reasons --
 spawn reasons:
-    breeding: breed, breeding
-    build_irongolem: built iron golem, build iron golem
-    build_snowman: built snowman, build snowman
-    build_wither: built wither, build wither
-    chunk_gen: chunk generation
-    cured: cured
-    custom: customized, customised, custom
-    default: default
-    dispenser_egg: dispense egg, dispensing egg
-    drowned: drowned
-    egg: egg
-    ender_pearl: ender pearl
-    infection: infection, infected
-    jockey: jockey
-    lightning: lightning
-    mount: mount
-    natural: natural
-    nether_portal: nether portal
-    ocelot_baby: ocelot baby
-    reinforcements: reinforcements
-    shoulder_entity: perching, shoulder
-    silverfish_block: silverfish reveal, silverfish trap
-    slime_split: slime split
-    spawner: mob spawner, creature spawner, spawner
-    spawner_egg: spawn egg
-    trap: trap
-    village_defense: village defense, golem defense, iron golem defense
-    village_invasion: village invasion, village invading
+	breeding: breed, breeding
+	build_irongolem: built iron golem, build iron golem
+	build_snowman: built snowman, build snowman
+	build_wither: built wither, build wither
+	chunk_gen: chunk generation
+	cured: cured
+	custom: customized, customised, custom
+	default: default
+	dispense_egg: dispense egg, dispensing egg
+	drowned: drowned
+	egg: egg
+	ender_pearl: ender pearl
+	infection: infection, infected
+	jockey: jockey
+	lightning: lightning
+	mount: mount
+	natural: natural
+	nether_portal: nether portal
+	ocelot_baby: ocelot baby
+	reinforcements: reinforcements
+	shoulder_entity: perching, shoulder
+	silverfish_block: silverfish reveal, silverfish trap
+	slime_split: slime split
+	spawner: mob spawner, creature spawner, spawner
+	spawner_egg: spawn egg
+	trap: trap
+	village_defense: village defense, golem defense, iron golem defense
+	village_invasion: village invasion, village invading
+	sheared: shear, sheared
+	
+# -- Difficulties --
+difficulties:
+	easy: easy
+	normal: medium, normal
+	hard: hard
+	peaceful: peaceful
 
 # -- Boolean --
 boolean:
@@ -1312,6 +1401,7 @@ types:
 	commandsender: player¦¦s¦/console @a
 	inventoryholder: inventory holder¦s @an
 	gamemode: gamemode¦s @a
+	material: material¦s @a
 	itemstack: item stack¦s @an
 	itementity: dropped item¦s @a # same as entities.dropped item.name
 	biome: biome¦s @a
@@ -1325,6 +1415,8 @@ types:
 	inventorytype: inventory type¦s @an
 	metadataholder: metadata holder¦s @a
 	spawnreason: spawn reason¦s @a
+	cachedservericon: server icon¦s @a
+	difficulty: (difficulty|difficulties) @a
 	
 	# Skript
 	weathertype: weather type¦s @a

@@ -54,7 +54,7 @@ public class EvtMoveOn extends SelfRegisteringSkriptEvent { // TODO on jump
 	static {
 		Skript.registerEvent("Move On", EvtMoveOn.class, PlayerMoveEvent.class, "(step|walk)[ing] (on|over) %*itemtypes%")
 				.description("Called when a player moves onto a certain type of block. Please note that using this event can cause lag if there are many players online.")
-				.examples("on walking on dirt or grass", "on stepping on stone")
+				.examples("on walking on dirt or grass:", "on stepping on stone:")
 				.since("2.0");
 	}
 	

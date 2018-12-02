@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author bi0qaw
  */
 @Name("Vectors - Dot product")
-@Description("Gets the dot product between two vectors")
+@Description("Gets the dot product between two vectors.")
 @Examples({"set {_v} to {_v2} dot {_v3}"})
 @Since("2.2-dev28")
 /**
