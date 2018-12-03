@@ -72,7 +72,7 @@ public class EffBreakNaturally extends Effect {
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return "break " + blocks.toString(e, debug) + " naturally" + (tool != null ? " using " + tool : "");
+		return "break " + blocks.toString(e, debug) + " naturally" + (tool != null ? " using " + tool.toString(e, debug) : "");
 	}
 }
 
