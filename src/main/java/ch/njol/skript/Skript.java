@@ -192,7 +192,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * Current updater instance used by Skript.
 	 */
 	@Nullable
-	private Updater updater;
+	private SkriptUpdater updater;
 	
 	public Skript() throws IllegalStateException {
 		if (instance != null)
@@ -407,7 +407,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		// Start the updater
 		// Note: if config prohibits update checks, it will NOT do network connections
 		try {
-			this.updater = new Updater();
+			this.updater = new SkriptUpdater();
 		} catch (Exception e) {
 			Skript.exception(e, "Update checker could not be initialized.");
 		}
@@ -1429,7 +1429,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			}
 		}
 		
-		Updater updater = Skript.getInstance().getUpdater();
+		SkriptUpdater updater = Skript.getInstance().getUpdater();
 		
 		// Check if server platform is supported
 		if (!isRunningMinecraft(1, 9)) {
@@ -1503,9 +1503,9 @@ public final class Skript extends JavaPlugin implements Listener {
 		logEx();
 		logEx("Version Information:");
 		// TODO fix these and other updater-related errors
-		logEx("  Skript: " + getVersion() + (Updater.state == Updater.UpdateState.RUNNING_LATEST ? " (latest)"
-				: Updater.state == Updater.UpdateState.UPDATE_AVAILABLE ? " (OUTDATED)"
-				: Updater.state == Updater.UpdateState.RUNNING_CUSTOM ? " (custom version)" : ""));
+		logEx("  Skript: " + getVersion() + (SkriptUpdater.state == Updater.SkriptUpdater.RUNNING_LATEST ? " (latest)"
+				: SkriptUpdater.state == Updater.SkriptUpdater.UPDATE_AVAILABLE ? " (OUTDATED)"
+				: SkriptUpdater.state == Updater.SkriptUpdater.RUNNING_CUSTOM ? " (custom version)" : ""));
 		logEx("  Bukkit: " + Bukkit.getBukkitVersion());
 		logEx("  Minecraft: " + getMinecraftVersion());
 		logEx("  Java: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + ")");
@@ -1589,10 +1589,10 @@ public final class Skript extends JavaPlugin implements Listener {
 	
 	/**
 	 * Gets the updater instance currently used by Skript.
-	 * @return Updater instance.
+	 * @return SkriptUpdater instance.
 	 */
 	@Nullable
-	public Updater getUpdater() {
+	public SkriptUpdater getUpdater() {
 		return updater;
 	}
 	

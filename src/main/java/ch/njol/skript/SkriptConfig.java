@@ -86,7 +86,7 @@ public abstract class SkriptConfig {
 			.setter(new Setter<Timespan>() {
 				@Override
 				public void set(final Timespan t) {
-					Updater updater = Skript.getInstance().getUpdater();
+					SkriptUpdater updater = Skript.getInstance().getUpdater();
 					if (updater != null)
 						updater.setCheckFrequency(t.getTicks_i());
 				}

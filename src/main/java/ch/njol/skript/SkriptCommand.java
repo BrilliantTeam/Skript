@@ -30,7 +30,6 @@ import org.bukkit.command.CommandSender;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader.ScriptInfo;
-import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.command.CommandHelp;
 import ch.njol.skript.config.Config;
@@ -40,6 +39,7 @@ import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.PluralizingArgsMessage;
 import ch.njol.skript.log.RedirectingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
+import ch.njol.skript.update.UpdaterState;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ExceptionUtils;
 import ch.njol.skript.util.FileUtils;
@@ -312,33 +312,33 @@ public class SkriptCommand implements CommandExecutor {
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
 				try {
-					final UpdateState state = Updater.state;
+					UpdaterState state = SkriptUpdater.state;
 					if (args[1].equals("check")) {
-						Updater.executor.set(sender); // We called it!
+						SkriptUpdater.executor.set(sender); // We called it!
 						switch (state) {
 							case NOT_STARTED:
-								Updater.start();
+								SkriptUpdater.start();
 								break;
 							case CHECKING:
-								Skript.info(sender, "" + Updater.m_check_in_progress);
+								Skript.info(sender, "" + SkriptUpdater.m_check_in_progress);
 								break;
 							case RUNNING_LATEST:
-								Skript.info(sender, "" + Updater.m_running_latest_version);
+								Skript.info(sender, "" + SkriptUpdater.m_running_latest_version);
 								break;
 							case RUNNING_CUSTOM:
-								Skript.info(sender, "" + Updater.m_custom_version);
+								Skript.info(sender, "" + SkriptUpdater.m_custom_version);
 								break;
 							case UPDATE_AVAILABLE:
-								Skript.info(sender, "" + Updater.m_update_available);
+								Skript.info(sender, "" + SkriptUpdater.m_update_available);
 								break;
 							case DOWNLOADING:
-								Skript.info(sender, "" + Updater.m_download_in_progress);
+								Skript.info(sender, "" + SkriptUpdater.m_download_in_progress);
 								break;
 							case DOWNLOADED:
-								Skript.info(sender, "" + Updater.m_downloaded);
+								Skript.info(sender, "" + SkriptUpdater.m_downloaded);
 								break;
 							case ERROR:
-								Updater.start(); // Errors messages were sent already, just try again...
+								SkriptUpdater.start(); // Errors messages were sent already, just try again...
 						}
 					} else if (args[1].equalsIgnoreCase("changes")) {
 						// TODO not supported yet

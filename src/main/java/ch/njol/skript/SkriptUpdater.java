@@ -30,59 +30,32 @@ import ch.njol.skript.update.ReleaseChannel;
 import ch.njol.skript.update.ReleaseManifest;
 import ch.njol.skript.update.UpdateChecker;
 import ch.njol.skript.update.UpdateManifest;
+import ch.njol.skript.update.Updater;
 import ch.njol.skript.update.UpdaterState;
 
 /**
  * Skript's updater checker.
  */
-public class Updater {
+public class SkriptUpdater extends Updater {
+	
+	SkriptUpdater() {
+		super(loadManifest());
+	}
 	
 	/**
-	 * Release that is currently in use.
+	 * Loads the release manifest from Skript jar.
+	 * @return Release manifest.
 	 */
-	private final ReleaseManifest currentRelease;
-	
-	/**
-	 * Update checker used by this build.
-	 */
-	private final UpdateChecker updateChecker;
-	
-	/**
-	 * Current state of the updater.
-	 */
-	private volatile UpdaterState state;
-	
-	Updater() {
+	private static ReleaseManifest loadManifest() {
 		String manifest;
 		try (InputStream is = Skript.getInstance().getResource("release-manifest.json");
 				Scanner s = new Scanner(is)) {
 			s.useDelimiter("\\A");
 			manifest = s.next();
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Skript is missing release-manifest.json!");
+			throw new IllegalStateException("Skript is missing release-manifest.json!");
 		}
 		assert manifest != null;
-		this.currentRelease = ReleaseManifest.load(manifest);
-		this.updateChecker = currentRelease.createUpdateChecker();
-		this.state = UpdaterState.NOT_STARTED;
-	}
-
-	public CompletableFuture<UpdateManifest> checkUpdates() {
-		String channel = SkriptConfig.releaseChannel.value();
-		if (channel.equals("release")) {
-			return updateChecker.check(currentRelease, new ReleaseChannel((update)
-					-> !update.contains("-"), channel));
-		}
-		// Just check that channel name is in update name
-		return updateChecker.check(currentRelease, new ReleaseChannel((update)
-				-> update.contains(channel), channel));
-	}
-	
-	public void setCheckFrequency(long ticks) {
-		// TODO implement scheduled update checks
-	}
-	
-	public UpdaterState getState() {
-		return state;
+		return ReleaseManifest.load(manifest);
 	}
 }
