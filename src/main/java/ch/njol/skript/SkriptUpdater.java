@@ -92,7 +92,8 @@ public class SkriptUpdater extends Updater {
 					Skript.info(sender, "" + m_running_latest_version);
 					break;
 				case OUTDATED:
-					Skript.info(sender, "" + m_update_available);
+					// TODO new version name there
+					Skript.info(sender, "" + m_update_available.toString("NEW VERSION"));
 					break;
 				case UNKNOWN:
 					if (isEnabled()) {

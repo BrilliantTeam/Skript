@@ -83,8 +83,8 @@ public class GithubChecker implements UpdateChecker {
 	 */
 	private final Gson gson;
 	
-	public GithubChecker(Gson gson) {
-		this.gson = gson;
+	public GithubChecker() {
+		this.gson = new Gson();
 	}
 	
 	private List<ResponseEntry> deserialize(String str) {

@@ -68,7 +68,12 @@ configurations.all {
 
 processResources {
 	filter ReplaceTokens, tokens: [
-			"version": System.getenv('SKRIPT_VERSION') == null ? project.property("version") : System.getenv('SKRIPT_VERSION')
+		"version": System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION"),
+		'today': "unknown",
+		"release-flavor": "selfbuilt-unknown",
+		"release-channel": "release",
+		"release-updater": "ch.njol.skript.update.NoUpdateChecker",
+		"release-source": ""
 	]
 }
 
@@ -153,10 +158,40 @@ publishing {
 	}
 }
 
-/*
-  Set compile encoding to UTF-8
-  Fixes issue #850
- */
-compileJava.options.encoding = 'UTF-8'
 
+// Set compile encoding to UTF-8 (#850)
+compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
+
+// Build flavor configurations
+task githubResources(type: ProcessResources) {
+	from ('src/main/resources') {
+		include '**'
+		version = System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION")
+		def channel = "release"
+		if (version.contains("alpha")) {
+			channel = "alpha"
+		} else if (version.contains("beta")) {
+			channel = "beta"
+		}
+		filter ReplaceTokens, tokens: [
+			"version": version,
+			"today": "" + LocalDate.now(),
+			"release-flavor": "skriptlang-github",
+			"release-channel": channel,
+			"release-updater": "ch.njol.skript.update.GithubChecker",
+			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases"
+		]
+	}
+	into 'build/resources/main'
+}
+
+task githubRelease(type: Jar) {
+	from sourceSets.main.output
+	dependsOn githubResources
+	archiveName = 'Skript-github.jar'
+	
+	from('skript-aliases') {
+		into('aliases-english')
+	}
+}

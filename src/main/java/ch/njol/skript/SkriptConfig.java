@@ -103,7 +103,7 @@ public abstract class SkriptConfig {
 			});
 	final static Option<Integer> updaterDownloadTries = new Option<Integer>("updater download tries", 7)
 			.optional(true);
-	final static Option<String> releaseChannel = new Option<String>("update release channel", "none")
+	final static Option<String> releaseChannel = new Option<String>("release channel", "none")
 			.setter(new Setter<String>() {
 
 				@Override
