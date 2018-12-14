@@ -10,7 +10,8 @@ import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.util.Task;
 
 /**
- * Extensible updater system.
+ * Extensible updater system. Note: starts disabled, must be enabled using
+ * {@link #setEnabled(boolean)}.
  */
 public abstract class Updater {
 	
@@ -51,11 +52,18 @@ public abstract class Updater {
 	@Nullable
 	private volatile UpdateManifest updateManifest;
 	
+	/**
+	 * Whether this checker is enabled or not. Disabled checkers never report
+	 * any updates or make network connections.
+	 */
+	private volatile boolean enabled;
+	
 	protected Updater(ReleaseManifest manifest) {
 		this.currentRelease = manifest;
 		this.updateChecker = manifest.createUpdateChecker();
 		this.state = UpdaterState.NOT_STARTED;
 		this.releaseStatus = ReleaseStatus.UNKNOWN;
+		this.enabled = false;
 	}
 	
 	/**
@@ -66,6 +74,11 @@ public abstract class Updater {
 	 * are available in current channel.
 	 */
 	public CompletableFuture<UpdateManifest> fetchUpdateManifest() {
+		if (!enabled) {
+			CompletableFuture<UpdateManifest> future = CompletableFuture.completedFuture(null);
+			assert future != null;
+			return future;
+		}
 		ReleaseChannel channel = releaseChannel;
 		if (channel == null) {
 			throw new IllegalStateException("release channel must be specified");
@@ -75,38 +88,56 @@ public abstract class Updater {
 	}
 	
 	/**
-	 * Checks for updates. This mutates the object it is called on.
+	 * Checks for updates asynchronously, without blocking the caller.
+	 * This updater instance will be mutated with new data.
+	 * @return A future which is completed when check has been done.
 	 */
-	public synchronized void checkUpdates() {
+	public CompletableFuture<Void> checkUpdates() {
+		if (!enabled) {
+			// Release status still unknown
+			CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
+			assert future != null;
+			return future;
+		}
+		
 		state = UpdaterState.CHECKING; // We started checking for updates
-		fetchUpdateManifest().thenAccept((manifest) -> {
-			if (manifest != null) {
-				releaseStatus = ReleaseStatus.OUTDATED; // Update available
-				updateManifest = manifest;
-			} else {
-				releaseStatus = ReleaseStatus.LATEST;
-				// TODO handle ReleaseStatus.CUSTOM
-			}
-			
-			state = UpdaterState.INACTIVE; // In any case, we finished now
-			
-			// Call this again later
-			long ticks = checkFrequency;
-			if (ticks > 0) {
-				new Task(Skript.getInstance(), ticks, true) {
-					
-					@Override
-					public void run() {
-						checkUpdates();
-					}
-				};
+		CompletableFuture<Void> completed = fetchUpdateManifest().thenAccept((manifest) -> {
+			synchronized (this) { // Avoid corrupting updater state
+				if (manifest != null) {
+					releaseStatus = ReleaseStatus.OUTDATED; // Update available
+					updateManifest = manifest;
+				} else {
+					releaseStatus = ReleaseStatus.LATEST;
+					// TODO handle ReleaseStatus.CUSTOM
+				}
+				
+				state = UpdaterState.INACTIVE; // In any case, we finished now
+				
+				// Call this again later
+				long ticks = checkFrequency;
+				if (ticks > 0) {
+					new Task(Skript.getInstance(), ticks, true) {
+						
+						@Override
+						public void run() {
+							checkUpdates();
+						}
+					};
+				}
 			}
 		}).whenComplete((none, e) -> {
-			state = UpdaterState.ERROR;
-			Skript.exception(e, "checking for updates failed");
-			
+			if (e != null) {
+				synchronized (this) {
+					state = UpdaterState.ERROR;
+					// Avoid Skript.exception, because this is probably not Skript developers' fault
+					// It is much more likely that server has connection issues
+					Skript.error("Checking for updates failed. Do you have Internet connection?");
+					e.printStackTrace();
+				}
+			}
 		});
-		// TODO UpdaterState.ERROR on error
+		assert completed != null;
+		return completed;
 	}
 	
 	public void setReleaseChannel(ReleaseChannel channel) {
@@ -114,13 +145,11 @@ public abstract class Updater {
 	}
 	
 	/**
-	 * Sets update check frequency. This will automatically schedule next
-	 * check to happen after given amount of ticks, too.
+	 * Sets update check frequency.
 	 * @param ticks Frequency in ticks.
 	 */
 	public void setCheckFrequency(long ticks) {
 		this.checkFrequency = ticks;
-		checkUpdates();
 	}
 	
 	public UpdaterState getState() {
@@ -134,5 +163,13 @@ public abstract class Updater {
 	@Nullable
 	public UpdateManifest getUpdateManifest() {
 		return updateManifest;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
 	}
 }

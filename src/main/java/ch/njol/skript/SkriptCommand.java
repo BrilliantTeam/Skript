@@ -39,6 +39,7 @@ import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.PluralizingArgsMessage;
 import ch.njol.skript.log.RedirectingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
+import ch.njol.skript.update.ReleaseStatus;
 import ch.njol.skript.update.UpdaterState;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ExceptionUtils;
@@ -311,42 +312,17 @@ public class SkriptCommand implements CommandExecutor {
 					}
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
-				try {
-					UpdaterState state = SkriptUpdater.state;
-					if (args[1].equals("check")) {
-						SkriptUpdater.executor.set(sender); // We called it!
-						switch (state) {
-							case NOT_STARTED:
-								SkriptUpdater.start();
-								break;
-							case CHECKING:
-								Skript.info(sender, "" + SkriptUpdater.m_check_in_progress);
-								break;
-							case RUNNING_LATEST:
-								Skript.info(sender, "" + SkriptUpdater.m_running_latest_version);
-								break;
-							case RUNNING_CUSTOM:
-								Skript.info(sender, "" + SkriptUpdater.m_custom_version);
-								break;
-							case UPDATE_AVAILABLE:
-								Skript.info(sender, "" + SkriptUpdater.m_update_available);
-								break;
-							case DOWNLOADING:
-								Skript.info(sender, "" + SkriptUpdater.m_download_in_progress);
-								break;
-							case DOWNLOADED:
-								Skript.info(sender, "" + SkriptUpdater.m_downloaded);
-								break;
-							case ERROR:
-								SkriptUpdater.start(); // Errors messages were sent already, just try again...
-						}
-					} else if (args[1].equalsIgnoreCase("changes")) {
-						// TODO not supported yet
-					} else if (args[1].equalsIgnoreCase("download")) {
-						// TODO not supported yet
-					}
-				} finally {
-					
+				SkriptUpdater updater = Skript.getInstance().getUpdater();
+				if (updater == null) { // Oh. That is bad
+					Skript.info(sender, "" + SkriptUpdater.m_internal_error);
+					return true;
+				}
+				if (args[1].equals("check")) {
+					updater.updateCheck(sender);
+				} else if (args[1].equalsIgnoreCase("changes")) {
+					// TODO not supported yet
+				} else if (args[1].equalsIgnoreCase("download")) {
+					// TODO not supported yet
 				}
 			} else if (args[0].equalsIgnoreCase("help")) {
 				skriptCommandHelp.showHelp(sender);

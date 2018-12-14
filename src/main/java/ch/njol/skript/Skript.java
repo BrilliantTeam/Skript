@@ -126,6 +126,7 @@ import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.timings.SkriptTimings;
+import ch.njol.skript.update.ReleaseStatus;
 import ch.njol.skript.update.UpdaterState;
 import ch.njol.skript.util.EmptyStacktraceException;
 import ch.njol.skript.util.ExceptionUtils;
@@ -298,6 +299,14 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		Workarounds.init();
 		
+		// Start the updater
+		// Note: if config prohibits update checks, it will NOT do network connections
+		try {
+			this.updater = new SkriptUpdater();
+		} catch (Exception e) {
+			Skript.exception(e, "Update checker could not be initialized.");
+		}
+		
 		if (!getDataFolder().isDirectory())
 			getDataFolder().mkdirs();
 		
@@ -365,6 +374,14 @@ public final class Skript extends JavaPlugin implements Listener {
 		// ... but also before platform check, because there is a config option to ignore some errors
 		SkriptConfig.load();
 		
+		// Use the updater, now that it has been configured to (not) do stuff
+		if (updater != null) {
+			CommandSender console = Bukkit.getConsoleSender();
+			assert console != null;
+			assert updater != null;
+			updater.updateCheck(console);
+		}
+		
 		// Check server software, Minecraft version, etc.
 		if (!checkServerPlatform()) {
 			disabled = true; // Nothing was loaded, nothing needs to be unloaded
@@ -403,14 +420,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		}
 		
 		Language.setUseLocal(true);
-		
-		// Start the updater
-		// Note: if config prohibits update checks, it will NOT do network connections
-		try {
-			this.updater = new SkriptUpdater();
-		} catch (Exception e) {
-			Skript.exception(e, "Update checker could not be initialized.");
-		}
 		
 		Commands.registerListeners();
 		
@@ -1502,10 +1511,14 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		logEx();
 		logEx("Version Information:");
-		// TODO fix these and other updater-related errors
-		logEx("  Skript: " + getVersion() + (SkriptUpdater.state == Updater.SkriptUpdater.RUNNING_LATEST ? " (latest)"
-				: SkriptUpdater.state == Updater.SkriptUpdater.UPDATE_AVAILABLE ? " (OUTDATED)"
-				: SkriptUpdater.state == Updater.SkriptUpdater.RUNNING_CUSTOM ? " (custom version)" : ""));
+		if (updater != null) {
+			ReleaseStatus status = updater.getReleaseStatus();
+			logEx("  Skript: " + getVersion() + (status == ReleaseStatus.LATEST ? " (latest)"
+					: status == ReleaseStatus.OUTDATED ? " (OUTDATED)"
+					: status == ReleaseStatus.CUSTOM ? " (custom version)" : ""));
+		} else {
+			logEx("  Skript: " + getVersion());
+		}
 		logEx("  Bukkit: " + Bukkit.getBukkitVersion());
 		logEx("  Minecraft: " + getMinecraftVersion());
 		logEx("  Java: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + ")");
@@ -1517,10 +1530,9 @@ public final class Skript extends JavaPlugin implements Listener {
 		logEx("Current item: " + (item == null ? "null" : item.toString(null, true)));
 		if (item != null && item.getTrigger() != null) {
 			Trigger trigger = item.getTrigger();
-			if (trigger != null) { // always true, but won't compile without this check
-				File script = trigger.getScript();
-				logEx("Current trigger: " + trigger.toString(null, true) + " (" + (script == null ? "null" : script.getName()) + ", line " + trigger.getLineNumber() + ")");
-			}
+			assert trigger != null;
+			File script = trigger.getScript();
+			logEx("Current trigger: " + trigger.toString(null, true) + " (" + (script == null ? "null" : script.getName()) + ", line " + trigger.getLineNumber() + ")");
 		}
 		logEx();
 		logEx("Thread: " + (thread == null ? Thread.currentThread() : thread).getName());
