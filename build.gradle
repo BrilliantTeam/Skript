@@ -70,9 +70,9 @@ processResources {
 	filter ReplaceTokens, tokens: [
 		"version": System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION"),
 		'today': "unknown",
-		"release-flavor": "selfbuilt-unknown",
-		"release-channel": "release",
-		"release-updater": "ch.njol.skript.update.NoUpdateChecker",
+		"release-flavor": "selfbuilt-unknown", // Note: 'selfbuilt' prefix makes updater report a custom build
+		"release-channel": "release", // No updates, so anything else wouldn't make sense
+		"release-updater": "ch.njol.skript.update.NoUpdateChecker", // Disable update checking
 		"release-source": ""
 	]
 }
@@ -177,10 +177,10 @@ task githubResources(type: ProcessResources) {
 		filter ReplaceTokens, tokens: [
 			"version": version,
 			"today": "" + LocalDate.now(),
-			"release-flavor": "skriptlang-github",
-			"release-channel": channel,
-			"release-updater": "ch.njol.skript.update.GithubChecker",
-			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases"
+			"release-flavor": "skriptlang-github", // SkriptLang build, distributed on Github
+			"release-channel": channel, // Release channel, see above
+			"release-updater": "ch.njol.skript.update.GithubChecker", // Github API client
+			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases" // Github API URL
 		]
 	}
 	into 'build/resources/main'

@@ -127,7 +127,7 @@ public class GithubChecker implements UpdateChecker {
 
 			// Go through all releases, attempting to find current one
 			for (ResponseEntry release : releases) {
-				String name = release.name;
+				String name = release.tag_name;
 				assert name != null;
 				
 				// Check if this is a suitable latest release
@@ -156,7 +156,7 @@ public class GithubChecker implements UpdateChecker {
 			}
 			
 			try {
-				String name = latest.name;
+				String name = latest.tag_name;
 				assert name != null;
 				String createdAt = latest.created_at;
 				assert createdAt != null;

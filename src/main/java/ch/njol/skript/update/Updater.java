@@ -119,6 +119,14 @@ public abstract class Updater {
 			return future;
 		}
 		
+		// Custom releases have updating disabled
+		if (currentRelease.flavor.contains("selfbuilt")) {
+			releaseStatus = ReleaseStatus.CUSTOM;
+			CompletableFuture<Void> future = CompletableFuture.completedFuture(null);
+			assert future != null;
+			return future;
+		}
+		
 		state = UpdaterState.CHECKING; // We started checking for updates
 		CompletableFuture<Void> completed = fetchUpdateManifest().thenAccept((manifest) -> {
 			synchronized (this) { // Avoid corrupting updater state
@@ -127,7 +135,6 @@ public abstract class Updater {
 					updateManifest = manifest;
 				} else {
 					releaseStatus = ReleaseStatus.LATEST;
-					// TODO handle ReleaseStatus.CUSTOM
 				}
 				
 				state = UpdaterState.INACTIVE; // In any case, we finished now

@@ -320,9 +320,9 @@ public class SkriptCommand implements CommandExecutor {
 				if (args[1].equals("check")) {
 					updater.updateCheck(sender);
 				} else if (args[1].equalsIgnoreCase("changes")) {
-					// TODO not supported yet
+					updater.changesCheck(sender);
 				} else if (args[1].equalsIgnoreCase("download")) {
-					// TODO not supported yet
+					updater.updateCheck(sender);
 				}
 			} else if (args[0].equalsIgnoreCase("help")) {
 				skriptCommandHelp.showHelp(sender);
