@@ -17,4 +17,10 @@ in addition to fixing bugs. Large changes should not appear in this branch
 until at least some testing on them has been performed.
 
 ### Freeze
-TODO
+Only bug fixes will be done in this branch to avoid introducing *more* bugs.
+It will also be regularly merged back to master to avoid fixing same bugs twice.
+All stable releases - major or minor - will be made from this freeze branch.
+
+Master will be merged to freeze a while before a stable release is going to be
+published. That marks the end of bug fix releases for the previous stable
+release.
