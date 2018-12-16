@@ -5,10 +5,19 @@ to modify their servers without learning Java. It can also be useful if you
 for prototyping etc.
 
 This Github fork of Skript is based on Mirreski's improvements which was built
-on Njol's original Skript. It is supported for **Spigot** (not Bukkit) versions of
-Minecraft 1.9-1.13. Other versions might work, but no guarantees. **Paper** is
-recommended, but not mandatory - without it, some features such as timings
-will be not available.
+on Njol's original Skript.
+
+## Supported Versions
+Skript requires **Spigot** to work. You heard it right, Bukkit does *not* work.
+**Paper**, which is a fork of Spigot, is recommended; it is required for some
+parts of Skript to be available.
+
+Skript supports **latest releases** of Minecraft 1.9, 1.10, 1.11, 1.12 and 1.13.
+For example, this means that 1.12.2 is supported, but 1.12.1 is *not*.
+Testing with all minor Minecraft releases is not feasible for us.
+
+Minecraft 1.8 and earlier are not, and will not be supported. New Minecraft
+versions will be supported as soon as possible.
 
 ## Documentation
 Documentation is available [here](https://skriptlang.github.io/Skript/) for the
@@ -64,8 +73,8 @@ First, you need to add the JitPack repository at the **END** of all your reposit
 repositories {
     jcenter()
     ...
-    maven { 
-        url 'https://jitpack.io' 
+    maven {
+        url 'https://jitpack.io'
     }
 }
 ```
@@ -83,8 +92,8 @@ Or, if you use Maven:
 For versions of Skript after dev37 you might need to add the paper-api repository to prevent build issues.
 
 ```gradle
-maven { 
-    url 'https://repo.destroystokyo.com/repository/maven-public/' 
+maven {
+    url 'https://repo.destroystokyo.com/repository/maven-public/'
 }
 ```
 
@@ -123,7 +132,8 @@ Or, if you use Maven:
 * [Skript Chat Discord Invite](https://discord.gg/0lx4QhQvwelCZbEX)
 * [Skript Hub](https://skripthub.net/)
 
-Note that these resources are not maintained by me. If you notice something wrong with them, do not contact me.
+Note that these resources are not maintained by Skript's developers. Don't
+contant us about any problems you might have with them.
 
 ## Developers
 Current team behind Skript:
@@ -134,7 +144,7 @@ Current team behind Skript:
 * [Nicofisi](https://github.com/Nicofisi) (Skript developer)
 * [TheBentoBox](https://github.com/TheBentoBox) (issue tracker manager, aliases developer)
 
-Also, of course, we should thank [Njol](https://github.com/Njol) for creating
+We should also thank [Njol](https://github.com/Njol) for creating
 Skript and [Mirreski](https://github.com/Mirreski) for maintaining it for a
 long time.
 
