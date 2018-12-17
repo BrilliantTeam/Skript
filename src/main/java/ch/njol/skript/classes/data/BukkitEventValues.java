@@ -67,6 +67,7 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.ClickType;
@@ -683,12 +684,14 @@ public final class BukkitEventValues {
 			}
 		}, 0);
 			
-		// HangingBreakByEntityEvent
-		EventValues.registerEventValue(HangingBreakByEntityEvent.class, Entity.class, new Getter<Entity, HangingBreakByEntityEvent>() {
+		// HangingBreakEvent
+		EventValues.registerEventValue(HangingBreakEvent.class, Entity.class, new Getter<Entity, HangingBreakEvent>() {
 			@Nullable
 			@Override
-			public Entity get(HangingBreakByEntityEvent e) {
-				return e.getRemover();
+			public Entity get(HangingBreakEvent e) {
+				if (e instanceof HangingBreakByEntityEvent)
+					return ((HangingBreakByEntityEvent) e).getRemover();
+				return null;
 			}
 		}, 0);
 		// HangingPlaceEvent
