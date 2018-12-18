@@ -26,6 +26,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -92,6 +93,12 @@ public class BukkitUnsafe {
 	 * users might not care, and find 1.12 material mappings accurate enough.
 	 */
 	private static boolean unsafeValuesErrored;
+	
+	/**
+	 * Maps pre 1.12 ids to materials for variable conversions.
+	 */
+	@Nullable
+	private static Map<Integer,Material> idMappings;
 	
 	public static void initialize() {
 		if (!newMaterials) {
@@ -182,5 +189,41 @@ public class BukkitUnsafe {
 				throw e;
 			}
 		}
+	}
+	
+	private static void initIdMappings() {
+		try (InputStream is = Skript.getInstance().getResource("materials/ids.json")) {
+			if (is == null) {
+				throw new AssertionError("missing id mappings");
+			}
+			String data = new String(ByteStreams.toByteArray(is), StandardCharsets.UTF_8);
+			
+			Type type = new TypeToken<Map<Integer,String>>(){}.getType();
+			Map<Integer, String> rawMappings = new Gson().fromJson(data, type);
+			
+			// Process raw mappings
+			Map<Integer, Material> parsed = new HashMap<>(rawMappings.size());
+			if (newMaterials) { // Legacy material conversion API
+				for (Map.Entry<Integer, String> entry : rawMappings.entrySet()) {
+					parsed.put(entry.getKey(), Material.matchMaterial(entry.getValue(), true));
+				}
+			} else { // Just enum API
+				for (Map.Entry<Integer, String> entry : rawMappings.entrySet()) {
+					parsed.put(entry.getKey(), Material.valueOf(entry.getValue()));
+				}
+			}
+			idMappings = parsed;
+		} catch (IOException e) {
+			throw new AssertionError(e);
+		}
+	}
+	
+	@Nullable
+	public static Material getMaterialFromId(int id) {
+		if (idMappings == null) {
+			initIdMappings();
+		}
+		assert idMappings != null;
+		return idMappings.get(id);
 	}
 }
