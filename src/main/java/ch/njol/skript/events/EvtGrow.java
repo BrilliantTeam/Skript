@@ -81,19 +81,17 @@ public class EvtGrow extends SkriptEvent {
 					return t.is(((StructureGrowEvent) e).getSpecies());
 				}
 			});
-		//
 		} else if (evtType == BLOCK && blocks != null && e instanceof BlockGrowEvent) {
 			assert blocks != null;
 			return blocks.check(e, new Checker<ItemType>() {
-				@SuppressWarnings("null")
 				@Override
 				public boolean check(final ItemType t) {
 					return t.isOfType(((BlockGrowEvent) e).getBlock());
 				}
 			});
 		}
-		// TODO: make sure BlockFormEvent isn't triggered for plant growing, could lead to unexpected behaviours again...
-		return !(e instanceof BlockFormEvent);
+
+		return false;
 	}
 	
 	@Override
