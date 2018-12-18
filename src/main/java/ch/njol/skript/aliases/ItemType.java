@@ -1095,8 +1095,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	@Nullable
 	public EnchantmentType[] getEnchantmentTypes() {
-		Set<Entry<Enchantment, Integer>> enchants = getItemMeta().getEnchants()
-				.entrySet();
+		Set<Entry<Enchantment, Integer>> enchants = getItemMeta().getEnchants().entrySet();
 		
 		return enchants.stream()
 			.map(enchant -> new EnchantmentType(enchant.getKey(), enchant.getValue()))
