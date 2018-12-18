@@ -331,9 +331,13 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		return blockValues;
 	}
 	
-	@SuppressWarnings("null") // Meta is created if it does not exist
 	public ItemMeta getItemMeta() {
-		return stack.getItemMeta();
+		ItemMeta meta = stack.getItemMeta();
+		if (meta == null) { // AIR has null item meta!
+			meta = itemFactory.getItemMeta(Material.STONE);
+		}
+		assert meta != null;
+		return meta;
 	}
 	
 	public void setItemMeta(ItemMeta meta) {
@@ -342,11 +346,11 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	}
 	
 	public int getDurability() {
-		return stack.getDurability();
+		return ItemUtils.getDamage(stack);
 	}
 	
 	public void setDurability(int durability) {
-		stack.setDurability((short) durability);
+		ItemUtils.setDamage(stack, durability);
 		isAlias = false; // Change happened
 	}
 
