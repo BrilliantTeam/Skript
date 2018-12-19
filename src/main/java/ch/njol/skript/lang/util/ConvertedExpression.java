@@ -19,6 +19,7 @@
  */
 package ch.njol.skript.lang.util;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -155,7 +156,9 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 	
 	@Override
 	public T[] getArray(final Event e) {
-		return Converters.convert(source.getArray(e), to, conv);
+		F[] arr = source.getArray(e);
+		T[] ret = Converters.convert(arr, to, conv);
+		return ret;
 	}
 	
 	@Override

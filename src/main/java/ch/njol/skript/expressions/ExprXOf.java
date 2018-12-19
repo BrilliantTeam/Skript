@@ -19,6 +19,8 @@
  */
 package ch.njol.skript.expressions;
 
+import java.util.Arrays;
+
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
@@ -34,7 +36,9 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.util.Kleenean;
 
 /**
@@ -69,7 +73,7 @@ public class ExprXOf extends PropertyExpression<Object, Object> {
 	
 	@Override
 	protected Object[] get(final Event e, final Object[] source) {
-		return get(source, new Converter<Object, Object>() {
+		Object[] ret = get(source, new Converter<Object, Object>() {
 			@Override
 			@Nullable
 			public Object convert(final Object o) {
@@ -87,6 +91,25 @@ public class ExprXOf extends PropertyExpression<Object, Object> {
 				}
 			}
 		});
+		return ret;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	@Nullable
+	public <R> Expression<? extends R> getConvertedExpression(Class<R>... to) {
+		// Make sure we get converted expression from Variables etc. correctly
+		// Then, wrap it so that our 'X' is properly applied
+		// See #1747 for issue that was caused by failure to do this
+		
+		Expression<? extends R> converted = getExpr().getConvertedExpression(to);
+		if (converted == null) // Can't create converted expression
+			return null;
+		
+		ExprXOf wrapped = new ExprXOf();
+		wrapped.setExpr(converted);
+		wrapped.amount = amount;
+		return (Expression<? extends R>) wrapped;
 	}
 	
 	@Override
