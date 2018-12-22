@@ -122,9 +122,8 @@ Your comments should look something like these:
   ```java
   import net.minecraft.server.v1_13_1.*; // BAD
   ```
-* Target Minecraft versions are 1.9, 1.10, 1.11, 1.12 and 1.13 (including all revisions)
+* Target Minecraft versions are 1.9, 1.10, 1.11, 1.12 and 1.13 (latest revisions)
   - Skript **must** run on these MC versions, in one way or another
-  - Do not intentionally break 1.8 compatibility
 * Supported server implementations are Spigot and Paper
   - Paper-specific functionality is acceptable
   - Glowstone also works, don't intentionally break it
@@ -133,8 +132,11 @@ Your comments should look something like these:
   - Instead, use Aliases.javaItemType
   ```java
   Material type = Material.DIRT; // Bad
-  ItemType type = Aliases.javaItemType("dirt"); // Goood
+  ItemType type = Aliases.javaItemType("dirt"); // Good
   ```
+  - Exceptions: <code>Material.AIR</code> and <code>Material.STONE</code>
+    - Air is better way to represent "nothing" than null
+    - Stone can be used to get dummy <code>ItemMeta</code>
 * Do not refer Biome enum directly, because it changed in 1.9 *and* 1.13
   ```java
   Biome.MEGA_SPRUCE_TAIGA_HILLS // Bad - 1.8 edition
