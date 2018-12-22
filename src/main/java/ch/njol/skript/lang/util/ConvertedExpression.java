@@ -156,9 +156,7 @@ public class ConvertedExpression<F, T> implements Expression<T> {
 	
 	@Override
 	public T[] getArray(final Event e) {
-		F[] arr = source.getArray(e);
-		T[] ret = Converters.convert(arr, to, conv);
-		return ret;
+		return Converters.convert(source.getArray(e), to, conv);
 	}
 	
 	@Override
