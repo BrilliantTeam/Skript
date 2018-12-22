@@ -558,8 +558,8 @@ entities:
 		name: human¦s
 		pattern: human(|1¦s)
 	tipped arrow:
-	    name: tipped arrow¦s
-	    pattern: tipped arrow(|1¦s)
+		name: tipped arrow¦s
+		pattern: tipped arrow(|1¦s)
 	arrow:
 		name: arrow¦s @an
 		pattern: arrow(|1¦s)

@@ -53,6 +53,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemData.OldItemData;
+import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.lang.Unit;
@@ -1027,10 +1028,13 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			if (noGenerics.get(0).getClass().equals(OldItemData.class)) { // Sorry generics :)
 				for (int i = 0; i < types.size(); i++) {
 					OldItemData old = (OldItemData) (Object) types.get(i); // Grab and hack together OldItemData
-					// TODO update for 1.13
-					ItemData data = new ItemData(Material.values()[old.typeid]); // Create new ItemData based on it
-					types.set(i, data); // Replace old with new
-					// TODO support for data values
+					Material mat = BukkitUnsafe.getMaterialFromId(old.typeid);
+					if (mat != null) {
+						ItemData data = new ItemData(mat); // Create new ItemData based on it
+						types.set(i, data); // Replace old with new
+					} else {
+						throw new NotSerializableException("item with id " + old.typeid + " could not be converted to new alias system");
+					}
 				}
 			}
 		}

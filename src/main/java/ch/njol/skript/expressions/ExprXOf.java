@@ -89,6 +89,24 @@ public class ExprXOf extends PropertyExpression<Object, Object> {
 		});
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	@Nullable
+	public <R> Expression<? extends R> getConvertedExpression(Class<R>... to) {
+		// Make sure we get converted expression from Variables etc. correctly
+		// Then, wrap it so that our 'X' is properly applied
+		// See #1747 for issue that was caused by failure to do this
+		
+		Expression<? extends R> converted = getExpr().getConvertedExpression(to);
+		if (converted == null) // Can't create converted expression
+			return null;
+		
+		ExprXOf wrapped = new ExprXOf();
+		wrapped.setExpr(converted);
+		wrapped.amount = amount;
+		return (Expression<? extends R>) wrapped;
+	}
+	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
 		return amount.toString(e, debug) + " of " + getExpr().toString(e, debug);
