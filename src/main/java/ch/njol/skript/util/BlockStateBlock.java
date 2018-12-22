@@ -38,6 +38,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -392,5 +393,10 @@ public class BlockStateBlock implements Block {
 	@Override
 	public boolean isPassable() {
 		return isPassable;
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return state.getBlock().getBoundingBox();
 	}
 }
