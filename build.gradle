@@ -1,7 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    id "com.github.hierynomus.license" version "0.14.0"
+	id "com.github.hierynomus.license" version "0.14.0"
 }
 
 apply plugin: 'java'
@@ -12,7 +12,7 @@ repositories {
 	mavenCentral()
 
 	maven {
-		url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+		url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
 	}
 
 	maven {
@@ -34,13 +34,13 @@ repositories {
 	maven {
 		url 'https://jitpack.io'
 	}
-	
+
 	maven {
-		url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+		url 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
-	
+
 	maven {
-	    url = 'https://repo.codemc.org/repository/maven-public'
+		url 'https://repo.codemc.org/repository/maven-public'
 	}
 }
 
@@ -68,7 +68,7 @@ configurations.all {
 
 processResources {
 	filter ReplaceTokens, tokens: [
-		"version" :System.getenv('SKRIPT_VERSION') == null ? project.property("version") : System.getenv('SKRIPT_VERSION')
+			"version": System.getenv('SKRIPT_VERSION') == null ? project.property("version") : System.getenv('SKRIPT_VERSION')
 	]
 }
 
@@ -79,19 +79,19 @@ jar {
 		attributes("Name": "ch/njol/skript",
 				"Sealed": "true")
 	}
-	
+
 	from('skript-aliases') {
-	    into('aliases-english') // Change this if we get aliases in other languages
+		into('aliases-english') // Change this if we get aliases in other languages
 	}
 }
 
 license {
-    header file('licenseheader.txt')
-    exclude('**/Metrics.java') // Not under GPLv3
-    exclude('**/BurgerHelper.java') // Not exclusively GPLv3
-    exclude('**/*.sk') // Sample scripts and maybe aliases
-    exclude('**/*.lang') // Language files do not have headers (still under GPLv3)
-    exclude('**/*.json') // JSON files do not have headers
+	header file('licenseheader.txt')
+	exclude('**/Metrics.java') // Not under GPLv3
+	exclude('**/BurgerHelper.java') // Not exclusively GPLv3
+	exclude('**/*.sk') // Sample scripts and maybe aliases
+	exclude('**/*.lang') // Language files do not have headers (still under GPLv3)
+	exclude('**/*.json') // JSON files do not have headers
 }
 
 configurations {
@@ -107,7 +107,7 @@ compileJava {
 	options.fork = true
 	options.encoding = 'UTF-8'
 	options.compilerArgs = ['-properties', '.settings/org.eclipse.jdt.core.prefs', '-encoding', 'UTF-8',
-			'-warn:-tasks(TODO|FIXME|REMIND)']
+							'-warn:-tasks(TODO|FIXME|REMIND)']
 	options.forkOptions.with {
 		executable = 'java'
 		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main']
@@ -128,7 +128,7 @@ task checkAliases {
 build.dependsOn(checkAliases)
 
 task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
+	from sourceSets.main.allJava
 }
 
 publishing {
@@ -141,7 +141,7 @@ publishing {
 			from components.java
 
 			artifact sourceJar {
-    			classifier "sources"
+				classifier "sources"
 			}
 		}
 	}

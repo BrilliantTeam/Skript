@@ -27,7 +27,9 @@ import org.eclipse.jdt.annotation.Nullable;
  * Contains all data block has that is needed for comparisions.
  */
 public abstract class BlockValues {
-		
+	
+	public abstract boolean isDefault();
+	
 	@Override
 	public abstract boolean equals(@Nullable Object other);
 	

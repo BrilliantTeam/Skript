@@ -80,8 +80,6 @@ public class ExprNamed extends PropertyExpression<Object, Object> {
 					return Bukkit.createInventory(null, (InventoryType) obj, name);
 				ItemType item = (ItemType) obj;
 				ItemMeta meta = item.getItemMeta();
-				if (meta == null) // Global item meta may or may not exist
-					meta = Bukkit.getItemFactory().getItemMeta(Material.STONE);
 				meta.setDisplayName(name);
 				item.setItemMeta(meta);
 				return item;

@@ -557,6 +557,9 @@ entities:
 	human:
 		name: human¦s
 		pattern: human(|1¦s)
+	tipped arrow:
+	    name: tipped arrow¦s
+	    pattern: tipped arrow(|1¦s)
 	arrow:
 		name: arrow¦s @an
 		pattern: arrow(|1¦s)
@@ -1083,6 +1086,7 @@ damage causes:
 	fly_into_wall: hitting wall while flying, flying into a wall
 	hot_floor: magma, hot floor
 	cramming: cramming
+	dryout: dryout
 	custom: unknown, custom, plugin, a plugin
 
 # -- Teleport Causes --
@@ -1331,7 +1335,7 @@ spawn reasons:
 	cured: cured
 	custom: customized, customised, custom
 	default: default
-	dispenser_egg: dispense egg, dispensing egg
+	dispense_egg: dispense egg, dispensing egg
 	drowned: drowned
 	egg: egg
 	ender_pearl: ender pearl
@@ -1351,6 +1355,7 @@ spawn reasons:
 	trap: trap
 	village_defense: village defense, golem defense, iron golem defense
 	village_invasion: village invasion, village invading
+	sheared: shear, sheared
 	
 # -- Difficulties --
 difficulties:
@@ -1396,6 +1401,7 @@ types:
 	commandsender: player¦¦s¦/console @a
 	inventoryholder: inventory holder¦s @an
 	gamemode: gamemode¦s @a
+	material: material¦s @a
 	itemstack: item stack¦s @an
 	itementity: dropped item¦s @a # same as entities.dropped item.name
 	biome: biome¦s @a
@@ -1409,6 +1415,7 @@ types:
 	inventorytype: inventory type¦s @an
 	metadataholder: metadata holder¦s @a
 	spawnreason: spawn reason¦s @a
+	cachedservericon: server icon¦s @a
 	difficulty: (difficulty|difficulties) @a
 	
 	# Skript

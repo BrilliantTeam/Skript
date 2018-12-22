@@ -1427,7 +1427,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		// Check if server platform is supported
 		if (!isRunningMinecraft(1, 9)) {
 			logEx("You are running an outdated Minecraft version not supported by Skript.");
-			logEx("Please update to Minecraft 1.9 or later or fix this yourself send us a pull request.");
+			logEx("Please update to Minecraft 1.9 or later or fix this yourself and send us a pull request.");
 			logEx("Alternatively, use an older Skript version; do note that those are also unsupported by us.");
 			logEx("");
 			logEx("Again, we do not support Minecraft versions this old.");

@@ -22,12 +22,14 @@ package ch.njol.skript.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -59,6 +61,7 @@ import ch.njol.yggdrasil.YggdrasilSerializable;
 public final class VisualEffect implements SyntaxElement, YggdrasilSerializable {
 
 	private final static String LANGUAGE_NODE = "visual effects";
+	static final boolean newEffectData = Skript.classExists("org.bukkit.block.data.BlockData");
 	
 	public static enum Type implements YggdrasilSerializable {
 		ENDER_SIGNAL(Effect.ENDER_SIGNAL),
@@ -154,11 +157,20 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				if (raw == null)
 					return Material.STONE.getData();
 				else if (raw instanceof ItemType) {
-					ItemStack rand = ((ItemType) raw).getRandom();
-					if (rand == null) return Material.STONE.getData();
-					MaterialData type = rand.getData();
-					assert type != null;
-					return type;
+					if (newEffectData) {
+						ItemStack rand = ((ItemType) raw).getRandom();
+						if (rand == null)
+							return Bukkit.createBlockData(Material.STONE);
+						return Bukkit.createBlockData(rand.getType());
+					} else {
+						ItemStack rand = ((ItemType) raw).getRandom();
+						if (rand == null)
+							return Material.STONE.getData();
+						@SuppressWarnings("deprecation")
+						MaterialData type = rand.getData();
+						assert type != null;
+						return type;
+					}
 				} else {
 					return raw;
 				}
@@ -171,11 +183,20 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				if (raw == null)
 					return Material.STONE.getData();
 				else if (raw instanceof ItemType) {
-					ItemStack rand = ((ItemType) raw).getRandom();
-					if (rand == null) return Material.STONE.getData();
-					MaterialData type = rand.getData();
-					assert type != null;
-					return type;
+					if (newEffectData) {
+						ItemStack rand = ((ItemType) raw).getRandom();
+						if (rand == null)
+							return Bukkit.createBlockData(Material.STONE);
+						return Bukkit.createBlockData(rand.getType());
+					} else {
+						ItemStack rand = ((ItemType) raw).getRandom();
+						if (rand == null)
+							return Material.STONE.getData();
+						@SuppressWarnings("deprecation")
+						MaterialData type = rand.getData();
+						assert type != null;
+						return type;
+					}
 				} else {
 					return raw;
 				}
@@ -200,7 +221,6 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		@Nullable
 		final String name;
 		
-		@SuppressWarnings("deprecation")
 		private Type(final Effect effect) {
 			this.effect = effect;
 			this.name = effect.name();
@@ -409,7 +429,6 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		play(ps, l, e, 0, 32);
 	}
 	
-	@SuppressWarnings({"deprecation"})
 	public void play(final @Nullable Player[] ps, final Location l, final @Nullable Entity e, final int count, final int radius) {
 		assert e == null || l.equals(e.getLocation());
 		if (isEntityEffect()) {
@@ -424,7 +443,8 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 				// Check that data has correct type (otherwise bad things will happen)
 				if (pData != null && !((Particle) type.effect).getDataType().isAssignableFrom(pData.getClass())) {
 					pData = null;
-					Skript.warning("Incompatible particle data, resetting it!");
+					if (Skript.debug())
+						Skript.warning("Incompatible particle data, resetting it!");
 				}
 				
 				if (ps == null) {
