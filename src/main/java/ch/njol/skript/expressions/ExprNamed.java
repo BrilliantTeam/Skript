@@ -79,6 +79,7 @@ public class ExprNamed extends PropertyExpression<Object, Object> {
 				if (obj instanceof InventoryType)
 					return Bukkit.createInventory(null, (InventoryType) obj, name);
 				ItemType item = (ItemType) obj;
+				item = item.clone();
 				ItemMeta meta = item.getItemMeta();
 				meta.setDisplayName(name);
 				item.setItemMeta(meta);
