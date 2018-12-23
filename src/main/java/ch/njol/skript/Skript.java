@@ -126,7 +126,9 @@ import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.timings.SkriptTimings;
+import ch.njol.skript.update.ReleaseManifest;
 import ch.njol.skript.update.ReleaseStatus;
+import ch.njol.skript.update.UpdateManifest;
 import ch.njol.skript.update.UpdaterState;
 import ch.njol.skript.util.EmptyStacktraceException;
 import ch.njol.skript.util.ExceptionUtils;
@@ -135,6 +137,7 @@ import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.Version;
+import ch.njol.skript.util.chat.BungeeConverter;
 import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Closeable;
@@ -651,14 +654,22 @@ public final class Skript extends JavaPlugin implements Listener {
 			public void onJoin(final PlayerJoinEvent e) {
 				if (e.getPlayer().hasPermission("skript.admin")) {
 					new Task(Skript.this, 0) {
-						@SuppressWarnings("incomplete-switch")
 						@Override
 						public void run() {
 							Player p = e.getPlayer();
-							if (p == null)
+							SkriptUpdater updater = getUpdater();
+							if (p == null || updater == null)
 								return;
 							
-							// TODO notify about updates
+							// Don't actually check for updates to avoid breaking Github rate limit
+							if (updater.getReleaseStatus() == ReleaseStatus.OUTDATED) {
+								// Last check indicated that an update is available
+								UpdateManifest update = updater.getUpdateManifest();
+								assert update != null; // Because we just checked that one is available
+								Skript.info(p, "" + SkriptUpdater.m_update_available.toString(update.id, Skript.getVersion()));
+								p.spigot().sendMessage(BungeeConverter.convert(ChatMessages.parseToArray(
+										"Download it at: <aqua><u><link:" + update.downloadUrl + ">" + update.downloadUrl)));
+							}
 						}
 					};
 				}
@@ -1393,7 +1404,6 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @return an EmptyStacktraceException to throw if code execution should terminate.
 	 */
 	public static EmptyStacktraceException exception(@Nullable Throwable cause, final @Nullable Thread thread, final @Nullable TriggerItem item, final String... info) {
-		
 		// First error: gather plugin package information
 		if (!checkedPlugins) { 
 			for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
@@ -1443,7 +1453,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		// Check if server platform is supported
 		if (!isRunningMinecraft(1, 9)) {
 			logEx("You are running an outdated Minecraft version not supported by Skript.");
-			logEx("Please update to Minecraft 1.9 or later or fix this yourself and send us a pull request.");
+			logEx("Please update to Minecraft 1.9.4 or later or fix this yourself and send us a pull request.");
 			logEx("Alternatively, use an older Skript version; do note that those are also unsupported by us.");
 			logEx("");
 			logEx("Again, we do not support Minecraft versions this old.");
@@ -1451,10 +1461,10 @@ public final class Skript extends JavaPlugin implements Listener {
 			logEx("Your server platform appears to be unsupported by Skript. It might not work reliably.");
 			logEx("You can report this at " + issuesUrl + ". However, we may be unable to fix the issue.");
 			logEx("It is recommended that you switch to Paper or Spigot, should you encounter problems.");
-		} else if (updater != null && false) { // TODO updater code changes needed
+		} else if (updater != null && updater.getReleaseStatus() == ReleaseStatus.OUTDATED) {
 			logEx("You're running outdated version of Skript! Please try updating it NOW; it might fix this.");
-			logEx("You may download new version of Skript at https://github.com/SkriptLang/Skript/releases");
-			logEx("You will be given instructions how to report this error if it persists with latest Skript.");
+			logEx("Run /sk update check to get a download link to latest Skript!");
+			logEx("You will be given instructions how to report this error if it persists after update.");
 		} else {
 			if (pluginPackages.isEmpty()) {
 				logEx("You should report it at " + issuesUrl + ". Please copy paste this report there (or use paste service).");
@@ -1516,8 +1526,11 @@ public final class Skript extends JavaPlugin implements Listener {
 			logEx("  Skript: " + getVersion() + (status == ReleaseStatus.LATEST ? " (latest)"
 					: status == ReleaseStatus.OUTDATED ? " (OUTDATED)"
 					: status == ReleaseStatus.CUSTOM ? " (custom version)" : ""));
+			ReleaseManifest current = updater.getCurrentRelease();
+			logEx("    Flavor: " + current.flavor);
+			logEx("    Timestamp: " + current.date);
 		} else {
-			logEx("  Skript: " + getVersion());
+			logEx("  Skript: " + getVersion() + " (unknown; likely custom)");
 		}
 		logEx("  Bukkit: " + Bukkit.getBukkitVersion());
 		logEx("  Minecraft: " + getMinecraftVersion());

@@ -166,6 +166,10 @@ public abstract class Updater {
 		return completed;
 	}
 	
+	public ReleaseManifest getCurrentRelease() {
+		return currentRelease;
+	}
+	
 	public void setReleaseChannel(ReleaseChannel channel) {
 		this.releaseChannel = channel;
 	}
