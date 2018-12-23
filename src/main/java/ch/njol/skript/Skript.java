@@ -80,7 +80,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.Gson;
 
-import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.bukkitutil.BurgerHelper;
@@ -127,6 +126,8 @@ import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.timings.SkriptTimings;
+import ch.njol.skript.update.ReleaseStatus;
+import ch.njol.skript.update.UpdaterState;
 import ch.njol.skript.util.EmptyStacktraceException;
 import ch.njol.skript.util.ExceptionUtils;
 import ch.njol.skript.util.FileUtils;
@@ -187,6 +188,12 @@ public final class Skript extends JavaPlugin implements Listener {
 			throw new IllegalStateException();
 		return i;
 	}
+	
+	/**
+	 * Current updater instance used by Skript.
+	 */
+	@Nullable
+	private SkriptUpdater updater;
 	
 	public Skript() throws IllegalStateException {
 		if (instance != null)
@@ -292,6 +299,14 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		Workarounds.init();
 		
+		// Start the updater
+		// Note: if config prohibits update checks, it will NOT do network connections
+		try {
+			this.updater = new SkriptUpdater();
+		} catch (Exception e) {
+			Skript.exception(e, "Update checker could not be initialized.");
+		}
+		
 		if (!getDataFolder().isDirectory())
 			getDataFolder().mkdirs();
 		
@@ -359,6 +374,14 @@ public final class Skript extends JavaPlugin implements Listener {
 		// ... but also before platform check, because there is a config option to ignore some errors
 		SkriptConfig.load();
 		
+		// Use the updater, now that it has been configured to (not) do stuff
+		if (updater != null) {
+			CommandSender console = Bukkit.getConsoleSender();
+			assert console != null;
+			assert updater != null;
+			updater.updateCheck(console);
+		}
+		
 		// Check server software, Minecraft version, etc.
 		if (!checkServerPlatform()) {
 			disabled = true; // Nothing was loaded, nothing needs to be unloaded
@@ -397,9 +420,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		}
 		
 		Language.setUseLocal(true);
-		
-		if (SkriptConfig.checkForNewVersion.value()) // We only start updater automatically if it was asked
-			Updater.start();
 		
 		Commands.registerListeners();
 		
@@ -638,13 +658,7 @@ public final class Skript extends JavaPlugin implements Listener {
 							if (p == null)
 								return;
 							
-							switch (Updater.state) {
-								case UPDATE_AVAILABLE:
-									Skript.info(p, "" + Updater.m_update_available);
-									break;
-								case DOWNLOADED:
-									Skript.info(p, "" + Updater.m_downloaded);
-							}
+							// TODO notify about updates
 						}
 					};
 				}
@@ -1424,6 +1438,8 @@ public final class Skript extends JavaPlugin implements Listener {
 			}
 		}
 		
+		SkriptUpdater updater = Skript.getInstance().getUpdater();
+		
 		// Check if server platform is supported
 		if (!isRunningMinecraft(1, 9)) {
 			logEx("You are running an outdated Minecraft version not supported by Skript.");
@@ -1435,7 +1451,7 @@ public final class Skript extends JavaPlugin implements Listener {
 			logEx("Your server platform appears to be unsupported by Skript. It might not work reliably.");
 			logEx("You can report this at " + issuesUrl + ". However, we may be unable to fix the issue.");
 			logEx("It is recommended that you switch to Paper or Spigot, should you encounter problems.");
-		} else if (Updater.state == UpdateState.UPDATE_AVAILABLE) {
+		} else if (updater != null && false) { // TODO updater code changes needed
 			logEx("You're running outdated version of Skript! Please try updating it NOW; it might fix this.");
 			logEx("You may download new version of Skript at https://github.com/SkriptLang/Skript/releases");
 			logEx("You will be given instructions how to report this error if it persists with latest Skript.");
@@ -1495,9 +1511,14 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		logEx();
 		logEx("Version Information:");
-		logEx("  Skript: " + getVersion() + (Updater.state == Updater.UpdateState.RUNNING_LATEST ? " (latest)"
-				: Updater.state == Updater.UpdateState.UPDATE_AVAILABLE ? " (OUTDATED)"
-				: Updater.state == Updater.UpdateState.RUNNING_CUSTOM ? " (custom version)" : ""));
+		if (updater != null) {
+			ReleaseStatus status = updater.getReleaseStatus();
+			logEx("  Skript: " + getVersion() + (status == ReleaseStatus.LATEST ? " (latest)"
+					: status == ReleaseStatus.OUTDATED ? " (OUTDATED)"
+					: status == ReleaseStatus.CUSTOM ? " (custom version)" : ""));
+		} else {
+			logEx("  Skript: " + getVersion());
+		}
 		logEx("  Bukkit: " + Bukkit.getBukkitVersion());
 		logEx("  Minecraft: " + getMinecraftVersion());
 		logEx("  Java: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + ")");
@@ -1509,10 +1530,9 @@ public final class Skript extends JavaPlugin implements Listener {
 		logEx("Current item: " + (item == null ? "null" : item.toString(null, true)));
 		if (item != null && item.getTrigger() != null) {
 			Trigger trigger = item.getTrigger();
-			if (trigger != null) { // always true, but won't compile without this check
-				File script = trigger.getScript();
-				logEx("Current trigger: " + trigger.toString(null, true) + " (" + (script == null ? "null" : script.getName()) + ", line " + trigger.getLineNumber() + ")");
-			}
+			assert trigger != null;
+			File script = trigger.getScript();
+			logEx("Current trigger: " + trigger.toString(null, true) + " (" + (script == null ? "null" : script.getName()) + ", line " + trigger.getLineNumber() + ")");
 		}
 		logEx();
 		logEx("Thread: " + (thread == null ? Thread.currentThread() : thread).getName());
@@ -1580,11 +1600,12 @@ public final class Skript extends JavaPlugin implements Listener {
 	}
 	
 	/**
-	 * Indicates if Skript is running prerelease build.
-	 * @return Boolean.
+	 * Gets the updater instance currently used by Skript.
+	 * @return SkriptUpdater instance.
 	 */
-	public static boolean isPrerelease() {
-		return true;
+	@Nullable
+	public SkriptUpdater getUpdater() {
+		return updater;
 	}
 	
 }
