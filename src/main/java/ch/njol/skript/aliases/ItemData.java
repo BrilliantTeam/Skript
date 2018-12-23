@@ -254,10 +254,13 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			return true;
 		
 		BlockValues values = blockValues;
-		if (itemForm && other.blockValues != null)
-			return other.blockValues.isDefault();
-		if (other.itemForm && blockValues != null)
-			return blockValues.isDefault();
+		if (type == other.type) {
+			if (itemForm && other.blockValues != null)
+				return other.blockValues.isDefault();
+			if (other.itemForm && blockValues != null)
+				return blockValues.isDefault();
+		}
+		
 		if (strictEquality) {
 			// The two blocks are not exactly same (even though normally they might be same enough to match)
 			if (!Objects.equals(values, other.blockValues))
