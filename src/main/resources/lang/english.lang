@@ -557,6 +557,9 @@ entities:
 	human:
 		name: human¦s
 		pattern: human(|1¦s)
+	tipped arrow:
+		name: tipped arrow¦s
+		pattern: tipped arrow(|1¦s)
 	arrow:
 		name: arrow¦s @an
 		pattern: arrow(|1¦s)
@@ -645,6 +648,45 @@ entities:
 	fish:
 		name: fish¦es
 		pattern: fish(|1¦es)
+	tropical fish:
+		name: tropical fish¦es
+		pattern: [(%-color%[-%-color%]|fully %-color%)] tropical fish(|1¦es)
+	kob:
+		name: kob¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] kob(|1¦s)
+	sunstreak:
+		name: sunstreak¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] sunstreak(|1¦s)
+	snooper:
+		name: snooper¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] snooper(|1¦s)
+	dasher:
+		name: dasher¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] dasher(|1¦s)
+	brinely:
+		name: brinely¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] brinely(|1¦s)
+	spotty:
+		name: spotty¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] spotty(|1¦s)
+	flopper:
+		name: flopper¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] flopper(|1¦s)
+	stripey:
+		name: stripey¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] stripey(|1¦s)
+	glitter:
+		name: glitter¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] glitter(|1¦s)
+	blockfish:
+		name: blockfish¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] blockfish(|1¦s)
+	betty:
+		name: betty¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] betty(|1¦s)
+	clayfish:
+		name: clayfish¦s
+		pattern: [(%-color%[-%-color%]|fully %-color%)] clayfish(|1¦s)
 	ghast:
 		name: ghast¦s
 		pattern: ghast(|1¦s)
@@ -1044,6 +1086,7 @@ damage causes:
 	fly_into_wall: hitting wall while flying, flying into a wall
 	hot_floor: magma, hot floor
 	cramming: cramming
+	dryout: dryout
 	custom: unknown, custom, plugin, a plugin
 
 # -- Teleport Causes --
@@ -1292,7 +1335,7 @@ spawn reasons:
 	cured: cured
 	custom: customized, customised, custom
 	default: default
-	dispenser_egg: dispense egg, dispensing egg
+	dispense_egg: dispense egg, dispensing egg
 	drowned: drowned
 	egg: egg
 	ender_pearl: ender pearl
@@ -1312,7 +1355,8 @@ spawn reasons:
 	trap: trap
 	village_defense: village defense, golem defense, iron golem defense
 	village_invasion: village invasion, village invading
-
+	sheared: shear, sheared
+	
 # -- Difficulties --
 difficulties:
 	easy: easy
@@ -1322,10 +1366,10 @@ difficulties:
 
 # -- Resource Pack States --
 resource pack states:
-    accepted: accept, accepted
-    declined: decline, refuse, reject, declined, refused, rejected
-    failed_download: download fail, fail, failed to download, failed
-    successfully_loaded: successfully load, successfully install, success, successfully loaded, successfully installed
+	accepted: accept, accepted
+	declined: decline, refuse, reject, declined, refused, rejected
+	failed_download: download fail, fail, failed to download, failed
+	successfully_loaded: successfully load, successfully install, success, successfully loaded, successfully installed
 
 # -- Boolean --
 boolean:
@@ -1364,6 +1408,7 @@ types:
 	commandsender: player¦¦s¦/console @a
 	inventoryholder: inventory holder¦s @an
 	gamemode: gamemode¦s @a
+	material: material¦s @a
 	itemstack: item stack¦s @an
 	itementity: dropped item¦s @a # same as entities.dropped item.name
 	biome: biome¦s @a
@@ -1377,9 +1422,9 @@ types:
 	inventorytype: inventory type¦s @an
 	metadataholder: metadata holder¦s @a
 	spawnreason: spawn reason¦s @a
+	cachedservericon: server icon¦s @a
 	difficulty: (difficulty|difficulties) @a
-	resourcepackaction: resource pack action¦s @a
-
+	
 	# Skript
 	weathertype: weather type¦s @a
 	entitytype: entity type¦s @an
@@ -1398,6 +1443,7 @@ types:
 	experience.pattern: (e?xp|experience( points?)?)
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
+	resourcepackstate: resource pack state¦s @a
 	
 	# Hooks
 	money: money

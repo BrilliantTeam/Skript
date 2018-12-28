@@ -107,6 +107,7 @@ public class Delay extends Effect {
 					}
 					
 					TriggerItem.walk(next, e);
+					Variables.removeLocals(e);
 					
 					SkriptTimings.stop(timing); // Stop timing if it was even started
 				}

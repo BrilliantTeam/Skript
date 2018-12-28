@@ -1,7 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    id "com.github.hierynomus.license" version "0.14.0"
+	id "com.github.hierynomus.license" version "0.14.0"
 }
 
 apply plugin: 'java'
@@ -12,7 +12,7 @@ repositories {
 	mavenCentral()
 
 	maven {
-		url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+		url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
 	}
 
 	maven {
@@ -34,13 +34,13 @@ repositories {
 	maven {
 		url 'https://jitpack.io'
 	}
-	
+
 	maven {
-		url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+		url 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
-	
+
 	maven {
-	    url = 'https://repo.bstats.org/content/repositories/releases/'
+		url 'https://repo.codemc.org/repository/maven-public'
 	}
 }
 
@@ -49,8 +49,10 @@ dependencies {
 	implementation 'org.eclipse.jdt:org.eclipse.jdt.annotation:1.1.0'
 	implementation 'com.google.code.findbugs:findbugs:3.0.1'
 	implementation 'com.sk89q.worldguard:worldguard-legacy:7.0.0-SNAPSHOT'
-	implementation 'net.milkbowl.vault:Vault:1.7.1'
 	implementation 'com.github.marcelo-mason:PreciousStones:24e3d4bf67b7240ae36b32be10e99d4091938c5c'
+	implementation('net.milkbowl.vault:Vault:1.7.1') {
+		exclude group: 'org.bstats', module: 'bstats-bukkit'
+	}
 
 	testImplementation 'junit:junit:4.12'
 	testImplementation 'org.easymock:easymock:3.6'
@@ -66,7 +68,12 @@ configurations.all {
 
 processResources {
 	filter ReplaceTokens, tokens: [
-		"version" :System.getenv('SKRIPT_VERSION') == null ? project.property("version") : System.getenv('SKRIPT_VERSION')
+		"version": System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION"),
+		'today': "unknown",
+		"release-flavor": "selfbuilt-unknown", // Note: 'selfbuilt' prefix makes updater report a custom build
+		"release-channel": "release", // No updates, so anything else wouldn't make sense
+		"release-updater": "ch.njol.skript.update.NoUpdateChecker", // Disable update checking
+		"release-source": ""
 	]
 }
 
@@ -77,19 +84,19 @@ jar {
 		attributes("Name": "ch/njol/skript",
 				"Sealed": "true")
 	}
-	
+
 	from('skript-aliases') {
-	    into('aliases-english') // Change this if we get aliases in other languages
+		into('aliases-english') // Change this if we get aliases in other languages
 	}
 }
 
 license {
-    header file('licenseheader.txt')
-    exclude('**/Metrics.java') // Not under GPLv3
-    exclude('**/BurgerHelper.java') // Not exclusively GPLv3
-    exclude('**/*.sk') // Sample scripts and maybe aliases
-    exclude('**/*.lang') // Language files do not have headers (still under GPLv3)
-    exclude('**/*.json') // JSON files do not have headers
+	header file('licenseheader.txt')
+	exclude('**/Metrics.java') // Not under GPLv3
+	exclude('**/BurgerHelper.java') // Not exclusively GPLv3
+	exclude('**/*.sk') // Sample scripts and maybe aliases
+	exclude('**/*.lang') // Language files do not have headers (still under GPLv3)
+	exclude('**/*.json') // JSON files do not have headers
 }
 
 configurations {
@@ -105,7 +112,7 @@ compileJava {
 	options.fork = true
 	options.encoding = 'UTF-8'
 	options.compilerArgs = ['-properties', '.settings/org.eclipse.jdt.core.prefs', '-encoding', 'UTF-8',
-			'-warn:-tasks(TODO|FIXME|REMIND)']
+							'-warn:-tasks(TODO|FIXME|REMIND)']
 	options.forkOptions.with {
 		executable = 'java'
 		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main']
@@ -126,7 +133,7 @@ task checkAliases {
 build.dependsOn(checkAliases)
 
 task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
+	from sourceSets.main.allJava
 }
 
 publishing {
@@ -139,7 +146,7 @@ publishing {
 			from components.java
 
 			artifact sourceJar {
-    			classifier "sources"
+				classifier "sources"
 			}
 		}
 	}
@@ -151,10 +158,40 @@ publishing {
 	}
 }
 
-/*
-  Set compile encoding to UTF-8
-  Fixes issue #850
- */
-compileJava.options.encoding = 'UTF-8'
 
+// Set compile encoding to UTF-8 (#850)
+compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
+
+// Build flavor configurations
+task githubResources(type: ProcessResources) {
+	from ('src/main/resources') {
+		include '**'
+		version = System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION")
+		def channel = "release"
+		if (version.contains("alpha")) {
+			channel = "alpha"
+		} else if (version.contains("beta")) {
+			channel = "beta"
+		}
+		filter ReplaceTokens, tokens: [
+			"version": version,
+			"today": "" + LocalDate.now(),
+			"release-flavor": "skriptlang-github", // SkriptLang build, distributed on Github
+			"release-channel": channel, // Release channel, see above
+			"release-updater": "ch.njol.skript.update.GithubChecker", // Github API client
+			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases" // Github API URL
+		]
+	}
+	into 'build/resources/main'
+}
+
+task githubRelease(type: Jar) {
+	from sourceSets.main.output
+	dependsOn githubResources
+	archiveName = 'Skript-github.jar'
+	
+	from('skript-aliases') {
+		into('aliases-english')
+	}
+}

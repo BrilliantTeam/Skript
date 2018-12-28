@@ -116,24 +116,6 @@ public class ExprInventorySlot extends SimpleExpression<Slot> {
 	}
 	
 	@Override
-	@Nullable
-	public Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
-		if (delta == null) // Nothing to nothing
-			return null;
-		Object first = delta[0];
-		if (first == null) // ConvertedExpression might cause this
-			return null;
-		
-		// Slots must be transformed to item stacks when writing to variables
-		// Documentation by Njol states so, plus it is convenient
-		if (changed instanceof Variable && first instanceof Slot) {
-			return new ItemStack[] {((Slot) first).getItem()};
-		}
-		
-		return delta;
-	}
-	
-	@Override
 	public String toString(@Nullable Event e, boolean debug) {
 		return "slots " + slots.toString(e, debug) + " of " + invis.toString(e, debug);
 	}

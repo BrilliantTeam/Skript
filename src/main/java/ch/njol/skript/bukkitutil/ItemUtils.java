@@ -36,6 +36,11 @@ public class ItemUtils {
 	
 	private static final boolean damageMeta = Skript.classExists("org.bukkit.inventory.meta.Damageable");
 	
+	/**
+	 * Gets damage/durability of an item, or 0 if it does not have damage.
+	 * @param stack Item.
+	 * @return Damage.
+	 */
 	@SuppressWarnings("deprecation")
 	public static int getDamage(ItemStack stack) {
 		if (damageMeta) {
@@ -48,6 +53,12 @@ public class ItemUtils {
 		}
 	}
 	
+	/**
+	 * Sets damage/durability of an item if possible.
+	 * @param stack Item to modify.
+	 * @param damage New damage. Note that on some Minecraft versions,
+	 * this might be truncated to short.
+	 */
 	@SuppressWarnings("deprecation")
 	public static void setDamage(ItemStack stack, int damage) {
 		if (damageMeta) {

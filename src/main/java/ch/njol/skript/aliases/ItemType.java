@@ -53,6 +53,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemData.OldItemData;
+import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.lang.Unit;
@@ -324,18 +325,14 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		return isOfType(new ItemData(id, null));
 	}
 	
-	public boolean isSupertypeOf(final ItemType other) {
-		if (amount != -1 && other.amount != amount)
-			return false;
-		outer: for (final ItemData o : other.types) {
-			assert o != null;
-			for (final ItemData t : types) {
-				if (t.hasCommonSupertype(o))
-					continue outer;
-			}
-			return false;
-		}
-		return true;
+	/**
+	 * Checks if this type represents all the items represented by given
+	 * item type. This type may of course also represent other items.
+	 * @param other Another item type.
+	 * @return Whether this is supertype of the given item type.
+	 */
+	public boolean isSupertypeOf(ItemType other) {
+		return types.containsAll(other.types);
 	}
 	
 	public ItemType getItem() {
@@ -722,7 +719,6 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public boolean removeFrom(Inventory invi) {
 		ItemStack[] buf = getCopiedContents(invi);
 		
-		@SuppressWarnings("unchecked")
 		final boolean ok = removeFrom(Arrays.asList(buf));
 		
 		invi.setContents(buf);
@@ -1032,10 +1028,13 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			if (noGenerics.get(0).getClass().equals(OldItemData.class)) { // Sorry generics :)
 				for (int i = 0; i < types.size(); i++) {
 					OldItemData old = (OldItemData) (Object) types.get(i); // Grab and hack together OldItemData
-					// TODO update for 1.13
-					ItemData data = new ItemData(Material.values()[old.typeid]); // Create new ItemData based on it
-					types.set(i, data); // Replace old with new
-					// TODO support for data values
+					Material mat = BukkitUnsafe.getMaterialFromId(old.typeid);
+					if (mat != null) {
+						ItemData data = new ItemData(mat); // Create new ItemData based on it
+						types.set(i, data); // Replace old with new
+					} else {
+						throw new NotSerializableException("item with id " + old.typeid + " could not be converted to new alias system");
+					}
 				}
 			}
 		}
@@ -1096,11 +1095,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 */
 	@Nullable
 	public EnchantmentType[] getEnchantmentTypes() {
-		if (globalMeta == null)
-			return null;
-		
-		assert globalMeta != null;
-		Set<Entry<Enchantment, Integer>> enchants = globalMeta.getEnchants().entrySet();
+		Set<Entry<Enchantment, Integer>> enchants = getItemMeta().getEnchants().entrySet();
 		
 		return enchants.stream()
 			.map(enchant -> new EnchantmentType(enchant.getKey(), enchant.getValue()))
@@ -1111,11 +1106,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * Checks whether this item type has enchantments.
 	 */
 	public boolean hasEnchantments() {
-		if (globalMeta == null)
-			return false;
-		
-		assert globalMeta != null;
-		return globalMeta.hasEnchants();
+		return getItemMeta().hasEnchants();
 	}
 	
 	/**
@@ -1125,42 +1116,43 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public boolean hasEnchantments(Enchantment... enchantments) {
 		if (!hasEnchantments())
 			return false;
+		ItemMeta meta = getItemMeta();
 		
 		for (Enchantment enchantment : enchantments) {
-			assert globalMeta != null;
-			if (!globalMeta.hasEnchant(enchantment))
+			if (!meta.hasEnchant(enchantment))
 				return false;
 		}
 		return true;
 	}
 	
 	/**
-	 * Checks wether this item type contains at most one of the given enchantments.
-	 * @param enchantments the enchantments to be checked.
+	 * Checks whether this item type contains at most one of the given enchantments.
+	 * @param enchantments The enchantments to be checked.
 	 */
 	public boolean hasAnyEnchantments(Enchantment... enchantments) {
 		if (!hasEnchantments())
 			return false;
+		ItemMeta meta = getItemMeta();
 		
 		for (Enchantment enchantment : enchantments) {
-			assert globalMeta != null;
-			if (globalMeta.hasEnchant(enchantment))
+			if (meta.hasEnchant(enchantment))
 				return true;
 		}
 		return false;
 	}
 	
 	/**
-	 * Checks wether this item type contains the given enchantments.
-	 * @param enchantments the enchantments to be checked.
+	 * Checks whether this item type contains the given enchantments.
+	 * @param enchantments The enchantments to be checked.
 	 */
 	public boolean hasEnchantments(EnchantmentType... enchantments) {
 		if (!hasEnchantments())
 			return false;
+		ItemMeta meta = getItemMeta();
 		
 		for (EnchantmentType enchantment : enchantments) {
-			assert globalMeta != null;
-			if (!globalMeta.hasEnchant(enchantment.getType()))
+			assert meta != null;
+			if (!meta.hasEnchant(enchantment.getType()))
 				return false;
 		}
 		return true;
@@ -1168,30 +1160,28 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	
 	/**
 	 * Adds the given enchantments to the item type.
-	 * @param enchantments the enchantments to be added.
+	 * @param enchantments The enchantments to be added.
 	 */
 	public void addEnchantments(EnchantmentType... enchantments) {
-		if (globalMeta == null)
-			globalMeta = ItemData.itemFactory.getItemMeta(Material.STONE);
+		ItemMeta meta = getItemMeta();
 		
 		for (EnchantmentType enchantment : enchantments) {
-			assert globalMeta != null;
-			globalMeta.addEnchant(enchantment.getType(), enchantment.getLevel(), true);
+			meta.addEnchant(enchantment.getType(), enchantment.getLevel(), true);
 		}
+		setItemMeta(meta);
 	}
 	
 	/**
 	 * Removes the given enchantments from this item type.
-	 * @param enchantments the enchantments to be removed.
+	 * @param enchantments The enchantments to be removed.
 	 */
 	public void removeEnchantments(EnchantmentType... enchantments) {
-		if (globalMeta == null)
-			return;
+		ItemMeta meta = getItemMeta();
 		
 		for (EnchantmentType enchantment : enchantments) {
-			assert globalMeta != null;
-			globalMeta.removeEnchant(enchantment.getType());
+			meta.removeEnchant(enchantment.getType());
 		}
+		setItemMeta(meta);
 	}
 	
 	/**
@@ -1199,23 +1189,21 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * defined for individual item datas only.
 	 */
 	public void clearEnchantments() {
-		if (globalMeta == null)
-			return; // No enchantments
-		assert globalMeta != null;
-		Set<Enchantment> enchants = globalMeta.getEnchants().keySet();
+		ItemMeta meta = getItemMeta();
+		
+		Set<Enchantment> enchants = meta.getEnchants().keySet();
 		for (Enchantment ench : enchants) {
-			assert globalMeta != null;
-			globalMeta.removeEnchant(ench);
+			meta.removeEnchant(ench);
 		}
+		setItemMeta(meta);
 	}
 	
 	/**
-	 * Gets item meta that applies to this type if it exists.
-	 * @return Item meta or null.
+	 * Gets item meta that applies to all items represented by this type.
+	 * @return Item meta.
 	 */
-	@Nullable
 	public ItemMeta getItemMeta() {
-		return globalMeta;
+		return globalMeta != null ? globalMeta : types.get(0).getItemMeta();
 	}
 
 	/**

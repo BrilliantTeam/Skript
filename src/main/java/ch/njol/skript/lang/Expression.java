@@ -22,6 +22,7 @@ package ch.njol.skript.lang;
 import java.util.Iterator;
 
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
@@ -34,6 +35,7 @@ import ch.njol.skript.conditions.CondIsSet;
 import ch.njol.skript.lang.util.ConvertedExpression;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
+import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Checker;
 
 /**
@@ -263,13 +265,30 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 	 * The return value is what will be used for change. You can use modified
 	 * version of initial delta array or create a new one altogether
 	 * <p>
-	 * Default implementation will just return the parameter array.
+	 * Default implementation will convert slots to items when they're set
+	 * to variables, as specified in Skript documentation.
 	 * @param changed What is about to be set.
 	 * @param delta Initial delta array.
 	 * @return Delta array to use for change.
 	 */
 	@Nullable
 	default Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
+		if (delta == null) // Nothing to nothing
+			return null;
+		Object first = delta[0];
+		if (first == null) // ConvertedExpression might cause this
+			return null;
+		
+		// Slots must be transformed to item stacks when writing to variables
+		// Also, item stacks must be cloned (to be safe from Vanilla /clear)
+		if (changed instanceof Variable && first instanceof Slot) {
+			ItemStack stack = ((Slot) first).getItem();
+			if (stack == null)
+				return new ItemStack[0];
+			return new ItemStack[] {stack.clone()};
+		}
+		
+		// Everything else (inventories, actions, etc.) does not need special handling
 		return delta;
 	}
 	

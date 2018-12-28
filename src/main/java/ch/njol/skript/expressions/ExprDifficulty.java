@@ -45,7 +45,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Name("Difficulty")
 @Description("The difficulty of a world.")
 @Examples("set the difficulty of \"world\" to hard")
-@Since("INSERT VERSION")
+@Since("2.3")
 public class ExprDifficulty extends SimplePropertyExpression<World, Difficulty> {
 
 	static {

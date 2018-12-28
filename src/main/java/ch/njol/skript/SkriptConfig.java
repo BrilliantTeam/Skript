@@ -46,6 +46,7 @@ import ch.njol.skript.localization.Language;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.log.Verbosity;
 import ch.njol.skript.timings.SkriptTimings;
+import ch.njol.skript.update.ReleaseChannel;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Timespan;
@@ -81,20 +82,58 @@ public abstract class SkriptConfig {
 				}
 			});
 	
-	final static Option<Boolean> checkForNewVersion = new Option<Boolean>("check for new version", false);
+	final static Option<Boolean> checkForNewVersion = new Option<Boolean>("check for new version", false)
+			.setter(new Setter<Boolean>() {
+
+				@Override
+				public void set(Boolean t) {
+					SkriptUpdater updater = Skript.getInstance().getUpdater();
+					if (updater != null)
+						updater.setEnabled(t);
+				}
+			});
 	final static Option<Timespan> updateCheckInterval = new Option<Timespan>("update check interval", new Timespan(12 * 60 * 60 * 1000))
 			.setter(new Setter<Timespan>() {
 				@Override
 				public void set(final Timespan t) {
-					final Task ct = Updater.checkerTask;
-					if (t.getTicks_i() != 0 && ct != null && !ct.isAlive())
-						ct.setNextExecution(t.getTicks_i());
+					SkriptUpdater updater = Skript.getInstance().getUpdater();
+					if (updater != null)
+						updater.setCheckFrequency(t.getTicks_i());
 				}
 			});
 	final static Option<Integer> updaterDownloadTries = new Option<Integer>("updater download tries", 7)
 			.optional(true);
-	final static Option<Boolean> updateToPrereleases = new Option<Boolean>("update to pre-releases", true);
-	final static Option<Boolean> automaticallyDownloadNewVersion = new Option<Boolean>("automatically download new version", false);
+	final static Option<String> releaseChannel = new Option<String>("release channel", "none")
+			.setter(new Setter<String>() {
+
+				@Override
+				public void set(String t) {
+					ReleaseChannel channel;
+					if (t.equals("alpha")) { // Everything goes in alpha channel
+						channel = new ReleaseChannel((name) -> true, t);
+					} else if (t.equals("beta")) {
+						channel = new ReleaseChannel((name) -> !name.contains("alpha"), t);
+					} else if (t.equals("stable")) {
+						channel = new ReleaseChannel((name) -> !name.contains("alpha") && !name.contains("beta"), t);
+					} else if (t.equals("none")) {
+						channel = new ReleaseChannel((name) -> false, t);
+					} else {
+						channel = new ReleaseChannel((name) -> false, t);
+						Skript.error("Unknown release channel '" + t + "'.");
+					}
+					SkriptUpdater updater = Skript.getInstance().getUpdater();
+					if (updater != null)
+						updater.setReleaseChannel(channel);
+				}
+			});
+	
+	// Legacy updater options. They have no effect
+	@Deprecated
+	final static Option<Boolean> automaticallyDownloadNewVersion = new Option<Boolean>("automatically download new version", false)
+			.optional(true);
+	@Deprecated
+	final static Option<Boolean> updateToPrereleases = new Option<Boolean>("update to pre-releases", true)
+			.optional(true);
 	
 	public final static Option<Boolean> enableEffectCommands = new Option<Boolean>("enable effect commands", false);
 	public final static Option<String> effectCommandToken = new Option<String>("effect command token", "!");
@@ -176,6 +215,7 @@ public abstract class SkriptConfig {
 				}
 			});
 	
+	@Deprecated
 	public final static Option<Boolean> enableScriptCaching = new Option<Boolean>("enable script caching", false)
 			.optional(true);
 	

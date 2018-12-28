@@ -33,7 +33,7 @@ import ch.njol.skript.doc.Since;
 @Description("Checks whether a living entity is swimming.")
 @Examples("player is swimming")
 @RequiredPlugins("1.13 or newer")
-@Since("INSERT VERSION")
+@Since("2.3")
 public class CondIsSwimming extends PropertyCondition<LivingEntity> {
 	
 	static {

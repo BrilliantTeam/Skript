@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.config.Config;
@@ -169,11 +170,6 @@ public class AliasesProvider {
 	private final Map<String, VariationGroup> variations;
 	
 	/**
-	 * Subtypes of materials.
-	 */
-	private final Map<ItemData, Set<ItemData>> subtypes;
-	
-	/**
 	 * Maps item datas back to Minecraft ids.
 	 */
 	private final Map<ItemData, String> minecraftIds;
@@ -186,11 +182,10 @@ public class AliasesProvider {
 	/**
 	 * Constructs a new aliases provider with no data.
 	 */
-	public AliasesProvider() {
-		aliases = new HashMap<>(10000);
-		materialNames = new HashMap<>(10000);
-		variations = new HashMap<>(500);
-		subtypes = new HashMap<>(1000);
+	public AliasesProvider(int expectedCount) {
+		aliases = new HashMap<>(expectedCount);
+		materialNames = new HashMap<>(expectedCount);
+		variations = new HashMap<>(expectedCount / 20);
 		minecraftIds = new HashMap<>(3000);
 		relatedEntities = new HashMap<>(10);
 		
@@ -213,12 +208,15 @@ public class AliasesProvider {
 	 * @param tags Tags.
 	 */
 	public ItemStack applyTags(ItemStack stack, Map<String, Object> tags) {
+		// Hack damage tag into item
 		Object damage = tags.get("Damage");
-		if (damage instanceof Number) { // Set durability manually, not NBT tag before 1.13
-			stack = new ItemStack(stack.getType(), 1, ((Number) damage).shortValue());
-			// Bukkit makes this work on 1.13+ too, which is nice
+		if (damage instanceof Number) { // Use helper for version compatibility
+			ItemUtils.setDamage(stack, ((Number) damage).shortValue());
 			tags.remove("Damage");
 		}
+		
+		if (tags.isEmpty()) // No real tags to apply
+			return stack;
 		
 		// Apply random tags using JSON
 		String json = gson.toJson(tags);
@@ -238,8 +236,9 @@ public class AliasesProvider {
 	public NonNullPair<String, String> getAliasPlural(String name) {
 		int marker = name.indexOf('¦');
 		if (marker == -1) { // No singular/plural forms
-			name = name.trim();
-			return new NonNullPair<>(name, name);
+			String trimmed = name.trim();
+			assert trimmed != null;
+			return new NonNullPair<>(trimmed, trimmed);
 		}
 		int pluralEnd = -1;
 		for (int i = marker; i < name.length(); i++) {
@@ -339,13 +338,6 @@ public class AliasesProvider {
 		// Make datas subtypes of the type we have here and handle Minecraft ids
 		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
 			data.strictEquality = true;
-			Set<ItemData> subs = subtypes.get(data);
-			if (subs == null) {
-				subs = new HashSet<>(datas.size());
-				subtypes.put(data, subs);
-			}
-			subs.addAll(datas); // Add all datas (the ones we have here)
-			
 			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
 				minecraftIds.put(data, id); // Register Minecraft id for the data, too
 			
@@ -376,12 +368,24 @@ public class AliasesProvider {
 
 	@Nullable
 	public String getMinecraftId(ItemData data) {
-		return minecraftIds.get(data);
+		String id = minecraftIds.get(data);
+		if (id == null) { // No non-default MC id found
+			ItemData defaultData = data.clone();
+			defaultData.blockValues = null;
+			id = minecraftIds.get(defaultData);
+		}
+		return id;
 	}
 	
 	@Nullable
-	public MaterialName getMaterialName(ItemData type) {
-		return materialNames.get(type);
+	public MaterialName getMaterialName(ItemData data) {
+		MaterialName name = materialNames.get(data);
+		if (name == null) { // No non-default name found
+			ItemData defaultData = data.clone();
+			defaultData.blockValues = null;
+			name = materialNames.get(defaultData);
+		}
+		return name;
 	}
 
 	public void setMaterialName(ItemData data, MaterialName materialName) {
@@ -392,11 +396,6 @@ public class AliasesProvider {
 		aliases.clear();
 		materialNames.clear();
 		variations.clear();
-	}
-	
-	@Nullable
-	public Set<ItemData> getSubtypes(ItemData supertype) {
-		return subtypes.get(supertype);
 	}
 
 	public int getAliasCount() {

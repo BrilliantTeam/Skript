@@ -28,11 +28,13 @@ import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.entity.Zombie;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -50,59 +52,41 @@ import ch.njol.util.Kleenean;
 /**
  * @author Peter Güttinger
  */
-@Name("Skull")
-@Description("Gets a skull item representing a player or an entity.")
+@Name("Player Skull")
+@Description("Gets a skull item representing a player. Skulls for other entities are provided by the aliases.")
 @Examples({"give the victim's skull to the attacker",
 		"set the block at the entity to the entity's skull"})
 @Since("2.0")
 public class ExprSkull extends SimplePropertyExpression<Object, ItemType> {
+	
 	static {
-		register(ExprSkull.class, ItemType.class, "skull", "offlineplayers/entities/entitydatas");
+		register(ExprSkull.class, ItemType.class, "skull", "offlineplayers");
 	}
+	
+	private static final ItemType playerSkull = Aliases.javaItemType("player skull");
+	
+	/**
+	 * In 2017, SkullMeta finally got a method that takes OfflinePlayer.
+	 */
+	private static final boolean newSkullOwner = Skript.methodExists(SkullMeta.class, "setOwner", OfflinePlayer.class);
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		if (!Skript.isRunningMinecraft(1, 4, 5)) {
-			Skript.error("Skulls are only available in Bukkit 1.4.5+");
-			return false;
-		}
 		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	@Nullable
 	public ItemType convert(final Object o) {
-		final SkullType type;
-		if (o instanceof Skeleton || o instanceof SkeletonData) {
-			if (o instanceof SkeletonData ? ((SkeletonData) o).isWither() : ((Skeleton) o).getSkeletonType() == SkeletonType.WITHER) {
-				type = SkullType.WITHER;
-			} else {
-				type = SkullType.SKELETON;
-			}
-		} else if (o instanceof Zombie || o instanceof EntityData && Zombie.class.isAssignableFrom(((EntityData<?>) o).getType())) {
-			type = SkullType.ZOMBIE;
-		} else if (o instanceof OfflinePlayer || o instanceof PlayerData) {
-			type = SkullType.PLAYER;
-		} else if (o instanceof Creeper || o instanceof CreeperData) {
-			type = SkullType.CREEPER;
-		} else if (o instanceof EnderDragon || o instanceof EntityData && EnderDragon.class.isAssignableFrom(((EntityData<?>) o).getType())) {
-			type = SkullType.DRAGON;
-		} else {
-			return null;
-		}
-		
-//		final ItemType i;
-//		final SkullMeta s = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
-//		if (o instanceof OfflinePlayer) {
-//			i = new ItemType(Material.SKULL_ITEM);
-//			s.setOwningPlayer((OfflinePlayer) o);
-//			i.setItemMeta(s);
-//		} else {
-//			// TODO 1.13 will change this so each skull gets their own id (except player skulls)
-//			i = new ItemType(Material.SKULL_ITEM, "{SkullType=" + type.ordinal() + "}");
-//		}
-		throw new UnsupportedOperationException("1.13 update");
-//		return i;
+		ItemType skull = playerSkull.clone();
+		SkullMeta meta = (SkullMeta) skull.getItemMeta();
+		if (newSkullOwner)
+			meta.setOwningPlayer((OfflinePlayer) o);
+		else
+			meta.setOwner(((OfflinePlayer) o).getName());
+		skull.setItemMeta(meta);
+		return skull;
 	}
 	
 	@Override

@@ -1459,7 +1459,7 @@ public class BukkitClasses {
 				.name("Difficulty")
 				.description("The difficulty of a <a href='#world'>world</a>.")
 				.examples(difficulties.getAllNames())
-				.since("INSERT VERSION")
+				.since("2.3")
 				.parser(new Parser<Difficulty>() {
 					
 					@Override

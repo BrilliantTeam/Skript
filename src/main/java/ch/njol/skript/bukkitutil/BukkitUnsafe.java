@@ -26,6 +26,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -53,6 +54,11 @@ public class BukkitUnsafe {
 	 * not particularly hard to achieve.
 	 */
 	private static final UnsafeValues unsafe;
+	
+	/**
+	 * 1.9 Spigot has some "fun" bugs.
+	 */
+	private static final boolean knownNullPtr = !Skript.isRunningMinecraft(1, 11);
 	
 	static {
 		UnsafeValues values = Bukkit.getUnsafe();
@@ -88,6 +94,12 @@ public class BukkitUnsafe {
 	 */
 	private static boolean unsafeValuesErrored;
 	
+	/**
+	 * Maps pre 1.12 ids to materials for variable conversions.
+	 */
+	@Nullable
+	private static Map<Integer,Material> idMappings;
+	
 	public static void initialize() {
 		if (!newMaterials) {
 			MethodHandle mh;
@@ -103,7 +115,7 @@ public class BukkitUnsafe {
 				Version version = Skript.getMinecraftVersion();
 				boolean mapExists = loadMaterialMap("materials/" + version.getMajor() + "." +  version.getMinor() + ".json");
 				if (!mapExists) {
-					loadMaterialMap("materials/1.12.json");
+					loadMaterialMap("materials/1.9.json"); // 1.9 is oldest we have mappings for
 					preferMaterialMap = false;
 					Skript.warning("Material mappings for " + version + " are not available.");
 					Skript.warning("Depending on your server software, some aliases may not work.");
@@ -167,6 +179,51 @@ public class BukkitUnsafe {
 	}
 	
 	public static void modifyItemStack(ItemStack stack, String arguments) {
-		unsafe.modifyItemStack(stack, arguments);
+		try {
+			unsafe.modifyItemStack(stack, arguments);
+		} catch (NullPointerException e) {
+			if (knownNullPtr) { // Probably known Spigot bug
+				// So we continue doing whatever we were doing and hope it works
+				Skript.warning("Item " + stack.getType() + arguments + " failed modifyItemStack. This is a bug on old Spigot versions.");
+			} else { // Not known null pointer, don't just swallow
+				throw e;
+			}
+		}
+	}
+	
+	private static void initIdMappings() {
+		try (InputStream is = Skript.getInstance().getResource("materials/ids.json")) {
+			if (is == null) {
+				throw new AssertionError("missing id mappings");
+			}
+			String data = new String(ByteStreams.toByteArray(is), StandardCharsets.UTF_8);
+			
+			Type type = new TypeToken<Map<Integer,String>>(){}.getType();
+			Map<Integer, String> rawMappings = new Gson().fromJson(data, type);
+			
+			// Process raw mappings
+			Map<Integer, Material> parsed = new HashMap<>(rawMappings.size());
+			if (newMaterials) { // Legacy material conversion API
+				for (Map.Entry<Integer, String> entry : rawMappings.entrySet()) {
+					parsed.put(entry.getKey(), Material.matchMaterial(entry.getValue(), true));
+				}
+			} else { // Just enum API
+				for (Map.Entry<Integer, String> entry : rawMappings.entrySet()) {
+					parsed.put(entry.getKey(), Material.valueOf(entry.getValue()));
+				}
+			}
+			idMappings = parsed;
+		} catch (IOException e) {
+			throw new AssertionError(e);
+		}
+	}
+	
+	@Nullable
+	public static Material getMaterialFromId(int id) {
+		if (idMappings == null) {
+			initIdMappings();
+		}
+		assert idMappings != null;
+		return idMappings.get(id);
 	}
 }

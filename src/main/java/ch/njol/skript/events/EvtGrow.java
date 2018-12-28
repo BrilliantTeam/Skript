@@ -19,9 +19,8 @@
  */
 package ch.njol.skript.events;
 
-import java.util.Arrays;
-
 import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.eclipse.jdt.annotation.Nullable;
@@ -73,15 +72,6 @@ public class EvtGrow extends SkriptEvent {
 	}
 	
 	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		if (evtType == STRUCTURE)
-			return "grow" + (types != null ? " of " + types.toString(e, debug) : "");
-		else if (evtType == BLOCK)
-			return "grow" + (blocks != null ? " of " + blocks.toString(e, debug) : "");
-		return "grow";
-	}
-	
-	@Override
 	public boolean check(final Event e) {
 		if (evtType == STRUCTURE  && types != null && e instanceof StructureGrowEvent) {
 			return types.check(e, new Checker<StructureType>() {
@@ -92,15 +82,25 @@ public class EvtGrow extends SkriptEvent {
 				}
 			});
 		} else if (evtType == BLOCK && blocks != null && e instanceof BlockGrowEvent) {
+			assert blocks != null;
 			return blocks.check(e, new Checker<ItemType>() {
-				@SuppressWarnings("null")
 				@Override
 				public boolean check(final ItemType t) {
-					return t.getRandom().getType() == ((BlockGrowEvent) e).getBlock().getType();
+					return t.isOfType(((BlockGrowEvent) e).getBlock());
 				}
 			});
 		}
-		return true;
+
+		return false;
+	}
+	
+	@Override
+	public String toString(final @Nullable Event e, final boolean debug) {
+		if (evtType == STRUCTURE)
+			return "grow" + (types != null ? " of " + types.toString(e, debug) : "");
+		else if (evtType == BLOCK)
+			return "grow" + (blocks != null ? " of " + blocks.toString(e, debug) : "");
+		return "grow";
 	}
 	
 }

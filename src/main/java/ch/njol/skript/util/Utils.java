@@ -614,7 +614,11 @@ public abstract class Utils {
 				return Object.class;
 			}
 		}
-		return r;
+		
+		// Cloneable is about as useful as object as super type
+		// However, it lacks special handling used for Object supertype
+		// See #1747 to learn how it broke returning items from functions
+		return r.equals(Cloneable.class) ? Object.class : r;
 	}
 	
 	/**
