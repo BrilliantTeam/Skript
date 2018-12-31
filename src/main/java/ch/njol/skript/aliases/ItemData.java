@@ -48,6 +48,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
@@ -88,6 +89,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	
 	// Load or create material registry
 	static {
+		Gson gson = new GsonBuilder().serializeNulls().create();
 		Path materialsFile = Paths.get(Skript.getInstance().getDataFolder().getAbsolutePath(), "materials.json");
 		if (Files.exists(materialsFile)) {
 			String content = null;
@@ -96,18 +98,23 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			} catch (IOException e) {
 				Skript.exception(e, "Loading material registry failed!");
 			}
-			if (content != null)
-				materialRegistry = new MaterialRegistry(new Gson().fromJson(content, Material[].class));
-			else
+			if (content != null) {
+				String[] names = gson.fromJson(content, String[].class);
+				assert names != null;
+				materialRegistry = MaterialRegistry.load(names);
+			} else {
 				materialRegistry = new MaterialRegistry();
+			}
 		} else {
 			materialRegistry = new MaterialRegistry();
-			String content = new Gson().toJson(materialRegistry.getMaterials());
-			try {
-				Files.write(materialsFile, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW);
-			} catch (IOException e) {
-				Skript.exception(e, "Saving material registry failed!");
-			}
+		}
+		
+		// Always rewrite material registry, in case some updates got applied to it
+		String content = gson.toJson(materialRegistry.getMaterials());
+		try {
+			Files.write(materialsFile, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+		} catch (IOException e) {
+			Skript.exception(e, "Saving material registry failed!");
 		}
 	}
 	
