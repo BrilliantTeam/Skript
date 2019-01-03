@@ -22,6 +22,7 @@ package ch.njol.skript.hooks.regions;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,8 +61,14 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	
 	@Override
 	protected boolean init() {
-		if (!Skript.classExists("com.sk89q.worldguard.WorldGuard")) {
-			Skript.error("Skript does not support WorldGuard 6. WorldGuard region support has been disabled!");
+		if (!Skript.classExists("com.sk89q.worldguard.WorldGuard")) { // Assume WorldGuard 6
+			try {
+				Class<?> oldHook = Class.forName("ch.njol.skript.module.worldguard6.WorldGuard6Hook");
+				oldHook.getDeclaredConstructor().newInstance();
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				Skript.error("This Skript version does not support WorldGuard 6. WorldGuard region support has been disabled!");
+			}
 			return false;
 		} else if (!Skript.classExists("com.sk89q.worldedit.math.BlockVector3")) {
 			Skript.error("WorldEdit you're using is not compatible with Skript. Disabling WorldGuard support!");
