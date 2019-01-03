@@ -273,7 +273,7 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 	 */
 	@Nullable
 	default Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
-		if (delta == null) // Nothing to nothing
+		if (delta == null || delta.length == 0) // Nothing to nothing
 			return null;
 		Object first = delta[0];
 		if (first == null) // ConvertedExpression might cause this
@@ -284,7 +284,7 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 		if (changed instanceof Variable && first instanceof Slot) {
 			ItemStack stack = ((Slot) first).getItem();
 			if (stack == null)
-				return new ItemStack[0];
+				return null;
 			return new ItemStack[] {stack.clone()};
 		}
 		
