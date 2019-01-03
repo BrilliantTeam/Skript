@@ -63,6 +63,14 @@ public class WorldGuard6Hook extends RegionsPlugin<WorldGuardPlugin> {
     @Override
     protected boolean init() {
         supportsUUIDs = Skript.methodExists(DefaultDomain.class, "getUniqueIds");
+        
+        // Manually load syntaxes for regions, because we're in module package
+        try {
+            Skript.getAddonInstance().loadClasses("ch.njol.skript.hooks.regions");
+        } catch (IOException e) {
+            Skript.exception(e);
+            return false;
+        }
         return super.init();
     }
     

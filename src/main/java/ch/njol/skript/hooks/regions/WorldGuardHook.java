@@ -63,7 +63,7 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	protected boolean init() {
 		if (!Skript.classExists("com.sk89q.worldguard.WorldGuard")) { // Assume WorldGuard 6
 			try {
-				Class<?> oldHook = Class.forName("ch.njol.skript.module.worldguard6.WorldGuard6Hook");
+				Class<?> oldHook = Class.forName("ch.njol.skript.module.worldguard6.WorldGuard6Hook", true, getClass().getClassLoader());
 				oldHook.getDeclaredConstructor().newInstance();
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
