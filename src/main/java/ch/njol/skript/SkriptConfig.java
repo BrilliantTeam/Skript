@@ -122,8 +122,12 @@ public abstract class SkriptConfig {
 						Skript.error("Unknown release channel '" + t + "'.");
 					}
 					SkriptUpdater updater = Skript.getInstance().getUpdater();
-					if (updater != null)
+					if (updater != null) {
+						if (updater.getCurrentRelease().flavor.contains("spigot") && !t.equals("stable")) {
+							Skript.error("Only stable Skript versions are uploaded to Spigot resources.");
+						}
 						updater.setReleaseChannel(channel);
+					}
 				}
 			});
 	

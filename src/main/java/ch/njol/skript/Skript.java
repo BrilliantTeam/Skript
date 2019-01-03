@@ -1528,7 +1528,7 @@ public final class Skript extends JavaPlugin implements Listener {
 					: status == ReleaseStatus.CUSTOM ? " (custom version)" : ""));
 			ReleaseManifest current = updater.getCurrentRelease();
 			logEx("    Flavor: " + current.flavor);
-			logEx("    Timestamp: " + current.date);
+			logEx("    Date: " + current.date);
 		} else {
 			logEx("  Skript: " + getVersion() + " (unknown; likely custom)");
 		}

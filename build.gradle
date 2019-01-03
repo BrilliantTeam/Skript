@@ -96,7 +96,8 @@ processResources {
 		"release-flavor": "selfbuilt-unknown", // Note: 'selfbuilt' prefix makes updater report a custom build
 		"release-channel": "none", // No updates, so anything else wouldn't make sense
 		"release-updater": "ch.njol.skript.update.NoUpdateChecker", // Disable update checking
-		"release-source": ""
+		"release-source": "",
+		"release-download": "null"
 	]
 }
 
@@ -174,7 +175,7 @@ task githubResources(type: ProcessResources) {
 	from ('src/main/resources') {
 		include '**'
 		version = System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION")
-		def channel = "release"
+		def channel = "stable"
 		if (version.contains("alpha")) {
 			channel = "alpha"
 		} else if (version.contains("beta")) {
@@ -186,7 +187,8 @@ task githubResources(type: ProcessResources) {
 			"release-flavor": "skriptlang-github", // SkriptLang build, distributed on Github
 			"release-channel": channel, // Release channel, see above
 			"release-updater": "ch.njol.skript.update.GithubChecker", // Github API client
-			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases" // Github API URL
+			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases", // Github API URL
+			"release-download": "null" // Update checker will figure it out
 		]
 	}
 	into 'build/resources/main'
@@ -196,6 +198,47 @@ task githubRelease(type: Jar) {
 	from sourceSets.main.output
 	dependsOn githubResources
 	archiveName = 'Skript-github.jar'
+	
+	manifest {
+		attributes("Name": "ch/njol/skript",
+				"Sealed": "true")
+	}
+	
+	from('skript-aliases') {
+		into('aliases-english')
+	}
+	
+	// Include all modules of Skript
+	from 'skript-worldguard6/build/classes/java/main'
+}
+
+task spigotResources(type: ProcessResources) {
+	from ('src/main/resources') {
+		include '**'
+		version = System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION")
+		def channel = "stable"
+		if (version.contains("alpha")) {
+			channel = "alpha"
+		} else if (version.contains("beta")) {
+			channel = "beta"
+		}
+		filter ReplaceTokens, tokens: [
+			"version": version,
+			"today": "" + LocalDate.now(),
+			"release-flavor": "skriptlang-spigot", // SkriptLang build, distributed on Spigot resources
+			"release-channel": channel, // Release channel, see above
+			"release-updater": "ch.njol.skript.update.GithubChecker", // Github API client
+			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases", // Github API URL
+			"release-download": "\"http://example.com\"" // TODO insert Spigot URL
+		]
+	}
+	into 'build/resources/main'
+}
+
+task spigotRelease(type: Jar) {
+	from sourceSets.main.output
+	dependsOn spigotResources
+	archiveName = 'Skript-spigot.jar'
 	
 	manifest {
 		attributes("Name": "ch/njol/skript",

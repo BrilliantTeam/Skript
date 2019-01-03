@@ -162,7 +162,13 @@ public class GithubChecker implements UpdateChecker {
 				assert createdAt != null;
 				String patchNotes = latest.body;
 				assert patchNotes != null;
-				URL download = new URL(latest.assets.get(0).browser_download_url);
+				URL download;
+				if (manifest.downloadSource != null) {
+					download = new URL(manifest.downloadSource);
+				} else {
+					download = new URL(latest.assets.get(0).browser_download_url);
+				}
+				
 				return new UpdateManifest(name, createdAt, patchNotes, download);
 			} catch (MalformedURLException e) {
 				throw new RuntimeException(e);

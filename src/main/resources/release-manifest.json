@@ -3,5 +3,6 @@
 	"date": "@today@",
 	"flavor": "@release-flavor@",
 	"updateCheckerType": "@release-updater@",
-	"updateSource": "@release-source@"
+	"updateSource": "@release-source@",
+	"downloadSource": @release-download@
 }

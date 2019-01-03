@@ -81,12 +81,20 @@ public class ReleaseManifest {
 	 */
 	public final String updateSource;
 	
-	public ReleaseManifest(String id, String date, String flavor, Class<? extends UpdateChecker> updateCheckerType, String updateSource) {
+	/**
+	 * Source for downloads. If null, update checker will figure out it.
+	 */
+	@Nullable
+	public final String downloadSource;
+	
+	public ReleaseManifest(String id, String date, String flavor, Class<? extends UpdateChecker> updateCheckerType,
+			String updateSource, @Nullable String downloadSource) {
 		this.id = id;
 		this.date = date;
 		this.flavor = flavor;
 		this.updateCheckerType = updateCheckerType;
 		this.updateSource = updateSource;
+		this.downloadSource = downloadSource;
 	}
 	
 	/**
