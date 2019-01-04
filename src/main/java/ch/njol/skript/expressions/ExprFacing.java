@@ -21,6 +21,7 @@ package ch.njol.skript.expressions;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.material.Directional;
@@ -28,6 +29,7 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -50,6 +52,9 @@ import ch.njol.util.coll.CollectionUtils;
 		"\tset loop-block to cobblestone"})
 @Since("1.4")
 public class ExprFacing extends SimplePropertyExpression<Object, Direction> {
+	
+	private static final boolean useBlockData = Skript.isRunningMinecraft(1, 13);
+	
 	static {
 		register(ExprFacing.class, Direction.class, "(1¦horizontal|) facing", "livingentities/blocks");
 	}
@@ -67,9 +72,16 @@ public class ExprFacing extends SimplePropertyExpression<Object, Direction> {
 	@Nullable
 	public Direction convert(final Object o) {
 		if (o instanceof Block) {
-			final MaterialData d = ((Block) o).getType().getNewData(((Block) o).getData());
-			if (d instanceof Directional)
-				return new Direction(((Directional) d).getFacing(), 1);
+			if (useBlockData) {
+				BlockData data = ((Block) o).getBlockData();
+				if (data instanceof org.bukkit.block.data.Directional) {
+					return new Direction(((org.bukkit.block.data.Directional) data).getFacing(), 1);
+				}
+			} else {
+				final MaterialData d = ((Block) o).getType().getNewData(((Block) o).getData());
+				if (d instanceof Directional)
+					return new Direction(((Directional) d).getFacing(), 1);
+			}
 			return null;
 		} else if (o instanceof LivingEntity) {
 			return new Direction(Direction.getFacing(((LivingEntity) o).getLocation(), horizontal), 1);
