@@ -625,6 +625,30 @@ public final class Skript extends JavaPlugin implements Listener {
 						return "" + SkriptConfig.executeFunctionsWithMissingParams.value();
 					}
 				});
+				metrics.addCustomChart(new Metrics.SimplePie("buildFlavor") {
+					
+					@Override
+					public String getValue() {
+						if (updater != null) {
+							return updater.getCurrentRelease().flavor;
+						}
+						return "unknown";
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("updateCheckerEnabled") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.checkForNewVersion.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("releaseChannel") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.releaseChannel.value();
+					}
+				});
 				
 				Skript.metrics = metrics;
 				
