@@ -39,14 +39,14 @@ import ch.njol.util.coll.CollectionUtils;
  * @author bi0qaw
  */
 @Name("Vectors - Normalized")
-@Description("Normalizes a vector.")
+@Description("Returns the same vector but with length 1.")
 @Examples({"set {_v} to normalized {_v}"})
 @Since("2.2-dev28")
 public class ExprVectorNormalize extends SimpleExpression<Vector> {
 
 	static {
 		Skript.registerExpression(ExprVectorNormalize.class, Vector.class, ExpressionType.SIMPLE,
-				"normalized %vector%",
+				"normalize[d] %vector%",
 				"%vector% normalized");
 	}
 
