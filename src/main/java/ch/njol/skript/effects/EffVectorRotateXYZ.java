@@ -61,8 +61,8 @@ public class EffVectorRotateXYZ extends Effect {
 	@Override
 	@SuppressWarnings({"unchecked", "null"})
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		vectors = (Expression<Vector>)expressions[0];
-		degree = (Expression<Number>)expressions[1];
+		vectors = (Expression<Vector>) expressions[0];
+		degree = (Expression<Number>) expressions[1];
 		axis = parseResult.mark;
 		return true;
 	}
@@ -75,15 +75,15 @@ public class EffVectorRotateXYZ extends Effect {
 			return;
 		switch (axis) {
 			case 1:
-				for (Vector v : vectors.getAll(e))
+				for (Vector v : vectors.getArray(e))
 					VectorMath.rotX(v, d.doubleValue());
 				break;
 			case 2:
-				for (Vector v : vectors.getAll(e))
+				for (Vector v : vectors.getArray(e))
 					VectorMath.rotY(v, d.doubleValue());
 				break;
 			case 3:
-				for (Vector v : vectors.getAll(e))
+				for (Vector v : vectors.getArray(e))
 					VectorMath.rotZ(v, d.doubleValue());
 		}
 	}

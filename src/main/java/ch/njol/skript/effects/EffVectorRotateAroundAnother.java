@@ -67,7 +67,7 @@ public class EffVectorRotateAroundAnother extends Effect {
 	protected void execute(Event e) {
 		Vector v2 = second.getSingle(e);
 		Number d = degree.getSingle(e);
-		if (v2 == null || d == null )
+		if (v2 == null || d == null)
 			return;
 		for (Vector v1 : first.getArray(e))
 			VectorMath.rot(v1, v2, d.doubleValue());
