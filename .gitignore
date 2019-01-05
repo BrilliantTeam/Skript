@@ -42,4 +42,4 @@ out/
 # ===== OTHER =====
 
 # [Maybe ECJ:] compiled stuff lands here
-/bin/
+**/bin/

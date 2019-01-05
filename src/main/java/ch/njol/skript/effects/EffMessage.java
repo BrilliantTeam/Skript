@@ -31,6 +31,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.hooks.regions.RegionsPlugin;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionList;
@@ -58,7 +59,7 @@ public class EffMessage extends Effect {
 	}
 
 	@SuppressWarnings("null")
-	private Expression<String>[] messages;
+	private Expression<? extends String>[] messages;
 
 	/**
 	 * Used for {@link EffMessage#toString(Event, boolean)}
@@ -72,18 +73,17 @@ public class EffMessage extends Effect {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		messages = (Expression<String>[]) (exprs[0] instanceof ExpressionList ? ((ExpressionList) exprs[0]).getExpressions() : new Expression[] {exprs[0]});
+		messages = exprs[0] instanceof ExpressionList ? ((ExpressionList<String>) exprs[0]).getExpressions() : new Expression[] {exprs[0]};
 		messageExpr = (Expression<String>) exprs[0];
 		recipients = (Expression<CommandSender>) exprs[1];
 		return true;
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	protected void execute(final Event e) {
-		for (Expression<String> message : messages) {
+		for (Expression<? extends String> message : messages) {
 			for (CommandSender sender : recipients.getArray(e)) {
-				if (message instanceof VariableString && sender instanceof Player) { // this could contain json formatting
+				if (message instanceof VariableString && sender instanceof Player) { // This could contain json formatting
 					List<MessageComponent> components = ((VariableString) message).getMessageComponents(e);
 					((Player) sender).spigot().sendMessage(BungeeConverter.convert(components.toArray(new MessageComponent[components.size()])));
 				} else {
@@ -95,7 +95,6 @@ public class EffMessage extends Effect {
 		}
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
 		return "send " + messageExpr.toString(e, debug) + " to " + recipients.toString(e, debug);

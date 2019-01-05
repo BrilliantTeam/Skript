@@ -275,10 +275,13 @@ public class EffChange extends Effect {
 	@Override
 	protected void execute(final Event e) {
 		final Expression<?> changer = this.changer;
-		final Object[] delta = changer == null ? null : changer.getArray(e);
+		Object[] delta = changer == null ? null : changer.getArray(e);
+		delta = changer == null ? delta : changer.beforeChange(changed, delta);
 		if (delta != null && delta.length == 0)
 			return;
-		changed.change(e, changer == null ? delta : changer.beforeChange(changed, delta), mode); // Trigger beforeChanged hook
+		if (delta == null && (mode != ChangeMode.DELETE && mode != ChangeMode.RESET))
+			return;
+		changed.change(e, delta, mode); // Trigger beforeChanged hook
 		// REMIND use a random element out of delta if changed only supports changing a single instance
 //		changed.change(e, new Changer2<Object>() {
 //			@Override

@@ -34,6 +34,7 @@ import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.ItemUtils;
 
 /**
  * Block compatibility implemented with magic numbers. No other choice until
@@ -43,7 +44,7 @@ public class MagicBlockCompat implements BlockCompat {
 	
 	private static final MethodHandle setRawDataMethod;
 	private static final MethodHandle getBlockDataMethod;
-	static final MethodHandle setDataMethod;
+	public static final MethodHandle setDataMethod;
 	
 	static {
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -158,11 +159,10 @@ public class MagicBlockCompat implements BlockCompat {
 		return type == Material.WATER || type == Material.LAVA;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	@Nullable
 	public BlockValues getBlockValues(ItemStack stack) {
-		short data = stack.getDurability();
+		short data = (short) ItemUtils.getDamage(stack);
 		if (data != 0)
 			return new MagicBlockValues(stack.getType(), data);
 		return null;

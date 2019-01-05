@@ -1,1 +1,4 @@
 enableFeaturePreview('STABLE_PUBLISHING')
+
+rootProject.name = 'Skript'
+include 'skript-worldguard6'

@@ -80,7 +80,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.Gson;
 
-import ch.njol.skript.Updater.UpdateState;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.bukkitutil.BurgerHelper;
@@ -127,6 +126,10 @@ import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.timings.SkriptTimings;
+import ch.njol.skript.update.ReleaseManifest;
+import ch.njol.skript.update.ReleaseStatus;
+import ch.njol.skript.update.UpdateManifest;
+import ch.njol.skript.update.UpdaterState;
 import ch.njol.skript.util.EmptyStacktraceException;
 import ch.njol.skript.util.ExceptionUtils;
 import ch.njol.skript.util.FileUtils;
@@ -134,6 +137,7 @@ import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.Task;
 import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.Version;
+import ch.njol.skript.util.chat.BungeeConverter;
 import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Closeable;
@@ -187,6 +191,12 @@ public final class Skript extends JavaPlugin implements Listener {
 			throw new IllegalStateException();
 		return i;
 	}
+	
+	/**
+	 * Current updater instance used by Skript.
+	 */
+	@Nullable
+	private SkriptUpdater updater;
 	
 	public Skript() throws IllegalStateException {
 		if (instance != null)
@@ -292,6 +302,14 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		Workarounds.init();
 		
+		// Start the updater
+		// Note: if config prohibits update checks, it will NOT do network connections
+		try {
+			this.updater = new SkriptUpdater();
+		} catch (Exception e) {
+			Skript.exception(e, "Update checker could not be initialized.");
+		}
+		
 		if (!getDataFolder().isDirectory())
 			getDataFolder().mkdirs();
 		
@@ -359,6 +377,14 @@ public final class Skript extends JavaPlugin implements Listener {
 		// ... but also before platform check, because there is a config option to ignore some errors
 		SkriptConfig.load();
 		
+		// Use the updater, now that it has been configured to (not) do stuff
+		if (updater != null) {
+			CommandSender console = Bukkit.getConsoleSender();
+			assert console != null;
+			assert updater != null;
+			updater.updateCheck(console);
+		}
+		
 		// Check server software, Minecraft version, etc.
 		if (!checkServerPlatform()) {
 			disabled = true; // Nothing was loaded, nothing needs to be unloaded
@@ -397,9 +423,6 @@ public final class Skript extends JavaPlugin implements Listener {
 		}
 		
 		Language.setUseLocal(true);
-		
-		if (SkriptConfig.checkForNewVersion.value()) // We only start updater automatically if it was asked
-			Updater.start();
 		
 		Commands.registerListeners();
 		
@@ -602,6 +625,30 @@ public final class Skript extends JavaPlugin implements Listener {
 						return "" + SkriptConfig.executeFunctionsWithMissingParams.value();
 					}
 				});
+				metrics.addCustomChart(new Metrics.SimplePie("buildFlavor") {
+					
+					@Override
+					public String getValue() {
+						if (updater != null) {
+							return updater.getCurrentRelease().flavor;
+						}
+						return "unknown";
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("updateCheckerEnabled") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.checkForNewVersion.value();
+					}
+				});
+				metrics.addCustomChart(new Metrics.SimplePie("releaseChannel") {
+					
+					@Override
+					public String getValue() {
+						return "" + SkriptConfig.releaseChannel.value();
+					}
+				});
 				
 				Skript.metrics = metrics;
 				
@@ -631,19 +678,21 @@ public final class Skript extends JavaPlugin implements Listener {
 			public void onJoin(final PlayerJoinEvent e) {
 				if (e.getPlayer().hasPermission("skript.admin")) {
 					new Task(Skript.this, 0) {
-						@SuppressWarnings("incomplete-switch")
 						@Override
 						public void run() {
 							Player p = e.getPlayer();
-							if (p == null)
+							SkriptUpdater updater = getUpdater();
+							if (p == null || updater == null)
 								return;
 							
-							switch (Updater.state) {
-								case UPDATE_AVAILABLE:
-									Skript.info(p, "" + Updater.m_update_available);
-									break;
-								case DOWNLOADED:
-									Skript.info(p, "" + Updater.m_downloaded);
+							// Don't actually check for updates to avoid breaking Github rate limit
+							if (updater.getReleaseStatus() == ReleaseStatus.OUTDATED) {
+								// Last check indicated that an update is available
+								UpdateManifest update = updater.getUpdateManifest();
+								assert update != null; // Because we just checked that one is available
+								Skript.info(p, "" + SkriptUpdater.m_update_available.toString(update.id, Skript.getVersion()));
+								p.spigot().sendMessage(BungeeConverter.convert(ChatMessages.parseToArray(
+										"Download it at: <aqua><u><link:" + update.downloadUrl + ">" + update.downloadUrl)));
 							}
 						}
 					};
@@ -1379,7 +1428,6 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @return an EmptyStacktraceException to throw if code execution should terminate.
 	 */
 	public static EmptyStacktraceException exception(@Nullable Throwable cause, final @Nullable Thread thread, final @Nullable TriggerItem item, final String... info) {
-		
 		// First error: gather plugin package information
 		if (!checkedPlugins) { 
 			for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
@@ -1424,10 +1472,12 @@ public final class Skript extends JavaPlugin implements Listener {
 			}
 		}
 		
+		SkriptUpdater updater = Skript.getInstance().getUpdater();
+		
 		// Check if server platform is supported
 		if (!isRunningMinecraft(1, 9)) {
 			logEx("You are running an outdated Minecraft version not supported by Skript.");
-			logEx("Please update to Minecraft 1.9 or later or fix this yourself and send us a pull request.");
+			logEx("Please update to Minecraft 1.9.4 or later or fix this yourself and send us a pull request.");
 			logEx("Alternatively, use an older Skript version; do note that those are also unsupported by us.");
 			logEx("");
 			logEx("Again, we do not support Minecraft versions this old.");
@@ -1435,10 +1485,10 @@ public final class Skript extends JavaPlugin implements Listener {
 			logEx("Your server platform appears to be unsupported by Skript. It might not work reliably.");
 			logEx("You can report this at " + issuesUrl + ". However, we may be unable to fix the issue.");
 			logEx("It is recommended that you switch to Paper or Spigot, should you encounter problems.");
-		} else if (Updater.state == UpdateState.UPDATE_AVAILABLE) {
+		} else if (updater != null && updater.getReleaseStatus() == ReleaseStatus.OUTDATED) {
 			logEx("You're running outdated version of Skript! Please try updating it NOW; it might fix this.");
-			logEx("You may download new version of Skript at https://github.com/SkriptLang/Skript/releases");
-			logEx("You will be given instructions how to report this error if it persists with latest Skript.");
+			logEx("Run /sk update check to get a download link to latest Skript!");
+			logEx("You will be given instructions how to report this error if it persists after update.");
 		} else {
 			if (pluginPackages.isEmpty()) {
 				logEx("You should report it at " + issuesUrl + ". Please copy paste this report there (or use paste service).");
@@ -1495,9 +1545,17 @@ public final class Skript extends JavaPlugin implements Listener {
 		
 		logEx();
 		logEx("Version Information:");
-		logEx("  Skript: " + getVersion() + (Updater.state == Updater.UpdateState.RUNNING_LATEST ? " (latest)"
-				: Updater.state == Updater.UpdateState.UPDATE_AVAILABLE ? " (OUTDATED)"
-				: Updater.state == Updater.UpdateState.RUNNING_CUSTOM ? " (custom version)" : ""));
+		if (updater != null) {
+			ReleaseStatus status = updater.getReleaseStatus();
+			logEx("  Skript: " + getVersion() + (status == ReleaseStatus.LATEST ? " (latest)"
+					: status == ReleaseStatus.OUTDATED ? " (OUTDATED)"
+					: status == ReleaseStatus.CUSTOM ? " (custom version)" : ""));
+			ReleaseManifest current = updater.getCurrentRelease();
+			logEx("    Flavor: " + current.flavor);
+			logEx("    Date: " + current.date);
+		} else {
+			logEx("  Skript: " + getVersion() + " (unknown; likely custom)");
+		}
 		logEx("  Bukkit: " + Bukkit.getBukkitVersion());
 		logEx("  Minecraft: " + getMinecraftVersion());
 		logEx("  Java: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + ")");
@@ -1509,10 +1567,9 @@ public final class Skript extends JavaPlugin implements Listener {
 		logEx("Current item: " + (item == null ? "null" : item.toString(null, true)));
 		if (item != null && item.getTrigger() != null) {
 			Trigger trigger = item.getTrigger();
-			if (trigger != null) { // always true, but won't compile without this check
-				File script = trigger.getScript();
-				logEx("Current trigger: " + trigger.toString(null, true) + " (" + (script == null ? "null" : script.getName()) + ", line " + trigger.getLineNumber() + ")");
-			}
+			assert trigger != null;
+			File script = trigger.getScript();
+			logEx("Current trigger: " + trigger.toString(null, true) + " (" + (script == null ? "null" : script.getName()) + ", line " + trigger.getLineNumber() + ")");
 		}
 		logEx();
 		logEx("Thread: " + (thread == null ? Thread.currentThread() : thread).getName());
@@ -1580,11 +1637,12 @@ public final class Skript extends JavaPlugin implements Listener {
 	}
 	
 	/**
-	 * Indicates if Skript is running prerelease build.
-	 * @return Boolean.
+	 * Gets the updater instance currently used by Skript.
+	 * @return SkriptUpdater instance.
 	 */
-	public static boolean isPrerelease() {
-		return true;
+	@Nullable
+	public SkriptUpdater getUpdater() {
+		return updater;
 	}
 	
 }

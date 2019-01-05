@@ -237,7 +237,7 @@ public class ExprLore extends SimpleExpression<String> {
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return lineNumber != null;
 	}
 
 	@Override

@@ -7,40 +7,69 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-repositories {
-	jcenter()
-	mavenCentral()
-
-	maven {
-		url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+// Substitute dependencies' versions of Bukkit with latest Paper API
+configurations.all {
+	resolutionStrategy.dependencySubstitution {
+		substitute module('org.bukkit:bukkit') with module('com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT')
 	}
+}
 
-	maven {
-		url 'http://maven.sk89q.com/repo'
+allprojects {
+	repositories {
+		jcenter()
+		mavenCentral()
+	
+		maven {
+			url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+		}
+	
+		maven {
+			url 'http://maven.sk89q.com/repo'
+		}
+	
+		maven {
+			url 'https://repo.destroystokyo.com/repository/maven-public//'
+		}
+	
+		maven {
+			url 'http://ci.emc.gs/nexus/content/groups/aikar/'
+		}
+	
+		maven {
+			url 'http://nexus.hc.to/content/repositories/pub_releases'
+		}
+	
+		maven {
+			url 'https://jitpack.io'
+		}
+	
+		maven {
+			url 'https://oss.sonatype.org/content/repositories/snapshots/'
+		}
+	
+		maven {
+			url 'https://repo.codemc.org/repository/maven-public'
+		}
 	}
-
-	maven {
-		url 'https://repo.destroystokyo.com/repository/maven-public//'
+	
+	configurations {
+		ecj
 	}
-
-	maven {
-		url 'http://ci.emc.gs/nexus/content/groups/aikar/'
+	
+	dependencies {
+		ecj 'org.eclipse.jdt:ecj:3.15.0'
 	}
-
-	maven {
-		url 'http://nexus.hc.to/content/repositories/pub_releases'
-	}
-
-	maven {
-		url 'https://jitpack.io'
-	}
-
-	maven {
-		url 'https://oss.sonatype.org/content/repositories/snapshots/'
-	}
-
-	maven {
-		url 'https://repo.codemc.org/repository/maven-public'
+	
+	sourceCompatibility = 1.8
+	compileJava {
+		options.fork = true
+		options.encoding = 'UTF-8'
+		options.compilerArgs = ['-properties', '.settings/org.eclipse.jdt.core.prefs', '-encoding', 'UTF-8',
+								'-warn:-tasks(TODO|FIXME|REMIND)']
+		options.forkOptions.with {
+			executable = 'java'
+			jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main']
+		}
 	}
 }
 
@@ -60,15 +89,15 @@ dependencies {
 	implementation fileTree(dir: 'lib', include: '*.jar')
 }
 
-configurations.all {
-	resolutionStrategy.dependencySubstitution {
-		substitute module('org.bukkit:bukkit') with module('com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT')
-	}
-}
-
 processResources {
 	filter ReplaceTokens, tokens: [
-			"version": System.getenv('SKRIPT_VERSION') == null ? project.property("version") : System.getenv('SKRIPT_VERSION')
+		"version": System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION"),
+		'today': "unknown", // Don't leak information about system this was built on
+		"release-flavor": "selfbuilt-unknown", // Note: 'selfbuilt' prefix makes updater report a custom build
+		"release-channel": "none", // No updates, so anything else wouldn't make sense
+		"release-updater": "ch.njol.skript.update.NoUpdateChecker", // Disable update checking
+		"release-source": "",
+		"release-download": "null"
 	]
 }
 
@@ -83,6 +112,9 @@ jar {
 	from('skript-aliases') {
 		into('aliases-english') // Change this if we get aliases in other languages
 	}
+	
+	// Include all modules of Skript
+	from 'skript-worldguard6/build/classes/java/main'
 }
 
 license {
@@ -92,26 +124,6 @@ license {
 	exclude('**/*.sk') // Sample scripts and maybe aliases
 	exclude('**/*.lang') // Language files do not have headers (still under GPLv3)
 	exclude('**/*.json') // JSON files do not have headers
-}
-
-configurations {
-	ecj
-}
-
-dependencies {
-	ecj 'org.eclipse.jdt:ecj:3.15.0'
-}
-
-sourceCompatibility = 1.8
-compileJava {
-	options.fork = true
-	options.encoding = 'UTF-8'
-	options.compilerArgs = ['-properties', '.settings/org.eclipse.jdt.core.prefs', '-encoding', 'UTF-8',
-							'-warn:-tasks(TODO|FIXME|REMIND)']
-	options.forkOptions.with {
-		executable = 'java'
-		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main']
-	}
 }
 
 task checkAliases {
@@ -153,10 +165,90 @@ publishing {
 	}
 }
 
-/*
-  Set compile encoding to UTF-8
-  Fixes issue #850
- */
-compileJava.options.encoding = 'UTF-8'
 
+// Set compile encoding to UTF-8 (#850)
+compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
+
+// Build flavor configurations
+task githubResources(type: ProcessResources) {
+	from ('src/main/resources') {
+		include '**'
+		version = System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION")
+		def channel = "stable"
+		if (version.contains("alpha")) {
+			channel = "alpha"
+		} else if (version.contains("beta")) {
+			channel = "beta"
+		}
+		filter ReplaceTokens, tokens: [
+			"version": version,
+			"today": "" + LocalDate.now(),
+			"release-flavor": "skriptlang-github", // SkriptLang build, distributed on Github
+			"release-channel": channel, // Release channel, see above
+			"release-updater": "ch.njol.skript.update.GithubChecker", // Github API client
+			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases", // Github API URL
+			"release-download": "null" // Update checker will figure it out
+		]
+	}
+	into 'build/resources/main'
+}
+
+task githubRelease(type: Jar) {
+	from sourceSets.main.output
+	dependsOn githubResources
+	archiveName = 'Skript-github.jar'
+	
+	manifest {
+		attributes("Name": "ch/njol/skript",
+				"Sealed": "true")
+	}
+	
+	from('skript-aliases') {
+		into('aliases-english')
+	}
+	
+	// Include all modules of Skript
+	from 'skript-worldguard6/build/classes/java/main'
+}
+
+task spigotResources(type: ProcessResources) {
+	from ('src/main/resources') {
+		include '**'
+		version = System.getenv("SKRIPT_VERSION") == null ? project.property("version") : System.getenv("SKRIPT_VERSION")
+		def channel = "stable"
+		if (version.contains("alpha")) {
+			channel = "alpha"
+		} else if (version.contains("beta")) {
+			channel = "beta"
+		}
+		filter ReplaceTokens, tokens: [
+			"version": version,
+			"today": "" + LocalDate.now(),
+			"release-flavor": "skriptlang-spigot", // SkriptLang build, distributed on Spigot resources
+			"release-channel": channel, // Release channel, see above
+			"release-updater": "ch.njol.skript.update.GithubChecker", // Github API client
+			"release-source": "https://api.github.com/repos/SkriptLang/Skript/releases", // Github API URL
+			"release-download": "\"http://example.com\"" // TODO insert Spigot URL
+		]
+	}
+	into 'build/resources/main'
+}
+
+task spigotRelease(type: Jar) {
+	from sourceSets.main.output
+	dependsOn spigotResources
+	archiveName = 'Skript-spigot.jar'
+	
+	manifest {
+		attributes("Name": "ch/njol/skript",
+				"Sealed": "true")
+	}
+	
+	from('skript-aliases') {
+		into('aliases-english')
+	}
+	
+	// Include all modules of Skript
+	from 'skript-worldguard6/build/classes/java/main'
+}
