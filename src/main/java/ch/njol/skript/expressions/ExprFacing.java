@@ -30,6 +30,7 @@ import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.block.MagicBlockCompat;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -119,11 +120,23 @@ public class ExprFacing extends SimplePropertyExpression<Object, Direction> {
 		final Block b = (Block) getExpr().getSingle(e);
 		if (b == null)
 			return;
-		final MaterialData d = b.getType().getNewData(b.getData());
-		if (!(d instanceof Directional))
-			return;
-		((Directional) d).setFacingDirection(toBlockFace(((Direction) delta[0]).getDirection(b)));
-		//b.setData(d.getData()); // TODO update for 1.13?
+		if (useBlockData) {
+			BlockData data = b.getBlockData();
+			if (data instanceof org.bukkit.block.data.Directional) {
+				((org.bukkit.block.data.Directional) data).setFacing(toBlockFace(((Direction) delta[0]).getDirection(b)));
+				b.setBlockData(data, false);
+			}
+		} else {
+			final MaterialData d = b.getType().getNewData(b.getData());
+			if (!(d instanceof Directional))
+				return;
+			((Directional) d).setFacingDirection(toBlockFace(((Direction) delta[0]).getDirection(b)));
+			try { // Quick and dirty fix for getting pre-1.13 setData(byte)
+				MagicBlockCompat.setDataMethod.invokeExact(b, d.getData());
+			} catch (Throwable ex) {
+				Skript.exception(ex);
+			}
+		}
 	}
 	
 	private static BlockFace toBlockFace(final Vector dir) {
