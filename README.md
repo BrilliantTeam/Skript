@@ -44,6 +44,18 @@ gradlew clean build # on Windows
 You can get source code from the [releases](https://github.com/SkriptLang/Skript/releases) page.
 You may also clone this repository, but that code may or may not be stable.
 
+### Compiling Modules
+Parts of Skript are provided as Gradle subprojects. They require Skript, so
+they are compiled *after* it has been built. For this reason, if you want them
+embedded in Skript jar, you must re-package it after compiling once. For example:
+
+```
+./gradlew jar
+```
+
+Note that modules are not necessary for Skript to work. Currently, they are
+only used to provide compatibility with old WorldGuard versions.
+
 ### Importing to Eclipse
 With new Eclipse versions, there is integrated Gradle support, and it actually works now.
 So, first get latest Eclipse, then import Skript as any Gradle project. Just
