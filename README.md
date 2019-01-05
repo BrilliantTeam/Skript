@@ -71,6 +71,14 @@ You'll need to make sure that nullness annotations are working correctly. Also,
 when sending pull requests, make sure not to change IDEA configuration files
 that may have been stored in the repository.
 
+### Releasing
+```
+./gradlew clean build
+./gradlew <flavor>Release
+```
+Available flavors are github and spigot. Please do not abuse flavors by
+compiling your own test builds as releases.
+
 ## Contributing
 Please review our [contribution guidelines](https://github.com/SkriptLang/Skript/blob/master/.github/CONTRIBUTING.md).
 In addition to that, if you are contributing Java code, check our
