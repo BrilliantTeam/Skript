@@ -62,7 +62,7 @@ public class EffCancelCooldown extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		if (!ScriptLoader.isCurrentEvent(ScriptCommandEvent.class)) {
-			Skript.error("The cancel cooldown effect may only be used in a command.", ErrorQuality.SEMANTIC_ERROR);
+			Skript.error("The cancel cooldown effect may only be used in a command", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}
 		cancel = matchedPattern == 0;

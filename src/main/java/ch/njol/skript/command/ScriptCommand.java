@@ -78,7 +78,6 @@ import ch.njol.util.Validate;
 
 /**
  * This class is used for user-defined commands.
- * 
  */
 public class ScriptCommand implements TabExecutor {
 
@@ -146,7 +145,7 @@ public class ScriptCommand implements TabExecutor {
 		this.cooldownStorage = cooldownStorage;
 
 		// remove aliases that are the same as the command
-		aliases.removeIf(s -> s.equalsIgnoreCase(label));
+		aliases.removeIf(label::equalsIgnoreCase);
 		this.aliases = aliases;
 		activeAliases = new ArrayList<>(aliases);
 
@@ -367,7 +366,7 @@ public class ScriptCommand implements TabExecutor {
 		help.addTopic(t);
 		helps.add(t);
 		final HelpTopic aliases = help.getHelpTopic("Aliases");
-		if (aliases != null && aliases instanceof IndexHelpTopic) {
+		if (aliases instanceof IndexHelpTopic) {
 			aliases.getFullText(Bukkit.getConsoleSender()); // CraftBukkit has a lazy IndexHelpTopic class (org.bukkit.craftbukkit.help.CustomIndexHelpTopic) - maybe its used for aliases as well
 			try {
 				final Field topics = IndexHelpTopic.class.getDeclaredField("allTopics");
