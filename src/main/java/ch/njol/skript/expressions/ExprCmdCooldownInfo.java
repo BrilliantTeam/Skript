@@ -99,11 +99,11 @@ public class ExprCmdCooldownInfo extends SimpleExpression<Object> {
 						: scriptCommand.getElapsedMilliseconds(uuid, event);
 				return new Timespan[] { new Timespan(ms) };
 			case 2:
-				return new Timespan[] {scriptCommand.getCooldown() };
+				return new Timespan[] { scriptCommand.getCooldown() };
 			case 3:
-				return new Date[] {scriptCommand.getLastUsage(uuid, event) };
+				return new Date[] { scriptCommand.getLastUsage(uuid, event) };
 			case 4:
-				return new String[] {scriptCommand.getCooldownBypass() };
+				return new String[] { scriptCommand.getCooldownBypass() };
 		}
 		
 		return null;
