@@ -65,6 +65,7 @@ import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.bukkitutil.EnchantmentIds;
+import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.ConfigurationSerializer;
 import ch.njol.skript.classes.EnumSerializer;
@@ -962,17 +963,9 @@ public class BukkitClasses {
 							return null;
 						}
 						
-						// Legacy code; probably not needed
-//						if (!t.getTypes().get(0).hasDataRange())
-//							return t.getRandom();
-//						if (t.getTypes().get(0).dataMin > 0) {
-//							Skript.error("'" + s + "' represents multiple materials");
-//							return null;
-//						}
-						
 						final ItemStack i = t.getRandom();
 						assert i != null;
-						i.setDurability((short) 0);
+						ItemUtils.setDamage(i, 0);
 						return i;
 					}
 					
@@ -981,12 +974,11 @@ public class BukkitClasses {
 						return ItemType.toString(i, flags);
 					}
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public String toVariableNameString(final ItemStack i) {
 						final StringBuilder b = new StringBuilder("item:");
 						b.append(i.getType().name());
-						b.append(":" + i.getDurability());
+						b.append(":" + ItemUtils.getDamage(i));
 						b.append("*" + i.getAmount());
 						for (final Entry<Enchantment, Integer> e : i.getEnchantments().entrySet()) {
 							b.append("#" + EnchantmentIds.ids.get(e.getKey()));

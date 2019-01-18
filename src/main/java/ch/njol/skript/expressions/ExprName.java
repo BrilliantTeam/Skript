@@ -77,6 +77,10 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 				if (o instanceof LivingEntity) {
 					((LivingEntity) o).setCustomName(name);
 					((LivingEntity) o).setRemoveWhenFarAway(false);
+				} else if (o instanceof ItemType) {
+					ItemMeta m = ((ItemType) o).getItemMeta();
+					m.setDisplayName(name);
+					((ItemType) o).setItemMeta(m);
 				} else if (o instanceof ItemStack) {
 					ItemMeta m = ((ItemStack) o).getItemMeta();
 					if (m != null) {
@@ -107,6 +111,9 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 					return ((Player) o).getName();
 				} else if (o instanceof LivingEntity) {
 					return ((LivingEntity) o).getCustomName();
+				} else if (o instanceof ItemType) {
+					ItemMeta m = ((ItemType) o).getItemMeta();
+					return !m.hasDisplayName() ? null : m.getDisplayName();
 				} else if (o instanceof ItemStack) {
 					if (!((ItemStack) o).hasItemMeta())
 						return null;
@@ -309,6 +316,12 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 				}
 			} else {
 				final Object i = getExpr().getSingle(e);
+				if (i instanceof ItemType) {
+					type.set(i, name);
+					getExpr().change(e, new ItemType[] {(ItemType) i}, ChangeMode.SET);
+					return;
+				}
+				
 				if (!(i instanceof ItemStack) && !(i instanceof Slot))
 					return;
 				final ItemStack is = i instanceof Slot ? ((Slot) i).getItem() : (ItemStack) i;
