@@ -320,7 +320,12 @@ public class SkriptClasses {
 					@Override
 					@Nullable
 					public Timespan parse(final String s, final ParseContext context) {
-						return Timespan.parse(s);
+						try {
+							return Timespan.parse(s);
+						} catch (IllegalArgumentException e) {
+							Skript.error("'" + s + "' is not a valid timespan");
+							return null;
+						}
 					}
 					
 					@Override
