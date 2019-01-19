@@ -436,7 +436,7 @@ final public class ScriptLoader {
 			else
 				Skript.debug("Commands changed but not synced to clients (normal on 1.12 and older)");
 		} else {
-			Skript.debug("Commands unchanged not syncing them to clients");
+			Skript.debug("Commands unchanged, not syncing them to clients");
 		}
 		
 		// If task was ran asynchronously, returned stats may be wrong
