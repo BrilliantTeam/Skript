@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 
 import org.bukkit.Bukkit;
@@ -209,13 +210,23 @@ final public class ScriptLoader {
 	public static class ScriptInfo {
 		public int files, triggers, commands, functions;
 		
-		public ScriptInfo() {}
+		/**
+		 * Command names. They're collected to see if commands need to be
+		 * sent to clients on Minecraft 1.13 and newer. Note that add/subtract
+		 * don't operate with command names!
+		 */
+		public final Set<String> commandNames;
+		
+		public ScriptInfo() {
+			commandNames = new HashSet<>();
+		}
 		
 		public ScriptInfo(final int numFiles, final int numTriggers, final int numCommands, final int numFunctions) {
 			files = numFiles;
 			triggers = numTriggers;
 			commands = numCommands;
 			functions = numFunctions;
+			commandNames = new HashSet<>();
 		}
 		
 		/**
@@ -227,6 +238,7 @@ final public class ScriptLoader {
 			triggers = o.triggers;
 			commands = o.commands;
 			functions = o.functions;
+			commandNames = new HashSet<>(o.commandNames);
 		}
 
 		public void add(final ScriptInfo other) {
@@ -248,6 +260,12 @@ final public class ScriptLoader {
 			return "ScriptInfo{files=" + files + ",triggers=" + triggers + ",commands=" + commands + ",functions:" + functions + "}";
 		}
 	}
+	
+	/**
+	 * Command names by script names. Used to figure out when commands need
+	 * to be re-sent to clients on MC 1.13+.
+	 */
+	private static final Map<String, Set<String>> commandNames = new HashMap<>();
 	
 //	private final static class SerializedScript {
 //		public SerializedScript() {}
@@ -381,13 +399,21 @@ final public class ScriptLoader {
 	public static ScriptInfo loadScripts(final List<Config> configs) {
 		ScriptInfo i = new ScriptInfo();
 		
+		AtomicBoolean syncCommands = new AtomicBoolean(false);
 		Runnable task = () -> {
 			// Do NOT sort here, list must be loaded in order it came in (see issue #667)
 			final boolean wasLocal = Language.setUseLocal(false);
 			try {
 				for (final Config cfg : configs) {
 					assert cfg != null : configs.toString();
-					i.add(loadScript(cfg));
+					ScriptInfo info = loadScript(cfg);
+					
+					// Check if commands have been changed and a re-send is needed
+					if (!info.commandNames.equals(commandNames.get(cfg.getFileName()))) {
+						syncCommands.set(true); // Sync once after everything has been loaded
+						commandNames.put(cfg.getFileName(), info.commandNames); // These will soon be sent to clients
+					}
+					i.add(info);
 				}
 			} finally {
 				if (wasLocal)
@@ -401,11 +427,17 @@ final public class ScriptLoader {
 		else
 			task.run();
 		
-		// After we've loaded everything, refresh commands
-		// TODO only sync if new were defined
-		Server server = Bukkit.getServer();
-		assert server != null;
-		CommandReloader.syncCommands(server);
+		// After we've loaded everything, refresh commands their names changed
+		if (syncCommands.get()) {
+			Server server = Bukkit.getServer();
+			assert server != null;
+			if (CommandReloader.syncCommands(server)) 
+				Skript.debug("Commands synced to clients");
+			else
+				Skript.debug("Commands changed but not synced to clients (normal on 1.12 and older)");
+		} else {
+			Skript.debug("Commands unchanged not syncing them to clients");
+		}
 		
 		// If task was ran asynchronously, returned stats may be wrong
 		// This is probably ok, since loadScripts() will go async if needed
@@ -436,7 +468,6 @@ final public class ScriptLoader {
 	 * @param configs Configs for scripts, loaded by {@link #loadStructure(File)}
 	 * @return Info on the loaded scripts
 	 */
-	@SuppressWarnings("null")
 	public static ScriptInfo loadScripts(final Config... configs) {
 		return loadScripts(Arrays.asList(configs));
 	}
@@ -489,9 +520,8 @@ final public class ScriptLoader {
 		List<ParsedEventData> events = new ArrayList<>();
 		
 		// Track what is loaded
-		int numTriggers = 0;
-		int numCommands = 0;
-		int numFunctions = 0;
+		ScriptInfo i = new ScriptInfo();
+		i.files = 1; // Loading one script
 		
 		try {
 			if (SkriptConfig.keepConfigsLoaded.value())
@@ -621,8 +651,9 @@ final public class ScriptLoader {
 						final ScriptCommand c = Commands.loadCommand(node, false);
 						if (c != null) {
 							commands.add(c);
+							i.commandNames.add(c.getName()); // For tab completion
 						}
-						numCommands++;
+						i.commands++;
 						
 						deleteCurrentEvent();
 						
@@ -635,7 +666,7 @@ final public class ScriptLoader {
 						if (func != null) {
 							functions.add(func);
 						}
-						numFunctions++;
+						i.functions++;
 						
 						deleteCurrentEvent();
 						
@@ -668,11 +699,11 @@ final public class ScriptLoader {
 						((SelfRegisteringSkriptEvent) parsedEvent.getSecond()).afterParse(config);
 					}
 					
-					numTriggers++;
+					i.triggers++;
 				}
 				
 				if (Skript.logHigh())
-					Skript.info("loaded " + numTriggers + " trigger" + (numTriggers == 1 ? "" : "s") + " and " + numCommands + " command" + (numCommands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
+					Skript.info("loaded " + i.triggers + " trigger" + (i.triggers == 1 ? "" : "s")+ " and " + i.commands + " command" + (i.commands == 1 ? "" : "s") + " from '" + config.getFileName() + "'");
 				
 				currentScript = null;
 				Aliases.setScriptAliases(null); // These are per-script
@@ -748,7 +779,7 @@ final public class ScriptLoader {
 			}
 		}
 		
-		return new ScriptInfo(1, numTriggers, numCommands, numFunctions);
+		return i;
 	}
 	
 	/**
@@ -837,7 +868,6 @@ final public class ScriptLoader {
 	 * actually loading that script.
 	 * @param config Config object for the script.
 	 */
-	@SuppressWarnings("unchecked")
 	public static @Nullable Config loadStructure(final Config config) {
 		try {
 			//final CountingLogHandler numErrors = SkriptLogger.startLogHandler(new CountingLogHandler(SkriptLogger.SEVERE));
@@ -862,7 +892,7 @@ final public class ScriptLoader {
 						
 						setCurrentEvent("function", FunctionEvent.class);
 						
-						final Signature<?> func = Functions.loadSignature(config.getFileName(), node);
+						Functions.loadSignature(config.getFileName(), node);
 						
 						deleteCurrentEvent();
 						
