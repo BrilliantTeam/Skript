@@ -42,7 +42,7 @@ public class InventorySlot extends SlotWithIndex {
 	
 	public InventorySlot(final Inventory invi, final int index) {
 		assert invi != null;
-		assert index > 0;
+		assert index >= 0;
 		this.invi = invi;
 		this.index = index;
 	}

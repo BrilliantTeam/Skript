@@ -26,6 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -78,6 +79,16 @@ public class ExprNamed extends PropertyExpression<Object, Object> {
 			public Object get(Object obj) {
 				if (obj instanceof InventoryType)
 					return Bukkit.createInventory(null, (InventoryType) obj, name);
+				if (obj instanceof ItemStack) {
+					ItemStack stack = (ItemStack) obj;
+					stack = stack.clone();
+					ItemMeta meta = stack.getItemMeta();
+					if (meta != null) {
+						meta.setDisplayName(name);
+						stack.setItemMeta(meta);
+					}
+					return new ItemType(stack);
+				}
 				ItemType item = (ItemType) obj;
 				item = item.clone();
 				ItemMeta meta = item.getItemMeta();

@@ -422,7 +422,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	 * @param meta Item meta.
 	 */
 	public void applyMeta(ItemMeta meta) {
-		ItemMeta our = stack.getItemMeta();
+		ItemMeta our = getItemMeta();
 		if (meta.hasLore())
 			our.setLore(meta.getLore());
 		if (meta.hasDisplayName())
