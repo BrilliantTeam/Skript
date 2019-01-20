@@ -66,25 +66,29 @@ public class MagicBlockCompat implements BlockCompat {
 		}
 	}
 	
-	@SuppressWarnings({"deprecation", "null"})
+	@SuppressWarnings({"deprecation"})
 	private class MagicBlockValues extends BlockValues {
 
 		private Material id;
 		short data;
+		private boolean isDefault;
 
+		@SuppressWarnings("null")
 		public MagicBlockValues(BlockState block) {
 			this.id = block.getType();
 			this.data = block.getRawData(); // Some black magic here, please look away...
+			this.isDefault = data == 0;
 		}
 		
-		public MagicBlockValues(Material id, short data) {
+		public MagicBlockValues(Material id, short data, boolean isDefault) {
 			this.id = id;
 			this.data = data;
+			this.isDefault = isDefault;
 		}
 		
 		@Override
 		public boolean isDefault() {
-			return true; // Defaultness is mostly 1.13+ concept
+			return isDefault;
 		}
 
 		@Override
@@ -144,8 +148,12 @@ public class MagicBlockCompat implements BlockCompat {
 	
 	@Nullable
 	@Override
-	public BlockValues createBlockValues(Material type, Map<String, String> states) {
-		return null;
+	public BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, boolean itemModified) {
+		short damage = 0;
+		if (item != null) {
+			damage = (short) ItemUtils.getDamage(item);
+		}
+		return new MagicBlockValues(type, damage, !itemModified);
 	}
 
 	@Override
@@ -159,13 +167,12 @@ public class MagicBlockCompat implements BlockCompat {
 		return type == Material.WATER || type == Material.LAVA;
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	@Nullable
 	public BlockValues getBlockValues(ItemStack stack) {
 		short data = (short) ItemUtils.getDamage(stack);
-		if (data != 0)
-			return new MagicBlockValues(stack.getType(), data);
-		return null;
+		return new MagicBlockValues(stack.getType(), data, data == 0);
 	}
 
 	@Override

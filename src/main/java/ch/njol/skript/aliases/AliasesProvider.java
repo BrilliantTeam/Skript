@@ -206,24 +206,27 @@ public class AliasesProvider {
 	 * Applies given tags to an item stack.
 	 * @param stack Item stack.
 	 * @param tags Tags.
+	 * @return Whether the stack changed or not.
 	 */
-	public ItemStack applyTags(ItemStack stack, Map<String, Object> tags) {
+	public boolean applyTags(ItemStack stack, Map<String, Object> tags) {
 		// Hack damage tag into item
 		Object damage = tags.get("Damage");
+		boolean appliedDamage = false;
 		if (damage instanceof Number) { // Use helper for version compatibility
 			ItemUtils.setDamage(stack, ((Number) damage).shortValue());
 			tags.remove("Damage");
+			appliedDamage = true;
 		}
 		
 		if (tags.isEmpty()) // No real tags to apply
-			return stack;
+			return appliedDamage;
 		
 		// Apply random tags using JSON
 		String json = gson.toJson(tags);
 		assert json != null;
 		BukkitUnsafe.modifyItemStack(stack, json);
 		
-		return stack;
+		return true;
 	}
 	
 	/**
@@ -303,14 +306,15 @@ public class AliasesProvider {
 				related = EntityData.parse(entityName);
 			}
 			
-			// Parse block state to block values
-			BlockValues blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockStates);
-			
 			// Apply (NBT) tags to item stack
 			ItemStack stack = new ItemStack(material);
+			boolean modifiedStack = false;
 			if (tags != null) {
-				stack = applyTags(stack, new HashMap<>(tags));
+				modifiedStack = applyTags(stack, new HashMap<>(tags));
 			}
+			
+			// Parse block state to block values
+			BlockValues blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockStates, stack, modifiedStack);
 			
 			ItemData data = new ItemData(stack, blockValues);
 			data.isAlias = true;

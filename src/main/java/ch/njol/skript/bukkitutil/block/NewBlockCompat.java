@@ -307,7 +307,8 @@ public class NewBlockCompat implements BlockCompat {
 
 	@Override
 	@Nullable
-	public BlockValues createBlockValues(Material type, Map<String, String> states) {
+	public BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, boolean itemModified) {
+		// Ignore item; on 1.13+ block data never applies to items
 		if (states.isEmpty()) {
 			if (type.isBlock()) { // Still need default block values
 				BlockData data =  Bukkit.createBlockData(type, "[]");

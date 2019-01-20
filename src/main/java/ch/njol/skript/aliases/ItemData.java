@@ -159,10 +159,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 		if (tags != null)
 			BukkitUnsafe.modifyItemStack(stack, tags);
-		assert stack != null; // Yeah nope; modifyItemStack is not THAT Unsafe
-		
-		// Grab item meta (may be null)
-		assert stack != null;
 	}
 	
 	public ItemData(Material type, int amount) {
@@ -191,7 +187,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	}
 	
 	public ItemData(ItemStack stack) {
-		this(stack, null);
+		this(stack, BlockCompat.INSTANCE.getBlockValues(stack));
 		this.itemForm = true;
 	}
 	
@@ -296,8 +292,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	@Override
 	public int hashCode() {
 		int hash = type.hashCode(); // Has collisions, but probably not too many of them
-		if (blockValues == null || (blockValues != null && blockValues.isDefault()))
+		if (blockValues == null || (blockValues != null && blockValues.isDefault())) {
 			hash = hash * 37 + 1;
+		}
 		return hash;
 	}
 	

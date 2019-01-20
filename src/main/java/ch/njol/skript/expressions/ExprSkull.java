@@ -68,7 +68,7 @@ public class ExprSkull extends SimplePropertyExpression<Object, ItemType> {
 	/**
 	 * In 2017, SkullMeta finally got a method that takes OfflinePlayer.
 	 */
-	private static final boolean newSkullOwner = Skript.methodExists(SkullMeta.class, "setOwner", OfflinePlayer.class);
+	private static final boolean newSkullOwner = Skript.methodExists(SkullMeta.class, "setOwningPlayer", OfflinePlayer.class);
 	
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {

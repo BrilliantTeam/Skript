@@ -87,13 +87,28 @@ public interface BlockCompat {
 	}
 
 	/**
+	 * Creates new block values for given material and state. Item, if given,
+	 * will be used to correct data value etc. when needed.
+	 * @param type Block material.
+	 * @param states Block states, as used in /setblock command in Minecraft.
+	 * @param item Item form that may or may not provide additional
+	 * information. Optional, but very useful on 1.12 and older.
+	 * @param itemModified Whether the item has been modified with tags or not.
+	 * @return Block values, or null if given state was invalid.
+	 */
+	@Nullable
+	BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, boolean itemModified);
+	
+	/**
 	 * Creates new block values for given material and state.
 	 * @param type Block material.
 	 * @param states Block states, as used in /setblock command in Minecraft.
 	 * @return Block values, or null if given state was invalid.
 	 */
 	@Nullable
-	BlockValues createBlockValues(Material type, Map<String, String> states);
+	default BlockValues createBlockValues(Material type, Map<String, String> states) {
+		return createBlockValues(type, states, null, false);
+	}
 	
 	/**
 	 * Gets block setter that understands block values produced by this
