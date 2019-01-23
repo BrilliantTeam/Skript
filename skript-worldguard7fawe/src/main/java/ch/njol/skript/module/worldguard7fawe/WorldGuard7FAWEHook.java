@@ -30,8 +30,11 @@ import java.util.UUID;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
@@ -64,7 +67,7 @@ public class WorldGuard7FAWEHook extends RegionsPlugin<WorldGuardPlugin> {
     
     @Override
     protected boolean init() {
-        supportsUUIDs = true; //Skript.methodExists(DefaultDomain.class, "getUniqueIds");
+        supportsUUIDs = Skript.methodExists(DefaultDomain.class, "getUniqueIds");
         
         // Manually load syntaxes for regions, because we're in module package
         try {
@@ -83,7 +86,10 @@ public class WorldGuard7FAWEHook extends RegionsPlugin<WorldGuardPlugin> {
     
     @Override
     public boolean canBuild_i(final Player p, final Location l) {
-        return true; //plugin.canBuild(p, l);
+        if (p.hasPermission("worldguard.region.bypass." + l.getWorld().getName())) return true;
+        RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+        LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(p);
+        return query.testState(BukkitAdapter.adapt(l), player, Flags.BUILD);
     }
     
     @YggdrasilID("WorldGuardRegion")
