@@ -51,6 +51,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -1536,6 +1537,38 @@ public class BukkitClasses {
 					}
 				})
 				.serializer(new EnumSerializer<>(Difficulty.class)));
+		
+		EnumUtils<PlayerResourcePackStatusEvent.Status> resourcePackStates = new EnumUtils<>(PlayerResourcePackStatusEvent.Status.class, "resource pack states");
+		Classes.registerClass(new ClassInfo<>(PlayerResourcePackStatusEvent.Status.class, "resourcepackstate")
+				.user("resource ?pack ?states?")
+				.name("Resource Pack State")
+				.description("The state in a <a href='events.html#resource_pack_request_action'>resource pack request response</a> event.")
+				.examples(resourcePackStates.getAllNames())
+				.since("INSERT VERSION")
+				.parser(new Parser<PlayerResourcePackStatusEvent.Status>() {
+					@Override
+					public String toString(PlayerResourcePackStatusEvent.Status state, int flags) {
+						return resourcePackStates.toString(state, flags);
+					}
+					
+					@Override
+					@Nullable
+					public PlayerResourcePackStatusEvent.Status parse(final String s, final ParseContext context) {
+						return resourcePackStates.parse(s);
+					}
+					
+					@SuppressWarnings("null")
+					@Override
+					public String toVariableNameString(PlayerResourcePackStatusEvent.Status state) {
+						return state.name();
+					}
+					
+					@Override
+					public String getVariableNamePattern() {
+						return "\\S+";
+					}
+				})
+				.serializer(new EnumSerializer<>(PlayerResourcePackStatusEvent.Status.class)));
 	}
 
 }
