@@ -115,6 +115,7 @@ jar {
 	
 	// Include all modules of Skript
 	from 'skript-worldguard6/build/classes/java/main'
+	from 'skript-worldguard7fawe/build/classes/java/main'
 }
 
 license {
@@ -210,6 +211,7 @@ task githubRelease(type: Jar) {
 	
 	// Include all modules of Skript
 	from 'skript-worldguard6/build/classes/java/main'
+	from 'skript-worldguard7fawe/build/classes/java/main'
 }
 
 task spigotResources(type: ProcessResources) {
@@ -251,4 +253,5 @@ task spigotRelease(type: Jar) {
 	
 	// Include all modules of Skript
 	from 'skript-worldguard6/build/classes/java/main'
+	from 'skript-worldguard7fawe/build/classes/java/main'
 }

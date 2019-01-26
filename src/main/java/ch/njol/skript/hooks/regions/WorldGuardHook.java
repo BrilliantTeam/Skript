@@ -61,13 +61,24 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	
 	@Override
 	protected boolean init() {
-		if (!Skript.classExists("com.sk89q.worldguard.WorldGuard")) { // Assume WorldGuard 6
+		if (Skript.classExists("com.boydti.fawe.FaweAPI")) { // Assume FAWE
+			try {
+				Class<?> faweHook = Class.forName("ch.njol.skript.module.worldguard7fawe.WorldGuard7FAWEHook", true, getClass().getClassLoader());
+				faweHook.getDeclaredConstructor().newInstance();
+				return true;
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				Skript.error("An error occurred while trying to enable support for FAWE WorldGuard 7. WorldGuard region support has been disabled!");
+			}
+			return false;
+		} else if (!Skript.classExists("com.sk89q.worldguard.WorldGuard")) { // Assume WorldGuard 6
 			try {
 				Class<?> oldHook = Class.forName("ch.njol.skript.module.worldguard6.WorldGuard6Hook", true, getClass().getClassLoader());
 				oldHook.getDeclaredConstructor().newInstance();
+				return true;
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				Skript.error("This Skript version does not support WorldGuard 6. WorldGuard region support has been disabled!");
+				Skript.error("An error occurred while trying to enable support for WorldGuard 6. WorldGuard region support has been disabled!");
 			}
 			return false;
 		} else if (!Skript.classExists("com.sk89q.worldedit.math.BlockVector3")) {
