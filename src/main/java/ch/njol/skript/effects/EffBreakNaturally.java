@@ -64,9 +64,11 @@ public class EffBreakNaturally extends Effect {
 	@Override
 	protected void execute(final Event e) {
 		ItemType tool = this.tool != null ? this.tool.getSingle(e) : null;
-		for (Block block : this.blocks.getArray(e)){
-			if (tool != null) block.breakNaturally(tool.getRandom());
-			else block.breakNaturally();
+		for (Block block : this.blocks.getArray(e)) {
+			if (tool != null)
+				block.breakNaturally(tool.getRandom());
+			else
+				block.breakNaturally();
 		}
 	}
 	
