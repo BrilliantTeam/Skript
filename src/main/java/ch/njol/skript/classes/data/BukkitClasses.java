@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -401,7 +402,6 @@ public class BukkitClasses {
 					}
 				})
 				.serializer(new Serializer<Vector>() {
-
 					@Override
 					public Fields serialize(Vector o) throws NotSerializableException {
 						Fields f = new Fields();
@@ -430,9 +430,7 @@ public class BukkitClasses {
 					protected boolean canBeInstantiated() {
 						return false;
 					}
-					
-				})
-				);
+				}));
 
 		// FIXME update doc
 		Classes.registerClass(new ClassInfo<>(World.class, "world")
@@ -567,7 +565,6 @@ public class BukkitClasses {
 				.since("2.2-dev16")
 				.defaultExpression(new EventValueExpression<>(InventoryAction.class))
 				.parser(new Parser<InventoryAction>() {
-
 					@Override
 					@Nullable
 					public InventoryAction parse(String s, ParseContext context) {
@@ -589,7 +586,6 @@ public class BukkitClasses {
 					public String getVariableNamePattern() {
 						return "\\S+";
 					}
-					
 				}));
 
 		final EnumUtils<ClickType> invClicks = new EnumUtils<>(ClickType.class, "click types"); // Less boilerplate code!
@@ -623,7 +619,6 @@ public class BukkitClasses {
 					public String getVariableNamePattern() {
 						return "\\S+";
 					}
-					
 				}));
 
 		final EnumUtils<InventoryType> invTypes = new EnumUtils<>(InventoryType.class, "inventory types");
@@ -657,7 +652,6 @@ public class BukkitClasses {
 					public String getVariableNamePattern() {
 						return "\\S+";
 					}
-					
 				}));
 
 		Classes.registerClass(new ClassInfo<>(Player.class, "player")
@@ -1307,7 +1301,6 @@ public class BukkitClasses {
 				.name(ClassInfo.NO_DOC)
 				.since("aliases-rework")
 				.serializer(new Serializer<Material>() {
-
 					@Override
 					public Fields serialize(Material o) throws NotSerializableException {
 						Fields f = new Fields();
@@ -1336,7 +1329,6 @@ public class BukkitClasses {
 					protected boolean canBeInstantiated() {
 						return false; // It is an enum, come on
 					}
-					
 				}));
 
 		Classes.registerClass(new ClassInfo<>(Metadatable.class, "metadataholder")
@@ -1442,7 +1434,75 @@ public class BukkitClasses {
 							return "server icon";
 						}
 					}));
+
 		}
+		
+		EnumUtils<FireworkEffect.Type> fireworktypes = new EnumUtils<>(FireworkEffect.Type.class, "firework types");
+		Classes.registerClass(new ClassInfo<>(FireworkEffect.Type.class, "fireworktype")
+				.user("fireworktypes?")
+				.name("Firework Type")
+				.description("The type of a <a href='#fireworkeffect'>fireworkeffect</a>.")
+				.defaultExpression(new EventValueExpression<>(FireworkEffect.Type.class))
+				.examples(fireworktypes.getAllNames())
+				.since("INSERT VERSION")
+				.parser(new Parser<FireworkEffect.Type>() {
+					@Override
+					@Nullable
+					public FireworkEffect.Type parse(String input, ParseContext context) {
+						return fireworktypes.parse(input);
+					}
+					
+					@Override
+					public String toString(FireworkEffect.Type type, int flags) {
+						return fireworktypes.toString(type, flags);
+					}
+					
+					@SuppressWarnings("null")
+					@Override
+					public String toVariableNameString(FireworkEffect.Type type) {
+						return type.name();
+					}
+					
+					@Override
+					public String getVariableNamePattern() {
+						return "\\S+";
+					}
+				})
+				.serializer(new EnumSerializer<>(FireworkEffect.Type.class)));
+		
+		Classes.registerClass(new ClassInfo<>(FireworkEffect.class, "fireworkeffect")
+				.user("fireworkeffects?")
+				.name("Firework Effect")
+				.description("A configuration of effects that defines the firework when exploded.")
+				.defaultExpression(new EventValueExpression<>(FireworkEffect.class))
+				.since("INSERT VERSION")
+				.parser(new Parser<FireworkEffect>() {
+					@Override
+					@Nullable
+					public FireworkEffect parse(String input, ParseContext context) {
+						return null;
+					}
+
+					@Override
+					public boolean canParse(ParseContext context) {
+						return false;
+					}
+					
+					@Override
+					public String toString(FireworkEffect effect, int flags) {
+						return "Firework effect " + effect.toString();
+					}
+
+					@Override
+					public String toVariableNameString(FireworkEffect effect) {
+						return "firework effect " + effect.toString();
+					}
+					
+					@Override
+					public String getVariableNamePattern() {
+						return "\\S+";
+					}
+				}));
 
 		EnumUtils<Difficulty> difficulties = new EnumUtils<>(Difficulty.class, "difficulties");
 		Classes.registerClass(new ClassInfo<>(Difficulty.class, "difficulty")
@@ -1476,7 +1536,6 @@ public class BukkitClasses {
 					}
 				})
 				.serializer(new EnumSerializer<>(Difficulty.class)));
-
 	}
 
 }

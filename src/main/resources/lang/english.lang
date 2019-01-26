@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Default English language file
 
 # Which version of Skript this language file was written for
@@ -1364,6 +1365,14 @@ difficulties:
 	hard: hard
 	peaceful: peaceful
 
+# -- Firework types --
+firework types:
+	ball_large: large ball, ball large, large
+	creeper: creeper, creeper face
+	ball: ball, small, small ball
+	star: star, star shaped
+	burst: burst
+
 # -- Boolean --
 boolean:
 	true:
@@ -1417,6 +1426,8 @@ types:
 	spawnreason: spawn reason¦s @a
 	cachedservericon: server icon¦s @a
 	difficulty: (difficulty|difficulties) @a
+	fireworkeffect: firework effect¦s @a
+	fireworktype: firework type¦s @a
 	
 	# Skript
 	weathertype: weather type¦s @a
@@ -1446,4 +1457,3 @@ types:
 io exceptions:
 	unknownhostexception: Cannot connect to %s
 	accessdeniedexception: Access denied for %s
-
