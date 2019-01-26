@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Default English language file
 
 # Which version of Skript this language file was written for
@@ -1365,7 +1364,6 @@ difficulties:
 	hard: hard
 	peaceful: peaceful
 
-<<<<<<< HEAD
 # -- Firework types --
 firework types:
 	ball_large: large ball, ball large, large
@@ -1373,14 +1371,13 @@ firework types:
 	ball: ball, small, small ball
 	star: star, star shaped
 	burst: burst
-=======
+
 # -- Resource Pack States --
 resource pack states:
 	accepted: accept, accepted
 	declined: decline, refuse, reject, declined, refused, rejected
 	failed_download: download fail, fail, failed to download, failed
 	successfully_loaded: successfully load, successfully install, success, successfully loaded, successfully installed
->>>>>>> 735a35b40f0478e3bf0dce7d6421e33b66e7712c
 
 # -- Boolean --
 boolean:
