@@ -176,7 +176,7 @@ public class MagicBlockCompat implements BlockCompat {
 	@Nullable
 	public BlockValues getBlockValues(ItemStack stack) {
 		short data = (short) ItemUtils.getDamage(stack);
-		return new MagicBlockValues(stack.getType(), data, data == 0);
+		return new MagicBlockValues(stack.getType(), data, false);
 	}
 
 	@Override
