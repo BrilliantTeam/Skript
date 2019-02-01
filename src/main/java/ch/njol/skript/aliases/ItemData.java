@@ -121,6 +121,11 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	private final static Message m_named = new Message("aliases.named");
 	
 	/**
+	 * Before 1.13, data values ("block states") are applicable to items.
+	 */
+	private static final boolean itemDataValues = !Skript.isRunningMinecraft(1, 13);
+	
+	/**
 	 * ItemStack, which is used for everything but serialization.
 	 */
 	transient ItemStack stack;
@@ -256,8 +261,11 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		if (isAnything || other.isAnything) // First, isAnything check
 			return true;
 		
+		if (!type.equals(other.type))
+			return false; // Types are not equal
+		
 		BlockValues values = blockValues;
-		if (type == other.type) {
+		if (!itemDataValues) {
 			if (itemForm && other.blockValues != null)
 				return other.blockValues.isDefault();
 			if (other.itemForm && blockValues != null)
@@ -273,11 +281,10 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 					&& other.blockValues.isDefault() != values.isDefault())
 				return false;
 		}
-		if (values != null && !itemForm && !other.itemForm)
-			return values.equals(other.blockValues);
 		
-		if (!type.equals(other.type))
-			return false; // Types are not equal
+		// Block state comparison if both are blocks or if we're on 1.12 or older
+		if (values != null && (itemDataValues || !itemForm && !other.itemForm))
+			return values.equals(other.blockValues);
 		
 		// Check the item meta, unless either ItemData is alias
 		if (!isAlias && !other.isAlias) {
