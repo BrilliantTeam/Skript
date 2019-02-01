@@ -965,7 +965,6 @@ public class BukkitClasses {
 						
 						final ItemStack i = t.getRandom();
 						assert i != null;
-						ItemUtils.setDamage(i, 0);
 						return i;
 					}
 					

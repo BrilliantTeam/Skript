@@ -147,6 +147,7 @@ public class ExprParse extends SimpleExpression<Object> {
 		try {
 			if (c != null) {
 				final Parser<?> p = c.getParser();
+				System.out.println(p);
 				assert p != null; // checked in init()
 				final Object o = p.parse(t, ParseContext.COMMAND);
 				if (o != null) {
