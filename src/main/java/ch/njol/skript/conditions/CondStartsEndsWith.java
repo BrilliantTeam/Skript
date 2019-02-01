@@ -71,7 +71,7 @@ public class CondStartsEndsWith extends Condition {
 		}
 		
 		return strings.check(e,
-				string -> usingEnds ? string.endsWith(affix) : string.endsWith(affix),
+				string -> usingEnds ? string.endsWith(affix) : string.startsWith(affix),
 				isNegated());
 	}
 	
