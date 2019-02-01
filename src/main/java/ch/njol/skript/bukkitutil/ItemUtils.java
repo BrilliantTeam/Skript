@@ -21,9 +21,11 @@ package ch.njol.skript.bukkitutil;
 
 import java.lang.invoke.MethodHandle;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 
@@ -70,5 +72,59 @@ public class ItemUtils {
 		} else {
 			stack.setDurability((short) damage);
 		}
+	}
+	
+	@Nullable
+	private static final Material bedItem;
+	@Nullable
+	private static final Material bedBlock;
+	
+	static {
+		if (!damageMeta) {
+			bedItem = Material.valueOf("BED");
+			bedBlock = Material.valueOf("BED_BLOCK");
+		} else {
+			bedItem = null;
+			bedBlock = null;
+		}
+	}
+	
+	/**
+	 * Gets a block material corresponding to given item material, which might
+	 * be the given material. If no block material is found, null is returned.
+	 * @param type Material.
+	 * @return Block version of material or null.
+	 */
+	@Nullable
+	public static Material asBlock(Material type) {
+		if (!damageMeta) { // Apply some hacks on 1.12 and older
+			if (type == bedItem) { // BED and BED_BLOCK mess, issue #1856
+				return bedBlock;
+			}
+		}
+		
+		if (type.isBlock()) {
+			return type;
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Gets an item material corresponding to given block material, which might
+	 * be the given material.
+	 * @param type Material.
+	 * @return Item version of material or null.
+	 */
+	public static Material asItem(Material type) {
+		if (!damageMeta) {
+			if (type == bedBlock) {
+				assert bedItem != null;
+				return bedItem;
+			}
+		}
+		
+		// Assume (naively) that all types are valid items
+		return type;
 	}
 }

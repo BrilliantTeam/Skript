@@ -54,6 +54,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemData.OldItemData;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
+import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.bukkitutil.block.BlockValues;
 import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.lang.Unit;
@@ -377,9 +378,10 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	public boolean setBlock(Block block, boolean applyPhysics) {
 		for (int i = random.nextInt(types.size()); i < types.size(); i++) {
 			ItemData d = types.get(i);
-			if (!d.type.isBlock()) // Ignore items which cannot be placed
+			Material blockType = ItemUtils.asBlock(d.type);
+			if (blockType == null) // Ignore items which cannot be placed
 				continue;
-			if (BlockUtils.set(block, d, applyPhysics))
+			if (BlockUtils.set(block, blockType, d.getBlockValues(), applyPhysics))
 				return true;
 		}
 		return false;

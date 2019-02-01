@@ -40,7 +40,6 @@ import ch.njol.util.coll.CollectionUtils;
  * 
  * @author Peter Güttinger
  */
-@SuppressWarnings("deprecation")
 public abstract class BlockUtils {
 	
 	private final static BlockFace[] bed = new BlockFace[] {
@@ -52,14 +51,26 @@ public abstract class BlockUtils {
 			BlockFace.WEST, BlockFace.NORTH
 	};
 	
-	public static boolean set(Block block, ItemData type, boolean applyPhysics) {
+	/**
+	 * Sets the given block.
+	 * @param block Block to set.
+	 * @param type New type of the block.
+	 * @param blockValues Block values to apply after setting the type.
+	 * @param applyPhysics Whether physics should be applied or not.
+	 * @return Whether setting block succeeded or not (currently always true).
+	 */
+	public static boolean set(Block block, Material type, @Nullable BlockValues blockValues, boolean applyPhysics) {
 		int flags = BlockSetter.ROTATE | BlockSetter.ROTATE_FIX_TYPE | BlockSetter.MULTIPART;
 		if (applyPhysics)
 			flags |= BlockSetter.APPLY_PHYSICS;
-		BlockCompat.SETTER.setBlock(block, type.getType(), type.getBlockValues(), flags);
+		BlockCompat.SETTER.setBlock(block, type, blockValues, flags);
 		
 		
 		return true;
+	}
+	
+	public static boolean set(Block block, ItemData type, boolean applyPhysics) {
+		return set(block, type.getType(), type.getBlockValues(), applyPhysics);
 	}
 	
 	@SuppressWarnings("null")
