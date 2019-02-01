@@ -75,9 +75,9 @@ public class MagicBlockCompat implements BlockCompat {
 
 		@SuppressWarnings("null")
 		public MagicBlockValues(BlockState block) {
-			this.id = block.getType();
+			this.id = ItemUtils.asItem(block.getType());
 			this.data = block.getRawData(); // Some black magic here, please look away...
-			this.isDefault = data == 0;
+			this.isDefault = false; // Blocks in world are NEVER default
 		}
 		
 		public MagicBlockValues(Material id, short data, boolean isDefault) {
@@ -96,7 +96,11 @@ public class MagicBlockCompat implements BlockCompat {
 			if (!(other instanceof MagicBlockValues))
 				return false;
 			MagicBlockValues magic = (MagicBlockValues) other;
-			return id == magic.id && data == magic.data;
+			if (isDefault() || magic.isDefault()) {
+				return id == magic.id; // Compare only ids, other has not specified data constraints
+			} else { // Compare ids and data
+				return id == magic.id && data == magic.data;
+			}
 		}
 
 		@Override
@@ -172,7 +176,7 @@ public class MagicBlockCompat implements BlockCompat {
 	@Nullable
 	public BlockValues getBlockValues(ItemStack stack) {
 		short data = (short) ItemUtils.getDamage(stack);
-		return new MagicBlockValues(stack.getType(), data, data == 0);
+		return new MagicBlockValues(stack.getType(), data, false);
 	}
 
 	@Override
