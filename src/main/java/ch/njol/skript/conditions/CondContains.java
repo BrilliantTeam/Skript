@@ -38,6 +38,7 @@ import ch.njol.skript.lang.Variable;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Comparators;
+import ch.njol.skript.registrations.Converters;
 import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
@@ -114,8 +115,8 @@ public class CondContains extends Condition {
 					} else {
 						if (container instanceof Inventory) {
 							final Inventory invi = (Inventory) container;
-							return items.check(e,
-									(Checker<Object>) type -> type instanceof ItemType && ((ItemType) type).isContainedIn(invi));
+							return items.check(e, (Checker<Object>) type
+									-> type instanceof ItemType && ((ItemType) type).isContainedIn(invi));
 						} else if (container instanceof String) {
 							final String s = (String) container;
 							return items.check(e,
@@ -128,10 +129,18 @@ public class CondContains extends Condition {
 										}
 										return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
 									});
-						} else if (container instanceof Variable) { // Ok, so we have a variable...
-							Object val = ((Variable<?>) container).getSingle(e);
-							if (val instanceof String) {
-								final String s = (String) val;
+						} else { // Ok, so we have a variable...
+							Object val = container instanceof Variable
+									? ((Variable<?>) container).getSingle(e) : container;
+							
+							Inventory invi = Converters.convert(val, Inventory.class);
+							if (invi != null) {
+								return items.check(e, (Checker<Object>) type
+										-> type instanceof ItemType && ((ItemType) type).isContainedIn(invi));
+							}
+							
+							String s = Converters.convert(val, String.class);
+							if (s != null) {
 								return items.check(e,
 										(Checker<Object>) type -> {
 											if (type instanceof Variable) {
@@ -143,7 +152,6 @@ public class CondContains extends Condition {
 											return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
 										});
 							}
-							// TODO support similar odd contains checks for inventories
 						}
 					}
 					return false;

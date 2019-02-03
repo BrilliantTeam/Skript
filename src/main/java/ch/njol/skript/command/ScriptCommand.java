@@ -55,7 +55,6 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.command.Commands.CommandAliasHelpTopic;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
@@ -72,6 +71,8 @@ import ch.njol.skript.util.Date;
 import ch.njol.skript.util.EmptyStacktraceException;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Utils;
+import ch.njol.skript.util.chat.BungeeConverter;
+import ch.njol.skript.util.chat.MessageComponent;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.StringUtils;
 import ch.njol.util.Validate;
@@ -89,7 +90,7 @@ public class ScriptCommand implements TabExecutor {
 	private final List<String> aliases;
 	private List<String> activeAliases;
 	private String permission;
-	private final Expression<String> permissionMessage;
+	private final VariableString permissionMessage;
 	private final String description;
 	@Nullable
 	private final Timespan cooldown;
@@ -126,15 +127,16 @@ public class ScriptCommand implements TabExecutor {
 	 */
 	public ScriptCommand(final File script, final String name, final String pattern, final List<Argument<?>> arguments,
 						 final String description, final String usage, final ArrayList<String> aliases,
-						 final String permission, @Nullable final Expression<String> permissionMessage, @Nullable final Timespan cooldown,
+						 final String permission, @Nullable final VariableString permissionMessage, @Nullable final Timespan cooldown,
 						 @Nullable final VariableString cooldownMessage, final String cooldownBypass,
 						 @Nullable VariableString cooldownStorage, final int executableBy, final List<TriggerItem> items) {
 		Validate.notNull(name, pattern, arguments, description, usage, aliases, items);
 		this.name = name;
 		label = "" + name.toLowerCase();
 		this.permission = permission;
+		assert permissionMessage != null;
 		this.permissionMessage = permissionMessage == null ?
-				new SimpleLiteral<>(Language.get("commands.no permission message"), false)
+				VariableString.newInstance(Language.get("commands.no permission message"))
 				: permissionMessage;
 
 		this.cooldown = cooldown;
@@ -171,9 +173,9 @@ public class ScriptCommand implements TabExecutor {
 			bukkitCommand.setDescription(description);
 			bukkitCommand.setLabel(label);
 			bukkitCommand.setPermission(permission);
-			// We can only set the message if it's available at parse time (aka a literal)
-			if (permissionMessage instanceof Literal)
-				bukkitCommand.setPermissionMessage(((Literal<String>) permissionMessage).getSingle());
+			// We can only set the message if it's simple (doesn't contains expressions)
+			if (permissionMessage.isSimple())
+				bukkitCommand.setPermissionMessage(permissionMessage.toString(null));
 			bukkitCommand.setUsage(usage);
 			bukkitCommand.setExecutor(this);
 			return bukkitCommand;
@@ -207,7 +209,13 @@ public class ScriptCommand implements TabExecutor {
 		final ScriptCommandEvent event = new ScriptCommandEvent(ScriptCommand.this, sender);
 
 		if (!permission.isEmpty() && !sender.hasPermission(permission)) {
-			sender.sendMessage(permissionMessage.getSingle(event));
+			if (sender instanceof Player) {
+				List<MessageComponent> components =
+						permissionMessage.getMessageComponents(event);
+				((Player) sender).spigot().sendMessage(BungeeConverter.convert(components));
+			} else {
+				sender.sendMessage(permissionMessage.getSingle(event));
+			}
 			return false;
 		}
 

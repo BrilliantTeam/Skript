@@ -258,7 +258,8 @@ public class EvtClick extends SkriptEvent {
 	private static final ItemType usableBlocksMainOnly = Aliases.javaItemType("block usable with main hand");
 	
 	public static boolean checkUseOffHand(Player player, int clickType, @Nullable Block block, @Nullable Entity entity) {
-		if (clickType != RIGHT) return false; // Attacking with off hand is not possible
+		if ((clickType & RIGHT) == 0)
+			return false; // Attacking with off hand is not possible
 		
 		boolean mainUsable = false; // Usable item
 		boolean offUsable = false;
@@ -317,8 +318,8 @@ public class EvtClick extends SkriptEvent {
 		if (blockUsable) { // Special behavior
 			if (isSneaking) {
 				//Skript.info("Is sneaking on usable block!");
-				if (offHand.getType() != Material.AIR) return false;
-				if (mainHand.getType() != Material.AIR) return true;
+				if (offHand.getType() == Material.AIR) return false;
+				if (mainHand.getType() == Material.AIR) return true;
 				//Skript.info("Sneak checks didn't pass.");
 			} else { // When not sneaking, main hand is ALWAYS used
 				return false;
