@@ -331,15 +331,10 @@ public class EvtClick extends SkriptEvent {
 		//Skript.info("Check for usable items...");
 		if (mainUsable) return false;
 		if (offUsable) return true;
-		//Skript.info("No hand has usable item");
-		
-		// Still not returned?
-		if (mainHand.getType() != Material.AIR) return false;
-		//Skript.info("Main hand is not item.");
-		if (offHand.getType() != Material.AIR) return true;
+		//Skript.info("No hand has usable item")
 		
 		//Skript.info("Final return!");
-		return false; // Both hands are AIR material!
+		return false; // Use main hand by default
 	}
 	
 }
