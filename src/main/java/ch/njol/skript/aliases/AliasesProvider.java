@@ -318,6 +318,7 @@ public class AliasesProvider {
 			
 			ItemData data = new ItemData(stack, blockValues);
 			data.isAlias = true;
+			data.modifiedStack = modifiedStack;
 			datas = Collections.singletonList(data);
 		}
 		

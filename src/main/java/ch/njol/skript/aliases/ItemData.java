@@ -155,7 +155,18 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	
 	boolean strictEquality;
 	
-	boolean isAlias;
+	/**
+	 * If this item is an alias or a clone of one that has not been
+	 * modified after loading the aliases.
+	 */
+	boolean isAlias = false;
+	
+	/**
+	 * Whether this item has been ever modified. Alias items may have been
+	 * modified with tags. Other items are always considered to have been
+	 * modified, because it is impossible to tell for sure.
+	 */
+	boolean modifiedStack = true;
 	
 	public ItemData(Material type, @Nullable String tags) {
 		this.type = type;
@@ -183,6 +194,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.type = data.type;
 		this.blockValues = data.blockValues;
 		this.isAlias = data.isAlias;
+		this.modifiedStack = data.modifiedStack;
 	}
 	
 	public ItemData(ItemStack stack, @Nullable BlockValues values) {
@@ -221,7 +233,17 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	public boolean isOfType(@Nullable ItemStack item) {
 		if (item == null)
 			return type == Material.AIR;
-		return item.isSimilar(stack);
+		
+		if (type != item.getType())
+			return false; // Obvious mismatch
+		
+		if (modifiedStack) { // Either stack has tags (or durability)
+			if (ItemUtils.getDamage(stack) != ItemUtils.getDamage(item))
+				return false; // On 1.12 and below, damage is not in meta
+			if (stack.hasItemMeta() == item.hasItemMeta()) // Compare ItemMeta as in isSimilar() of ItemStack
+				return stack.hasItemMeta() ? itemFactory.equals(stack.getItemMeta(), item.getItemMeta()) : true;
+		}
+		return true;
 	}
 	
 	/**
@@ -357,6 +379,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	public void setItemMeta(ItemMeta meta) {
 		stack.setItemMeta(meta);
 		isAlias = false; // This is no longer exact alias
+		modifiedStack = true;
 	}
 	
 	public int getDurability() {
@@ -366,6 +389,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	public void setDurability(int durability) {
 		ItemUtils.setDamage(stack, durability);
 		isAlias = false; // Change happened
+		modifiedStack = true;
 	}
 
 	@Override
