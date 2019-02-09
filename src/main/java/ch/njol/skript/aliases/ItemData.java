@@ -242,6 +242,8 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 				return false; // On 1.12 and below, damage is not in meta
 			if (stack.hasItemMeta() == item.hasItemMeta()) // Compare ItemMeta as in isSimilar() of ItemStack
 				return stack.hasItemMeta() ? itemFactory.equals(stack.getItemMeta(), item.getItemMeta()) : true;
+			else
+				return false;
 		}
 		return true;
 	}
