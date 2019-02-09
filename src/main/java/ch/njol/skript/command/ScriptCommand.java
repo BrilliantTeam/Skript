@@ -136,10 +136,13 @@ public class ScriptCommand implements TabExecutor {
 		this.name = name;
 		label = "" + name.toLowerCase();
 		this.permission = permission;
-		assert permissionMessage != null;
-		this.permissionMessage = permissionMessage == null ?
-				VariableString.newInstance(Language.get("commands.no permission message"))
-				: permissionMessage;
+		if (permissionMessage == null) {
+			VariableString defaultMsg = VariableString.newInstance(Language.get("commands.no permission message"));
+			assert defaultMsg != null;
+			this.permissionMessage = defaultMsg;
+		} else {
+			this.permissionMessage = permissionMessage;
+		}
 
 		this.cooldown = cooldown;
 		this.cooldownMessage = cooldownMessage == null
