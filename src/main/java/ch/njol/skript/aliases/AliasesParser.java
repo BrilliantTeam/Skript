@@ -642,6 +642,8 @@ public class AliasesParser {
 			if (id == null) {
 				Skript.warning(m_empty_alias.toString());
 			} else {
+				id = id.toLowerCase();
+				assert id != null;
 				try {
 					provider.addAlias(fixName(name), id, merged.getTags(), merged.getBlockStates());
 				} catch (InvalidMinecraftIdException e) { // Spit out a more useful error message
@@ -692,7 +694,7 @@ public class AliasesParser {
 			i += Character.charCount(c);
 		}
 		
-		String result = fixed.toString();
+		String result = fixed.toString().toLowerCase();
 		assert result != null;
 		return result;
 	}

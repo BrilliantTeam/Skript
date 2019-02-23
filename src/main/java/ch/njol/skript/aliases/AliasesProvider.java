@@ -323,9 +323,7 @@ public class AliasesProvider {
 		}
 		
 		// Create plural form of the alias (warning: I don't understand it either)
-		String lower = name.toLowerCase();
-		assert lower != null;
-		NonNullPair<String, Integer> plain = Noun.stripGender(lower, lower); // Name without gender and its gender token
+		NonNullPair<String, Integer> plain = Noun.stripGender(name, name); // Name without gender and its gender token
 		NonNullPair<String, String> forms = getAliasPlural(plain.getFirst()); // Singular and plural forms
 		
 		// Check if there is item type with this name already, create otherwise
