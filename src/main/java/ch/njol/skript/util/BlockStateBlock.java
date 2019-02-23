@@ -45,6 +45,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
+import ch.njol.skript.bukkitutil.block.MagicBlockCompat;
 
 /**
  * A block that gets all data from a BlockState, and either reflects changes on the BlockState or delays them to the real block by 1 tick depending on which constructor is used.
@@ -99,6 +100,10 @@ public class BlockStateBlock implements Block {
 	@Override
 	public byte getData() {
 		return state.getRawData();
+	}
+	
+	public void setData(byte data) throws Throwable {
+		MagicBlockCompat.setRawDataMethod.invokeExact(state, data);
 	}
 	
 	@Override

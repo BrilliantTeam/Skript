@@ -42,7 +42,7 @@ import ch.njol.skript.bukkitutil.ItemUtils;
  */
 public class MagicBlockCompat implements BlockCompat {
 	
-	private static final MethodHandle setRawDataMethod;
+	public static final MethodHandle setRawDataMethod;
 	private static final MethodHandle getBlockDataMethod;
 	public static final MethodHandle setDataMethod;
 	
