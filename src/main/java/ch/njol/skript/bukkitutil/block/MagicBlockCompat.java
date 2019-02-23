@@ -143,7 +143,7 @@ public class MagicBlockCompat implements BlockCompat {
 		BlockState state = entity.getWorld().getBlockAt(0, 0, 0).getState();
 		state.setType(entity.getMaterial());
 		try {
-			setRawDataMethod.invokeExact(state, getBlockDataMethod.invokeExact(entity));
+			setRawDataMethod.invokeExact(state, (byte) getBlockDataMethod.invokeExact(entity));
 		} catch (Throwable e) {
 			Skript.exception(e);
 		}
