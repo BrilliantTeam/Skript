@@ -275,21 +275,30 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 	default Object[] beforeChange(Expression<?> changed, @Nullable Object[] delta) {
 		if (delta == null || delta.length == 0) // Nothing to nothing
 			return null;
-		Object first = delta[0];
-		if (first == null) // ConvertedExpression might cause this
-			return null;
 		
 		// Slots must be transformed to item stacks when writing to variables
 		// Also, item stacks must be cloned (to be safe from Vanilla /clear)
-		if (changed instanceof Variable && first instanceof Slot) {
-			ItemStack stack = ((Slot) first).getItem();
-			if (stack == null)
-				return null;
-			return new ItemStack[] {stack.clone()};
+		Object[] newDelta = null; // Created if we can't store a type we need to input delta
+		if (changed instanceof Variable) {
+			for (int i = 0; i < delta.length; i++) {
+				Object value = delta[i];
+				if (value instanceof Slot) {
+					if (newDelta != null) { // Always store to new array if it has been initialized
+						newDelta[i] =  ((Slot) value).getItem();
+					} else if (!delta.getClass().getComponentType().isAssignableFrom(ItemStack.class)) {
+						// Initialize new delta to avoid storing incompatible type to array
+						newDelta = new Object[delta.length];
+						System.arraycopy(delta, 0, newDelta, 0, i); // Copy previously processed elements
+					} else {
+						delta[i] =  ((Slot) value).getItem();
+					}
+				}
+			}
 		}
-		
 		// Everything else (inventories, actions, etc.) does not need special handling
-		return delta;
+		
+		// Return the given delta or an Object[] copy of it, with some values transformed
+		return newDelta == null ? delta : newDelta;
 	}
 	
 }

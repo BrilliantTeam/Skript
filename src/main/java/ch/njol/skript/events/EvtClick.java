@@ -60,7 +60,16 @@ import ch.njol.util.coll.CollectionUtils;
 @SuppressWarnings("unchecked")
 public class EvtClick extends SkriptEvent {
 	
+	/**
+	 * Two hands available.
+	 */
 	final static boolean twoHanded = Skript.isRunningMinecraft(1, 9);
+	
+	/**
+	 * If a hand has item, it will always be used when the other hand has
+	 * nothing.
+	 */
+	final static boolean alwaysPreferItem = !Skript.isRunningMinecraft(1, 13);
 	
 	/**
 	 * Click types.
@@ -329,17 +338,17 @@ public class EvtClick extends SkriptEvent {
 		}
 		
 		//Skript.info("Check for usable items...");
-		if (mainUsable) return false;
-		if (offUsable) return true;
-		//Skript.info("No hand has usable item");
-		
-		// Still not returned?
-		if (mainHand.getType() != Material.AIR) return false;
-		//Skript.info("Main hand is not item.");
-		if (offHand.getType() != Material.AIR) return true;
+		if (alwaysPreferItem) {
+			if (offHand.getType() == Material.AIR) return false;
+			if (mainHand.getType() == Material.AIR) return true;
+		} else {
+			if (mainUsable) return false;
+			if (offUsable) return true;
+		}
+		//Skript.info("No hand has usable item")
 		
 		//Skript.info("Final return!");
-		return false; // Both hands are AIR material!
+		return false; // Use main hand by default
 	}
 	
 }

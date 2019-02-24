@@ -182,7 +182,9 @@ public class DefaultChangers {
 	};
 	
 	public final static Changer<Inventory> inventoryChanger = new Changer<Inventory>() {
-		@SuppressWarnings("unchecked")
+		
+		private Material[] cachedMaterials = Material.values();
+		
 		@Override
 		@Nullable
 		public Class<? extends Object>[] acceptChange(final ChangeMode mode) {
@@ -242,6 +244,26 @@ public class DefaultChangers {
 					case REMOVE:
 					case REMOVE_ALL:
 						assert delta != null;
+						if (delta.length == cachedMaterials.length) {
+							// Potential fast path: remove all items -> clear inventory
+							boolean equal = true;
+							for (int i = 0; i < delta.length; i++) {
+								if (!(delta[i] instanceof ItemType)) {
+									equal = false;
+									break; // Not an item, take slow path
+								}
+								if (((ItemType) delta[i]).getMaterial() != cachedMaterials[i]) {
+									equal = false;
+									break;
+								}
+							}
+							if (equal) { // Take fast path, break out before slow one
+								invi.clear();
+								break;
+							}
+						}
+						
+						// Slow path
 						for (final Object d : delta) {
 							if (d instanceof Inventory) {
 								assert mode == ChangeMode.REMOVE;

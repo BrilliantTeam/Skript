@@ -61,7 +61,7 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	
 	@Override
 	protected boolean init() {
-		if (Skript.classExists("com.boydti.fawe.FaweAPI")) { // Assume FAWE
+		if (Skript.classExists("com.boydti.fawe.FaweAPI") && Skript.isRunningMinecraft(1, 13)) { // Assume FAWE on MC 1.13+
 			try {
 				Class<?> faweHook = Class.forName("ch.njol.skript.module.worldguard7fawe.WorldGuard7FAWEHook", true, getClass().getClassLoader());
 				faweHook.getDeclaredConstructor().newInstance();
