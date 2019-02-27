@@ -53,7 +53,7 @@ public class EffSendResourcePack extends Effect {
 	static {
 		Skript.registerEffect(EffSendResourcePack.class,
 				"send [the] resource pack [from [[the] URL]] %string% to %players%",
-				"send [the] resource pack [from [URL]] %string% with hash %string% to %players%");
+				"send [the] resource pack [from [[the] URL]] %string% with hash %string% to %players%");
 	}
 
 	private static final boolean PAPER_METHOD_EXISTS = Skript.methodExists(Player.class, "setResourcePack", String.class, String.class);
