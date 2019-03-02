@@ -19,6 +19,7 @@
  */
 package ch.njol.skript.lang;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.bukkit.event.Event;
@@ -289,6 +290,7 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 						// Initialize new delta to avoid storing incompatible type to array
 						newDelta = new Object[delta.length];
 						System.arraycopy(delta, 0, newDelta, 0, i); // Copy previously processed elements
+						newDelta[i] =  ((Slot) value).getItem(); // Convert this slot to item
 					} else {
 						delta[i] =  ((Slot) value).getItem();
 					}
