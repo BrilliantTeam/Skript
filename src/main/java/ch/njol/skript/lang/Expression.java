@@ -28,6 +28,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.Changer.ChangerUtils;
@@ -294,6 +295,10 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 					} else {
 						delta[i] =  ((Slot) value).getItem();
 					}
+				} else if (value instanceof ItemType) {
+					delta[i] = ((ItemType) value).clone();
+				} else if (value instanceof ItemStack) {
+					delta[i] = ((ItemStack) value).clone();
 				}
 			}
 		}
