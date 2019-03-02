@@ -34,7 +34,7 @@ import net.md_5.bungee.api.chat.TextComponent;
  */
 public class BungeeConverter {
 
-	private static boolean HAS_INSERTION_SUPPORT = Skript.methodExists(BaseComponent.class, "setInsertion");
+	private static boolean HAS_INSERTION_SUPPORT = Skript.methodExists(BaseComponent.class, "setInsertion", String.class);
 
 	@SuppressWarnings("null")
 	public static BaseComponent convert(MessageComponent origin) {
