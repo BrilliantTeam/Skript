@@ -330,6 +330,58 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	}
 	
 	/**
+	 * Checks how well this item is matching with given item.
+	 * @param item Other item.
+	 * @return Match quality.
+	 */
+	public MatchQuality matchAlias(ItemData item) {
+		if (isAnything || item.isAnything) {
+			return MatchQuality.EXACT; // TODO different match quality?
+		}
+		
+		// Ensure that both items share the material
+		if (item.getType() != getType()) {
+			return MatchQuality.DIFFERENT;
+		}
+		
+		BlockValues values = blockValues;
+		if (!itemDataValues) {
+			// Items (held in inventories) don't have block values
+			// If this is an item, given item must not have them either
+			if (itemForm && item.blockValues != null
+					&& !item.blockValues.isDefault()) {
+				return MatchQuality.SAME_MATERIAL;
+			}
+		}
+		
+		/**
+		 * Initially, except an exact match. This gets lowered as differences
+		 * between items are noticed.
+		 */
+		MatchQuality quality = MatchQuality.EXACT;
+		
+		// Check that block values of given item match ours
+		if (values != null) {
+			// TODO BlockValues#match(BlockValues)
+		}
+		
+		// Go through ItemMeta to find suitable match quality
+		// TODO implement ItemMeta comparison
+		
+		return quality;
+	}
+	
+	/**
+	 * Checks if this item is a 'default' of type. Default items must have not
+	 * had their ItemMeta (tags) modified or have block states. Only aliases
+	 * can be default items.
+	 * @return If this item can be considered the default item of its type.
+	 */
+	public boolean isDefault() {
+		return !modifiedStack && blockValues == null;
+	}
+	
+	/**
 	 * Computes the intersection of two ItemDatas. The data range of the returned item data will be the real intersection of the two data ranges, and the type id will be the one
 	 * set if any.
 	 * 
