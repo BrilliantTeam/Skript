@@ -354,6 +354,16 @@ public final class BukkitEventValues {
 				return new BlockStateBlock(s, true);
 			}
 		}, 0);
+		// The .getPlayer() was added in 1.13
+		if (Skript.isRunningMinecraft(1, 13)) {
+			EventValues.registerEventValue(BlockCanBuildEvent.class, Player.class, new Getter<Player, BlockCanBuildEvent>() {
+				@Override
+				@Nullable
+				public Player get(final BlockCanBuildEvent e) {
+					return e.getPlayer();
+				}
+			}, 0);
+		}
 		// SignChangeEvent
 		EventValues.registerEventValue(SignChangeEvent.class, Player.class, new Getter<Player, SignChangeEvent>() {
 			@Override
