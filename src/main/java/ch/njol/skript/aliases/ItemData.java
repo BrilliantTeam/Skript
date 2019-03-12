@@ -362,7 +362,11 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		
 		// Check that block values of given item match ours
 		if (values != null) {
-			// TODO BlockValues#match(BlockValues)
+			if (item.blockValues != null) {
+				quality = values.match(item.blockValues);
+			} else { // Other item has no block values, but we do
+				quality = MatchQuality.SAME_MATERIAL;
+			}
 		}
 		
 		// Go through ItemMeta to find suitable match quality

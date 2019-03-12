@@ -34,6 +34,7 @@ import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.MatchQuality;
 import ch.njol.skript.bukkitutil.ItemUtils;
 
 /**
@@ -108,6 +109,24 @@ public class MagicBlockCompat implements BlockCompat {
 			// FindBugs reports "Scariest" bug when done with just ordinal << 8 | data
 			// byte -> int widening seems to be a bit weird in Java
 			return (id.ordinal() << 8) | (data & 0xff);
+		}
+
+		@Override
+		public MatchQuality match(BlockValues other) {
+			if (!(other instanceof MagicBlockValues)) {
+				throw new IllegalArgumentException("wrong block compat");
+			}
+			MagicBlockValues magic = (MagicBlockValues) other;
+			if (id == magic.id) {
+				if (data == magic.data) {
+					return MatchQuality.EXACT;
+				} else {
+					// TODO figure out when to return SAME_ITEM
+					return MatchQuality.SAME_MATERIAL;
+				}
+			} else {
+				return MatchQuality.DIFFERENT;
+			}
 		}
 	}
 	
