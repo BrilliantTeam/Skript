@@ -30,13 +30,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.classes.Arithmetic;
-import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.localization.Adjective;
 import ch.njol.skript.localization.Language;
-import ch.njol.skript.localization.LanguageChangeListener;
-import ch.njol.skript.registrations.Classes;
-import ch.njol.yggdrasil.YggdrasilSerializable;
 
 @SuppressWarnings("null")
 public enum SkriptColor implements Color {
@@ -70,7 +65,7 @@ public enum SkriptColor implements Color {
 	@Nullable
 	Adjective adjective;
 	
-	private SkriptColor(DyeColor dye, ChatColor chat) {
+	SkriptColor(DyeColor dye, ChatColor chat) {
 		this.chat = chat;
 		this.dye = dye;
 	}
@@ -81,6 +76,7 @@ public enum SkriptColor implements Color {
 	}
 	
 	// currently only used by SheepData
+	@Nullable
 	public Adjective getAdjective() {
 		return adjective;
 	}
@@ -122,18 +118,14 @@ public enum SkriptColor implements Color {
 	public final static String LANGUAGE_NODE = "colors";
 	
 	static {
-		for (SkriptColor color : values())
-			colors.add(color);
-		Language.addListener(new LanguageChangeListener() {
-			@Override
-			public void onLanguageChange() {
-				names.clear();
-				for (SkriptColor color : values()) {
-					String node = LANGUAGE_NODE + "." + color.name();
-					color.adjective = new Adjective(node + ".adjective");
-					for (String name : Language.getList(node + ".names"))
-						names.put(name.toLowerCase(), color);
-				}
+		colors.addAll(Arrays.asList(values()));
+		Language.addListener(() -> {
+			names.clear();
+			for (SkriptColor color : values()) {
+				String node = LANGUAGE_NODE + "." + color.name();
+				color.adjective = new Adjective(node + ".adjective");
+				for (String name : Language.getList(node + ".names"))
+					names.put(name.toLowerCase(), color);
 			}
 		});
 	}
@@ -145,7 +137,7 @@ public enum SkriptColor implements Color {
 	public static Optional<SkriptColor> fromName(String name) {
 		return names.entrySet().stream()
 				.filter(entry -> entry.getKey().equals(name))
-				.map(entry -> entry.getValue())
+				.map(Map.Entry::getValue)
 				.findAny();
 	}
 	
@@ -159,9 +151,15 @@ public enum SkriptColor implements Color {
 				.findAny();
 	}
 	
+	public static Optional<SkriptColor> fromBukkitColor(org.bukkit.Color color) {
+		return colors.stream()
+				.filter(c -> c.asBukkitColor().equals(color))
+				.findAny();
+	}
+	
 	/**
 	 * @deprecated Magic numbers
-	 * @param dye DyeColor to match against a defined Skript Color.
+	 * @param data DyeColor to match against a defined Skript Color.
 	 * @return Optional if any Skript Color matched up with the defined DyeColor
 	 */
 	@Deprecated
@@ -175,7 +173,7 @@ public enum SkriptColor implements Color {
 	
 	/**
 	 * @deprecated Magic numbers
-	 * @param dye DyeColor to match against a defined Skript Color.
+	 * @param data DyeColor to match against a defined Skript Color.
 	 * @return Optional if any Skript Color matched up with the defined DyeColor
 	 */
 	@Deprecated

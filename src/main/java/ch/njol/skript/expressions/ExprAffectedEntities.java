@@ -1,0 +1,87 @@
+/**
+ *   This file is part of Skript.
+ *
+ *  Skript is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Skript is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
+ */
+package ch.njol.skript.expressions;
+
+import java.util.Iterator;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.Event;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.eclipse.jdt.annotation.Nullable;
+
+import ch.njol.skript.ScriptLoader;
+import ch.njol.skript.Skript;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.ExpressionType;
+import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.util.Kleenean;
+
+public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
+	
+	static {
+		Skript.registerExpression(ExprAffectedEntities.class, LivingEntity.class, ExpressionType.SIMPLE, "[the] affected entities");
+	}
+	
+	@Override
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
+		if (!ScriptLoader.isCurrentEvent(AreaEffectCloudApplyEvent.class)) {
+			Skript.error("The 'affected entities' expression may only be used in a area effect cloud apply event.");
+			return false;
+		}
+		return true;
+	}
+	
+	@Nullable
+	@Override
+	protected LivingEntity[] get(Event e) {
+		if (e instanceof AreaEffectCloudApplyEvent)
+			return ((AreaEffectCloudApplyEvent) e).getAffectedEntities().toArray(new LivingEntity[0]);
+		return null;
+	}
+	
+	@Nullable
+	@Override
+	public Iterator<? extends LivingEntity> iterator(Event e) {
+		if (e instanceof AreaEffectCloudApplyEvent)
+			return ((AreaEffectCloudApplyEvent) e).getAffectedEntities().iterator();
+		return super.iterator(e);
+	}
+	
+	@Override
+	public boolean isSingle() {
+		return false;
+	}
+	
+	@Override
+	public boolean isDefault() {
+		return true;
+	}
+	
+	@Override
+	public Class<? extends LivingEntity> getReturnType() {
+		return LivingEntity.class;
+	}
+	
+	@Override
+	public String toString(@Nullable Event e, boolean debug) {
+		return "the affected entities";
+	}
+}
