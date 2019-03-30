@@ -42,7 +42,6 @@ public class InventorySlot extends SlotWithIndex {
 	
 	private final Inventory invi;
 	private final int index;
-	private final static ItemStack EMPTY_STACK = new ItemStack(Material.AIR, 1);
 	
 	public InventorySlot(final Inventory invi, final int index) {
 		assert invi != null;
@@ -64,8 +63,8 @@ public class InventorySlot extends SlotWithIndex {
 	@Nullable
 	public ItemStack getItem() {
 		if (invi == null)
-			return EMPTY_STACK;
-		return invi.getItem(index) == null  ? EMPTY_STACK : invi.getItem(index).clone();
+			return new ItemStack(Material.AIR, 1);
+		return invi.getItem(index) == null  ? new ItemStack(Material.AIR, 1) : invi.getItem(index).clone();
 	}
 	
 	@Override

@@ -39,7 +39,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 
 @Name("Affected Entities")
-@Description("The affected entities in the <a href='events.html#aoe_cloud_effect>are cloud effect</a> event.")
+@Description("The affected entities in the <a href='events.html#aoe_cloud_effect>area cloud effect</a> event.")
 @Examples({"on area cloud effect:",
 		"	loop affected entities:",
 		"		if loop-value is a player:",
@@ -54,7 +54,7 @@ public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
 		if (!ScriptLoader.isCurrentEvent(AreaEffectCloudApplyEvent.class)) {
-			Skript.error("The 'affected entities' expression may only be used in a area effect cloud apply event.");
+			Skript.error("The 'affected entities' expression may only be used in an area cloud effect event.");
 			return false;
 		}
 		return true;
