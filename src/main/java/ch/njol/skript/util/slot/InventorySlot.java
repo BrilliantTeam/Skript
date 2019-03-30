@@ -20,10 +20,12 @@
 package ch.njol.skript.util.slot;
 
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.eclipse.jdt.annotation.Nullable;
@@ -31,6 +33,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.PlayerUtils;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.util.BlockInventoryHolder;
 
 /**
  * Represents a slot in some inventory.
@@ -39,6 +42,7 @@ public class InventorySlot extends SlotWithIndex {
 	
 	private final Inventory invi;
 	private final int index;
+	private final static ItemStack EMPTY_STACK = new ItemStack(Material.AIR, 1);
 	
 	public InventorySlot(final Inventory invi, final int index) {
 		assert invi != null;
@@ -59,7 +63,9 @@ public class InventorySlot extends SlotWithIndex {
 	@Override
 	@Nullable
 	public ItemStack getItem() {
-		return invi.getItem(index) == null ? new ItemStack(Material.AIR, 1) : invi.getItem(index).clone();
+		if (invi == null)
+			return EMPTY_STACK;
+		return invi.getItem(index) == null  ? EMPTY_STACK : invi.getItem(index).clone();
 	}
 	
 	@Override
@@ -71,11 +77,16 @@ public class InventorySlot extends SlotWithIndex {
 	
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
+		InventoryHolder holder = invi.getHolder();
+		
+		if (holder instanceof BlockState)
+			holder = new BlockInventoryHolder((BlockState) holder);
+		
 		if (invi.getHolder() != null) {
 			if (invi instanceof CraftingInventory) // 4x4 crafting grid is contained in player too!
-				return "crafting slot " + index + " of " + Classes.toString(invi.getHolder());
+				return "crafting slot " + index + " of " + Classes.toString(holder);
 			
-			return "inventory slot " + index + " of " + Classes.toString(invi.getHolder());
+			return "inventory slot " + index + " of " + Classes.toString(holder);
 		}
 		return "inventory slot " + index + " of " + Classes.toString(invi);
 	}

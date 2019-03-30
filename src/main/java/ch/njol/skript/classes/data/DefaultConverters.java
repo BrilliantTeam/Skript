@@ -19,8 +19,6 @@
  */
 package ch.njol.skript.classes.data;
 
-import java.util.Collection;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -39,12 +37,12 @@ import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.bukkitutil.PlayerUtils;
 import ch.njol.skript.classes.Converter;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.entity.XpOrbData;
 import ch.njol.skript.registrations.Converters;
+import ch.njol.skript.util.BlockInventoryHolder;
 import ch.njol.skript.util.BlockUtils;
 import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.EnchantmentType;
@@ -263,16 +261,28 @@ public class DefaultConverters {
 				return null;
 			}
 		}, Converter.NO_COMMAND_ARGUMENTS);
-//		Skript.registerConverter(InventoryHolder.class, Block.class, new Converter<InventoryHolder, Block>() {
-//			@Override
-//			public Block convert(final InventoryHolder h) {
-//				if (h == null)
-//					return null;
-//				if (h instanceof BlockState)
-//					return ((BlockState) h).getBlock();
-//				return null;
-//			}
-//		});
+		
+		Converters.registerConverter(InventoryHolder.class, Block.class, new Converter<InventoryHolder, Block>() {
+			@Override
+			@Nullable
+			public Block convert(final InventoryHolder holder) {
+				if (holder == null)
+					return null;
+				if (holder instanceof BlockState)
+					return new BlockInventoryHolder((BlockState) holder);
+				return null;
+			}
+		});
+		
+		Converters.registerConverter(InventoryHolder.class, Entity.class, new Converter<InventoryHolder, Entity>() {
+			@Override
+			@Nullable
+			public Entity convert(InventoryHolder holder) {
+				if (holder instanceof Entity)
+					return (Entity) holder;
+				return null;
+			}
+		});
 		
 //		// World - Time
 //		Skript.registerConverter(World.class, Time.class, new Converter<World, Time>() {
