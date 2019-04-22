@@ -34,7 +34,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 
@@ -52,7 +52,7 @@ public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
 	}
 	
 	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
 		if (!ScriptLoader.isCurrentEvent(AreaEffectCloudApplyEvent.class)) {
 			Skript.error("The 'affected entities' expression may only be used in an area cloud effect event.");
 			return false;

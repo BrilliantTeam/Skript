@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -268,13 +269,11 @@ public class AliasesParser {
 		public void push(int value) {
 			if (pos == ints.length - 1)
 				enlargeArray();
-			ints[pos] = value;
-			pos++;
+			ints[pos++] = value;
 		}
 		
 		public int pop() {
-			pos--;
-			return ints[pos];
+			return ints[--pos];
 		}
 		
 		public boolean isEmpty() {
@@ -305,7 +304,6 @@ public class AliasesParser {
 		IntStack choices = new IntStack(4);
 		for (int i = 0; i < name.length();) {
 			int c = name.codePointAt(i);
-			
 			if (c == '[') { // Start optional part
 				optionals.push(i);
 				simple = false;
@@ -660,42 +658,12 @@ public class AliasesParser {
 	 * @return Name fixed.
 	 */
 	protected String fixName(String name) {
-		StringBuilder fixed = new StringBuilder();
+		String result = StringUtils.normalizeSpace(name);
 		
-		// Trim whitespace at beginning
-		int i = 0;
-		for (;i < name.length();) {
-			int c = name.codePointAt(i);
-			if (!Character.isWhitespace(c))
-				break;
-			
-			i += Character.charCount(c);
-		}
+		int i = result.indexOf('¦');
 		
-		// Remove extra whitespace
-		boolean whitespace = false;
-		int len = name.length();
-		for (;i < len;) {
-			int c = name.codePointAt(i);
-			if (Character.isWhitespace(c)) {
-				// Ignore multiple whitespace after each other and the last whitespace
-				if (whitespace || i == len - 1) {
-					i += Character.charCount(c);
-					continue;
-				} else { // First whitespace
-					whitespace = true;
-				}
-			} else {
-				whitespace = false;
-			}
-			
-			fixed.appendCodePoint(c);
-			
-			i += Character.charCount(c);
-		}
-		
-		String result = fixed.toString().toLowerCase();
-		assert result != null;
+		if (i != -1 && Character.isWhitespace(result.codePointBefore(i)))
+			result = result.substring(0, i - 1) + result.substring(i);
 		return result;
 	}
 	
