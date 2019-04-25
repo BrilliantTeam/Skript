@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.aliases.ItemType;
@@ -114,8 +115,20 @@ public class ExprEnchantments extends SimpleExpression<EnchantmentType> {
 				break;
 			case REMOVE:
 			case REMOVE_ALL:
-				for (ItemType item : source)
-					item.removeEnchantments(enchants);
+				for (ItemType item : source) {
+					ItemMeta meta = item.getItemMeta();
+					assert meta != null;
+					for (EnchantmentType enchant : enchants) {
+						Enchantment ench = enchant.getType();
+						assert ench != null;
+						if (enchant.getInternalLevel() == -1
+								|| meta.getEnchantLevel(ench) == enchant.getLevel()) {
+							// Remove directly from meta since it's more efficient on this case
+							meta.removeEnchant(ench);
+						}
+					item.setItemMeta(meta);
+					}
+				}
 				break;
 			case SET:
 				for (ItemType item : source) {
