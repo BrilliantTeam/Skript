@@ -2,4 +2,4 @@ enableFeaturePreview('STABLE_PUBLISHING')
 
 rootProject.name = 'Skript'
 include 'skript-worldguard6'
-include 'skript-worldguard7fawe'
+//include 'skript-worldguard7fawe'
