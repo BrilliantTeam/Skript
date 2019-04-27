@@ -151,7 +151,6 @@ public class AliasesMap {
 	public void addAlias(AliasData data) {
 		MaterialEntry entry = getEntry(data.getItem());
 		if (data.getItem().isDefault()) {
-			// TODO handle overwriting defaults; is it an error?
 			entry.defaultItem = data;
 		} else {
 			entry.items.add(data);

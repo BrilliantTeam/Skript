@@ -314,6 +314,14 @@ public class AliasesProvider {
 		NonNullPair<String, Integer> plain = Noun.stripGender(name, name); // Name without gender and its gender token
 		NonNullPair<String, String> forms = getAliasPlural(plain.getFirst()); // Singular and plural forms
 		
+		// If this is first time we're defining an item, store additional data about it
+		if (typeOfId == null) {
+			ItemData data = datas.get(0);
+			// Most accurately named alias for this item SHOULD be defined first
+			MaterialName materialName = new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond());
+			aliasesMap.addAlias(new AliasesMap.AliasData(data, materialName, id, related));
+		}
+		 
 		// Check if there is item type with this name already, create otherwise
 		ItemType type = aliases.get(forms.getFirst());
 		if (type == null)
@@ -327,12 +335,6 @@ public class AliasesProvider {
 		// Add item datas we got earlier to the type
 		assert datas != null;
 		type.addAll(datas);
-		
-		// Add additional data to aliases map
-		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
-			MaterialName materialName = new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond());
-			aliasesMap.addAlias(new AliasesMap.AliasData(data, materialName, id, related));
-		}
 	}
 	
 	public void addVariationGroup(String name, VariationGroup group) {
