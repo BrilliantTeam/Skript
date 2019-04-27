@@ -45,7 +45,6 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockFadeEvent;
-import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -79,8 +78,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.hanging.HangingEvent;
-import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -99,6 +96,9 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.weather.WeatherEvent;
@@ -135,7 +135,7 @@ public final class BukkitEventValues {
 	
 	public BukkitEventValues() {}
 	
-	protected static final boolean offHandSupport = Skript.isRunningMinecraft(1, 9);
+	private static final boolean offHandSupport = Skript.isRunningMinecraft(1, 9);
 	
 	static {
 		
@@ -354,6 +354,16 @@ public final class BukkitEventValues {
 				return new BlockStateBlock(s, true);
 			}
 		}, 0);
+		// BlockCanBuildEvent#getPlayer was added in 1.13
+		if (Skript.methodExists(BlockCanBuildEvent.class, "getPlayer")) {
+			EventValues.registerEventValue(BlockCanBuildEvent.class, Player.class, new Getter<Player, BlockCanBuildEvent>() {
+				@Override
+				@Nullable
+				public Player get(final BlockCanBuildEvent e) {
+					return e.getPlayer();
+				}
+			}, 0);
+		}
 		// SignChangeEvent
 		EventValues.registerEventValue(SignChangeEvent.class, Player.class, new Getter<Player, SignChangeEvent>() {
 			@Override
@@ -727,6 +737,32 @@ public final class BukkitEventValues {
 				return e.getExited();
 			}
 		}, 0);
+		
+		EventValues.registerEventValue(VehicleEnterEvent.class, Entity.class, new Getter<Entity, VehicleEnterEvent>() {
+			@Nullable
+			@Override
+			public Entity get(VehicleEnterEvent e) {
+				return e.getEntered();
+			}
+		}, 0);
+		
+		// We could error here instead but it's preferable to not do it in this case
+		EventValues.registerEventValue(VehicleDamageEvent.class, Entity.class, new Getter<Entity, VehicleDamageEvent>() {
+			@Nullable
+			@Override
+			public Entity get(VehicleDamageEvent e) {
+				return e.getAttacker();
+			}
+		}, 0);
+		
+		EventValues.registerEventValue(VehicleDestroyEvent.class, Entity.class, new Getter<Entity, VehicleDestroyEvent>() {
+			@Nullable
+			@Override
+			public Entity get(VehicleDestroyEvent e) {
+				return e.getAttacker();
+			}
+		}, 0);
+		
 		EventValues.registerEventValue(VehicleEvent.class, Entity.class, new Getter<Entity, VehicleEvent>() {
 			@Override
 			@Nullable
@@ -734,6 +770,7 @@ public final class BukkitEventValues {
 				return e.getVehicle().getPassenger();
 			}
 		}, 0);
+		
 		
 		// === CommandEvents ===
 		// PlayerCommandPreprocessEvent is a PlayerEvent

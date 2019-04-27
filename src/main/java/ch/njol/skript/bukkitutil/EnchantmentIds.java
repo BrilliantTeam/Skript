@@ -32,7 +32,7 @@ import ch.njol.skript.Skript;
 public class EnchantmentIds {
 	
 	public static final Map<Enchantment,Integer> ids = new HashMap<>();
-	public static final Enchantment[] enchantments = new Enchantment[71];
+	public static final Enchantment[] enchantments = new Enchantment[72];
 	
 	static {
 		ids.put(Enchantment.PROTECTION_ENVIRONMENTAL, 0);
@@ -73,7 +73,7 @@ public class EnchantmentIds {
 			ids.put(Enchantment.LOYALTY, 65);
 			ids.put(Enchantment.IMPALING, 66);
 			ids.put(Enchantment.RIPTIDE, 67);
-			ids.put(Enchantment.CHANNELING, 68);  // Funny 1.13 Comment here?!?! 
+			ids.put(Enchantment.CHANNELING, 68);  // Funny 1.13 Comment here?!?!
 		}
 		
 		for (Map.Entry<Enchantment, Integer> entry : ids.entrySet()) {

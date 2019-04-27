@@ -39,6 +39,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -885,7 +886,29 @@ public class BukkitClasses {
 		Classes.registerClass(new ClassInfo<>(InventoryHolder.class, "inventoryholder")
 				.name(ClassInfo.NO_DOC)
 				.defaultExpression(new EventValueExpression<>(InventoryHolder.class))
-				.after("entity"));
+				.after("entity", "block")
+				.parser(new Parser<InventoryHolder>() {
+					
+					@Override
+					public boolean canParse(ParseContext context) {
+						return false;
+					}
+					
+					@Override
+					public String toString(InventoryHolder holder, int flags) {
+						return Classes.toString(holder instanceof BlockState ? ((BlockState) holder).getBlock() : holder);
+					}
+					
+					@Override
+					public String toVariableNameString(InventoryHolder holder) {
+						return toString(holder, 0);
+					}
+					
+					@Override
+					public String getVariableNamePattern() {
+						return ".+";
+					}
+				}));
 
 		Classes.registerClass(new ClassInfo<>(GameMode.class, "gamemode")
 				.user("game ?modes?")
