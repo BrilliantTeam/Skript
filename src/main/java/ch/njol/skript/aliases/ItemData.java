@@ -153,8 +153,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	 */
 	boolean itemForm;
 	
-	boolean strictEquality;
-	
 	/**
 	 * If this item is an alias or a clone of one that has not been
 	 * modified after loading the aliases.
@@ -282,42 +280,11 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			return false;
 		
 		ItemData other = (ItemData) obj;
-		if (isAnything || other.isAnything) // First, isAnything check
-			return true;
-		
-		if (!type.equals(other.type))
-			return false; // Types are not equal
-		
-		BlockValues values = blockValues;
-		if (!itemDataValues) {
-			if (itemForm && other.blockValues != null)
-				return other.blockValues.isDefault();
-			if (other.itemForm && blockValues != null)
-				return blockValues.isDefault();
+		if (isAlias) { // This is alias, other item might not be
+			return other.matchAlias(this) == MatchQuality.SAME_ITEM;
+		} else { // This is not alias, but other might be
+			return matchAlias(other) == MatchQuality.SAME_ITEM;
 		}
-		
-		if (strictEquality) {
-			// The two blocks are not exactly same (even though normally they might be same enough to match)
-			if (!Objects.equals(values, other.blockValues))
-				return false;
-			// The two blocks are same, but aliases differ when it comes to item equality
-			if (values != null && other.blockValues != null
-					&& other.blockValues.isDefault() != values.isDefault())
-				return false;
-		}
-		
-		// Block state comparison if both are blocks or if we're on 1.12 or older
-		if (values != null && (itemDataValues || !itemForm && !other.itemForm))
-			return values.equals(other.blockValues);
-		
-		// Check the item meta, unless either ItemData is alias
-		if (!isAlias && !other.isAlias) {
-			return Objects.equals(getItemMeta(), other.getItemMeta());
-		} else { // Even for aliases, do a few checks
-			// REMIND follow bug reports closely to see which checks are needed
-		}
-
-		return true; // All equality checks passed
 	}
 	
 	@Override
@@ -355,14 +322,14 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		}
 		
 		/**
-		 * Initially, except an exact match. This gets lowered as differences
-		 * between items are noticed.
+		 * Initially, expect exact match. Lower expectations as new differences
+		 * between items are discovered.
 		 */
 		MatchQuality quality = MatchQuality.EXACT;
 		
 		// Check that block values of given item match ours
 		if (values != null) {
-			if (item.blockValues != null) {
+			if (item.blockValues != null) { // Other item has block values, so match against them
 				quality = values.match(item.blockValues);
 			} else { // Other item has no block values, but we do
 				quality = MatchQuality.SAME_MATERIAL;

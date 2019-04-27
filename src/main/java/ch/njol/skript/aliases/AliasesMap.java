@@ -1,3 +1,22 @@
+/**
+ *   This file is part of Skript.
+ *
+ *  Skript is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Skript is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
+ */
 package ch.njol.skript.aliases;
 
 import java.util.ArrayList;
@@ -7,6 +26,7 @@ import org.bukkit.Material;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.aliases.AliasesMap.Match;
+import ch.njol.skript.entity.EntityData;
 
 /**
  * Stores the aliases.
@@ -25,10 +45,20 @@ public class AliasesMap {
 			this.data = data;
 		}
 		
+		/**
+		 * Gets quality of this match.
+		 * @return Match quality.
+		 */
 		public MatchQuality getQuality() {
 			return quality;
 		}
 		
+		/**
+		 * Retrieves the alias data of this match. Provided that
+		 * {@link #getQuality()} is at least {@link MatchQuality#SAME_MATERIAL}
+		 * this will be not null; otherwise, it may or may not be null.
+		 * @return Alias data for matching item.
+		 */
 		@Nullable
 		public AliasData getData() {
 			return data;
@@ -52,22 +82,34 @@ public class AliasesMap {
 		 */
 		private final String minecraftId;
 		
-		public AliasData(ItemData item, MaterialName name, String minecraftId) {
+		/**
+		 * Entity related to this alias.
+		 */
+		@Nullable
+		private final EntityData<?> relatedEntity;
+		
+		public AliasData(ItemData item, MaterialName name, String minecraftId, @Nullable EntityData<?> relatedEntity) {
 			this.item = item;
 			this.name = name;
 			this.minecraftId = minecraftId;
+			this.relatedEntity = relatedEntity;
 		}
 
 		public ItemData getItem() {
 			return item;
 		}
-
+		
 		public MaterialName getName() {
 			return name;
 		}
-
+		
 		public String getMinecraftId() {
 			return minecraftId;
+		}
+		
+		@Nullable
+		public EntityData<?> getRelatedEntity() {
+			return relatedEntity;
 		}
 	}
 		
@@ -93,13 +135,11 @@ public class AliasesMap {
 	/**
 	 * One material entry per material. Ordinal of material is index of entry.
 	 */
-	private final MaterialEntry[] materialEntries;
+	private MaterialEntry[] materialEntries;
 	
+	@SuppressWarnings("null") // clear() initializes material entries
 	public AliasesMap() {
-		this.materialEntries = new MaterialEntry[Material.values().length];
-		for (int i = 0; i < materialEntries.length; i++) {
-			materialEntries[i] = new MaterialEntry();
-		}
+		clear();
 	}
 	
 	private MaterialEntry getEntry(ItemData item) {
@@ -159,5 +199,15 @@ public class AliasesMap {
 		}
 		
 		throw new AssertionError(); // Shouldn't have reached here
+	}
+
+	/**
+	 * Clears all data from this aliases map.
+	 */
+	public void clear() {
+		materialEntries = new MaterialEntry[Material.values().length];
+		for (int i = 0; i < materialEntries.length; i++) {
+			materialEntries[i] = new MaterialEntry();
+		}
 	}
 }

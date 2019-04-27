@@ -65,11 +65,6 @@ public class AliasesProvider {
 	private final Map<String, ItemType> aliases;
 	
 	/**
-	 * Material names for aliases this provider has.
-	 */
-	private final Map<ItemData, MaterialName> materialNames;
-	
-	/**
 	 * Tags are in JSON format. We may need GSON when merging tags
 	 * (which might be done if variations are used).
 	 */
@@ -170,24 +165,17 @@ public class AliasesProvider {
 	private final Map<String, VariationGroup> variations;
 	
 	/**
-	 * Maps item datas back to Minecraft ids.
+	 * Allows looking up aliases based on item datas created runtime.
 	 */
-	private final Map<ItemData, String> minecraftIds;
-	
-	/**
-	 * Entities related to the items. Most items won't have any.
-	 */
-	private final Map<ItemData, EntityData<?>> relatedEntities;
+	private final AliasesMap aliasesMap;
 	
 	/**
 	 * Constructs a new aliases provider with no data.
 	 */
 	public AliasesProvider(int expectedCount) {
 		aliases = new HashMap<>(expectedCount);
-		materialNames = new HashMap<>(expectedCount);
 		variations = new HashMap<>(expectedCount / 20);
-		minecraftIds = new HashMap<>(3000);
-		relatedEntities = new HashMap<>(10);
+		aliasesMap = new AliasesMap();
 		
 		gson = new Gson();
 	}
@@ -340,20 +328,10 @@ public class AliasesProvider {
 		assert datas != null;
 		type.addAll(datas);
 		
-		// Make datas subtypes of the type we have here and handle Minecraft ids
+		// Add additional data to aliases map
 		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
-			data.strictEquality = true;
-			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
-				minecraftIds.put(data, id); // Register Minecraft id for the data, too
-			
-			// Material name, including both singular and plural forms
-			materialNames.putIfAbsent(data, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond()));
-			
-			// Related entity type
-			if (related != null)
-				relatedEntities.put(data, related);
-			
-			data.strictEquality = false;
+			MaterialName materialName = new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond());
+			aliasesMap.addAlias(new AliasesMap.AliasData(data, materialName, id, related));
 		}
 	}
 	
@@ -370,46 +348,47 @@ public class AliasesProvider {
 	public ItemType getAlias(String alias) {
 		return aliases.get(alias);
 	}
+	
+	@Nullable
+	public AliasesMap.AliasData getAliasData(ItemData item) {
+		return aliasesMap.matchAlias(item).getData();
+	}
 
 	@Nullable
-	public String getMinecraftId(ItemData data) {
-		String id = minecraftIds.get(data);
-		if (id == null) { // No non-default MC id found
-			ItemData defaultData = data.clone();
-			defaultData.blockValues = null;
-			id = minecraftIds.get(defaultData);
+	public String getMinecraftId(ItemData item) {
+		AliasesMap.AliasData data = getAliasData(item);
+		if (data != null) {
+			return data.getMinecraftId();
 		}
-		return id;
+		return null;
 	}
 	
 	@Nullable
-	public MaterialName getMaterialName(ItemData data) {
-		MaterialName name = materialNames.get(data);
-		if (name == null) { // No non-default name found
-			ItemData defaultData = data.clone();
-			defaultData.blockValues = null;
-			name = materialNames.get(defaultData);
+	public MaterialName getMaterialName(ItemData item) {
+		AliasesMap.AliasData data = getAliasData(item);
+		if (data != null) {
+			return data.getName();
 		}
-		return name;
+		return null;
 	}
-
-	public void setMaterialName(ItemData data, MaterialName materialName) {
-		materialNames.put(data, materialName);
+	
+	@Nullable
+	public EntityData<?> getRelatedEntity(ItemData item) {
+		AliasesMap.AliasData data = getAliasData(item);
+		if (data != null) {
+			return data.getRelatedEntity();
+		}
+		return null;
 	}
 
 	public void clearAliases() {
 		aliases.clear();
-		materialNames.clear();
 		variations.clear();
+		aliasesMap.clear();
 	}
 
 	public int getAliasCount() {
 		return aliases.size();
-	}
-	
-	@Nullable
-	public EntityData<?> getRelatedEntity(ItemData type) {
-		return relatedEntities.get(type);
 	}
 
 }

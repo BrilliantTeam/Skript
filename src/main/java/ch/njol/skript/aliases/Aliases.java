@@ -216,26 +216,6 @@ public abstract class Aliases {
 	}
 	
 	/**
-	 * @return how many ids are missing an alias, including the 'any id' (-1)
-	 */
-	static int addMissingMaterialNames() {
-		int r = 0;
-		StringBuilder missing = new StringBuilder(m_missing_aliases + " ");
-		for (final Material m : Material.values()) {
-			assert m != null;
-			ItemData data = new ItemData(m);
-			if (provider.getMaterialName(data) == null) { // Material name is missing
-				provider.setMaterialName(data, new MaterialName(m, "" + m.toString().toLowerCase(Locale.ENGLISH).replace('_', ' '), "" + m.toString().toLowerCase().replace('_', ' '), 0));
-				missing.append(m + ", ");
-				r++;
-			}
-		}
-		if (r > 0) // Give a warning about missing aliases we just worked around
-			Skript.warning("" + missing.substring(0, missing.length() - 2));
-		return r;
-	}
-	
-	/**
 	 * Parses an ItemType to be used as an alias, i.e. it doesn't parse 'all'/'every' and the amount.
 	 * 
 	 * @param s mixed case string
