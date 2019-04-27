@@ -183,18 +183,16 @@ public abstract class Aliases {
 	
 	@Nullable
 	private static MaterialName getMaterialNameData(ItemData type) {
-		ItemData aliasCopy = type.aliasCopy();
-		
 		// Check script aliases first
 		ScriptAliases aliases = scriptAliases;
 		if (aliases != null) {
-			MaterialName name = aliases.provider.getMaterialName(aliasCopy);
+			MaterialName name = aliases.provider.getMaterialName(type);
 			if (name != null)
 				return name;
 		}
 		
 		// Then global aliases
-		return provider.getMaterialName(aliasCopy);
+		return provider.getMaterialName(type);
 	}
 	
 	public static String getMaterialName(ItemData type, boolean plural) {
@@ -523,7 +521,7 @@ public abstract class Aliases {
 			if (id != null)
 				return id;
 		}
-		return provider.getMinecraftId(data.aliasCopy());
+		return provider.getMinecraftId(data);
 	}
 	
 	/**
@@ -540,7 +538,7 @@ public abstract class Aliases {
 			if (entity != null)
 				return entity;
 		}
-		return provider.getRelatedEntity(data.aliasCopy());
+		return provider.getRelatedEntity(data);
 	}
 	
 	/**
