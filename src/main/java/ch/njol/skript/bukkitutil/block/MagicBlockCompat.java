@@ -34,6 +34,7 @@ import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemFlags;
 import ch.njol.skript.aliases.MatchQuality;
 import ch.njol.skript.bukkitutil.ItemUtils;
 
@@ -72,24 +73,25 @@ public class MagicBlockCompat implements BlockCompat {
 
 		private Material id;
 		short data;
-		private boolean isDefault;
+		private int itemFlags;
 
 		@SuppressWarnings("null")
 		public MagicBlockValues(BlockState block) {
 			this.id = ItemUtils.asItem(block.getType());
 			this.data = block.getRawData(); // Some black magic here, please look away...
-			this.isDefault = false; // Blocks in world are NEVER default
+			// We don't know whether block data 0 has been set explicitly
+			this.itemFlags = ItemFlags.CHANGED_DURABILITY;
 		}
 		
-		public MagicBlockValues(Material id, short data, boolean isDefault) {
+		public MagicBlockValues(Material id, short data, int itemFlags) {
 			this.id = id;
 			this.data = data;
-			this.isDefault = isDefault;
+			this.itemFlags = itemFlags;
 		}
 		
 		@Override
 		public boolean isDefault() {
-			return isDefault;
+			return itemFlags == 0; // No tag or durability changes
 		}
 
 		@Override
@@ -121,8 +123,11 @@ public class MagicBlockCompat implements BlockCompat {
 				if (data == magic.data) {
 					return MatchQuality.EXACT;
 				} else {
-					// TODO figure out when to return SAME_ITEM
-					return MatchQuality.SAME_MATERIAL;
+					if ((magic.itemFlags & ItemFlags.CHANGED_DURABILITY) == 0) {
+						return MatchQuality.SAME_ITEM; // Other doesn't care about durability
+					} else {
+						return MatchQuality.SAME_MATERIAL;
+					}
 				}
 			} else {
 				return MatchQuality.DIFFERENT;
@@ -171,12 +176,12 @@ public class MagicBlockCompat implements BlockCompat {
 	
 	@Nullable
 	@Override
-	public BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, boolean itemModified) {
+	public BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, int itemFlags) {
 		short damage = 0;
 		if (item != null) {
 			damage = (short) ItemUtils.getDamage(item);
 		}
-		return new MagicBlockValues(type, damage, !itemModified);
+		return new MagicBlockValues(type, damage, itemFlags);
 	}
 
 	@Override
@@ -195,7 +200,7 @@ public class MagicBlockCompat implements BlockCompat {
 	@Nullable
 	public BlockValues getBlockValues(ItemStack stack) {
 		short data = (short) ItemUtils.getDamage(stack);
-		return new MagicBlockValues(stack.getType(), data, false);
+		return new MagicBlockValues(stack.getType(), data, ItemFlags.CHANGED_DURABILITY | ItemFlags.CHANGED_TAGS);
 	}
 
 	@Override

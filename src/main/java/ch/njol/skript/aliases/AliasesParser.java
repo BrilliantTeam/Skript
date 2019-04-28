@@ -20,6 +20,7 @@
 package ch.njol.skript.aliases;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -491,7 +492,7 @@ public class AliasesParser {
 			// Fast path: no variations
 			PatternSlot slot = slots.get(0);
 			if (!(slot instanceof VariationSlot)) {
-				variations.put(fixName(name), new Variation(null, -1, new HashMap<>(), new HashMap<>()));
+				variations.put(fixName(name), new Variation(null, -1, Collections.emptyMap(), Collections.emptyMap()));
 				return variations;
 			}
 			// Otherwise we have only one slot, which is variation. Weird, isn't it?
