@@ -1298,6 +1298,7 @@ public class BukkitClasses {
 					@Override
 					protected Enchantment deserialize(final Fields fields) throws StreamCorruptedException {
 						final String key = fields.getObject("key", String.class);
+						assert key != null; // If a key happens to be null, something went really wrong...
 						final Enchantment e = EnchantmentUtils.getByKey(key);
 						if (e == null)
 							throw new StreamCorruptedException("Invalid enchantment " + key);

@@ -234,9 +234,12 @@ public class SkriptClasses {
 						final EnchantmentType[] enchs = t.getEnchantmentTypes();
 						if (enchs != null) {
 							b.append("|");
-							for (final EnchantmentType e : enchs) {
-								b.append("#" + EnchantmentUtils.getKey(e.getType()));
-								b.append(":" + e.getLevel());
+							for (final EnchantmentType ench : enchs) {
+								Enchantment e = ench.getType();
+								if (e == null)
+									continue;
+								b.append("#" + EnchantmentUtils.getKey(e));
+								b.append(":" + ench.getLevel());
 							}
 						}
 						return "" + b.toString();
