@@ -344,53 +344,8 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		
 		// See if we need to compare item metas (excluding durability)
 		if ((item.itemFlags & ItemFlags.CHANGED_TAGS) != 0) {
-			ItemMeta our = getItemMeta();
-			ItemMeta their = item.getItemMeta();
-			
-			// Display names
-			if (our.hasDisplayName() != their.hasDisplayName()) {
+			if (!itemFactory.equals(getItemMeta(), item.getItemMeta())) {
 				quality = MatchQuality.SAME_MATERIAL;
-			} else if (our.hasDisplayName()) {
-				if (!our.getDisplayName().equals(their.getDisplayName())) {
-					quality = MatchQuality.SAME_MATERIAL;
-				}
-			}
-			
-			// Lores
-			if (our.hasLore() != their.hasLore()) {
-				quality = MatchQuality.SAME_MATERIAL;
-			} else if (our.hasLore()) {
-				if (!our.getLore().equals(their.getLore())) {
-					quality = MatchQuality.SAME_MATERIAL;
-				}
-			}
-			
-			// Enchantments
-			if (our.hasEnchants() != their.hasEnchants()) {
-				quality = MatchQuality.SAME_MATERIAL;
-			} else if (our.hasEnchants()) {
-				if (!our.getEnchants().equals(their.getEnchants())) {
-					quality = MatchQuality.SAME_MATERIAL;
-				}
-			}
-			
-			// Item flags
-			if (!our.getItemFlags().equals(their.getItemFlags())) {
-				quality = MatchQuality.SAME_MATERIAL;
-			}
-			
-			// Unbreakability
-			if (our.isUnbreakable() != their.isUnbreakable()) {
-				quality = MatchQuality.SAME_MATERIAL;
-			}
-			
-			// Attribute modifiers
-			if (our.hasAttributeModifiers() != their.hasAttributeModifiers()) {
-				quality = MatchQuality.SAME_MATERIAL;
-			} else if (our.hasAttributeModifiers()) {
-				if (!our.getAttributeModifiers().equals(their.getAttributeModifiers())) {
-					quality = MatchQuality.SAME_MATERIAL;
-				}
 			}
 		}
 		
