@@ -75,7 +75,7 @@ skript command:
 			check: Checks for a new version
 			changes: Lists all changes since the current version
 			download: Download the newest version
-	
+
 	invalid script: Can't find the script <grey>'<gold>%s<grey>'<red> in the scripts folder!
 	invalid folder: Can't find the folder <grey>'<gold>%s<grey>'<red> in the scripts folder!
 	reload:
@@ -83,7 +83,7 @@ skript command:
 		reloaded: Successfully reloaded %s.
 		error: Encountered %2$s error¦¦s¦ while reloading %1$s!
 		script disabled: <gold>%s<reset> is currently disabled. Use <gray>/<gold>skript <cyan>enable <red>%s<reset> to enable it.
-		
+
 		config and scripts: the config and all scripts
 		scripts: all scripts
 		main config: the main configuration
@@ -175,7 +175,7 @@ aliases:
 	every: (?:every|all)
 	of every: of (?:every|all)
 	of: of(?: any)?
-	
+
 	# Errors and warnings
 	empty string: '' is not an item type
 	invalid item type: '%s' is not an item type
@@ -192,7 +192,7 @@ aliases:
 	unexpected section: Sections are not allowed here
 	invalid variation section: A section should be variation section, but %s is not valid variation name
 	outside section: Aliases must be put in sections
-	
+
 	# Other messages
 	loaded x aliases from: Loaded %s english aliases from %s
 	loaded x aliases: Loaded a total of %s english aliases
@@ -203,33 +203,30 @@ aliases:
 enchantments:
 	of: of
 	names:
-		protection_environmental: Protection
-		protection_fire: Fire Protection
-		protection_fall: Feather Falling
-		protection_explosions: Blast Protection
-		protection_projectile: Projectile Protection
-		oxygen: Respiration
-		water_worker: Aqua Affinity
-		damage_all: Sharpness
-		damage_undead: Smite
-		damage_arthropods: Bane of Arthropods
+		protection: Protection
+		fire_protection: Fire Protection
+		feather_falling: Feather Falling
+		blast_protection: Blast Protection
+		projectile_protection: Projectile Protection
+		respiration: Respiration
+		aqua_affinity: Aqua Affinity
+		sharpness: Sharpness
+		smite: Smite
+		bane_of_arthropods: Bane of Arthropods
 		knockback: Knockback
 		fire_aspect: Fire Aspect
-		loot_bonus_mobs: Looting
-		dig_speed: Efficiency
+		looting: Looting
+		efficiency: Efficiency
 		silk_touch: Silk Touch
-		durability: Unbreaking
-		loot_bonus_blocks: Fortune
-		arrow_damage: Power
-		arrow_knockback: Punch
-		arrow_fire: Flame
-		arrow_infinite: Infinity
+		unbreaking: Unbreaking
+		fortune: Fortune
+		power: Power
+		punch: Punch
+		flame: Flame
+		infinity: Infinity
 		thorns: Thorns
-		unknown_enchant_61: Luck of the Sea
 		luck: Luck of the Sea
-		unknown_enchant_62: Lure
 		lure: Lure
-		unknown_enchant_8: Depth Strider
 		depth_strider: Depth Strider
 		mending: Mending
 		frost_walker: Frost Walker
@@ -237,7 +234,6 @@ enchantments:
 		binding_curse: Curse of Binding
 		# It's sweeping on 1.10 and below for some reason.
 		sweeping: Sweeping Edge
-		sweeping_edge: Sweeping Edge
 		# New 1.13 Enchantments
 		channeling: Channeling, Channelling
 		riptide: Riptide
@@ -451,7 +447,7 @@ time:
 colors:
 	black:
 		adjective: black
-		names: black 
+		names: black
 	dark_grey:
 		adjective: dark grey
 		names: dark grey, dark gray
@@ -516,16 +512,16 @@ chat styles:
 # -- Directions --
 directions:
 	meter: meter¦s
-	
+
 	at: at
-	
+
 	up: above
 	down: below
 	north: north
 	east: east
 	south: south
 	west: west
-	
+
 	above: above
 	below: below
 	front: in front of
@@ -577,7 +573,7 @@ entities:
 		pattern: any boat(|1¦s)
 	oak boat:
 		name: oak boat¦s
-		pattern: oak boat(|1¦s)	
+		pattern: oak boat(|1¦s)
 	spruce boat:
 		name: spruce boat¦s
 		pattern: spruce boat(|1¦s)
@@ -1356,7 +1352,7 @@ spawn reasons:
 	village_defense: village defense, golem defense, iron golem defense
 	village_invasion: village invasion, village invading
 	sheared: shear, sheared
-	
+
 # -- Difficulties --
 difficulties:
 	easy: easy
@@ -1402,7 +1398,7 @@ types:
 	boolean: boolean¦ (yes/no)¦s (yes/no) @a
 	string: text¦s @a
 	chunk: chunk¦s @a
-	
+
 	# Bukkit
 	entity: entit¦y¦ies @an
 	livingentity: living entit¦y¦ies @a
@@ -1434,7 +1430,7 @@ types:
 	difficulty: (difficulty|difficulties) @a
 	fireworkeffect: firework effect¦s @a
 	fireworktype: firework type¦s @a
-	
+
 	# Skript
 	weathertype: weather type¦s @a
 	entitytype: entity type¦s @an
@@ -1454,7 +1450,7 @@ types:
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
 	resourcepackstate: resource pack state¦s @a
-	
+
 	# Hooks
 	money: money
 	region: region¦s

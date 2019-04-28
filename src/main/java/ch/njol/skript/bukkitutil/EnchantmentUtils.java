@@ -19,14 +19,13 @@
  */
 package ch.njol.skript.bukkitutil;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import ch.njol.skript.Skript;
 
 /**
@@ -35,8 +34,7 @@ import ch.njol.skript.Skript;
 public class EnchantmentUtils {
 	
 	private static final boolean KEY_METHOD_EXISTS = Skript.methodExists(Enchantment.class, "getKey");
-	private static final Map<Enchantment, String> ENCHANTMENTS = new HashMap<>();
-	private static final Collection<String> keys;
+	private static final BiMap<Enchantment, String> ENCHANTMENTS = HashBiMap.create();
 	
 	static {
 		ENCHANTMENTS.put(Enchantment.PROTECTION_ENVIRONMENTAL, "protection");
@@ -74,8 +72,6 @@ public class EnchantmentUtils {
 			ENCHANTMENTS.put(Enchantment.BINDING_CURSE, "binding_curse");
 			ENCHANTMENTS.put(Enchantment.VANISHING_CURSE, "vanishing_curse");
 		}
-		
-		keys = ENCHANTMENTS.values();
 	}
 	
 	public static String getKey(Enchantment ench) {
@@ -87,11 +83,6 @@ public class EnchantmentUtils {
 	public static Enchantment getByKey(String key) {
 		if (KEY_METHOD_EXISTS)
 			return Enchantment.getByKey(NamespacedKey.minecraft(key));
-		return ENCHANTMENTS.entrySet()
-				.stream()
-				.filter(k -> k.getValue().equals(key))
-				.map(Entry::getKey)
-				.findFirst()
-				.get();
+		return ENCHANTMENTS.inverse().get(key);
 	}
 }

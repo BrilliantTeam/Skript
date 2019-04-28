@@ -1269,7 +1269,7 @@ public class BukkitClasses {
 					
 					@Override
 					public String toVariableNameString(final Enchantment e) {
-						return "" + e.getName();
+						return "" + EnchantmentUtils.getKey(e);
 					}
 					
 					@Override
