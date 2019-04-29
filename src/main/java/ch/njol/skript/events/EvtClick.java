@@ -85,7 +85,7 @@ public class EvtClick extends SkriptEvent {
 	static {
 		/*
 		 * On 1.9 and above, handling entity click events is a mess, because
-		 * just listening for one event is enough.
+		 * just listening for one event is not enough.
 		 * 
 		 * PlayerInteractEntityEvent
 		 * Good: when it is fired, you can cancel it
@@ -96,8 +96,7 @@ public class EvtClick extends SkriptEvent {
 		 * Bad: cannot be cancelled if entity is item frame or villager (!)
 		 * 
 		 * Just use both? Well, not so simple, as in many cases both are
-		 * called. To make matters worse, handling both events sometimes
-		 * causes PlayerInteractAtEntityEvent to be called TWICE.
+		 * called.
 		 */
 		Class<? extends PlayerEvent>[] eventTypes;
 		if (twoHanded)
@@ -125,10 +124,6 @@ public class EvtClick extends SkriptEvent {
 	
 	private int click = ANY;
 	boolean isHolding = false;
-	
-	// Entity event spaghetti handling
-	@Nullable
-	private Object lastInteractAtEvent;
 	
 	@Override
 	public boolean init(final Literal<?>[] args, final int matchedPattern, final ParseResult parser) {
@@ -163,11 +158,6 @@ public class EvtClick extends SkriptEvent {
 				if (!(clicked instanceof ArmorStand))
 					return false;
 			}
-			
-			// Guard against PlayerInteractAtEvent being called twice
-			if (lastInteractAtEvent == e) // Intentional identity comparison
-				return false; // Don't handle same event twice
-			lastInteractAtEvent = e; // We're first event, second must not pass
 			
 			if (twoHanded) {
 				//ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
