@@ -95,14 +95,10 @@ public class EvtClick extends SkriptEvent {
 		 * Good: catches clicks on armor stands
 		 * Bad: cannot be cancelled if entity is item frame or villager (!)
 		 * 
-		 * Just listen to both? Good luck with that, because sometimes
-		 * both are fired. Also, one of them cannot be cancelled.
+		 * So, we listen to both of those, filter our At when it is not needed
+		 * and use it for armor stands. Seems to work.
 		 */
-		Class<? extends PlayerEvent>[] eventTypes;
-		if (twoHanded)
-			eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractAtEntityEvent.class, PlayerInteractEntityEvent.class);
-		else
-			eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class);
+		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(PlayerInteractEvent.class, PlayerInteractEntityEvent.class);
 		
 		Skript.registerEvent("Click", EvtClick.class, eventTypes,
 				"[(" + RIGHT + "¦right|" + LEFT + "¦left)(| |-)][mouse(| |-)]click[ing] [on %-entitydata/itemtype%] [(with|using|" + HOLDING + "¦holding) %itemtype%]",
@@ -163,12 +159,12 @@ public class EvtClick extends SkriptEvent {
 		
 		if (e instanceof PlayerInteractEntityEvent) {
 			PlayerInteractEntityEvent clickEvent = ((PlayerInteractEntityEvent) e);
+			Entity clicked = clickEvent.getRightClicked();
 			
 			// Usually, don't handle these events
 			if (clickEvent instanceof PlayerInteractAtEntityEvent) {
 				// But armor stands are an exception
 				// Later, there may be more exceptions...
-				Entity clicked = clickEvent.getRightClicked();
 				if (!(clicked instanceof ArmorStand))
 					return false;
 			}
@@ -176,7 +172,8 @@ public class EvtClick extends SkriptEvent {
 			if (click == LEFT) // Lefts clicks on entities don't work
 				return false;
 			
-			if (twoHanded) {
+			// PlayerInteractAtEntityEvent called only once for armor stands
+			if (twoHanded && !(e instanceof PlayerInteractAtEntityEvent)) {
 				//ItemStack mainHand = clickEvent.getPlayer().getInventory().getItemInMainHand();
 				//ItemStack offHand = clickEvent.getPlayer().getInventory().getItemInOffHand();
 				
@@ -184,7 +181,7 @@ public class EvtClick extends SkriptEvent {
 				assert player != null;
 				// Server fires two click events but only one of them can be cancelled
 				// Try to figure if it is this one
-				boolean useOffHand = checkUseOffHand(player, click, null, clickEvent.getRightClicked());
+				boolean useOffHand = checkUseOffHand(player, click, null, clicked);
 				//Skript.info("useOffHand: " + useOffHand);
 				//Skript.info("Event hand: " + clickEvent.getHand());
 				if ((useOffHand && clickEvent.getHand() == EquipmentSlot.HAND) || (!useOffHand && clickEvent.getHand() == EquipmentSlot.OFF_HAND)) {
@@ -192,7 +189,7 @@ public class EvtClick extends SkriptEvent {
 				}
 			}
 			
-			entity = clickEvent.getRightClicked();
+			entity = clicked;
 			block = null;
 		} else if (e instanceof PlayerInteractEvent) {
 			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) e);
