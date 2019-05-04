@@ -403,7 +403,7 @@ public class DefaultFunctions {
 				return new Long[] {exp};
 			}
 			
-		}.description("Calculates experience needed to achieve given level in Minecraft.")
+		}.description("Calculates the total amount of experience needed to achieve given level from scratch in Minecraft.")
 				.since("2.2-dev32"));
 		
 	}
