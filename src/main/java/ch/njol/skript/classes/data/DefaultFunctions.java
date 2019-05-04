@@ -396,9 +396,9 @@ public class DefaultFunctions {
 			    else if (level >= 1 && level <= 15)
 			        exp = level * level + 6 * level;
 			    else if (level >= 16 && level <= 30) // Truncating decimal parts probably works
-			        exp = (int) (2.5 * level * level - 40.5 * level - 360);
+			        exp = (int) (2.5 * level * level - 40.5 * level + 360);
 			    else // Half experience points do not exist, anyway
-			        exp = (int) (4.5 * level * level - 162.5 * level - 2220);
+			        exp = (int) (4.5 * level * level - 162.5 * level + 2220);
 				
 				return new Long[] {exp};
 			}
