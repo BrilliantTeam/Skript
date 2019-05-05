@@ -798,6 +798,33 @@ entities:
 	normal:
 		name: villager¦s
 		pattern: <age> villager(|1¦s)|(4¦)[villager] (kid(|1¦s)|child(|1¦ren))
+	armorer:
+		name: armorer¦s
+		pattern: <age> armorer(|1¦s) (4¦)armorer (kid(|1¦s)|child(|1¦ren))
+	cartographer:
+		name: cartographer¦s
+		pattern: <age> cartographer(|1¦s) (4¦)cartographer (kid(|1¦s)|child(|1¦ren))
+	fisherman:
+		name: fisherman¦s
+		pattern: <age> fisherman(|1¦s) (4¦)fisherman (kid(|1¦s)|child(|1¦ren))
+	fletcher:
+		name: fletcher¦s
+		pattern: <age> fletcher(|1¦s) (4¦)fletcher (kid(|1¦s)|child(|1¦ren))
+	leatherworker:
+		name: leatherworker¦s
+		pattern: <age> leatherworker(|1¦s) (4¦)leatherworker (kid(|1¦s)|child(|1¦ren))
+	mason:
+		name: mason¦s
+		pattern: <age> mason(|1¦s) (4¦)mason (kid(|1¦s)|child(|1¦ren))
+	shepherd:
+		name: shepherd¦s
+		pattern: <age> shepherd(|1¦s) (4¦)shepherd (kid(|1¦s)|child(|1¦ren))
+	toolsmith:
+		name: toolsmith¦s
+		pattern: <age> tool[ ](smith|maker)(|1¦s) (4¦)tool[ ](smith|maker) (kid(|1¦s)|child(|1¦ren))
+	weaponsmith:
+		name: weaponsmith¦s
+		pattern: <age> weapon[ ]smith(|1¦s) (4¦)weapon[ ]smith (kid(|1¦s)|child(|1¦ren))
 	farmer:
 		name: farmer¦s
 		pattern: <age> farmer(|1¦s)|(4¦)farmer (kid(|1¦s)|child(|1¦ren))
