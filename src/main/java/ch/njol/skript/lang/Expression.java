@@ -285,15 +285,20 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 			for (int i = 0; i < delta.length; i++) {
 				Object value = delta[i];
 				if (value instanceof Slot) {
+					ItemStack item = ((Slot) value).getItem();
+					if (item != null) {
+						item = item.clone(); // ItemStack in inventory is mutable
+					}
+					
 					if (newDelta != null) { // Always store to new array if it has been initialized
-						newDelta[i] =  ((Slot) value).getItem();
+						newDelta[i] = item;
 					} else if (!delta.getClass().getComponentType().isAssignableFrom(ItemStack.class)) {
 						// Initialize new delta to avoid storing incompatible type to array
 						newDelta = new Object[delta.length];
 						System.arraycopy(delta, 0, newDelta, 0, i); // Copy previously processed elements
-						newDelta[i] =  ((Slot) value).getItem(); // Convert this slot to item
+						newDelta[i] = item; // Convert this slot to item
 					} else {
-						delta[i] =  ((Slot) value).getItem();
+						delta[i] = item;
 					}
 				} else if (value instanceof ItemType) {
 					delta[i] = ((ItemType) value).clone();

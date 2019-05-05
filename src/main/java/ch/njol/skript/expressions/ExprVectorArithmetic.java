@@ -19,6 +19,10 @@
  */
 package ch.njol.skript.expressions;
 
+import org.bukkit.event.Event;
+import org.bukkit.util.Vector;
+import org.eclipse.jdt.annotation.Nullable;
+
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -26,15 +30,11 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Patterns;
 import ch.njol.util.Kleenean;
-import org.bukkit.event.Event;
-import org.bukkit.util.Vector;
-import org.eclipse.jdt.annotation.Nullable;
-
-import java.lang.reflect.Array;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * @author bi0qaw
@@ -53,7 +53,7 @@ import java.lang.reflect.Array;
 @Since("2.2-dev28")
 public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 
-	private static enum Operator {
+	private enum Operator {
 		PLUS("++") {
 			@Override
 			@SuppressWarnings("null")
@@ -85,7 +85,7 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 
 		public final String sign;
 
-		private Operator(final String sign) {
+		Operator(final String sign) {
 			this.sign = sign;
 		}
 
@@ -98,12 +98,10 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 	}
 
 	private final static Patterns<Operator> patterns = new Patterns<>(new Object[][] {
-
 			{"%vector%[ ]++[ ]%vector%", Operator.PLUS},
 			{"%vector%[ ]--[ ]%vector%", Operator.MINUS},
-
 			{"%vector%[ ]**[ ]%vector%", Operator.MULT},
-			{"%vector%[ ]//[ ]%vector%", Operator.DIV},
+			{"%vector%[ ]//[ ]%vector%", Operator.DIV}
 	});
 
 	static {
@@ -112,21 +110,27 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 
 	@SuppressWarnings("null")
 	private Expression<Vector> first, second;
+
 	@SuppressWarnings("null")
 	private Operator op;
 
 	@Override
-	protected Vector[] get(Event event) {
-		final Vector[] vectors = (Vector[]) Array.newInstance(Vector.class, 1);
-		Vector v1 = first.getSingle(event), v2 = second.getSingle(event);
-		if (v1 == null) {
+	@SuppressWarnings({"unchecked", "null"})
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		first = (Expression<Vector>) exprs[0];
+		second = (Expression<Vector>) exprs[1];
+		op = patterns.getInfo(matchedPattern);
+		return true;
+	}
+
+	@Override
+	protected Vector[] get(Event e) {
+		Vector v1 = first.getSingle(e), v2 = second.getSingle(e);
+		if (v1 == null)
 			v1 = new Vector();
-		}
-		if (v2 == null) {
+		if (v2 == null)
 			v2 = new Vector();
-		}
-		vectors[0] = op.calculate(v1, v2);
-		return vectors;
+		return CollectionUtils.array(op.calculate(v1, v2));
 	}
 
 	@Override
@@ -140,16 +144,8 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 	}
 
 	@Override
-	public String toString(final @Nullable Event event, boolean b) {
-		return first.toString(event, b) + " " + op +  " " + second.toString(event, b);
+	public String toString(@Nullable Event e, boolean debug) {
+		return first.toString(e, debug) + " " + op +  " " + second.toString(e, debug);
 	}
 
-	@Override
-	@SuppressWarnings({"unchecked", "null"})
-	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean kleenean, SkriptParser.ParseResult parseResult) {
-		first = (Expression<Vector>) expressions[0];
-		second = (Expression<Vector>) expressions[1];
-		op = patterns.getInfo(matchedPattern);
-		return true;
-	}
 }

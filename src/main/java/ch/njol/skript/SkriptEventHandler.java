@@ -32,9 +32,13 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.EventExecutor;
@@ -263,10 +267,25 @@ public abstract class SkriptEventHandler {
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	static void registerBukkitEvents() {
+		EventPriority priority = SkriptConfig.defaultEventPriority.value();
 		for (final Class<? extends Event> e : triggers.keySet()) {
 			assert e != null;
+			// PlayerInteractEntityEvent has a subclass we need for armor stands
+			if (e.equals(PlayerInteractEntityEvent.class)) {
+				if (!registeredEvents.contains(e)) {
+					registeredEvents.add(e);
+					Bukkit.getPluginManager().registerEvent(e, listener, priority, ee, Skript.getInstance());
+					Bukkit.getPluginManager().registerEvent(PlayerInteractAtEntityEvent.class, listener, priority, ee, Skript.getInstance());
+					//Bukkit.getPluginManager().registerEvent(PlayerArmorStandManipulateEvent.class, listener, priority, ee, Skript.getInstance());
+				}
+				continue;
+			}
+			if (e.equals(PlayerInteractAtEntityEvent.class) || e.equals(PlayerArmorStandManipulateEvent.class)) {
+				continue; // Ignore. Registered with PlayerInteractEntityEvent above
+			}
+				
 			if (!containsSuperclass((Set) registeredEvents, e)) { // I just love Java's generics
-				Bukkit.getPluginManager().registerEvent(e, listener, SkriptConfig.defaultEventPriority.value(), ee, Skript.getInstance());
+				Bukkit.getPluginManager().registerEvent(e, listener, priority, ee, Skript.getInstance());
 				registeredEvents.add(e);
 //				for (final Iterator<Class<? extends Event>> i = registeredEvents.iterator(); i.hasNext();) {
 //					final Class<? extends Event> ev = i.next();

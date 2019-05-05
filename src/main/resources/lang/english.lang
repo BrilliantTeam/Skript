@@ -1402,6 +1402,19 @@ resource pack states:
 	failed_download: download fail, fail, failed to download, failed
 	successfully_loaded: successfully load, successfully install, success, successfully loaded, successfully installed
 
+# -- Sound Categories --
+sound categories:
+	ambient: ambient category, environment category
+	blocks: block category, blocks category
+	hostile: hostile category, hostile creature category, hostile creatures category, hostile mob category, hostile mobs category
+	master: master category, master volume category
+	music: music category
+	neutral: neutral category, friendly creature category, friendly creatures category, friendly mob category, friendly mobs category
+	players: player category, players category
+	records: record category, records category, jukebox category, jukeboxes category, noteblock category, noteblocks category, note block category, note blocks category
+	voice: voice category, speech category
+	weather: weather category
+
 # -- Boolean --
 boolean:
 	true:
@@ -1454,7 +1467,7 @@ types:
 	metadataholder: metadata holder¦s @a
 	spawnreason: spawn reason¦s @a
 	cachedservericon: server icon¦s @a
-	difficulty: (difficulty|difficulties) @a
+	difficulty: difficult¦y¦ies @a
 	fireworkeffect: firework effect¦s @a
 	fireworktype: firework type¦s @a
 
