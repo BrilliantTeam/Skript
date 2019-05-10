@@ -153,8 +153,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	 */
 	boolean itemForm;
 	
-	boolean strictEquality;
-	
 	/**
 	 * If this item is an alias or a clone of one that has not been
 	 * modified after loading the aliases.
@@ -162,11 +160,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	boolean isAlias = false;
 	
 	/**
-	 * Whether this item has been ever modified. Alias items may have been
-	 * modified with tags. Other items are always considered to have been
-	 * modified, because it is impossible to tell for sure.
+	 * Some properties about this item.
 	 */
-	boolean modifiedStack = true;
+	int itemFlags;
 	
 	public ItemData(Material type, @Nullable String tags) {
 		this.type = type;
@@ -194,7 +190,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.type = data.type;
 		this.blockValues = data.blockValues;
 		this.isAlias = data.isAlias;
-		this.modifiedStack = data.modifiedStack;
+		this.itemFlags = data.itemFlags;
 	}
 	
 	public ItemData(ItemStack stack, @Nullable BlockValues values) {
@@ -237,7 +233,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		if (type != item.getType())
 			return false; // Obvious mismatch
 		
-		if (modifiedStack) { // Either stack has tags (or durability)
+		if (itemFlags != 0) { // Either stack has tags (or durability)
 			if (ItemUtils.getDamage(stack) != ItemUtils.getDamage(item))
 				return false; // On 1.12 and below, damage is not in meta
 			if (stack.hasItemMeta() == item.hasItemMeta()) // Compare ItemMeta as in isSimilar() of ItemStack
@@ -282,42 +278,11 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			return false;
 		
 		ItemData other = (ItemData) obj;
-		if (isAnything || other.isAnything) // First, isAnything check
-			return true;
-		
-		if (!type.equals(other.type))
-			return false; // Types are not equal
-		
-		BlockValues values = blockValues;
-		if (!itemDataValues) {
-			if (itemForm && other.blockValues != null)
-				return other.blockValues.isDefault();
-			if (other.itemForm && blockValues != null)
-				return blockValues.isDefault();
+		if (isAlias) { // This is alias, other item might not be
+			return other.matchAlias(this).isAtLeast(MatchQuality.SAME_ITEM);
+		} else { // This is not alias, but other might be
+			return matchAlias(other).isAtLeast(MatchQuality.SAME_ITEM);
 		}
-		
-		if (strictEquality) {
-			// The two blocks are not exactly same (even though normally they might be same enough to match)
-			if (!Objects.equals(values, other.blockValues))
-				return false;
-			// The two blocks are same, but aliases differ when it comes to item equality
-			if (values != null && other.blockValues != null
-					&& other.blockValues.isDefault() != values.isDefault())
-				return false;
-		}
-		
-		// Block state comparison if both are blocks or if we're on 1.12 or older
-		if (values != null && (itemDataValues || !itemForm && !other.itemForm))
-			return values.equals(other.blockValues);
-		
-		// Check the item meta, unless either ItemData is alias
-		if (!isAlias && !other.isAlias) {
-			return Objects.equals(getItemMeta(), other.getItemMeta());
-		} else { // Even for aliases, do a few checks
-			// REMIND follow bug reports closely to see which checks are needed
-		}
-
-		return true; // All equality checks passed
 	}
 	
 	@Override
@@ -327,6 +292,74 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			hash = hash * 37 + 1;
 		}
 		return hash;
+	}
+	
+	/**
+	 * Checks how well this item is matching with given item.
+	 * @param item Other item, preferably an alias.
+	 * @return Match quality.
+	 */
+	public MatchQuality matchAlias(ItemData item) {
+		if (isAnything || item.isAnything) {
+			return MatchQuality.EXACT; // TODO different match quality?
+		}
+		
+		// Ensure that both items share the material
+		if (item.getType() != getType()) {
+			return MatchQuality.DIFFERENT;
+		}
+		
+		BlockValues values = blockValues;
+		if (!itemDataValues) {
+			// Items (held in inventories) don't have block values
+			// If this is an item, given item must not have them either
+			if (itemForm && item.blockValues != null
+					&& !item.blockValues.isDefault()) {
+				return MatchQuality.SAME_MATERIAL;
+			}
+		}
+		
+		/**
+		 * Initially, expect exact match. Lower expectations as new differences
+		 * between items are discovered.
+		 */
+		MatchQuality quality = MatchQuality.EXACT;
+		
+		// Check that block values of given item match ours
+		if (values != null) {
+			if (item.blockValues != null) { // Other item has block values, so match against them
+				quality = values.match(item.blockValues);
+			} else { // Other item has no block values, but we do
+				quality = MatchQuality.SAME_MATERIAL;
+			}
+		}
+		
+		// See if we need to compare durability
+		if ((item.itemFlags & ItemFlags.CHANGED_DURABILITY) != 0) {
+			// We need, so do it
+			if (ItemUtils.getDamage(stack) != ItemUtils.getDamage(item.stack)) {
+				quality = MatchQuality.SAME_MATERIAL;
+			}
+		}
+		
+		// See if we need to compare item metas (excluding durability)
+		if ((item.itemFlags & ItemFlags.CHANGED_TAGS) != 0) {
+			if (!itemFactory.equals(getItemMeta(), item.getItemMeta())) {
+				quality = MatchQuality.SAME_MATERIAL;
+			}
+		}
+		
+		return quality;
+	}
+	
+	/**
+	 * Checks if this item is a 'default' of type. Default items must have not
+	 * had their ItemMeta (tags) modified or have block states. Only aliases
+	 * can be default items.
+	 * @return If this item can be considered the default item of its type.
+	 */
+	public boolean isDefault() {
+		return itemFlags == 0 && blockValues == null;
 	}
 	
 	/**
@@ -381,7 +414,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	public void setItemMeta(ItemMeta meta) {
 		stack.setItemMeta(meta);
 		isAlias = false; // This is no longer exact alias
-		modifiedStack = true;
+		itemFlags |= ItemFlags.CHANGED_TAGS;
 	}
 	
 	public int getDurability() {
@@ -391,7 +424,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	public void setDurability(int durability) {
 		ItemUtils.setDamage(stack, durability);
 		isAlias = false; // Change happened
-		modifiedStack = true;
+		itemFlags |= ItemFlags.CHANGED_DURABILITY;
 	}
 
 	@Override

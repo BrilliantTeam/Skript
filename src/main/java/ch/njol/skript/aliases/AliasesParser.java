@@ -20,6 +20,7 @@
 package ch.njol.skript.aliases;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,8 @@ import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Message;
+import ch.njol.skript.localization.Noun;
+import ch.njol.util.NonNullPair;
 
 /**
  * Parses aliases.
@@ -489,7 +492,7 @@ public class AliasesParser {
 			// Fast path: no variations
 			PatternSlot slot = slots.get(0);
 			if (!(slot instanceof VariationSlot)) {
-				variations.put(name, new Variation(null, -1, new HashMap<>(), new HashMap<>()));
+				variations.put(fixName(name), new Variation(null, -1, Collections.emptyMap(), Collections.emptyMap()));
 				return variations;
 			}
 			// Otherwise we have only one slot, which is variation. Weird, isn't it?
@@ -562,7 +565,7 @@ public class AliasesParser {
 			}
 			
 			// Put variation to map which we will return
-			variations.put(pattern.toString(), new Variation(id, insertPoint, tags, states));
+			variations.put(fixName(pattern.toString()), new Variation(id, insertPoint, tags, states));
 			
 			// Check if we're finished with permutations
 			if (incremented == count) {
@@ -624,6 +627,55 @@ public class AliasesParser {
 		}
 	}
 	
+	/**
+	 * Gets singular and plural forms for given name. This might work
+	 * slightly differently from {@link Noun#getPlural(String)}, to ensure
+	 * it meets specification of aliases.
+	 * @param name Name to get forms from.
+	 * @return Singular form, plural form.
+	 */
+	protected NonNullPair<String, String> getAliasPlural(String name) {
+		int marker = name.indexOf('¦');
+		if (marker == -1) { // No singular/plural forms
+			String trimmed = name.trim();
+			assert trimmed != null;
+			return new NonNullPair<>(trimmed, trimmed);
+		}
+		int pluralEnd = -1;
+		for (int i = marker; i < name.length(); i++) {
+			int c = name.codePointAt(i);
+			if (Character.isWhitespace(c)) {
+				pluralEnd = i;
+				break;
+			}
+			
+			i += Character.charCount(c);
+		}
+		
+		// No whitespace after marker, so creating forms is simple
+		if (pluralEnd == -1) {
+			String singular = name.substring(0, marker);
+			String plural = singular + name.substring(marker + 1);
+			
+			singular = singular.trim();
+			plural = plural.trim();
+			assert singular != null;
+			assert plural != null;
+			return new NonNullPair<>(singular, plural);
+		}
+		
+		// Need to stitch both singular and plural together
+		String base = name.substring(0, marker);
+		String singular = base + name.substring(pluralEnd);
+		String plural = base + name.substring(marker + 1);
+		
+		singular = singular.trim();
+		plural = plural.trim();
+		assert singular != null;
+		assert plural != null;
+		return new NonNullPair<>(singular, plural);
+	}
+	
 	protected void loadSingleAlias(Map<String, Variation> variations, String item) {
 		Variation base = parseVariation(item); // Share parsing code with variations
 		
@@ -643,7 +695,13 @@ public class AliasesParser {
 				id = id.toLowerCase();
 				assert id != null;
 				try {
-					provider.addAlias(fixName(name), id, merged.getTags(), merged.getBlockStates());
+					// Create singular and plural forms of the alias
+					NonNullPair<String, Integer> plain = Noun.stripGender(name, name); // Name without gender and its gender token
+					NonNullPair<String, String> forms = getAliasPlural(plain.getFirst()); // Singular and plural forms
+					
+					// Add alias to provider
+					provider.addAlias(new AliasesProvider.AliasName(forms.getFirst(), forms.getSecond(), plain.getSecond()),
+							id, merged.getTags(), merged.getBlockStates());
 				} catch (InvalidMinecraftIdException e) { // Spit out a more useful error message
 					Skript.error(m_invalid_minecraft_id.toString(e.getId()));
 				}

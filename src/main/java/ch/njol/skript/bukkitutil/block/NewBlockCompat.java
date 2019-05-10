@@ -40,6 +40,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.aliases.MatchQuality;
 import ch.njol.util.Setter;
 
 /**
@@ -85,6 +86,25 @@ public class NewBlockCompat implements BlockCompat {
 		@Override
 		public String toString() {
 			return data.toString() + (isDefault ? " (default)" : "");
+		}
+
+		@Override
+		public MatchQuality match(BlockValues other) {
+			if (!(other instanceof NewBlockValues)) {
+				throw new IllegalArgumentException("wrong block compat");
+			}
+			NewBlockValues n = (NewBlockValues) other;
+			if (type == n.type) {
+				if (data.equals(n.data)) { // Check for exact item match
+					return MatchQuality.EXACT;
+				} else if (data.matches(n.data)) { // What about explicitly defined states only?
+					return MatchQuality.SAME_ITEM;
+				} else { // Just same material and different block states
+					return MatchQuality.SAME_MATERIAL;
+				}
+			} else {
+				return MatchQuality.DIFFERENT;
+			}
 		}
 		
 	}
@@ -307,7 +327,7 @@ public class NewBlockCompat implements BlockCompat {
 
 	@Override
 	@Nullable
-	public BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, boolean itemModified) {
+	public BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, int itemFlags) {
 		// Ignore item; on 1.13+ block data never applies to items
 		if (states.isEmpty()) {
 			if (type.isBlock()) { // Still need default block values

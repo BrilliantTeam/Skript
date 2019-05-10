@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemFlags;
 
 /**
  * Methods which operate with blocks but are not compatible across some
@@ -93,11 +94,11 @@ public interface BlockCompat {
 	 * @param states Block states, as used in /setblock command in Minecraft.
 	 * @param item Item form that may or may not provide additional
 	 * information. Optional, but very useful on 1.12 and older.
-	 * @param itemModified Whether the item has been modified with tags or not.
+	 * @param itemFlags Additional information about item. See {@link ItemFlags}.
 	 * @return Block values, or null if given state was invalid.
 	 */
 	@Nullable
-	BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, boolean itemModified);
+	BlockValues createBlockValues(Material type, Map<String, String> states, @Nullable ItemStack item, int itemFlags);
 	
 	/**
 	 * Creates new block values for given material and state.
@@ -107,7 +108,7 @@ public interface BlockCompat {
 	 */
 	@Nullable
 	default BlockValues createBlockValues(Material type, Map<String, String> states) {
-		return createBlockValues(type, states, null, false);
+		return createBlockValues(type, states, null, 0);
 	}
 	
 	/**

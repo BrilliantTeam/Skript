@@ -183,18 +183,16 @@ public abstract class Aliases {
 	
 	@Nullable
 	private static MaterialName getMaterialNameData(ItemData type) {
-		ItemData aliasCopy = type.aliasCopy();
-		
 		// Check script aliases first
 		ScriptAliases aliases = scriptAliases;
 		if (aliases != null) {
-			MaterialName name = aliases.provider.getMaterialName(aliasCopy);
+			MaterialName name = aliases.provider.getMaterialName(type);
 			if (name != null)
 				return name;
 		}
 		
 		// Then global aliases
-		return provider.getMaterialName(aliasCopy);
+		return provider.getMaterialName(type);
 	}
 	
 	public static String getMaterialName(ItemData type, boolean plural) {
@@ -213,26 +211,6 @@ public abstract class Aliases {
 		if (n != null)
 			return n.gender;
 		return -1;
-	}
-	
-	/**
-	 * @return how many ids are missing an alias, including the 'any id' (-1)
-	 */
-	static int addMissingMaterialNames() {
-		int r = 0;
-		StringBuilder missing = new StringBuilder(m_missing_aliases + " ");
-		for (final Material m : Material.values()) {
-			assert m != null;
-			ItemData data = new ItemData(m);
-			if (provider.getMaterialName(data) == null) { // Material name is missing
-				provider.setMaterialName(data, new MaterialName(m, "" + m.toString().toLowerCase(Locale.ENGLISH).replace('_', ' '), "" + m.toString().toLowerCase().replace('_', ' '), 0));
-				missing.append(m + ", ");
-				r++;
-			}
-		}
-		if (r > 0) // Give a warning about missing aliases we just worked around
-			Skript.warning("" + missing.substring(0, missing.length() - 2));
-		return r;
 	}
 	
 	/**
@@ -543,7 +521,7 @@ public abstract class Aliases {
 			if (id != null)
 				return id;
 		}
-		return provider.getMinecraftId(data.aliasCopy());
+		return provider.getMinecraftId(data);
 	}
 	
 	/**
@@ -560,7 +538,7 @@ public abstract class Aliases {
 			if (entity != null)
 				return entity;
 		}
-		return provider.getRelatedEntity(data.aliasCopy());
+		return provider.getRelatedEntity(data);
 	}
 	
 	/**

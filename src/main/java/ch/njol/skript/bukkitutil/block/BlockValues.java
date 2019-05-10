@@ -23,12 +23,16 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.aliases.MatchQuality;
+
 /**
  * Contains all data block has that is needed for comparisions.
  */
 public abstract class BlockValues {
 	
 	public abstract boolean isDefault();
+	
+	public abstract MatchQuality match(BlockValues other);
 	
 	@Override
 	public abstract boolean equals(@Nullable Object other);

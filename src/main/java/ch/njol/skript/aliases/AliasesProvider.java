@@ -65,11 +65,6 @@ public class AliasesProvider {
 	private final Map<String, ItemType> aliases;
 	
 	/**
-	 * Material names for aliases this provider has.
-	 */
-	private final Map<ItemData, MaterialName> materialNames;
-	
-	/**
 	 * Tags are in JSON format. We may need GSON when merging tags
 	 * (which might be done if variations are used).
 	 */
@@ -170,24 +165,17 @@ public class AliasesProvider {
 	private final Map<String, VariationGroup> variations;
 	
 	/**
-	 * Maps item datas back to Minecraft ids.
+	 * Allows looking up aliases based on item datas created runtime.
 	 */
-	private final Map<ItemData, String> minecraftIds;
-	
-	/**
-	 * Entities related to the items. Most items won't have any.
-	 */
-	private final Map<ItemData, EntityData<?>> relatedEntities;
+	private final AliasesMap aliasesMap;
 	
 	/**
 	 * Constructs a new aliases provider with no data.
 	 */
 	public AliasesProvider(int expectedCount) {
 		aliases = new HashMap<>(expectedCount);
-		materialNames = new HashMap<>(expectedCount);
 		variations = new HashMap<>(expectedCount / 20);
-		minecraftIds = new HashMap<>(3000);
-		relatedEntities = new HashMap<>(10);
+		aliasesMap = new AliasesMap();
 		
 		gson = new Gson();
 	}
@@ -206,76 +194,58 @@ public class AliasesProvider {
 	 * Applies given tags to an item stack.
 	 * @param stack Item stack.
 	 * @param tags Tags.
-	 * @return Whether the stack changed or not.
+	 * @return Additional flags for the item.
 	 */
-	public boolean applyTags(ItemStack stack, Map<String, Object> tags) {
+	public int applyTags(ItemStack stack, Map<String, Object> tags) {
 		// Hack damage tag into item
 		Object damage = tags.get("Damage");
-		boolean appliedDamage = false;
+		int flags = 0;
 		if (damage instanceof Number) { // Use helper for version compatibility
 			ItemUtils.setDamage(stack, ((Number) damage).shortValue());
 			tags.remove("Damage");
-			appliedDamage = true;
+			flags |= ItemFlags.CHANGED_DURABILITY;
 		}
 		
 		if (tags.isEmpty()) // No real tags to apply
-			return appliedDamage;
+			return flags;
 		
 		// Apply random tags using JSON
 		String json = gson.toJson(tags);
 		assert json != null;
 		BukkitUnsafe.modifyItemStack(stack, json);
+		flags |= ItemFlags.CHANGED_TAGS;
 		
-		return true;
+		return flags;
 	}
 	
 	/**
-	 * Gets singular and plural forms for given name. This might work
-	 * slightly differently from {@link Noun#getPlural(String)}, to ensure
-	 * it meets specification of aliases.
-	 * @param name Name to get forms from.
-	 * @return Singular form, plural form.
+	 * Name of an alias used by {@link #addAlias(String, String, Map, Map)}
+	 * for registration.
 	 */
-	public NonNullPair<String, String> getAliasPlural(String name) {
-		int marker = name.indexOf('¦');
-		if (marker == -1) { // No singular/plural forms
-			String trimmed = name.trim();
-			assert trimmed != null;
-			return new NonNullPair<>(trimmed, trimmed);
-		}
-		int pluralEnd = -1;
-		for (int i = marker; i < name.length(); i++) {
-			int c = name.codePointAt(i);
-			if (Character.isWhitespace(c)) {
-				pluralEnd = i;
-				break;
-			}
-			
-			i += Character.charCount(c);
-		}
+	public static class AliasName {
 		
-		// No whitespace after marker, so creating forms is simple
-		if (pluralEnd == -1) {
-			String singular = name.substring(0, marker);
-			String plural = singular + name.substring(marker + 1);
-			
-			singular = singular.trim();
-			plural = plural.trim();
-			assert singular != null;
-			assert plural != null;
-			return new NonNullPair<>(singular, plural);
+		/**
+		 * Singular for of alias name.
+		 */
+		public final String singular;
+		
+		/**
+		 * Plural form of alias name.
+		 */
+		public final String plural;
+		
+		/**
+		 * Gender of alias name.
+		 */
+		public final int gender;
+
+		public AliasName(String singular, String plural, int gender) {
+			super();
+			this.singular = singular;
+			this.plural = plural;
+			this.gender = gender;
 		}
 		
-		// Need to stitch both singular and plural together
-		String base = name.substring(0, marker);
-		String singular = base + name.substring(pluralEnd);
-		String plural = base + name.substring(marker + 1);
-		
-		singular = singular.trim();
-		plural = plural.trim();
-		assert singular != null;
-		assert plural != null;
-		return new NonNullPair<>(singular, plural);
 	}
 	
 	/**
@@ -285,7 +255,7 @@ public class AliasesProvider {
 	 * @param tags Tags for material.
 	 * @param blockStates Block states.
 	 */
-	public void addAlias(String name, String id, @Nullable Map<String, Object> tags, Map<String, String> blockStates) {
+	public void addAlias(AliasName name, String id, @Nullable Map<String, Object> tags, Map<String, String> blockStates) {
 		// First, try to find if aliases already has a type with this id
 		// (so that aliases can refer to each other)
 		ItemType typeOfId = aliases.get(id);
@@ -308,53 +278,41 @@ public class AliasesProvider {
 			
 			// Apply (NBT) tags to item stack
 			ItemStack stack = new ItemStack(material);
-			boolean modifiedStack = false;
+			int itemFlags = 0;
 			if (tags != null) {
-				modifiedStack = applyTags(stack, new HashMap<>(tags));
+				itemFlags = applyTags(stack, new HashMap<>(tags));
 			}
 			
 			// Parse block state to block values
-			BlockValues blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockStates, stack, modifiedStack);
+			BlockValues blockValues = BlockCompat.INSTANCE.createBlockValues(material, blockStates, stack, itemFlags);
 			
 			ItemData data = new ItemData(stack, blockValues);
 			data.isAlias = true;
-			data.modifiedStack = modifiedStack;
+			data.itemFlags = itemFlags;
 			datas = Collections.singletonList(data);
 		}
 		
-		// Create plural form of the alias (warning: I don't understand it either)
-		NonNullPair<String, Integer> plain = Noun.stripGender(name, name); // Name without gender and its gender token
-		NonNullPair<String, String> forms = getAliasPlural(plain.getFirst()); // Singular and plural forms
-		
+		// If this is first time we're defining an item, store additional data about it
+		if (typeOfId == null) {
+			ItemData data = datas.get(0);
+			// Most accurately named alias for this item SHOULD be defined first
+			MaterialName materialName = new MaterialName(data.type, name.singular, name.plural, name.gender);
+			aliasesMap.addAlias(new AliasesMap.AliasData(data, materialName, id, related));
+		}
+		 
 		// Check if there is item type with this name already, create otherwise
-		ItemType type = aliases.get(forms.getFirst());
+		ItemType type = aliases.get(name.singular);
 		if (type == null)
-			type = aliases.get(forms.getSecond());
+			type = aliases.get(name.plural);
 		if (type == null) {
 			type = new ItemType();
-			aliases.put(forms.getFirst(), type); // Singular form
-			aliases.put(forms.getSecond(), type); // Plural form
+			aliases.put(name.singular, type); // Singular form
+			aliases.put(name.plural, type); // Plural form
 		}
 		
 		// Add item datas we got earlier to the type
 		assert datas != null;
 		type.addAll(datas);
-		
-		// Make datas subtypes of the type we have here and handle Minecraft ids
-		for (ItemData data : type.getTypes()) { // Each ItemData in our type is supertype
-			data.strictEquality = true;
-			if (typeOfId == null) // Only when it is Minecraft id, not an alias reference
-				minecraftIds.put(data, id); // Register Minecraft id for the data, too
-			
-			// Material name, including both singular and plural forms
-			materialNames.putIfAbsent(data, new MaterialName(data.type, forms.getFirst(), forms.getSecond(), plain.getSecond()));
-			
-			// Related entity type
-			if (related != null)
-				relatedEntities.put(data, related);
-			
-			data.strictEquality = false;
-		}
 	}
 	
 	public void addVariationGroup(String name, VariationGroup group) {
@@ -370,46 +328,47 @@ public class AliasesProvider {
 	public ItemType getAlias(String alias) {
 		return aliases.get(alias);
 	}
+	
+	@Nullable
+	public AliasesMap.AliasData getAliasData(ItemData item) {
+		return aliasesMap.matchAlias(item).getData();
+	}
 
 	@Nullable
-	public String getMinecraftId(ItemData data) {
-		String id = minecraftIds.get(data);
-		if (id == null) { // No non-default MC id found
-			ItemData defaultData = data.clone();
-			defaultData.blockValues = null;
-			id = minecraftIds.get(defaultData);
+	public String getMinecraftId(ItemData item) {
+		AliasesMap.AliasData data = getAliasData(item);
+		if (data != null) {
+			return data.getMinecraftId();
 		}
-		return id;
+		return null;
 	}
 	
 	@Nullable
-	public MaterialName getMaterialName(ItemData data) {
-		MaterialName name = materialNames.get(data);
-		if (name == null) { // No non-default name found
-			ItemData defaultData = data.clone();
-			defaultData.blockValues = null;
-			name = materialNames.get(defaultData);
+	public MaterialName getMaterialName(ItemData item) {
+		AliasesMap.AliasData data = getAliasData(item);
+		if (data != null) {
+			return data.getName();
 		}
-		return name;
+		return null;
 	}
-
-	public void setMaterialName(ItemData data, MaterialName materialName) {
-		materialNames.put(data, materialName);
+	
+	@Nullable
+	public EntityData<?> getRelatedEntity(ItemData item) {
+		AliasesMap.AliasData data = getAliasData(item);
+		if (data != null) {
+			return data.getRelatedEntity();
+		}
+		return null;
 	}
 
 	public void clearAliases() {
 		aliases.clear();
-		materialNames.clear();
 		variations.clear();
+		aliasesMap.clear();
 	}
 
 	public int getAliasCount() {
 		return aliases.size();
-	}
-	
-	@Nullable
-	public EntityData<?> getRelatedEntity(ItemData type) {
-		return relatedEntities.get(type);
 	}
 
 }
