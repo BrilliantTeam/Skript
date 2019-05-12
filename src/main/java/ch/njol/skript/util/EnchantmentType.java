@@ -22,6 +22,7 @@ package ch.njol.skript.util;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.bukkit.enchantments.Enchantment;
@@ -124,21 +125,20 @@ public class EnchantmentType implements YggdrasilSerializable {
 	}
 	
 	@SuppressWarnings("null")
-	private final static Pattern pattern = Pattern.compile(".+( \\d+)?");
+	private final static Pattern pattern = Pattern.compile("(.+)( \\d+)?");
 	
 	@SuppressWarnings("null")
 	@Nullable
 	public static EnchantmentType parse(final String s) {
-		if (pattern.matcher(s).matches()) {
-			final Enchantment ench = parseEnchantment(s.substring(0, s.lastIndexOf(' ')));
+		Matcher m = pattern.matcher(s);
+		if (m.matches()) {
+			final Enchantment ench = parseEnchantment(m.group(1));
 			if (ench == null)
 				return null;
-			return new EnchantmentType(ench, Utils.parseInt(s.substring(s.lastIndexOf(' ') + 1)));
+			String level = m.group(2);
+			return new EnchantmentType(ench, level == null ? -1 : Utils.parseInt(level));
 		}
-		final Enchantment ench = parseEnchantment(s);
-		if (ench == null)
-			return null;
-		return new EnchantmentType(ench, -1);
+		return null;
 	}
 	
 	@Nullable
