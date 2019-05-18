@@ -334,8 +334,8 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			}
 		}
 		
-		// See if we need to compare durability
-		if ((item.itemFlags & ItemFlags.CHANGED_DURABILITY) != 0) {
+		// See if we need to compare durability; for blocks, BlockValues handles this when needed
+		if (itemForm && (item.itemFlags & ItemFlags.CHANGED_DURABILITY) != 0) {
 			// We need, so do it
 			if (ItemUtils.getDamage(stack) != ItemUtils.getDamage(item.stack)) {
 				quality = MatchQuality.SAME_MATERIAL;
