@@ -33,7 +33,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 @Name("Last Resource Pack Response")
 @Description("Returns the last resource pack response received from a player.")
 @Examples("if player's last resource pack response is deny or download fail:")
-@Since("INSERT VERSION")
+@Since("2.4")
 @RequiredPlugins("Paper 1.9 or newer")
 public class ExprLastResourcePackResponse extends SimplePropertyExpression<Player, Status> {
 

@@ -41,7 +41,7 @@ import ch.njol.util.Kleenean;
 @Description("Returns all the indexes of a list variable")
 @Examples("set {l::*} to \"some\", \"cool\" and \"values\"\n" +
 		"broadcast \"%all indexes of {l::*}%\" # result is 1, 2 and 3")
-@Since("INSERT VERSION")
+@Since("2.4")
 public class ExprIndices extends SimpleExpression<String> {
 	
 	static {

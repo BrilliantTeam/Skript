@@ -1466,7 +1466,7 @@ public class BukkitClasses {
 				.description("The type of a <a href='#fireworkeffect'>fireworkeffect</a>.")
 				.defaultExpression(new EventValueExpression<>(FireworkEffect.Type.class))
 				.examples(fireworktypes.getAllNames())
-				.since("INSERT VERSION")
+				.since("2.4")
 				.parser(new Parser<FireworkEffect.Type>() {
 					@Override
 					@Nullable
@@ -1497,7 +1497,7 @@ public class BukkitClasses {
 				.name("Firework Effect")
 				.description("A configuration of effects that defines the firework when exploded.")
 				.defaultExpression(new EventValueExpression<>(FireworkEffect.class))
-				.since("INSERT VERSION")
+				.since("2.4")
 				.parser(new Parser<FireworkEffect>() {
 					@Override
 					@Nullable
@@ -1564,7 +1564,7 @@ public class BukkitClasses {
 				.name("Resource Pack State")
 				.description("The state in a <a href='events.html#resource_pack_request_action'>resource pack request response</a> event.")
 				.examples(resourcePackStates.getAllNames())
-				.since("INSERT VERSION")
+				.since("2.4")
 				.parser(new Parser<PlayerResourcePackStatusEvent.Status>() {
 					@Override
 					public String toString(PlayerResourcePackStatusEvent.Status state, int flags) {
@@ -1598,7 +1598,7 @@ public class BukkitClasses {
 					.description("The category of a sound, they are used for sound options of Minecraft. " +
 							"See the <a href='effects.html#EffPlaySound'>play sound</a> and <a href='effects.html#EffStopSound'>stop sound</a> effects.")
 					.examples(soundCategories.getAllNames())
-					.since("INSERT VERSION")
+					.since("2.4")
 					.requiredPlugins("Minecraft 1.11 or newer")
 					.parser(new Parser<SoundCategory>() {
 						@Override

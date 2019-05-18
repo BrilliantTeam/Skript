@@ -41,7 +41,7 @@ import ch.njol.util.Kleenean;
 @Examples({"on resource pack response:",
 		"	if the resource pack wasn't accepted:",
 		"		kick the player due to \"You have to install the resource pack to play in this server!\""})
-@Since("INSERT VERSION")
+@Since("2.4")
 @Events("resource pack request response")
 public class CondResourcePack extends Condition {
 

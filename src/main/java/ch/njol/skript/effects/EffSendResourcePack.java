@@ -47,7 +47,7 @@ import ch.njol.util.StringUtils;
 		"status of the sent resource pack request."})
 @Examples({"on join:",
 		"	send the resource pack from \"URL\" with hash \"hash\" to the player"})
-@Since("INSERT VERSION")
+@Since("2.4")
 public class EffSendResourcePack extends Effect {
 
 	static {

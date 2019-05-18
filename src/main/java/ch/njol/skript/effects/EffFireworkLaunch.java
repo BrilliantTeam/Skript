@@ -39,7 +39,7 @@ import ch.njol.util.Kleenean;
 @Name("Launch firework")
 @Description("Launch firework effects at the given location(s).")
 @Examples("launch ball large coloured red, purple and white fading to light green and black at player's location with duration 1")
-@Since("INSERT VERSION")
+@Since("2.4")
 public class EffFireworkLaunch extends Effect {
 	
 	static {

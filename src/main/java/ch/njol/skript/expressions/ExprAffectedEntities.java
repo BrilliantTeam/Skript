@@ -44,7 +44,7 @@ import ch.njol.util.Kleenean;
 		"	loop affected entities:",
 		"		if loop-value is a player:",
 		"			send \"WARNING: you've step on a area cloud!\""})
-@Since("INSERT VERSION")
+@Since("2.4")
 public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
 	
 	static {

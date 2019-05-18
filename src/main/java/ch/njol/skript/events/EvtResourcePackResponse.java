@@ -47,7 +47,7 @@ public class EvtResourcePackResponse extends SkriptEvent {
 						"",
 						"on resource pack deny:",
 						"	kick the player due to \"You have to install the resource pack to play in this server!\"")
-				.since("INSERT VERSION");
+				.since("2.4");
 	}
 
 	@SuppressWarnings("null")

@@ -50,7 +50,7 @@ import ch.njol.util.Kleenean;
 @Examples({"play sound \"block.note_block.pling\" # It is block.note.pling in 1.12.2",
 		"play sound \"entity.experience_orb.pickup\" with volume 0.5 to the player",
 		"play sound \"custom.music.1\" in jukebox category at {speakerBlock}"})
-@Since("2.2-dev28, INSERT VERSION (sound categories)")
+@Since("2.2-dev28, 2.4 (sound categories)")
 @RequiredPlugins("Minecraft 1.11+ (sound categories)")
 public class EffPlaySound extends Effect {
 

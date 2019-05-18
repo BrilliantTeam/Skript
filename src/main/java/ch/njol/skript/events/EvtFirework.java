@@ -54,7 +54,7 @@ public class EvtFirework extends SkriptEvent {
 							"on firework exploding colored red, light green and black",
 							"on firework explosion coloured light green:",
 							"	broadcast \"A firework colored %colors% was exploded at %location%!\"")//TODO fix 
-					.since("INSERT VERSION");
+					.since("2.4");
 	}
 	
 	@Nullable

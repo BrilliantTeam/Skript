@@ -47,7 +47,7 @@ import ch.njol.util.Kleenean;
 		"Please note that sound names can get changed in any Minecraft or Spigot version, or even removed from Minecraft itself."})
 @Examples({"stop sound \"block.chest.open\" for the player",
 		"stop playing sounds \"ambient.underwater.loop\" and \"ambient.underwater.loop.additions\" to the player"})
-@Since("INSERT VERSION")
+@Since("2.4")
 @RequiredPlugins("Minecraft 1.10.2+, Minecraft 1.11+ (sound categories)")
 public class EffStopSound extends Effect {
 
