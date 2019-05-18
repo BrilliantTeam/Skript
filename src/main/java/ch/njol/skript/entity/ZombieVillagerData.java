@@ -44,7 +44,7 @@ public class ZombieVillagerData extends EntityData<ZombieVillager> {
 		
 	}
 	
-	private Villager.Profession profession = PROFESSION_UPDATE ? Profession.valueOf("NORMAL") : Profession.NONE;
+	private Villager.Profession profession = PROFESSION_UPDATE ? Profession.NONE : Profession.valueOf("NORMAL");
 	
 	public ZombieVillagerData() {}
 	
@@ -106,7 +106,7 @@ public class ZombieVillagerData extends EntityData<ZombieVillager> {
 	
 	@Override
 	protected int hashCode_i() {
-		return profession == null ? 0 : profession.hashCode();
+		return profession.hashCode();
 	}
 	
 	@Override
