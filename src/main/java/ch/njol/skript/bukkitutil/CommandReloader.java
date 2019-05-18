@@ -39,7 +39,12 @@ public class CommandReloader {
 	
 	static {
 		try {
-			Class<?> craftServer = Class.forName("org.bukkit.craftbukkit.v1_13_R2.CraftServer");
+			Class<?> craftServer;
+			if (Skript.classExists("org.bukkit.craftbukkit.v1_14_R1.CraftServer")) {
+				craftServer = Class.forName("org.bukkit.craftbukkit.v1_14_R1.CraftServer");
+			} else {
+				craftServer = Class.forName("org.bukkit.craftbukkit.v1_13_R2.CraftServer");
+			}
 			syncCommandsMethod = craftServer.getDeclaredMethod("syncCommands");
 			if (syncCommandsMethod != null)
 				syncCommandsMethod.setAccessible(true);
@@ -64,8 +69,10 @@ public class CommandReloader {
 			syncCommandsMethod.invoke(server);
 			return true; // Sync probably succeeded
 		} catch (Throwable e) {
-			if (Skript.debug())
+			if (Skript.debug()) {
+				Skript.info("syncCommands failed; stack trace for debugging below");
 				e.printStackTrace();
+			}
 			return false; // Something went wrong, sync probably failed
 		}
 	}

@@ -19,8 +19,12 @@
  */
 package ch.njol.skript.expressions;
 
+import java.util.stream.Stream;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Container;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -119,8 +123,9 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return null;
 					final ItemMeta m = ((ItemStack) o).getItemMeta();
 					return m == null || !m.hasDisplayName() ? null : m.getDisplayName();
-				} else if (o instanceof Inventory) {
-					return ((Inventory) o).getName();
+				// We must implement this differently in 1.14
+				//} else if (o instanceof Inventory) {
+				//	return ((Inventory) o).getName();
 				} else {
 					assert false;
 					return null;
@@ -173,8 +178,8 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return null;
 					final ItemMeta m = ((ItemStack) o).getItemMeta();
 					return m == null || !m.hasDisplayName() ? null : m.getDisplayName();
-				} else if (o instanceof Inventory) {
-					return ((Inventory) o).getTitle(); // Title is closest to display name... I guess
+				//} else if (o instanceof Inventory) {
+				//	return ((Inventory) o).getTitle(); // Title is closest to display name... I guess
 				} else {
 					assert false;
 					return null;

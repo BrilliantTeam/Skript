@@ -67,7 +67,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.bukkitutil.EnchantmentIds;
+import ch.njol.skript.bukkitutil.EnchantmentUtils;
 import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.ConfigurationSerializer;
@@ -998,10 +998,12 @@ public class BukkitClasses {
 						b.append(i.getType().name());
 						b.append(":" + ItemUtils.getDamage(i));
 						b.append("*" + i.getAmount());
-						for (final Entry<Enchantment, Integer> e : i.getEnchantments().entrySet()) {
-							b.append("#" + EnchantmentIds.ids.get(e.getKey()));
-							b.append(":" + e.getValue());
-						}
+						
+						for (Entry<Enchantment, Integer> entry : i.getEnchantments().entrySet())
+							b.append("#" + EnchantmentUtils.getKey(entry.getKey()))
+							.append(":" + entry.getValue());
+						
+						
 						return "" + b.toString();
 					}
 
@@ -1268,7 +1270,7 @@ public class BukkitClasses {
 
 					@Override
 					public String toVariableNameString(final Enchantment e) {
-						return "" + e.getName();
+						return "" + EnchantmentUtils.getKey(e);
 					}
 
 					@Override
@@ -1278,9 +1280,9 @@ public class BukkitClasses {
 				})
 				.serializer(new Serializer<Enchantment>() {
 					@Override
-					public Fields serialize(final Enchantment e) {
+					public Fields serialize(final Enchantment ench) {
 						final Fields f = new Fields();
-						f.putObject("name", e.getName());
+						f.putObject("key", EnchantmentUtils.getKey(ench));
 						return f;
 					}
 
@@ -1296,22 +1298,19 @@ public class BukkitClasses {
 
 					@Override
 					protected Enchantment deserialize(final Fields fields) throws StreamCorruptedException {
-						final String name = fields.getObject("name", String.class);
-						final Enchantment e = Enchantment.getByName(name);
+						final String key = fields.getObject("key", String.class);
+						assert key != null; // If a key happens to be null, something went really wrong...
+						final Enchantment e = EnchantmentUtils.getByKey(key);
 						if (e == null)
-							throw new StreamCorruptedException("Invalid enchantment " + name);
+							throw new StreamCorruptedException("Invalid enchantment " + key);
 						return e;
 					}
 
 					// return "" + e.getId();
 					@Override
 					@Nullable
-					public Enchantment deserialize(final String s) {
-						try {
-							return EnchantmentIds.enchantments[Integer.parseInt(s)];
-						} catch (final NumberFormatException e) {
-							return null;
-						}
+					public Enchantment deserialize(String s) {
+						return Enchantment.getByName(s);
 					}
 
 					@Override

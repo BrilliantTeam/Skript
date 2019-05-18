@@ -19,36 +19,30 @@
  */
 package ch.njol.skript.classes.data;
 
-import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import ch.njol.skript.Skript;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.eclipse.jdt.annotation.Nullable;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemData;
 import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.bukkitutil.EnchantmentIds;
+import ch.njol.skript.bukkitutil.EnchantmentUtils;
 import ch.njol.skript.classes.Arithmetic;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.ClassInfo;
-import ch.njol.skript.classes.ConfigurationSerializer;
 import ch.njol.skript.classes.EnumSerializer;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.classes.Serializer;
 import ch.njol.skript.classes.YggdrasilSerializer;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.localization.RegexMessage;
@@ -240,9 +234,12 @@ public class SkriptClasses {
 						final EnchantmentType[] enchs = t.getEnchantmentTypes();
 						if (enchs != null) {
 							b.append("|");
-							for (final EnchantmentType e : enchs) {
-								b.append("#" + EnchantmentIds.ids.get(e.getType()));
-								b.append(":" + e.getLevel());
+							for (final EnchantmentType ench : enchs) {
+								Enchantment e = ench.getType();
+								if (e == null)
+									continue;
+								b.append("#" + EnchantmentUtils.getKey(e));
+								b.append(":" + ench.getLevel());
 							}
 						}
 						return "" + b.toString();
@@ -752,7 +749,7 @@ public class SkriptClasses {
 						if (split.length != 2)
 							return null;
 						try {
-							final Enchantment ench = EnchantmentIds.enchantments[Integer.parseInt(split[0])];
+							final Enchantment ench = EnchantmentUtils.getByKey(split[0]);
 							if (ench == null)
 								return null;
 							return new EnchantmentType(ench, Integer.parseInt(split[1]));

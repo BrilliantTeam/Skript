@@ -112,7 +112,7 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		// Always rewrite material registry, in case some updates got applied to it
 		String content = gson.toJson(materialRegistry.getMaterials());
 		try {
-			Files.write(materialsFile, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+			Files.write(materialsFile, content.getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			Skript.exception(e, "Saving material registry failed!");
 		}
