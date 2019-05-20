@@ -69,6 +69,8 @@ import ch.njol.util.coll.CollectionUtils;
 @Since("1.4.6 (players' name & display name), <i>unknown</i> (player list name), 2.0 (item name), 2.2-dev20 (inventory name)")
 public class ExprName extends SimplePropertyExpression<Object, String> {
 	
+	private static final boolean inventoryTitles = Skript.methodExists(Inventory.class, "getTitle");
+	
 	final static int ITEMSTACK = 1, ENTITY = 2, PLAYER = 4, INVENTORY = 8;
 	final static String[] types = {"itemstacks/slots", "livingentities", "players", "inventories"};
 	
