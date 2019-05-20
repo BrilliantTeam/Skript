@@ -114,7 +114,8 @@ public class EnchantmentType implements YggdrasilSerializable {
 	static {
 		Language.addListener(() -> {
 			NAMES.clear();
-			for (final Enchantment e : Enchantment.values()) {
+			for (Enchantment e : Enchantment.values()) {
+				assert e != null;
 				final String[] names = Language.getList(LANGUAGE_NODE + ".names." + EnchantmentUtils.getKey(e));
 				NAMES.put(e, names[0]);
 				
@@ -125,20 +126,30 @@ public class EnchantmentType implements YggdrasilSerializable {
 	}
 	
 	@SuppressWarnings("null")
-	private final static Pattern pattern = Pattern.compile("(.+)( \\d+)?");
+	private final static Pattern pattern = Pattern.compile(".+ \\d+");
 	
-	@SuppressWarnings("null")
+	/**
+	 * Parses an enchantment type from string. This includes an {@link Enchantment}
+	 * and its level.
+	 * @param s String to parse.
+	 * @return Enchantment type, or null if parsing failed.
+	 */
 	@Nullable
 	public static EnchantmentType parse(final String s) {
-		Matcher m = pattern.matcher(s);
-		if (m.matches()) {
-			final Enchantment ench = parseEnchantment(m.group(1));
+		if (pattern.matcher(s).matches()) {
+			String name = s.substring(0, s.lastIndexOf(' '));
+			assert name != null;
+			final Enchantment ench = parseEnchantment(name);
 			if (ench == null)
 				return null;
-			String level = m.group(2);
-			return new EnchantmentType(ench, level == null ? -1 : Utils.parseInt(level));
+			String level = s.substring(s.lastIndexOf(' ') + 1);
+			assert level != null;
+			return new EnchantmentType(ench, Utils.parseInt(level));
 		}
-		return null;
+		final Enchantment ench = parseEnchantment(s);
+		if (ench == null)
+			return null;
+		return new EnchantmentType(ench, -1);
 	}
 	
 	@Nullable
