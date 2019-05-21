@@ -153,7 +153,7 @@ Or, if you use Maven:
 * [Skript Hub](https://skripthub.net/)
 
 Note that these resources are not maintained by Skript's developers. Don't
-contant us about any problems you might have with them.
+contact us about any problems you might have with them.
 
 ## Developers
 Current team behind Skript:
