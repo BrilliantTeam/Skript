@@ -239,6 +239,10 @@ enchantments:
 		riptide: Riptide
 		impaling: Impaling
 		loyalty: Loyalty
+		# new 1.14 Enchantments
+		multishot: multishot, multi shot
+		piercing: piercing
+		quick_charge: quick charge
 
 # -- Potion Effects --
 potions:
@@ -1059,6 +1063,9 @@ entities:
 	monster:
 		name: monster¦s
 		pattern: monster(|1¦s)
+	mob:
+		name: mob¦s
+		pattern: mob(|1¦s)
 	animal:
 		name: animal¦s
 		pattern: animal(|1¦s)
