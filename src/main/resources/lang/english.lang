@@ -536,7 +536,7 @@ directions:
 # -- Entities --
 # about patterns:
 #	the marks (1¦..) are only required in the english file, i.e. you can use (..|..) or [..] for plurals in other languages
-#	the exception to this rule is the 'age pattern' and the corresponding marks (4¦ and 8¦)
+#	the exception to this rule is the 'f' and the corresponding marks (4¦ and 8¦)
 entities:
 	age pattern: (|4¦baby|4¦young|8¦adult|8¦grown(-| )up)
 	age adjectives:
@@ -920,7 +920,22 @@ entities:
 		pattern: <age> any horse(|1¦s)|(4¦)foal(|1¦s)
 	llama:
 		name: llama¦s
-		pattern: llama(|1¦s)
+		pattern: llama(|1¦s)|llama (4¦)cria(|1¦s)
+	trader llama:
+		name: trader llama¦s
+		pattern: trader llama(|1¦s)|trader llama (4¦)cria(|1¦s)
+	creamy llama:
+		name: creamy llama¦s
+		pattern: creamy [(2¦trader)] llama(|1¦s)|creamy [(2¦trader)] llama (4¦)cria(|1¦s)
+	white llama:
+		name: white llama¦s
+		pattern: white [(2¦trader)] llama(|1¦s)|white [(2¦trader)] llama (4¦)cria(|1¦s)
+	brown llama:
+		name: brown llama¦s
+		pattern: brown [(2¦trader)] llama(|1¦s)|brown [(2¦trader)] llama (4¦)cria(|1¦s)
+	gray llama:
+		name: gray llama¦s
+		pattern: gray [(2¦trader)] llama(|1¦s)|gray [(2¦trader)] llama (4¦)cria(|1¦s)
 	llama spit:
 		name: llama spit¦s
 		pattern: llama spit(|1¦s)
@@ -1096,6 +1111,9 @@ entities:
 	wandering trader:
 		name: wandering trader¦s
 		pattern: <age> wandering trader(|1¦s)|(4¦)wandering trader (kid(|1¦s)|child(|1¦ren)) //supposed to be ageable, but not working, spigot bug?
+	panda:
+		name: panda¦s
+		pattern: <age> [%-gene%[%-gene%]] panda(|1¦s)
 
 
 # -- Damage Causes --
@@ -1457,6 +1475,16 @@ sound categories:
 	voice: voice category, speech category
 	weather: weather category
 
+# -- Panda Genes --
+genes:
+	normal: normal
+	lazy: lazy
+	worried: worried, worrisome
+	playful: playful, happy
+	brown: brown, brownish
+	weak: weak
+	aggressive: aggressive, savage, wild
+
 # -- Boolean --
 boolean:
 	true:
@@ -1532,6 +1560,7 @@ types:
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
 	resourcepackstate: resource pack state¦s @a
+	gene: panda gene¦s @a
 
 	# Hooks
 	money: money
