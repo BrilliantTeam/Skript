@@ -138,8 +138,11 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 					else {
 						try {
 							return ((String) getTitle.invoke(o));
-						} catch (IllegalAccessException | InvocationTargetException e) {
-							e.printStackTrace();
+						} catch (IllegalAccessException e) {
+							assert false;
+							return null;
+						} catch (InvocationTargetException e) {
+							Skript.exception(e);
 							return null;
 						}
 					}
@@ -201,8 +204,11 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 					else {
 						try {
 							return ((String) getTitle.invoke(o));
-						} catch (IllegalAccessException | InvocationTargetException e) {
-							e.printStackTrace();
+						} catch (IllegalAccessException e) {
+							assert false;
+							return null;
+						} catch (InvocationTargetException e) {
+							Skript.exception(e);
 							return null;
 						}
 					}
