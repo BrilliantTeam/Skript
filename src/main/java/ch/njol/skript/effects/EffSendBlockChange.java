@@ -28,7 +28,6 @@ import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -75,7 +74,10 @@ public class EffSendBlockChange extends Effect {
 			return;
 		for (Player player : players.getArray(e)) {
 			for (Block block : blocks.getArray(e)) {
-				player.sendBlockChange(block.getLocation(), as.getType(), (byte) as.getDurability());
+				if (Skript.isRunningMinecraft(1, 13))
+					player.sendBlockChange(block.getLocation(), as.getType().createBlockData());
+				else
+					player.sendBlockChange(block.getLocation(), as.getType(), (byte) as.getDurability());
 			}
 		}
 	}
