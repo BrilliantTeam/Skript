@@ -1108,7 +1108,7 @@ entities:
 	#1.14 entities
 	fox:
 		name: fox¦es
-		pattern: <age> fox(|1¦s)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
+		pattern: <age> fox(|1¦es)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
 	pillager:
 		name: pillager¦s
 		pattern: pillager(|1¦s)
@@ -1118,6 +1118,9 @@ entities:
 	wandering trader:
 		name: wandering trader¦s
 		pattern: <age> wandering trader(|1¦s)|(4¦)wandering trader (kid(|1¦s)|child(|1¦ren)) //supposed to be ageable, but not working, spigot bug?
+	raider:
+		name: raider¦s
+		pattern: raider(|1¦s)
 	panda:
 		name: panda¦s
 		pattern: <age> [%-gene%[%-gene%]] panda(|1¦s)
