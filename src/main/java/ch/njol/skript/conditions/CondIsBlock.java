@@ -28,13 +28,13 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 
 @Name("Is Block")
-@Description("Checks whether an item is a block")
-@Examples({"player's held item is a block", "iron pickaxe isn't a block"})
+@Description("Checks whether an item is a block.")
+@Examples({"player's held item is a block", "{list::*} are blocks"})
 @Since("INSERT VERSION")
 public class CondIsBlock extends PropertyCondition<ItemStack> {
 	
 	static {
-		register(CondIsBlock.class, "[a] block", "itemstacks");
+		register(CondIsBlock.class, "([a] block|blocks)", "itemstacks");
 	}
 	
 	@Override
