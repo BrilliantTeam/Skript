@@ -119,7 +119,10 @@ public class CondContains extends Condition {
 							return items.check(e, (Checker<Object>) type -> {
 								if (type instanceof ItemType && ((ItemType) type).isContainedIn(invi)) {
 									return true;
-								} else return type instanceof ItemStack && invi.contains(((ItemStack) type));
+								} else if (type instanceof ItemStack && invi.contains(((ItemStack) type))) {
+									return true;
+								}
+								return false;
 							});
 						} else if (container instanceof String) {
 							final String s = (String) container;
@@ -142,7 +145,10 @@ public class CondContains extends Condition {
 								return items.check(e, (Checker<Object>) type -> {
 									if (type instanceof ItemType && ((ItemType) type).isContainedIn(invi)) {
 										return true;
-									} else return type instanceof ItemStack && invi.contains(((ItemStack) type));
+									} else if (type instanceof ItemStack && invi.contains(((ItemStack) type))) {
+										return true;
+									}
+									return false;
 								});
 							}
 							
