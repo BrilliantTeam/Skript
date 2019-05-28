@@ -117,12 +117,11 @@ public class CondContains extends Condition {
 						if (container instanceof Inventory) {
 							final Inventory invi = (Inventory) container;
 							return items.check(e, (Checker<Object>) type -> {
-								if (type instanceof ItemType && ((ItemType) type).isContainedIn(invi)) {
-									return true;
-								} else if (type instanceof ItemStack && invi.contains(((ItemStack) type))) {
-									return true;
-								}
-								return false;
+								if (type instanceof ItemType)
+									return ((ItemType) type).isContainedIn(invi);
+								else if (type instanceof ItemStack)
+									return invi.contains((ItemStack) type);
+								else return false;
 							});
 						} else if (container instanceof String) {
 							final String s = (String) container;
@@ -143,12 +142,11 @@ public class CondContains extends Condition {
 							Inventory invi = Converters.convert(val, Inventory.class);
 							if (invi != null) {
 								return items.check(e, (Checker<Object>) type -> {
-									if (type instanceof ItemType && ((ItemType) type).isContainedIn(invi)) {
-										return true;
-									} else if (type instanceof ItemStack && invi.contains(((ItemStack) type))) {
-										return true;
-									}
-									return false;
+									if (type instanceof ItemType)
+										return ((ItemType) type).isContainedIn(invi);
+									else if (type instanceof ItemStack)
+										return invi.contains((ItemStack) type);
+									else return false;
 								});
 							}
 							
