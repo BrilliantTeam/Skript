@@ -70,11 +70,11 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	
 	private static final boolean inventoryTitles = Skript.methodExists(Inventory.class, "getTitle");
 	@SuppressWarnings("null")
-	private static Method getTitle;
+	private static Method TITLE_METHOD;
 	
 	static {
 		try {
-			getTitle = Inventory.class.getMethod("getName");
+			TITLE_METHOD = Inventory.class.getMethod("getName");
 		} catch (NoSuchMethodException ignore) {}
 	}
 	
@@ -137,7 +137,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return ((Inventory) o).getViewers().get(0).getOpenInventory().getTitle();
 					else {
 						try {
-							return ((String) getTitle.invoke(o));
+							return ((String) TITLE_METHOD.invoke(o));
 						} catch (IllegalAccessException e) {
 							assert false;
 							return null;
@@ -203,7 +203,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return ((Inventory) o).getViewers().get(0).getOpenInventory().getTitle();
 					else {
 						try {
-							return ((String) getTitle.invoke(o));
+							return ((String) TITLE_METHOD.invoke(o));
 						} catch (IllegalAccessException e) {
 							assert false;
 							return null;
