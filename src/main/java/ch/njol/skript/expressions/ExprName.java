@@ -69,13 +69,16 @@ import ch.njol.util.coll.CollectionUtils;
 public class ExprName extends SimplePropertyExpression<Object, String> {
 	
 	private static final boolean inventoryTitles = Skript.methodExists(Inventory.class, "getTitle");
+	
 	@SuppressWarnings("null")
-	private static Method TITLE_METHOD;
+	private static final Method TITLE_METHOD;
 	
 	static {
+		Method _METHOD = null;
 		try {
-			TITLE_METHOD = Inventory.class.getMethod("getName");
+			_METHOD = Inventory.class.getMethod("getName");
 		} catch (NoSuchMethodException ignore) {}
+		TITLE_METHOD = _METHOD;
 	}
 	
 	final static int ITEMSTACK = 1, ENTITY = 2, PLAYER = 4, INVENTORY = 8;

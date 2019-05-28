@@ -296,8 +296,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("human", HumanEntity.class, true));
 		types.add(new SimpleEntityDataInfo("damageable", Damageable.class, true));
 		types.add(new SimpleEntityDataInfo("monster", Monster.class, true)); //I don't know why Njol never included that. I did now ^^
-		if (Skript.classExists("org.bukkit.entity.Mob")) // Apparently not in 1.9.4
-			types.add(new SimpleEntityDataInfo("mob", Mob.class, true)); //Same goes for this one
+		if (Skript.classExists("org.bukkit.entity.Mob"))
+			types.add(new SimpleEntityDataInfo("mob", Mob.class, true));
 		types.add(new SimpleEntityDataInfo("creature", Creature.class, true));
 		types.add(new SimpleEntityDataInfo("animal", Animals.class, true));
 		types.add(new SimpleEntityDataInfo("golem", Golem.class, true));
