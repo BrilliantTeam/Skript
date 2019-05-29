@@ -44,11 +44,11 @@ import ch.njol.util.coll.CollectionUtils;
 		"reset view distance of all players", "add 2 to view distance of player"})
 @RequiredPlugins("Paper 1.9-1.13.2")
 @Since("INSERT VERSION")
-public class ExprPlayerViewDistance extends PropertyExpression<Player, Integer> {
+public class ExprPlayerViewDistance extends PropertyExpression<Player, Number> {
 	
 	static {
 		if (Skript.methodExists(Player.class, "getViewDistance"))
-			register(ExprPlayerViewDistance.class, Integer.class, "view distance", "players");
+			register(ExprPlayerViewDistance.class, Number.class, "view distance", "players");
 	}
 	
 	@Override
@@ -59,7 +59,7 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Integer> 
 	}
 	
 	@Override
-	protected Integer[] get(Event e, Player[] source) {
+	protected Number[] get(Event e, Player[] source) {
 		return get(source, new Getter<Integer, Player>() {
 			@SuppressWarnings("null")
 			@Override
@@ -107,8 +107,8 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Integer> 
 	}
 	
 	@Override
-	public Class<? extends Integer> getReturnType() {
-		return Integer.class;
+	public Class<? extends Number> getReturnType() {
+		return Number.class;
 	}
 	
 	@Override
