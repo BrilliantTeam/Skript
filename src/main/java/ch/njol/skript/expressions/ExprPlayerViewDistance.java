@@ -29,6 +29,7 @@ import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
@@ -37,10 +38,11 @@ import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-@Name("Player View Distance")
-@Description("The view distance of a player. This expression requires PaperMC.")
+@Name("View Distance")
+@Description("The view distance of a player. Can be changed.")
 @Examples({"set view distance of player to 10", "set {_view} to view distance of player",
 		"reset view distance of all players", "add 2 to view distance of player"})
+@RequiredPlugins("Paper 1.9-1.13.2")
 @Since("INSERT VERSION")
 public class ExprPlayerViewDistance extends PropertyExpression<Player, Integer> {
 	
@@ -49,8 +51,8 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Integer> 
 			register(ExprPlayerViewDistance.class, Integer.class, "view distance", "players");
 	}
 	
-	@SuppressWarnings({"unchecked", "null"})
 	@Override
+	@SuppressWarnings({"unchecked", "null"})
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		setExpr((Expression<Player>) exprs[0]);
 		return true;
@@ -67,12 +69,18 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Integer> 
 		});
 	}
 	
-	@Nullable
 	@Override
+	@Nullable
 	public Class<?>[] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.REMOVE_ALL)
-			return null;
-		return CollectionUtils.array(Number.class);
+		switch (mode) {
+			case DELETE:
+			case SET:
+			case ADD:
+			case REMOVE:
+			case RESET:
+				return CollectionUtils.array(Number.class);
+		}
+		return null;
 	}
 	
 	@Override
@@ -81,27 +89,20 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Integer> 
 		switch (mode) {
 			case DELETE:
 			case SET:
-				for (Player player : getExpr().getArray(e)) {
+				for (Player player : getExpr().getArray(e))
 					player.setViewDistance(distance);
-				}
 				break;
 			case ADD:
-				for (Player player : getExpr().getArray(e)) {
+				for (Player player : getExpr().getArray(e))
 					player.setViewDistance(player.getViewDistance() + distance);
-				}
 				break;
 			case REMOVE:
-				for (Player player : getExpr().getArray(e)) {
+				for (Player player : getExpr().getArray(e))
 					player.setViewDistance(player.getViewDistance() - distance);
-				}
 				break;
 			case RESET:
-				for (Player player : getExpr().getArray(e)) {
+				for (Player player : getExpr().getArray(e))
 					player.setViewDistance(Bukkit.getServer().getViewDistance());
-				}
-				break;
-			case REMOVE_ALL:
-				assert false;
 		}
 	}
 	
