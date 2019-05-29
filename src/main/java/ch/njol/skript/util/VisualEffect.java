@@ -503,6 +503,10 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		return StringUtils.join(names, ", ");
 	}
 	
+	public @Nullable Object getEffect(){
+		return type.effect;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
