@@ -22,6 +22,7 @@ package ch.njol.skript.expressions;
 import java.util.List;
 
 import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -51,24 +52,33 @@ import ch.njol.util.coll.iterator.IteratorIterable;
  * @author Peter Güttinger
  */
 @Name("Drops")
-@Description("Only works in death events. Holds the drops of the dying creature. Drops can be prevented by removing them with \"remove ... from drops\", e.g. \"remove all pickaxes from the drops\", or \"clear drops\" if you don't want any drops at all.")
+@Description("Only works in death events (Also block break events in 1.12+). Holds the drops of the dying creature. Drops can be prevented by removing them with \"remove ... from drops\", e.g. \"remove all pickaxes from the drops\", or \"clear drops\" if you don't want any drops at all.")
 @Examples({"clear drops",
-		"remove 4 planks from the drops"})
-@Since("1.0")
-@Events("death")
+		"remove 4 planks from the drops", "on break of diamond ore:", "\tclear drops"})
+@Since("1.0, INSERT VERSION (break event drops)")
+@Events("break(1.12+)/death")
 public class ExprDrops extends SimpleExpression<ItemStack> {
 	static {
 		Skript.registerExpression(ExprDrops.class, ItemStack.class, ExpressionType.SIMPLE, "[the] drops");
 	}
+	
+	private final boolean BREAK_DROPS = Skript.methodExists(BlockBreakEvent.class, "setDropItems", boolean.class);
 	
 	@SuppressWarnings("null")
 	private Kleenean delayed;
 	
 	@Override
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
-		if (!ScriptLoader.isCurrentEvent(EntityDeathEvent.class)) {
-			Skript.error("The expression 'drops' can only be used in death events", ErrorQuality.SEMANTIC_ERROR);
-			return false;
+		if (BREAK_DROPS) {
+			if (!ScriptLoader.isCurrentEvent(EntityDeathEvent.class, BlockBreakEvent.class)) {
+				Skript.error("The expression 'drops' can only be used in break and death events", ErrorQuality.SEMANTIC_ERROR);
+				return false;
+			}
+		} else {
+			if (!ScriptLoader.isCurrentEvent(EntityDeathEvent.class)) {
+				Skript.error("The expression 'drops' can only be used in death events", ErrorQuality.SEMANTIC_ERROR);
+				return false;
+			}
 		}
 		delayed = isDelayed;
 		return true;
@@ -99,6 +109,12 @@ public class ExprDrops extends SimpleExpression<ItemStack> {
 	@Override
 	public void change(final Event e, final @Nullable Object[] deltas, final ChangeMode mode) {
 		assert mode != ChangeMode.RESET;
+		if (e instanceof BlockBreakEvent) {
+			if (mode == ChangeMode.DELETE) {
+				((BlockBreakEvent) e).setDropItems(false);
+				return;
+			}
+		}
 		if (!(e instanceof EntityDeathEvent)) {
 			assert false;
 			return;
