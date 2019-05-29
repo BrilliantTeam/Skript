@@ -70,7 +70,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	
 	private static final boolean inventoryTitles = Skript.methodExists(Inventory.class, "getTitle");
 	
-	@SuppressWarnings("null")
+	@Nullable
 	private static final Method TITLE_METHOD;
 	
 	static {
@@ -140,6 +140,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return ((Inventory) o).getViewers().get(0).getOpenInventory().getTitle();
 					else {
 						try {
+							assert TITLE_METHOD != null;
 							return ((String) TITLE_METHOD.invoke(o));
 						} catch (IllegalAccessException e) {
 							assert false;
@@ -206,6 +207,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return ((Inventory) o).getViewers().get(0).getOpenInventory().getTitle();
 					else {
 						try {
+							assert TITLE_METHOD != null;
 							return ((String) TITLE_METHOD.invoke(o));
 						} catch (IllegalAccessException e) {
 							assert false;
