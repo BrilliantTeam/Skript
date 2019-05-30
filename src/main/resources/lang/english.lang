@@ -1205,6 +1205,69 @@ visual effects:
 	wolf_smoke:
 		name: wolf smoke @-
 		pattern: wolf smok(e|ing)
+	iron_golem_rose:
+		name: iron golem offering rose @an
+		pattern: (iron golem [offering] rose|rose in hand)
+	villager_hearts:
+		name: villager hearts @x
+		pattern: villager hearts
+	villager_entity_angry:
+		name: angry villager entity @an
+		pattern: angry villager entity
+	villager_entity_happy:
+		name: happy villager entity @a
+		pattern: happy villager entity
+	witch_magic:
+		name: witch magic @-
+		pattern: witch magic
+	zombie_transform:
+		name: zombie turning to a villager
+		pattern: ([zombie] turning to a villager|zombie transform)
+	firework_explode:
+		name: firework explosion @a
+		pattern: firework explosion
+	arrow_particles:
+		name: arrow particles @x
+		pattern: [tipped] arrow particles
+	rabbit_jump:
+		name: jumping rabbit @a
+		pattern: (jumping rabbit|rabbit jump)
+	love_hearts:
+		name: love hearts @x
+		pattern: (love|breeding) hearts
+	squid_rotate:
+		name: squid rotation reset @a
+		pattern: [squid] rotation reset
+	entity_poof:
+		name: entity poof @-
+		pattern: entity poof
+	guardian_target:
+		name: guardian target @a
+		pattern: guardian target [with laser]
+	shield_block:
+		name: block with shield @-
+		pattern: (block [with a shield]|shield block)
+	shield_break:
+		name: shield break @a
+		pattern: shield break
+	armor_stand_hit:
+		name: armor stand hit @a
+		pattern: armor stand hit
+	thorns_hurt:
+		name: hurt by thorns @-
+		pattern: (hurt|damage) by thorns
+	iron_golem_sheath:
+		name: iron golem sheathing rose
+		pattern: iron golem (sheathing|putting away) rose
+	totem_resurrect:
+		name: resurrection by totem
+		pattern: resurrection [by totem]
+	hurt_drown:
+		name: hurt by drowning @-
+		pattern: (hurt|damage) by drowning
+	hurt_explosion:
+		name: hurt by explosion @-
+		pattern: (hurt|damage) by explosion
 	fireworks_spark:
 		name: firework's spark @-
 		pattern: firework['s] spark
