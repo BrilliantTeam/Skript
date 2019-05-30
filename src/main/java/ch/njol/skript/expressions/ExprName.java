@@ -19,8 +19,9 @@
  */
 package ch.njol.skript.expressions;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -71,13 +72,13 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	private static final boolean inventoryTitles = Skript.methodExists(Inventory.class, "getTitle");
 	
 	@Nullable
-	private static final Method TITLE_METHOD;
+	private static final MethodHandle TITLE_METHOD;
 	
 	static {
-		Method _METHOD = null;
+		MethodHandle _METHOD = null;
 		try {
-			_METHOD = Inventory.class.getMethod("getName");
-		} catch (NoSuchMethodException ignore) {}
+			_METHOD = MethodHandles.lookup().findVirtual(Inventory.class, "getName", MethodType.methodType(String.class));
+		} catch (IllegalAccessException | NoSuchMethodException ignore) {}
 		TITLE_METHOD = _METHOD;
 	}
 	
@@ -145,7 +146,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						} catch (IllegalAccessException e) {
 							assert false;
 							return null;
-						} catch (InvocationTargetException e) {
+						} catch (Throwable e) {
 							Skript.exception(e);
 							return null;
 						}
@@ -212,7 +213,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						} catch (IllegalAccessException e) {
 							assert false;
 							return null;
-						} catch (InvocationTargetException e) {
+						} catch (Throwable e) {
 							Skript.exception(e);
 							return null;
 						}
