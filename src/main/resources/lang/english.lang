@@ -75,6 +75,7 @@ skript command:
 			check: Checks for a new version
 			changes: Lists all changes since the current version
 			download: Download the newest version
+		gen-docs: Generates documentation using doc-templates in plugin folder
 
 	invalid script: Can't find the script <grey>'<gold>%s<grey>'<red> in the scripts folder!
 	invalid folder: Can't find the folder <grey>'<gold>%s<grey>'<red> in the scripts folder!
@@ -239,10 +240,11 @@ enchantments:
 		riptide: Riptide
 		impaling: Impaling
 		loyalty: Loyalty
+		luck_of_the_sea: Luck of The Sea
 		# new 1.14 Enchantments
-		multishot: multishot, multi shot
-		piercing: piercing
-		quick_charge: quick charge
+		multishot: Multishot, Multi-Shot
+		piercing: Piercing
+		quick_charge: Quick Charge
 
 # -- Potion Effects --
 potions:
@@ -812,6 +814,9 @@ entities:
 	cartographer:
 		name: cartographer¦s
 		pattern: <age> cartographer(|1¦s)|(4¦)cartographer (kid(|1¦s)|child(|1¦ren))
+	cleric:
+		name: cleric¦s
+		pattern: <age> cleric(|1¦s)|(4¦)cleric (kid(|1¦s)|child(|1¦ren))
 	fisherman:
 		name: fisherman¦s
 		pattern: <age> fisherman(|1¦s)|(4¦)fisherman (kid(|1¦s)|child(|1¦ren))
@@ -1109,6 +1114,12 @@ entities:
 	fox:
 		name: fox¦es
 		pattern: <age> fox(|1¦es)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
+	red fox:
+		name: red fox¦es
+		pattern: <age> red fox(|1¦es)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
+	snow fox:
+		name: snow fox¦es
+		pattern: <age> snow fox(|1¦es)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
 	pillager:
 		name: pillager¦s
 		pattern: pillager(|1¦s)
@@ -1480,6 +1491,14 @@ inventory types:
 	beacon: beacon inventory
 	hopper: hopper inventory
 	shulker_box: shulker box inventory
+	barrel: barrel inventory
+	blast_furnace: blast furnace inventory
+	lectern: lectern inventory
+	smoker: smoker inventory
+	loom: loom inventory
+	cartography: cartography table inventory
+	grindstone: grindstone inventory
+	stonecutter: stonecutter inventory
 
 # -- Spawn Reasons --
 spawn reasons:
@@ -1613,6 +1632,7 @@ types:
 	difficulty: difficult¦y¦ies @a
 	fireworkeffect: firework effect¦s @a
 	fireworktype: firework type¦s @a
+	soundcategory: sound categor¦y¦ies @a
 
 	# Skript
 	weathertype: weather type¦s @a
