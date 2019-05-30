@@ -423,8 +423,21 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		return true;
 	}
 	
+	/**
+	 * Entity effects are always played on entities.
+	 * @return If this is an entity effect.
+	 */
 	public boolean isEntityEffect() {
 		return type.effect instanceof EntityEffect;
+	}
+	
+	/**
+	 * Particles are implemented differently from traditional effects in
+	 * Minecraft. Most new visual effects are particles.
+	 * @return If this is a particle effect.
+	 */
+	public boolean isParticle() {
+		return type.effect instanceof Particle;
 	}
 	
 	@Nullable
@@ -503,8 +516,21 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		return StringUtils.join(names, ", ");
 	}
 	
-	public @Nullable Object getEffect(){
-		return type.effect;
+	/**
+	 * Gets Bukkit effect backing this visual effect. It may be either
+	 * {@link Effect}, {@link EntityEffect} or {@link Particle}.
+	 * @return Backing effect.
+	 * @throws IllegalStateException When this is called before the effect
+	 * is initialized. Note that
+	 * {@link #init(Expression[], int, Kleenean, ParseResult)} may fail when
+	 * the used Minecraft version lacks support for effect used.
+	 */
+	public Object getEffect() {
+		Object effect = type.effect;
+		if (effect == null) { // init() not called or returned false
+			throw new IllegalStateException("effect not initialized");
+		}
+		return effect;
 	}
 	
 	@Override
