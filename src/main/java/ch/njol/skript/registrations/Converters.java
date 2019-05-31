@@ -303,8 +303,9 @@ public abstract class Converters {
 	@Nullable
 	private static <F, T> Converter<? super F, ? extends T> getConverter_i(final Class<F> from, final Class<T> to) {
 		for (final ConverterInfo<?, ?> conv : converters) {
-			if (conv.from.isAssignableFrom(from) && to.isAssignableFrom(conv.to))
+			if (conv.from.isAssignableFrom(from) && to.isAssignableFrom(conv.to)) {
 				return (Converter<? super F, ? extends T>) conv.converter;
+			}
 		}
 		for (final ConverterInfo<?, ?> conv : converters) {
 			if (conv.from.isAssignableFrom(from) && conv.to.isAssignableFrom(to)) {

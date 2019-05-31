@@ -451,7 +451,8 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	 * amount of 1 and same block values. Tags will also be copied, with
 	 * following exceptions:
 	 * <ul>
-	 * <li>Damage: 1.13 tag-damage is only used for actual durability
+	 * <li>Damage: 1.13 tag-damage is only used for actual durability.
+	 * Present on 1.12 and older versions.
 	 * <li>Name: custom names made with anvil do not change item type
 	 * </ul>
 	 * @return A modified copy of this item data.
@@ -465,7 +466,9 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			meta.setDisplayName(null); // Clear display name
 			data.stack.setItemMeta(meta);
 		}
-		ItemUtils.setDamage(data.stack, 0); // Set to undamaged
+		if (!itemDataValues) {
+			ItemUtils.setDamage(data.stack, 0); // Set to undamaged
+		}
 		
 		data.type = type;
 		data.blockValues = blockValues;

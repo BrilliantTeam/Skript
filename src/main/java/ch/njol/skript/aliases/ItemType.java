@@ -1236,4 +1236,18 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			throw new IllegalStateException("material not found");
 		return data.getType();
 	}
+
+	/**
+	 * Returns a base item type of this. Essentially, this calls
+	 * {@link ItemData#aliasCopy()} on all datas and creates a new type
+	 * containing the results.
+	 * @return Base item type.
+	 */
+	public Object getBaseType() {
+		ItemType copy = new ItemType();
+		for (ItemData data : types) {
+			copy.add(data.aliasCopy());
+		}
+		return copy;
+	}
 }

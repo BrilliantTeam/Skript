@@ -132,12 +132,11 @@ public class DefaultConverters {
 			}
 		}, Converter.NO_COMMAND_ARGUMENTS);
 		
-		// Block - ItemStack
-		Converters.registerConverter(Block.class, ItemStack.class, new Converter<Block, ItemStack>() {
-			@SuppressWarnings("deprecation")
+		// Block - ItemType
+		Converters.registerConverter(Block.class, ItemType.class, new Converter<Block, ItemType>() {
 			@Override
-			public ItemStack convert(final Block b) {
-				return new ItemStack(b.getType(), 1, b.getData());
+			public ItemType convert(final Block b) {
+				return new ItemType(b);
 			}
 		}, Converter.NO_LEFT_CHAINING | Converter.NO_COMMAND_ARGUMENTS);
 		
@@ -260,7 +259,7 @@ public class DefaultConverters {
 					return (InventoryHolder) s;
 				return null;
 			}
-		}, Converter.NO_COMMAND_ARGUMENTS);
+		}, Converter.NO_RIGHT_CHAINING | Converter.NO_COMMAND_ARGUMENTS);
 		
 		Converters.registerConverter(InventoryHolder.class, Block.class, new Converter<InventoryHolder, Block>() {
 			@Override
