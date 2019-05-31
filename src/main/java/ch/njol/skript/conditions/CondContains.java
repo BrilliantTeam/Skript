@@ -21,6 +21,7 @@ package ch.njol.skript.conditions;
 
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -115,8 +116,13 @@ public class CondContains extends Condition {
 					} else {
 						if (container instanceof Inventory) {
 							final Inventory invi = (Inventory) container;
-							return items.check(e, (Checker<Object>) type
-									-> type instanceof ItemType && ((ItemType) type).isContainedIn(invi));
+							return items.check(e, (Checker<Object>) type -> {
+								if (type instanceof ItemType)
+									return ((ItemType) type).isContainedIn(invi);
+								else if (type instanceof ItemStack)
+									return invi.contains((ItemStack) type);
+								else return false;
+							});
 						} else if (container instanceof String) {
 							final String s = (String) container;
 							return items.check(e,
@@ -135,8 +141,13 @@ public class CondContains extends Condition {
 							
 							Inventory invi = Converters.convert(val, Inventory.class);
 							if (invi != null) {
-								return items.check(e, (Checker<Object>) type
-										-> type instanceof ItemType && ((ItemType) type).isContainedIn(invi));
+								return items.check(e, (Checker<Object>) type -> {
+									if (type instanceof ItemType)
+										return ((ItemType) type).isContainedIn(invi);
+									else if (type instanceof ItemStack)
+										return invi.contains((ItemStack) type);
+									else return false;
+								});
 							}
 							
 							String s = Converters.convert(val, String.class);
