@@ -493,6 +493,7 @@ public class BukkitClasses {
 					@Override
 					protected World deserialize(final Fields fields) throws StreamCorruptedException {
 						final String name = fields.getObject("name", String.class);
+						assert name != null;
 						final World w = Bukkit.getWorld(name);
 						if (w == null)
 							throw new StreamCorruptedException("Missing world " + name);
@@ -1103,6 +1104,7 @@ public class BukkitClasses {
 					@Override
 					protected PotionEffectType deserialize(final Fields fields) throws StreamCorruptedException {
 						final String name = fields.getObject("name", String.class);
+						assert name != null;
 						final PotionEffectType t = PotionEffectType.getByName(name);
 						if (t == null)
 							throw new StreamCorruptedException("Invalid PotionEffectType " + name);

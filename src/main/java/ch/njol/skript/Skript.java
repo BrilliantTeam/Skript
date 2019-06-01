@@ -67,6 +67,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -403,7 +404,9 @@ public final class Skript extends JavaPlugin implements Listener {
 			return;
 		}
 		
-		getCommand("skript").setExecutor(new SkriptCommand());
+		PluginCommand skriptCommand = getCommand("skript");
+		assert skriptCommand != null; // It is defined, unless build is corrupted or something like that
+		skriptCommand.setExecutor(new SkriptCommand());
 		
 		// Load Bukkit stuff. It is done after platform check, because something might be missing!
 		new BukkitClasses();
@@ -1283,6 +1286,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	public static <E extends SkriptEvent> SkriptEventInfo<E> registerEvent(final String name, final Class<E> c, final Class<? extends Event>[] events, final String... patterns) {
 		checkAcceptRegistrations();
 		String originClassPath = Thread.currentThread().getStackTrace()[2].getClassName();
+		assert originClassPath != null;
 		final SkriptEventInfo<E> r = new SkriptEventInfo<>(name, patterns, c, originClassPath, events);
 		Skript.events.add(r);
 		return r;
@@ -1501,7 +1505,8 @@ public final class Skript extends JavaPlugin implements Listener {
 					StringBuilder pluginsMessage = new StringBuilder();
 					for (PluginDescriptionFile desc : pluginPackages.values()) {
 						pluginsMessage.append(desc.getName());
-						if (desc.getWebsite() != null && !desc.getWebsite().isEmpty()) // Add website if found
+						String website = desc.getWebsite();
+						if (website != null && !website.isEmpty()) // Add website if found
 							pluginsMessage.append(" (").append(desc.getWebsite()).append(")");
 						
 						pluginsMessage.append(" ");
@@ -1513,7 +1518,8 @@ public final class Skript extends JavaPlugin implements Listener {
 					StringBuilder pluginsMessage = new StringBuilder();
 					for (PluginDescriptionFile desc : stackPlugins) {
 						pluginsMessage.append(desc.getName());
-						if (desc.getWebsite() != null && !desc.getWebsite().isEmpty()) // Add website if found
+						String website = desc.getWebsite();
+						if (website != null && !website.isEmpty()) // Add website if found
 							pluginsMessage.append(" (").append(desc.getWebsite()).append(")");
 						
 						pluginsMessage.append(" ");

@@ -172,7 +172,7 @@ public class BlockStateBlock implements Block {
 	}
 	
 	@Override
-	public void setType(final Material type) {
+	public void setType(Material type) {
 		if (delayChanges) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
 				@Override
@@ -187,7 +187,7 @@ public class BlockStateBlock implements Block {
 	
 	@Nullable
 	@Override
-	public BlockFace getFace(final Block block) {
+	public BlockFace getFace(Block block) {
 		return state.getBlock().getFace(block);
 	}
 	
