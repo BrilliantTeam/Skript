@@ -28,6 +28,10 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -35,6 +39,12 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
+@Name("Player List Header and Footer")
+@Description("The message above and below the player list in the tab menu.")
+@Examples({"set all players tab list header to \"Welcome to the Server!\"",
+			"send \"%the player's tab list header%\" to player",
+			"reset all player's tab list header"})
+@Since("INSERT VERSION")
 public class ExprPlayerlistHeaderFooter extends PropertyExpression<Player, String> {
 	
 	static {
