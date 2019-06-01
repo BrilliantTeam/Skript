@@ -29,12 +29,22 @@ import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptCommand;
 import ch.njol.skript.config.Config;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.util.Kleenean;
 
+@Name("Enable/Disable/Reload Script File")
+@Description("Enables, disables, or reloads a script file.")
+@Examples({"reload script \"test\"",
+			"enable script file \"testing\"",
+			"unload script file \"script.sk\""})
+@Since("INSERT VERSION")
 public class EffScriptFile extends Effect {
 	static {
 		Skript.registerEffect(EffScriptFile.class, "(1¦enable|1¦load|2¦reload|3¦disable|3¦unload) s(c|k)ript [file] %string%");
