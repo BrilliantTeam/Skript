@@ -74,20 +74,18 @@ public class EffScriptFile extends Effect {
 		String name = fileName != null ? fileName.getSingle(e) : "";
 		File f = SkriptCommand.getScriptFromName(name != null ? name : "");
 		if (f == null) {
-			Skript.error(name != null ? "Invalid script file name: " + name : "Invalid script file name!");
 			return;
 		}
 		switch (mark) {
 			case ENABLE: {
 				if (!f.getName().startsWith("-")) {
-					Skript.warning("Script file, " + name + ", is already enabled.");
 					return;
 				}
 				
 				try {
 					f = FileUtils.move(f, new File(f.getParentFile(), f.getName().substring(1)), false);
 				} catch (final IOException ex) {
-					Skript.error("Error while enabling script file: " + name);
+					Skript.exception(ex, "Error while enabling script file: " + name);
 					return;
 				}
 				Config config = ScriptLoader.loadStructure(f);
@@ -96,7 +94,6 @@ public class EffScriptFile extends Effect {
 			}
 			case RELOAD: {
 				if (f.getName().startsWith("-")) {
-					Skript.warning("Script file, " + name + ", is disabled.");
 					return;
 				}
 				
@@ -108,7 +105,6 @@ public class EffScriptFile extends Effect {
 			}
 			case DISABLE: {
 				if (f.getName().startsWith("-")) {
-					Skript.warning("Script file, " + name + ", is already disabled.");
 					return;
 				}
 				
@@ -116,13 +112,14 @@ public class EffScriptFile extends Effect {
 				try {
 					FileUtils.move(f, new File(f.getParentFile(), "-" + f.getName()), false);
 				} catch (final IOException ex) {
-					Skript.error("Error while disabling script file: " + name);
+					Skript.exception(ex, "Error while disabling script file: " + name);
 					return;
 				}
 				break;
 			}
 			default: {
-				throw new AssertionError();
+				assert false;
+				return;
 			}
 		}
 	}
