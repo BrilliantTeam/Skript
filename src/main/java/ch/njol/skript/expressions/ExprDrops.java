@@ -52,11 +52,12 @@ import ch.njol.util.coll.iterator.IteratorIterable;
  * @author Peter Güttinger
  */
 @Name("Drops")
-@Description("Only works in death events (Also block break events in 1.12+). Holds the drops of the dying creature. Drops can be prevented by removing them with \"remove ... from drops\", e.g. \"remove all pickaxes from the drops\", or \"clear drops\" if you don't want any drops at all.")
+@Description("Only works in block break and death events. Holds the drops of the dying creature. Drops can be prevented by removing them with \"remove ... from drops\", e.g. \"remove all pickaxes from the drops\", or \"clear drops\" if you don't want any drops at all. " +
+		"In break events, drops can only be cleared, and is only available in 1.12+")
 @Examples({"clear drops",
 		"remove 4 planks from the drops", "on break of diamond ore:", "\tclear drops"})
-@Since("1.0, INSERT VERSION (break event drops)")
-@Events("break(1.12+)/death")
+@Since("1.0, INSERT VERSION (block break event drops)")
+@Events("break / mine, death")
 public class ExprDrops extends SimpleExpression<ItemStack> {
 	static {
 		Skript.registerExpression(ExprDrops.class, ItemStack.class, ExpressionType.SIMPLE, "[the] drops");
@@ -71,7 +72,7 @@ public class ExprDrops extends SimpleExpression<ItemStack> {
 	public boolean init(final Expression<?>[] vars, final int matchedPattern, final Kleenean isDelayed, final ParseResult parser) {
 		if (BREAK_DROPS) {
 			if (!ScriptLoader.isCurrentEvent(EntityDeathEvent.class, BlockBreakEvent.class)) {
-				Skript.error("The expression 'drops' can only be used in break and death events", ErrorQuality.SEMANTIC_ERROR);
+				Skript.error("The expression 'drops' can only be used in block break and death events", ErrorQuality.SEMANTIC_ERROR);
 				return false;
 			}
 		} else {
