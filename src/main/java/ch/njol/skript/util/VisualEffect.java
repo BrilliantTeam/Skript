@@ -81,10 +81,34 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 			}
 		},
 		HURT(EntityEffect.HURT),
-		SHEEP_EAT("SHEEP_EAT", true), // Seriously, Spigot?
+		// Omit DEATH, because it causes client glitches
+		WOLF_SMOKE(EntityEffect.WOLF_SMOKE),
 		WOLF_HEARTS(EntityEffect.WOLF_HEARTS),
 		WOLF_SHAKE(EntityEffect.WOLF_SHAKE),
-		WOLF_SMOKE(EntityEffect.WOLF_SMOKE),
+		SHEEP_EAT("SHEEP_EAT", true), // Was once mistakenly removed from Spigot
+		IRON_GOLEM_ROSE(EntityEffect.IRON_GOLEM_ROSE),
+		VILLAGER_HEARTS(EntityEffect.VILLAGER_HEART),
+		VILLAGER_ENTITY_ANGRY(EntityEffect.VILLAGER_ANGRY),
+		VILLAGER_ENTITY_HAPPY(EntityEffect.VILLAGER_HAPPY),
+		WITCH_MAGIC(EntityEffect.WITCH_MAGIC),
+		ZOMBIE_TRANSFORM(EntityEffect.ZOMBIE_TRANSFORM),
+		FIREWORK_EXPLODE(EntityEffect.FIREWORK_EXPLODE),
+		
+		// Spigot 2017 entity effects update (1.10+)
+		ARROW_PARTICLES("ARROW_PARTICLES", true),
+		RABBIT_JUMP("RABBIT_JUMP", true),
+		LOVE_HEARTS("LOVE_HEARTS", true),
+		SQUID_ROTATE("SQUID_ROTATE", true),
+		ENTITY_POOF("ENTITY_POOF", true),
+		GUARDIAN_TARGET("GUARDIAN_TARGET", true),
+		SHIELD_BLOCK("SHIELD_BLOCK", true),
+		SHIELD_BREAK("SHIELD_BREAK", true),
+		ARMOR_STAND_HIT("ARMOR_STAND_HIT", true),
+		THORNS_HURT("THORNS_HURT", true),
+		IRON_GOLEM_SHEATH("IRON_GOLEM_SHEATH", true),
+		TOTEM_RESURRECT("TOTEM_RESURRECT", true),
+		HURT_DROWN("HURT_DROWN", true),
+		HURT_EXPLOSIION("HURT_EXPLOSION", true),
 		
 		// Particles
 		FIREWORKS_SPARK(Particle.FIREWORKS_SPARK),
@@ -421,8 +445,21 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 		return true;
 	}
 	
+	/**
+	 * Entity effects are always played on entities.
+	 * @return If this is an entity effect.
+	 */
 	public boolean isEntityEffect() {
 		return type.effect instanceof EntityEffect;
+	}
+	
+	/**
+	 * Particles are implemented differently from traditional effects in
+	 * Minecraft. Most new visual effects are particles.
+	 * @return If this is a particle effect.
+	 */
+	public boolean isParticle() {
+		return type.effect instanceof Particle;
 	}
 	
 	@Nullable
@@ -505,6 +542,23 @@ public final class VisualEffect implements SyntaxElement, YggdrasilSerializable 
 	
 	public static String getAllNames() {
 		return StringUtils.join(names, ", ");
+	}
+	
+	/**
+	 * Gets Bukkit effect backing this visual effect. It may be either
+	 * {@link Effect}, {@link EntityEffect} or {@link Particle}.
+	 * @return Backing effect.
+	 * @throws IllegalStateException When this is called before the effect
+	 * is initialized. Note that
+	 * {@link #init(Expression[], int, Kleenean, ParseResult)} may fail when
+	 * the used Minecraft version lacks support for effect used.
+	 */
+	public Object getEffect() {
+		Object effect = type.effect;
+		if (effect == null) { // init() not called or returned false
+			throw new IllegalStateException("effect not initialized");
+		}
+		return effect;
 	}
 	
 	@Override

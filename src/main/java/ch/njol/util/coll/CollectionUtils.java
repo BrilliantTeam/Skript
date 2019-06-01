@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -74,7 +75,7 @@ public abstract class CollectionUtils {
 		if (array == null)
 			return -1;
 		for (int i = start; i < end; i++) {
-			if (array[i] == null ? t == null : array[i].equals(t))
+			if (Objects.equals(array[i], t))
 				return i;
 		}
 		return -1;

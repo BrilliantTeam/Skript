@@ -73,11 +73,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Llama;
 import org.bukkit.entity.LlamaSpit;
 import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Mule;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Painting;
-import org.bukkit.entity.Panda;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Pillager;
@@ -103,7 +103,6 @@ import org.bukkit.entity.Stray;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownExpBottle;
 import org.bukkit.entity.TippedArrow;
-import org.bukkit.entity.TraderLlama;
 import org.bukkit.entity.Trident;
 import org.bukkit.entity.TropicalFish;
 import org.bukkit.entity.Turtle;
@@ -205,11 +204,6 @@ public class SimpleEntityData extends EntityData<Entity> {
 		types.add(new SimpleEntityDataInfo("bottle of enchanting", ThrownExpBottle.class));
 		types.add(new SimpleEntityDataInfo("tnt", TNTPrimed.class));
 		types.add(new SimpleEntityDataInfo("leash hitch", LeashHitch.class));
-		if (Skript.classExists("org.bukkit.entity.Husk")) {
-			// Husk must be registered before zombie to work correctly
-			types.add(new SimpleEntityDataInfo("husk", Husk.class));
-		}
-		types.add(new SimpleEntityDataInfo("zombie", Zombie.class));
 		
 		if (Skript.classExists("org.bukkit.entity.ItemFrame")) {
 			types.add(new SimpleEntityDataInfo("item frame", ItemFrame.class));
@@ -237,6 +231,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 		if (Skript.isRunningMinecraft(1, 11)) { // More subtypes, more supertypes - changes needed
 			types.add(new SimpleEntityDataInfo("wither skeleton", WitherSkeleton.class));
 			types.add(new SimpleEntityDataInfo("stray", Stray.class));
+			types.add(new SimpleEntityDataInfo("husk", Husk.class));
 			types.add(new SimpleEntityDataInfo("skeleton", Skeleton.class, true));
 
 			// Guardians
@@ -292,12 +287,16 @@ public class SimpleEntityData extends EntityData<Entity> {
 		if (Skript.classExists("org.bukkit.entity.Illusioner")) {
 			types.add(new SimpleEntityDataInfo("illusioner", Illusioner.class));
 		}
+		// Register zombie after Husk and Drowned to make sure those 2 work
+		types.add(new SimpleEntityDataInfo("zombie", Zombie.class));
+		
 		// TODO !Update with every version [entities]
 		
 		// supertypes
 		types.add(new SimpleEntityDataInfo("human", HumanEntity.class, true));
 		types.add(new SimpleEntityDataInfo("damageable", Damageable.class, true));
 		types.add(new SimpleEntityDataInfo("monster", Monster.class, true)); //I don't know why Njol never included that. I did now ^^
+		types.add(new SimpleEntityDataInfo("mob", Mob.class, true)); //Same goes for this one
 		types.add(new SimpleEntityDataInfo("creature", Creature.class, true));
 		types.add(new SimpleEntityDataInfo("animal", Animals.class, true));
 		types.add(new SimpleEntityDataInfo("golem", Golem.class, true));

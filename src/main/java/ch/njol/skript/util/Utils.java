@@ -47,7 +47,6 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.effects.EffTeleport;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.localization.Language;
@@ -57,6 +56,7 @@ import ch.njol.util.Callback;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.Pair;
 import ch.njol.util.StringUtils;
+import ch.njol.util.coll.CollectionUtils;
 
 /**
  * Utility class.
@@ -94,6 +94,10 @@ public abstract class Utils {
 		return "" + b.toString();
 	}
 	
+	
+	public static <T> boolean isEither(@Nullable T compared, @Nullable T... types) {
+		return CollectionUtils.contains(types, compared);
+	}
 	/**
 	 * Tests whether two item stacks are of the same type, i.e. it ignores the amounts.
 	 * 

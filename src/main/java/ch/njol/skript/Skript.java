@@ -316,31 +316,35 @@ public final class Skript extends JavaPlugin implements Listener {
 			getDataFolder().mkdirs();
 		
 		final File scripts = new File(getDataFolder(), SCRIPTSFOLDER);
-		if (!scripts.isDirectory()) {
+		final File config = new File(getDataFolder(), "config.sk");
+		final File features = new File(getDataFolder(), "features.sk");
+		if (!scripts.isDirectory() || !config.exists() || !features.exists()) {
 			ZipFile f = null;
 			try {
-				if (!scripts.mkdirs())
-					throw new IOException("Could not create the directory " + scripts);
+				boolean populateExamples = false;
+				if (!scripts.isDirectory()) {
+					if (!scripts.mkdirs())
+						throw new IOException("Could not create the directory " + scripts);
+					populateExamples = true;
+				}
 				f = new ZipFile(getFile());
 				for (final ZipEntry e : new EnumerationIterable<ZipEntry>(f.entries())) {
 					if (e.isDirectory())
 						continue;
 					File saveTo = null;
-					if (e.getName().startsWith(SCRIPTSFOLDER + "/")) {
+					if (e.getName().startsWith(SCRIPTSFOLDER + "/") && populateExamples) {
 						final String fileName = e.getName().substring(e.getName().lastIndexOf('/') + 1);
 						saveTo = new File(scripts, (fileName.startsWith("-") ? "" : "-") + fileName);
 					} else if (e.getName().equals("config.sk")) {
-						final File cf = new File(getDataFolder(), e.getName());
-						if (!cf.exists())
-							saveTo = cf;
+						if (!config.exists())
+							saveTo = config;
 //					} else if (e.getName().startsWith("aliases-") && e.getName().endsWith(".sk") && !e.getName().contains("/")) {
 //						final File af = new File(getDataFolder(), e.getName());
 //						if (!af.exists())
 //							saveTo = af;
 					} else if (e.getName().startsWith("features.sk")) {
-						final File af = new File(getDataFolder(), e.getName());
-						if (!af.exists())
-							saveTo = af;
+						if (!features.exists())
+							saveTo = features;
 					}
 					if (saveTo != null) {
 						final InputStream in = f.getInputStream(e);

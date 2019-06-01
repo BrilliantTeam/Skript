@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -228,7 +229,7 @@ public class NewBlockCompat implements BlockCompat {
 				}
 				
 				// Top-down bisected blocks (doors etc.)
-				if (Bisected.class.isAssignableFrom(dataType)) {
+				if (Bisected.class.isAssignableFrom(dataType) && !Tag.STAIRS.isTagged(type) && !Tag.TRAPDOORS.isTagged(type)) {
 					Bisected data;
 					if (ourValues != null)
 						data = (Bisected) ourValues.data;

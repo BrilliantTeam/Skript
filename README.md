@@ -153,7 +153,7 @@ Or, if you use Maven:
 * [Skript Hub](https://skripthub.net/)
 
 Note that these resources are not maintained by Skript's developers. Don't
-contant us about any problems you might have with them.
+contact us about any problems you might have with them.
 
 ## Developers
 Current team behind Skript:
@@ -171,5 +171,5 @@ long time.
 And of course, Skript has received lots of pull requests over time.
 You can find all contributors [here](https://github.com/SkriptLang/Skript/graphs/contributors).
 
-All code is owned by it's writer, licensed for others under GPLv3 (see LICENSE)
+All code is owned by its writer, licensed for others under GPLv3 (see LICENSE)
 unless otherwise specified.

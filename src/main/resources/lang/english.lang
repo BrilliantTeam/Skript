@@ -75,6 +75,7 @@ skript command:
 			check: Checks for a new version
 			changes: Lists all changes since the current version
 			download: Download the newest version
+		gen-docs: Generates documentation using doc-templates in plugin folder
 
 	invalid script: Can't find the script <grey>'<gold>%s<grey>'<red> in the scripts folder!
 	invalid folder: Can't find the folder <grey>'<gold>%s<grey>'<red> in the scripts folder!
@@ -239,6 +240,11 @@ enchantments:
 		riptide: Riptide
 		impaling: Impaling
 		loyalty: Loyalty
+		luck_of_the_sea: Luck of The Sea
+		# new 1.14 Enchantments
+		multishot: Multishot, Multi-Shot
+		piercing: Piercing
+		quick_charge: Quick Charge
 
 # -- Potion Effects --
 potions:
@@ -536,7 +542,7 @@ directions:
 # -- Entities --
 # about patterns:
 #	the marks (1¦..) are only required in the english file, i.e. you can use (..|..) or [..] for plurals in other languages
-#	the exception to this rule is the 'age pattern' and the corresponding marks (4¦ and 8¦)
+#	the exception to this rule is the 'f' and the corresponding marks (4¦ and 8¦)
 entities:
 	age pattern: (|4¦baby|4¦young|8¦adult|8¦grown(-| )up)
 	age adjectives:
@@ -808,6 +814,9 @@ entities:
 	cartographer:
 		name: cartographer¦s
 		pattern: <age> cartographer(|1¦s)|(4¦)cartographer (kid(|1¦s)|child(|1¦ren))
+	cleric:
+		name: cleric¦s
+		pattern: <age> cleric(|1¦s)|(4¦)cleric (kid(|1¦s)|child(|1¦ren))
 	fisherman:
 		name: fisherman¦s
 		pattern: <age> fisherman(|1¦s)|(4¦)fisherman (kid(|1¦s)|child(|1¦ren))
@@ -920,7 +929,22 @@ entities:
 		pattern: <age> any horse(|1¦s)|(4¦)foal(|1¦s)
 	llama:
 		name: llama¦s
-		pattern: llama(|1¦s)
+		pattern: llama(|1¦s)|llama (4¦)cria(|1¦s)
+	trader llama:
+		name: trader llama¦s
+		pattern: trader llama(|1¦s)|trader llama (4¦)cria(|1¦s)
+	creamy llama:
+		name: creamy llama¦s
+		pattern: creamy [(2¦trader)] llama(|1¦s)|creamy [(2¦trader)] llama (4¦)cria(|1¦s)
+	white llama:
+		name: white llama¦s
+		pattern: white [(2¦trader)] llama(|1¦s)|white [(2¦trader)] llama (4¦)cria(|1¦s)
+	brown llama:
+		name: brown llama¦s
+		pattern: brown [(2¦trader)] llama(|1¦s)|brown [(2¦trader)] llama (4¦)cria(|1¦s)
+	gray llama:
+		name: gray llama¦s
+		pattern: gray [(2¦trader)] llama(|1¦s)|gray [(2¦trader)] llama (4¦)cria(|1¦s)
 	llama spit:
 		name: llama spit¦s
 		pattern: llama spit(|1¦s)
@@ -1044,6 +1068,9 @@ entities:
 	monster:
 		name: monster¦s
 		pattern: monster(|1¦s)
+	mob:
+		name: mob¦s
+		pattern: mob(|1¦s)
 	animal:
 		name: animal¦s
 		pattern: animal(|1¦s)
@@ -1086,7 +1113,13 @@ entities:
 	#1.14 entities
 	fox:
 		name: fox¦es
-		pattern: <age> fox(|1¦s)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
+		pattern: <age> fox(|1¦es)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
+	red fox:
+		name: red fox¦es
+		pattern: <age> red fox(|1¦es)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
+	snow fox:
+		name: snow fox¦es
+		pattern: <age> snow fox(|1¦es)|(4¦)fox (kid(|1¦s)|child(|1¦ren))
 	pillager:
 		name: pillager¦s
 		pattern: pillager(|1¦s)
@@ -1096,6 +1129,12 @@ entities:
 	wandering trader:
 		name: wandering trader¦s
 		pattern: <age> wandering trader(|1¦s)|(4¦)wandering trader (kid(|1¦s)|child(|1¦ren)) //supposed to be ageable, but not working, spigot bug?
+	raider:
+		name: raider¦s
+		pattern: raider(|1¦s)
+	panda:
+		name: panda¦s
+		pattern: <age> [%-gene%[%-gene%]] panda(|1¦s)
 
 
 # -- Damage Causes --
@@ -1177,6 +1216,69 @@ visual effects:
 	wolf_smoke:
 		name: wolf smoke @-
 		pattern: wolf smok(e|ing)
+	iron_golem_rose:
+		name: iron golem offering rose @an
+		pattern: (iron golem [offering] rose|rose in hand)
+	villager_hearts:
+		name: villager hearts @x
+		pattern: villager hearts
+	villager_entity_angry:
+		name: angry villager entity @an
+		pattern: angry villager entity
+	villager_entity_happy:
+		name: happy villager entity @a
+		pattern: happy villager entity
+	witch_magic:
+		name: witch magic @-
+		pattern: witch magic
+	zombie_transform:
+		name: zombie turning to a villager
+		pattern: ([zombie] turning to a villager|zombie transform)
+	firework_explode:
+		name: firework explosion @a
+		pattern: firework explosion
+	arrow_particles:
+		name: arrow particles @x
+		pattern: [tipped] arrow particles
+	rabbit_jump:
+		name: jumping rabbit @a
+		pattern: (jumping rabbit|rabbit jump)
+	love_hearts:
+		name: love hearts @x
+		pattern: (love|breeding) hearts
+	squid_rotate:
+		name: squid rotation reset @a
+		pattern: [squid] rotation reset
+	entity_poof:
+		name: entity poof @-
+		pattern: entity poof
+	guardian_target:
+		name: guardian target @a
+		pattern: guardian target [with laser]
+	shield_block:
+		name: block with shield @-
+		pattern: (block [with a shield]|shield block)
+	shield_break:
+		name: shield break @a
+		pattern: shield break
+	armor_stand_hit:
+		name: armor stand hit @a
+		pattern: armor stand hit
+	thorns_hurt:
+		name: hurt by thorns @-
+		pattern: (hurt|damage) by thorns
+	iron_golem_sheath:
+		name: iron golem sheathing rose
+		pattern: iron golem (sheathing|putting away) rose
+	totem_resurrect:
+		name: resurrection by totem
+		pattern: resurrection [by totem]
+	hurt_drown:
+		name: hurt by drowning @-
+		pattern: (hurt|damage) by drowning
+	hurt_explosion:
+		name: hurt by explosion @-
+		pattern: (hurt|damage) by explosion
 	fireworks_spark:
 		name: firework's spark @-
 		pattern: firework['s] spark
@@ -1389,6 +1491,14 @@ inventory types:
 	beacon: beacon inventory
 	hopper: hopper inventory
 	shulker_box: shulker box inventory
+	barrel: barrel inventory
+	blast_furnace: blast furnace inventory
+	lectern: lectern inventory
+	smoker: smoker inventory
+	loom: loom inventory
+	cartography: cartography table inventory
+	grindstone: grindstone inventory
+	stonecutter: stonecutter inventory
 
 # -- Spawn Reasons --
 spawn reasons:
@@ -1457,6 +1567,16 @@ sound categories:
 	voice: voice category, speech category
 	weather: weather category
 
+# -- Panda Genes --
+genes:
+	normal: normal
+	lazy: lazy
+	worried: worried, worrisome
+	playful: playful, happy
+	brown: brown, brownish
+	weak: weak
+	aggressive: aggressive, savage, wild
+
 # -- Boolean --
 boolean:
 	true:
@@ -1512,6 +1632,7 @@ types:
 	difficulty: difficult¦y¦ies @a
 	fireworkeffect: firework effect¦s @a
 	fireworktype: firework type¦s @a
+	soundcategory: sound categor¦y¦ies @a
 
 	# Skript
 	weathertype: weather type¦s @a
@@ -1532,6 +1653,7 @@ types:
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
 	resourcepackstate: resource pack state¦s @a
+	gene: panda gene¦s @a
 
 	# Hooks
 	money: money
