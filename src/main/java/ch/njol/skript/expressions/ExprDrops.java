@@ -56,7 +56,7 @@ import ch.njol.util.coll.iterator.IteratorIterable;
 		"In break events, drops can only be cleared, and is only available in 1.12+")
 @Examples({"clear drops",
 		"remove 4 planks from the drops", "on break of diamond ore:", "\tclear drops"})
-@Since("1.0, INSERT VERSION (block break event drops)")
+@Since("1.0, 2.4 (block break event drops)")
 @Events("break / mine, death")
 public class ExprDrops extends SimpleExpression<ItemStack> {
 	static {

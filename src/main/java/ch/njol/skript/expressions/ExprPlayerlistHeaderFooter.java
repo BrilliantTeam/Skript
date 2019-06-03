@@ -45,7 +45,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Examples({"set all players tab list header to \"Welcome to the Server!\"",
 			"send \"%the player's tab list header%\" to player",
 			"reset all player's tab list header"})
-@Since("INSERT VERSION")
+@Since("2.4")
 @RequiredPlugins("Spigot 1.13 or newer")
 public class ExprPlayerlistHeaderFooter extends PropertyExpression<Player, String> {
 	
