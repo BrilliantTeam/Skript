@@ -258,9 +258,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("evoker fangs", EvokerFangs.class));
 			types.add(new SimpleEntityDataInfo("vex", Vex.class));
 			types.add(new SimpleEntityDataInfo("vindicator", Vindicator.class));
-
-
 		}
+		
 		if (Skript.isRunningMinecraft(1, 13)) { // More subtypes, more supertypes - changes needed
 			types.add(new SimpleEntityDataInfo("dolphin", Dolphin.class));
 			types.add(new SimpleEntityDataInfo("phantom", Phantom.class));
@@ -271,9 +270,8 @@ public class SimpleEntityData extends EntityData<Entity> {
 			types.add(new SimpleEntityDataInfo("salmon", Salmon.class));
 			types.add(new SimpleEntityDataInfo("tropical fish", TropicalFish.class));
 			types.add(new SimpleEntityDataInfo("trident", Trident.class));
-
-
 		}
+		
 		if (Skript.isRunningMinecraft(1, 14)) {
 			types.add(new SimpleEntityDataInfo("fox", Fox.class));
 			types.add(new SimpleEntityDataInfo("pillager", Pillager.class));
@@ -281,13 +279,11 @@ public class SimpleEntityData extends EntityData<Entity> {
 			
 			types.add(new SimpleEntityDataInfo("wandering trader", WanderingTrader.class));
 			types.add(new SimpleEntityDataInfo("raider", Raider.class, true));
-			
-			
 		}
 		if (Skript.classExists("org.bukkit.entity.Illusioner")) {
 			types.add(new SimpleEntityDataInfo("illusioner", Illusioner.class));
 		}
-		// Register zombie after Husk and Drowned to make sure those 2 work
+		// Register zombie after Husk and Drowned to make sure both work
 		types.add(new SimpleEntityDataInfo("zombie", Zombie.class));
 		
 		// TODO !Update with every version [entities]
@@ -295,8 +291,10 @@ public class SimpleEntityData extends EntityData<Entity> {
 		// supertypes
 		types.add(new SimpleEntityDataInfo("human", HumanEntity.class, true));
 		types.add(new SimpleEntityDataInfo("damageable", Damageable.class, true));
-		types.add(new SimpleEntityDataInfo("monster", Monster.class, true)); //I don't know why Njol never included that. I did now ^^
-		types.add(new SimpleEntityDataInfo("mob", Mob.class, true)); //Same goes for this one
+		types.add(new SimpleEntityDataInfo("monster", Monster.class, true));
+		if (Skript.classExists("org.bukkit.entity.Mob")) { // Introduced by Spigot 1.13
+			types.add(new SimpleEntityDataInfo("mob", Mob.class, true));
+		}
 		types.add(new SimpleEntityDataInfo("creature", Creature.class, true));
 		types.add(new SimpleEntityDataInfo("animal", Animals.class, true));
 		types.add(new SimpleEntityDataInfo("golem", Golem.class, true));
