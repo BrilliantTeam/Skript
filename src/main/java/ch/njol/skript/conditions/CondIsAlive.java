@@ -31,16 +31,16 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
 @Name("Is Alive/Valid")
-@Description("Checks whether an entity is alive/valid. Using 'alive' for non-living entities works too.")
+@Description("Checks whether an entity is alive. Works for non-living entities too.")
 @Examples({"if {villager-buddy::%player's uuid%} is not dead:",
 	"",
 	"on shoot:",
-	"\twhile the projectile is valid:"})
+	"\twhile the projectile is alive:"})
 @Since("2.0, INSERT VERSION (non-living entity support)")
 public class CondIsAlive extends PropertyCondition<Entity> {
 
 	static {
-		register(CondIsAlive.class, "(alive|valid|1¦dead|1¦invalid)", "entities");
+		register(CondIsAlive.class, "(alive|1¦dead)", "entities");
 	}
 
 	private boolean isNegated;
