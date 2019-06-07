@@ -30,7 +30,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
-@Name("Is Alive/Valid")
+@Name("Is Alive")
 @Description("Checks whether an entity is alive. Works for non-living entities too.")
 @Examples({"if {villager-buddy::%player's uuid%} is not dead:",
 	"",
