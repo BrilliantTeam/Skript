@@ -19,6 +19,10 @@
  */
 package ch.njol.skript.entity;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Tameable;
 import org.eclipse.jdt.annotation.Nullable;
@@ -32,8 +36,20 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
  */
 public class OcelotData extends EntityData<Ocelot> {
 	
-	private static final boolean TAMEABLE = !Skript.isRunningMinecraft(1, 14);
+	private static final boolean TAMEABLE = !Skript.methodExists(Ocelot.class, "setTamed");
+	private static final MethodHandle TAME_METHOD;
 	static {
+		MethodHandle _METHOD = null;
+		
+		try {
+			_METHOD = MethodHandles.publicLookup()
+				.findSpecial(Ocelot.class, "setTamed",
+					MethodType.methodType(Void.class, boolean.class), Ocelot.class);
+		} catch (NoSuchMethodException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		TAME_METHOD = _METHOD;
+		
 		if (TAMEABLE)
 			EntityData.register(OcelotData.class, "ocelot", Ocelot.class, 1,
 					"wild ocelot", "ocelot", "cat");
@@ -58,8 +74,15 @@ public class OcelotData extends EntityData<Ocelot> {
 	
 	@Override
 	public void set(final Ocelot entity) {
-		if (tamed != 0)
-			((Tameable) entity).setTamed(tamed == 1);
+		if (tamed != 0) {
+			try {
+				TAME_METHOD.bindTo(entity)
+					.invokeExact(true);
+				
+			} catch (Throwable throwable) {
+				throwable.printStackTrace();
+			}
+		}
 	}
 	
 	@Override

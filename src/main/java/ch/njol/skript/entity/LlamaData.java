@@ -32,13 +32,13 @@ import ch.njol.util.coll.CollectionUtils;
 
 public class LlamaData extends EntityData<Llama> {
 	
-	private final static boolean TRADER_SUPPORT = Skript.isRunningMinecraft(1, 14);
+	private final static boolean TRADER_SUPPORT = Skript.classExists("org.bukkit.entity.TraderLlama");
 	static {
 		if (TRADER_SUPPORT)
 			EntityData.register(LlamaData.class, "llama", Llama.class, 0,
 					"llama", "trader llama", "creamy llama",
 					"white llama", "brown llama", "gray llama");
-		else if (Skript.isRunningMinecraft(1, 11))
+		else if (Skript.classExists("org.bukkit.entity.Llama"))
 			EntityData.register(LlamaData.class, "llama", Llama.class, 0,
 					"llama", "creamy llama",
 					"white llama", "brown llama", "gray llama");
