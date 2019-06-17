@@ -42,42 +42,50 @@ public class EffLeash extends Effect {
 
 	static {
 		Skript.registerEffect(EffLeash.class,
-				"(leash|lead) %livingentities% to %entity%",
-				"make %entity% (leash|lead) %livingentities%",
-				"un(leash|lead) [holder of] %livingentities%");
+			"(leash|lead) %livingentities% to %entity%",
+			"make %entity% (leash|lead) %livingentities%",
+			"un(leash|lead) [holder of] %livingentities%");
 	}
-	
+
 	@SuppressWarnings("null")
 	private Expression<Entity> holder;
 	@SuppressWarnings("null")
 	private Expression<LivingEntity> targets;
-	private boolean unleash;
+	private boolean leash;
 
-	@SuppressWarnings({"unchecked", "null"})
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		unleash = matchedPattern == 2;
-		if (!unleash) {
+		leash = matchedPattern != 2;
+		if (leash) {
 			holder = (Expression<Entity>) exprs[1 - matchedPattern];
 			targets = (Expression<LivingEntity>) exprs[matchedPattern];
-		} else 
+		} else {
 			targets = (Expression<LivingEntity>) exprs[0];
+		}
 		return true;
 	}
-	
+
 	@Override
 	protected void execute(Event e) {
-		Entity holder = this.holder.getSingle(e);
-		if (holder == null && !unleash)
-			return;
-		for (LivingEntity target : targets.getArray(e)) {
-			target.setLeashHolder(!unleash ? holder : null);
+		if (leash) {
+			Entity holder = this.holder.getSingle(e);
+			if (holder == null)
+				return;
+			for (LivingEntity target : targets.getArray(e))
+				target.setLeashHolder(holder);
+		} else {
+			for (LivingEntity target : targets.getArray(e))
+				target.setLeashHolder(null);
 		}
 	}
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return unleash ? "un" : "leash " + targets.toString(e, debug) + (unleash ? "" : " to ") + holder.toString(e, debug);
+		if (leash)
+			return "leash " + targets.toString(e, debug) + " to " + holder.toString(e, debug);
+		else
+			return "unleash " + targets.toString(e, debug);
 	}
 
 }

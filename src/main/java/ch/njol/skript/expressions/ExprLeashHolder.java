@@ -19,9 +19,9 @@
  */
 package ch.njol.skript.expressions;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -30,29 +30,29 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
 @Name("Leash Holder")
-@Description("Leash holder of a living entity.")
+@Description("The leash holder of a living entity.")
 @Examples("set {_example} to the leash holder of the target mob")
 @Since("2.3")
 public class ExprLeashHolder extends SimplePropertyExpression<LivingEntity, Entity> {
 
 	static {
-		register(ExprLeashHolder.class, Entity.class, "leash holder", "livingentity");
+		register(ExprLeashHolder.class, Entity.class, "leash holder[s]", "livingentities");
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public Entity convert(final LivingEntity entity) {
-		return entity.getLeashHolder();
+	@Nullable
+	public Entity convert(LivingEntity entity) {
+		return entity.isLeashed() ? entity.getLeashHolder() : null;
 	}
-	
-	@Override
-	protected String getPropertyName() {
-		return "leash holder";
-	}
-	
+
 	@Override
 	public Class<Entity> getReturnType() {
 		return Entity.class;
+	}
+
+	@Override
+	protected String getPropertyName() {
+		return "leash holder";
 	}
 
 }
