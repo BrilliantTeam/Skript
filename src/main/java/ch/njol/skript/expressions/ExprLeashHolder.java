@@ -22,6 +22,7 @@ package ch.njol.skript.expressions;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -39,10 +40,12 @@ public class ExprLeashHolder extends SimplePropertyExpression<LivingEntity, Enti
 		register(ExprLeashHolder.class, Entity.class, "leash holder", "livingentity");
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public Entity convert(final LivingEntity entity) {
-		return entity.getLeashHolder();
+	@Nullable
+	public Entity convert(LivingEntity entity) {
+		if (entity.isLeashed())
+			return entity.getLeashHolder();
+		return null;
 	}
 	
 	@Override
