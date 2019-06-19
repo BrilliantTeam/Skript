@@ -18,6 +18,7 @@ public class CatData extends EntityData<Cat> {
 	@Nullable
 	private Cat.Type race = null;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected boolean init(Literal<?>[] exprs, int matchedPattern, ParseResult parseResult) {
 		if (exprs.length > 0 && exprs[0] != null)
@@ -27,7 +28,9 @@ public class CatData extends EntityData<Cat> {
 	
 	@Override
 	protected boolean init(@Nullable Class<? extends Cat> c, @Nullable Cat cat) {
-		race = cat.getCatType();
+		if (cat != null)
+			race = cat.getCatType();
+		race = Cat.Type.TABBY;
 		return false;
 	}
 	

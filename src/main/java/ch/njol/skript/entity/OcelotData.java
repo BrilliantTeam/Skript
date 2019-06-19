@@ -37,24 +37,26 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 public class OcelotData extends EntityData<Ocelot> {
 	
 	private static final boolean TAMEABLE = !Skript.methodExists(Ocelot.class, "setTamed");
-	private static final MethodHandle TAME_METHOD;
+	@Nullable
+	private static MethodHandle TAME_METHOD;
 	static {
-		MethodHandle _METHOD = null;
-		
-		try {
-			_METHOD = MethodHandles.publicLookup()
-				.findSpecial(Ocelot.class, "setTamed",
-					MethodType.methodType(Void.class, boolean.class), Ocelot.class);
-		} catch (NoSuchMethodException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		TAME_METHOD = _METHOD;
-		
-		if (TAMEABLE)
+		if (TAMEABLE) {
+			try {
+				MethodHandle method = MethodHandles.publicLookup()
+					.findSpecial(Ocelot.class, "setTamed",
+						MethodType.methodType(Void.class, boolean.class), Ocelot.class);
+				assert method != null;
+				TAME_METHOD = method;
+			} catch (NoSuchMethodException | IllegalAccessException e) {
+				TAME_METHOD = null;
+				Skript.exception(e, "Version supports setTamed but MethodHandle lookup failed");
+			}
+
 			EntityData.register(OcelotData.class, "ocelot", Ocelot.class, 1,
 					"wild ocelot", "ocelot", "cat");
-		else
+		} else {
 			EntityData.register(OcelotData.class, "ocelot", Ocelot.class, "ocelot");
+		}
 	}
 	
 	int tamed = 0;
@@ -74,13 +76,12 @@ public class OcelotData extends EntityData<Ocelot> {
 	
 	@Override
 	public void set(final Ocelot entity) {
-		if (tamed != 0) {
+		if (tamed != 0 && TAMEABLE) {
+			assert TAME_METHOD != null;
 			try {
-				TAME_METHOD.bindTo(entity)
-					.invokeExact(true);
-				
+				TAME_METHOD.bindTo(entity).invokeExact(true);
 			} catch (Throwable throwable) {
-				throwable.printStackTrace();
+				Skript.exception(throwable);
 			}
 		}
 	}
