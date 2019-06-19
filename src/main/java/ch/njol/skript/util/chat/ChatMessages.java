@@ -242,6 +242,7 @@ public class ChatMessages {
 					} else {
 						name = tag;
 					}
+					name = name.toLowerCase(); // Tags are case-insensitive
 					
 					code = codes.get(name);
 					if (code != null) { // ... and if the tag IS really valid
