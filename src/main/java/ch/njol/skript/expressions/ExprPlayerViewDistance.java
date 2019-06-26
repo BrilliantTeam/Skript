@@ -48,7 +48,7 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Number> {
 	
 	static {
 		if (Skript.methodExists(Player.class, "getViewDistance"))
-			register(ExprPlayerViewDistance.class, Number.class, "view distance", "players");
+			register(ExprPlayerViewDistance.class, Number.class, "view distance[s]", "players");
 	}
 	
 	@Override
