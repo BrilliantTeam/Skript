@@ -85,7 +85,7 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Number> {
 	
 	@Override
 	public void change(Event e, @Nullable Object[] delta, ChangeMode mode) {
-		int distance = delta == null ? 0 : ((Number) delta[0]).intValue();
+		int distance = delta == null ? 0 : (int) delta[0];
 		switch (mode) {
 			case DELETE:
 			case SET:
