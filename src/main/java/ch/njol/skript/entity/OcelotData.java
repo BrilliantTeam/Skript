@@ -19,10 +19,6 @@
  */
 package ch.njol.skript.entity;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Tameable;
 import org.eclipse.jdt.annotation.Nullable;
@@ -36,27 +32,13 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
  */
 public class OcelotData extends EntityData<Ocelot> {
 	
-	private static final boolean TAMEABLE = !Skript.methodExists(Ocelot.class, "setTamed");
-	@Nullable
-	private static MethodHandle TAME_METHOD;
+	private static final boolean TAMEABLE = !Skript.isRunningMinecraft(1, 14);
 	static {
-		if (TAMEABLE) {
-			try {
-				MethodHandle method = MethodHandles.publicLookup()
-					.findSpecial(Ocelot.class, "setTamed",
-						MethodType.methodType(Void.class, boolean.class), Ocelot.class);
-				assert method != null;
-				TAME_METHOD = method;
-			} catch (NoSuchMethodException | IllegalAccessException e) {
-				TAME_METHOD = null;
-				Skript.exception(e, "Version supports setTamed but MethodHandle lookup failed");
-			}
-
+		if (TAMEABLE)
 			EntityData.register(OcelotData.class, "ocelot", Ocelot.class, 1,
 					"wild ocelot", "ocelot", "cat");
-		} else {
+		else
 			EntityData.register(OcelotData.class, "ocelot", Ocelot.class, "ocelot");
-		}
 	}
 	
 	int tamed = 0;
@@ -76,14 +58,8 @@ public class OcelotData extends EntityData<Ocelot> {
 	
 	@Override
 	public void set(final Ocelot entity) {
-		if (tamed != 0 && TAMEABLE) {
-			assert TAME_METHOD != null;
-			try {
-				TAME_METHOD.bindTo(entity).invokeExact(true);
-			} catch (Throwable throwable) {
-				Skript.exception(throwable);
-			}
-		}
+		if (tamed != 0)
+			((Tameable) entity).setTamed(tamed == 1);
 	}
 	
 	@Override
