@@ -34,6 +34,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Utils;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 
 /**
@@ -68,7 +69,7 @@ public class ExprColoured extends PropertyExpression<String, String> {
 		return get(source, new Converter<String, String>() {
 			@Override
 			public String convert(final String s) {
-				return color ? Utils.replaceChatStyles(s) : "" + ChatColor.stripColor(s);
+				return color ? Utils.replaceChatStyles(s) : "" + ChatMessages.stripStyles(s);
 			}
 		});
 	}

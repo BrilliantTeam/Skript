@@ -42,6 +42,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Utils;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
 
@@ -164,7 +165,20 @@ public class ExprArgument extends SimpleExpression<Object> {
 	protected Object[] get(final Event e) {
 		if (!(e instanceof ScriptCommandEvent))
 			return null;
-		return arg.getCurrent(e);
+		Object[] values = arg.getCurrent(e);
+		if (values == null)
+			return null;
+		
+		// Process all string arguments to remove formatting
+		// Fixes a security issue #2198
+		for (int i = 0; i < values.length; i++) {
+			if (values[i] instanceof String) {
+				String text = (String) values[i];
+				assert text != null;
+				values[i] = ChatMessages.stripStyles(text);
+			}
+		}
+		return values;
 	}
 	
 	@Override
