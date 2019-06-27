@@ -19,12 +19,12 @@
  */
 package ch.njol.skript.expressions;
 
-import java.util.stream.Stream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Container;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -70,6 +70,17 @@ import ch.njol.util.coll.CollectionUtils;
 public class ExprName extends SimplePropertyExpression<Object, String> {
 	
 	private static final boolean inventoryTitles = Skript.methodExists(Inventory.class, "getTitle");
+	
+	@Nullable
+	private static final MethodHandle TITLE_METHOD;
+	
+	static {
+		MethodHandle _METHOD = null;
+		try {
+			_METHOD = MethodHandles.lookup().findVirtual(Inventory.class, "getName", MethodType.methodType(String.class));
+		} catch (IllegalAccessException | NoSuchMethodException ignore) {}
+		TITLE_METHOD = _METHOD;
+	}
 	
 	final static int ITEMSTACK = 1, ENTITY = 2, PLAYER = 4, INVENTORY = 8;
 	final static String[] types = {"itemstacks/slots", "livingentities", "players", "inventories"};
@@ -131,9 +142,20 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return null;
 					final ItemMeta m = ((ItemStack) o).getItemMeta();
 					return m == null || !m.hasDisplayName() ? null : m.getDisplayName();
-				// We must implement this differently in 1.14
-				//} else if (o instanceof Inventory) {
-				//	return ((Inventory) o).getName();
+				} else if (o instanceof Inventory) {
+					if (TITLE_METHOD != null) {
+						try {
+							assert TITLE_METHOD != null;
+							return ((String) TITLE_METHOD.invoke(o));
+						} catch (IllegalAccessException e) {
+							assert false;
+							return null;
+						} catch (Throwable e) {
+							Skript.exception(e);
+							return null;
+						}
+					}
+					return null;
 				} else {
 					assert false;
 					return null;
@@ -186,8 +208,20 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 						return null;
 					final ItemMeta m = ((ItemStack) o).getItemMeta();
 					return m == null || !m.hasDisplayName() ? null : m.getDisplayName();
-				//} else if (o instanceof Inventory) {
-				//	return ((Inventory) o).getTitle(); // Title is closest to display name... I guess
+				} else if (o instanceof Inventory) {
+					if (TITLE_METHOD != null) {
+						try {
+							assert TITLE_METHOD != null;
+							return ((String) TITLE_METHOD.invoke(o));
+						} catch (IllegalAccessException e) {
+							assert false;
+							return null;
+						} catch (Throwable e) {
+							Skript.exception(e);
+							return null;
+						}
+					}
+					return null;
 				} else {
 					assert false;
 					return null;
