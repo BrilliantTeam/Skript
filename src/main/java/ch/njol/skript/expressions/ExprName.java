@@ -72,7 +72,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	private static final boolean inventoryTitles = Skript.methodExists(Inventory.class, "getTitle");
 	
 	@Nullable
-	private static final MethodHandle TITLE_METHOD;
+	static final MethodHandle TITLE_METHOD;
 	
 	static {
 		MethodHandle _METHOD = null;
