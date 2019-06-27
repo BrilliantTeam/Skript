@@ -26,9 +26,11 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.classes.Changer;
+import ch.njol.skript.doc.NoDoc;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 
+@NoDoc
 public class ExprSpectatorTarget extends SimplePropertyExpression<Player, Entity> {
 
 	static {
