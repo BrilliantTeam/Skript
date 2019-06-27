@@ -36,7 +36,7 @@ import ch.njol.util.Kleenean;
 	"",
 	"on shoot:",
 	"\twhile the projectile is alive:"})
-@Since("2.0, INSERT VERSION (non-living entity support)")
+@Since("2.0, 2.4-alpha4 (non-living entity support)")
 public class CondIsAlive extends PropertyCondition<Entity> {
 
 	static {
