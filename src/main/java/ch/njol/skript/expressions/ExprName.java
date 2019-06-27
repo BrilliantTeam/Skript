@@ -143,9 +143,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 					final ItemMeta m = ((ItemStack) o).getItemMeta();
 					return m == null || !m.hasDisplayName() ? null : m.getDisplayName();
 				} else if (o instanceof Inventory) {
-					if (Skript.isRunningMinecraft(1, 14))
-						return ((Inventory) o).getViewers().get(0).getOpenInventory().getTitle();
-					else {
+					if (TITLE_METHOD != null) {
 						try {
 							assert TITLE_METHOD != null;
 							return ((String) TITLE_METHOD.invoke(o));
@@ -157,6 +155,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 							return null;
 						}
 					}
+					return null;
 				} else {
 					assert false;
 					return null;
@@ -210,9 +209,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 					final ItemMeta m = ((ItemStack) o).getItemMeta();
 					return m == null || !m.hasDisplayName() ? null : m.getDisplayName();
 				} else if (o instanceof Inventory) {
-					if (Skript.isRunningMinecraft(1, 14))
-						return ((Inventory) o).getViewers().get(0).getOpenInventory().getTitle();
-					else {
+					if (TITLE_METHOD != null) {
 						try {
 							assert TITLE_METHOD != null;
 							return ((String) TITLE_METHOD.invoke(o));
@@ -224,6 +221,7 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 							return null;
 						}
 					}
+					return null;
 				} else {
 					assert false;
 					return null;
