@@ -113,7 +113,7 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Number> {
 	
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "the view distance of " + getExpr().toString(e, d);
+		return "the view distance of " + getExpr().toString(e, debug);
 	}
 	
 }
