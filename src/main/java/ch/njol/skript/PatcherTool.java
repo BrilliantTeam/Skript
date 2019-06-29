@@ -97,7 +97,10 @@ public class PatcherTool {
 			copy("effects.EffMessage", true);
 			copy("expressions.ExprArgument", true);
 			copy("expressions.ExprColoured", true);
+			copy("util.chat.BungeeConverter", true);
+			copy("util.chat.ChatCode", true);
 			copy("util.chat.ChatMessages", true);
+			copy("util.chat.SkriptChatCode", true);
 		}
 		if (options.contains(Option.MEMORY_LEAK)) {
 			copy("SkriptEventHandler", true);
