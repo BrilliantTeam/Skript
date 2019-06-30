@@ -138,7 +138,8 @@ public class ChatMessages {
 		
 		if (code.isLocalized()) {
 			if (code.getColorCode() != null) { // Color code!
-				for (String name : Language.getList("colors.names")) {
+				// Avoid dependency on SkriptColor
+				for (String name : Language.getList("colors." + langName + ".names")) {
 					codes.put(name, code);
 				}
 			} else { // Not color code
