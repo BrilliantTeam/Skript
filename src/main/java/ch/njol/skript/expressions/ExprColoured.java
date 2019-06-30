@@ -37,11 +37,10 @@ import ch.njol.skript.util.Utils;
 import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 
-/**
- * @author Peter Güttinger
- */
 @Name("Coloured / Uncoloured")
-@Description("Parses &lt;colour&gt;s (including chat styles) in a message or removes any colours & chat styles from the message.")
+@Description({"Parses &lt;colour&gt;s and styles in a message or removes",
+		"any colours <i>and</i> chat styles from the message. Note that",
+		"parsing styles from user input is dangerous."})
 @Examples({"on chat:",
 		"	set message to coloured message",
 		"command /fade <player>:",

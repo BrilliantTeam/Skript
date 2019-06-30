@@ -165,20 +165,7 @@ public class ExprArgument extends SimpleExpression<Object> {
 	protected Object[] get(final Event e) {
 		if (!(e instanceof ScriptCommandEvent))
 			return null;
-		Object[] values = arg.getCurrent(e);
-		if (values == null)
-			return null;
-		
-		// Process all string arguments to remove formatting
-		// Fixes a security issue #2198
-		for (int i = 0; i < values.length; i++) {
-			if (values[i] instanceof String) {
-				String text = (String) values[i];
-				assert text != null;
-				values[i] = ChatMessages.stripStyles(text);
-			}
-		}
-		return values;
+		return arg.getCurrent(e);
 	}
 	
 	@Override

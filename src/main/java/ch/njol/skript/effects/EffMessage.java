@@ -31,6 +31,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.ExprColoured;
 import ch.njol.skript.hooks.regions.RegionsPlugin;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
@@ -43,13 +44,14 @@ import ch.njol.skript.util.chat.MessageComponent;
 import ch.njol.util.Kleenean;
 
 @Name("Message")
-@Description("Sends a message to the given player.")
+@Description({"Sends a message to the given player. Only styles written",
+		"in given string or in 'coloured' expressions will be parsed."})
 @Examples({"message \"A wild %player% appeared!\"",
 		"message \"This message is a distraction. Mwahaha!\"",
 		"send \"Your kill streak is %{kill streak::%uuid of player%}%.\" to player",
 		"if the targeted entity exists:",
 		"	message \"You're currently looking at a %type of the targeted entity%!\""})
-@Since("1.0, 2.2-dev26 (advanced features)")
+@Since("1.0, 2.2-dev26 (advanced features), 2.3.8 (send json)")
 public class EffMessage extends Effect {
 	
 	static {
@@ -82,14 +84,20 @@ public class EffMessage extends Effect {
 		for (Expression<? extends String> message : messages) {
 			for (CommandSender receiver : recipients.getArray(e)) {
 				if (receiver instanceof Player) { // Can use JSON formatting
-					if (message instanceof VariableString) { // Avoid processing ANY chat codes
-						((Player) receiver).spigot().sendMessage(BungeeConverter.convert(
-								ChatMessages.parse(((VariableString) message).toUnformattedString(e))));
-					} else { // It is just a string, parse components from it
+					if (message instanceof VariableString) { // Process formatting that is safe
+						((Player) receiver).spigot().sendMessage(BungeeConverter
+								.convert(((VariableString) message).getMessageComponents(e)));
+					} else if (message instanceof ExprColoured) { // Manually marked as trusted
+						String text = message.getSingle(e);
+						if (text != null) {
+							((Player) receiver).spigot().sendMessage(BungeeConverter
+									.convert(ChatMessages.parse(text)));
+						}
+					} else { // It is just a string, no idea if it comes from a trusted source -> don't parse anything
 						for (String string : message.getArray(e)) {
 							assert string != null;
-							((Player) receiver).spigot().sendMessage(BungeeConverter.convert(
-									ChatMessages.parse(string)));
+							assert string != null;
+							receiver.sendMessage(string);
 						}
 					}
 				} else { // Not a player, send plain text with legacy formatting

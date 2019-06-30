@@ -489,9 +489,9 @@ public class ChatMessages {
 	}
 	
 	/**
-	 * Strips all style markup from given string.
-	 * @param text String to strip markup from.
-	 * @return A string without markup.
+	 * Strips all styles from given string.
+	 * @param text String to strip styles from.
+	 * @return A string without styles.
 	 */
 	public static String stripStyles(String text) {
 		List<MessageComponent> components = parse(text);
@@ -500,6 +500,9 @@ public class ChatMessages {
 			sb.append(component.text);
 		}
 		String plain = sb.toString();
+		
+		// To be extra safe, strip <, >, § and &; protects against bugs in parser
+		plain = plain.replace("<", "").replace(">", "").replace("§", "").replace("&", "");
 		assert plain != null;
 		return plain;
 	}
