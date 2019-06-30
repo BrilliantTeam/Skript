@@ -88,10 +88,10 @@ public class EffMessage extends Effect {
 						((Player) receiver).spigot().sendMessage(BungeeConverter
 								.convert(((VariableString) message).getMessageComponents(e)));
 					} else if (message instanceof ExprColoured) { // Manually marked as trusted
-						String text = message.getSingle(e);
-						if (text != null) {
+						for (String string : message.getArray(e)) {
+							assert string != null;
 							((Player) receiver).spigot().sendMessage(BungeeConverter
-									.convert(ChatMessages.parse(text)));
+									.convert(ChatMessages.parse(string)));
 						}
 					} else { // It is just a string, no idea if it comes from a trusted source -> don't parse anything
 						for (String string : message.getArray(e)) {

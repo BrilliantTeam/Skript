@@ -567,6 +567,13 @@ public class VariableString implements Expression<String> {
 						final String style = Utils.getChatStyle(s);
 						text = style == null ? "<" + s + ">" : style;
 					} else {
+						if (info.expr instanceof ExprColoured) { // Special case: user wants to process formatting
+							String unformatted = ((ExprColoured) info.expr).getSingle(e);
+							if (unformatted != null) {
+								message.addAll(ChatMessages.parse(unformatted));
+							}
+							continue;
+						}
 						text = Classes.toString(info.expr.getArray(e), flags, null);
 					}
 				} else {
@@ -575,10 +582,10 @@ public class VariableString implements Expression<String> {
 				
 				assert text != null;
 				message.add(ChatMessages.plainText(text));
-				stringPart += 2; // Previous literal part and this variable part are now processed
 			} else {
 				message.add(component);
 			}
+			stringPart++;
 		}
 		
 		return message;
