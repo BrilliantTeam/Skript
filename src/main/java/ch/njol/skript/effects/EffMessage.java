@@ -45,7 +45,7 @@ import ch.njol.util.Kleenean;
 
 @Name("Message")
 @Description({"Sends a message to the given player. Only styles written",
-		"in given string or in 'coloured' expressions will be parsed."})
+		"in given string or in <a href=expressions.html#ExprColoured>formatted expressions</a> will be parsed."})
 @Examples({"message \"A wild %player% appeared!\"",
 		"message \"This message is a distraction. Mwahaha!\"",
 		"send \"Your kill streak is %{kill streak::%uuid of player%}%.\" to player",
@@ -87,7 +87,7 @@ public class EffMessage extends Effect {
 					if (message instanceof VariableString) { // Process formatting that is safe
 						((Player) receiver).spigot().sendMessage(BungeeConverter
 								.convert(((VariableString) message).getMessageComponents(e)));
-					} else if (message instanceof ExprColoured) { // Manually marked as trusted
+					} else if (message instanceof ExprColoured && ((ExprColoured) message).isUnsafeFormat()) { // Manually marked as trusted
 						for (String string : message.getArray(e)) {
 							assert string != null;
 							((Player) receiver).spigot().sendMessage(BungeeConverter

@@ -567,7 +567,7 @@ public class VariableString implements Expression<String> {
 						final String style = Utils.getChatStyle(s);
 						text = style == null ? "<" + s + ">" : style;
 					} else {
-						if (info.expr instanceof ExprColoured) { // Special case: user wants to process formatting
+						if (info.expr instanceof ExprColoured && ((ExprColoured) info.expr).isUnsafeFormat()) { // Special case: user wants to process formatting
 							String unformatted = ((ExprColoured) info.expr).getSingle(e);
 							if (unformatted != null) {
 								message.addAll(ChatMessages.parse(unformatted));
