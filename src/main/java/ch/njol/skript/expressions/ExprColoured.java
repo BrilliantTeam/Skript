@@ -42,7 +42,8 @@ import ch.njol.util.Kleenean;
 		"any colours <i>and</i> chat styles from the message. Note that",
 		"parsing styles from user input is dangerous."})
 @Examples({"on chat:",
-		"	set message to coloured message",
+		"	player is op # Formatting can be dangerous",
+		"	set message to formatted message",
 		"command /fade <player>:",
 		"	trigger:",
 		"		set display name of the player-argument to uncoloured display name of the player-argument"})
@@ -50,7 +51,8 @@ import ch.njol.util.Kleenean;
 public class ExprColoured extends PropertyExpression<String, String> {
 	static {
 		Skript.registerExpression(ExprColoured.class, String.class, ExpressionType.COMBINED,
-				"(colo[u]r-|colo[u]red )%strings%", "(un|non)[-](colo[u]r-|colo[u]red )%strings%");
+				"(colo[u]r-|colo[u]red |format-|formatted )%strings%",
+				"(un|non)[-](colo[u]r-|colo[u]red |format-|formatted )%strings%");
 	}
 	
 	boolean color;
