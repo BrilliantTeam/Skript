@@ -97,6 +97,7 @@ public class PatcherTool {
 			copy("effects.EffMessage", true);
 			copy("expressions.ExprArgument", true);
 			copy("expressions.ExprColoured", true);
+			copy("lang.VariableString", true);
 			copy("util.chat.BungeeConverter", true);
 			copy("util.chat.ChatCode", true);
 			copy("util.chat.ChatMessages", true);
