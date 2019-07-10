@@ -35,6 +35,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.function.ExprFunctionCall;
 import ch.njol.skript.lang.Variable;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -103,7 +104,8 @@ public class CondContains extends Condition {
 		
 		return containers.check(e,
 				(Checker<Object>) container -> {
-					if (containers instanceof Variable && !containers.isSingle()) { // List variable
+					if ((containers instanceof Variable || containers instanceof ExprFunctionCall)
+							&& !containers.isSingle()) { // List variable
 						Object[] all = containers.getAll(e); // Compare all items to all entries in list
 						return items.check(e,
 								(Checker<Object>) item -> {
