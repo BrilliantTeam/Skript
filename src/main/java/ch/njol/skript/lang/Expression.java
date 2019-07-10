@@ -280,7 +280,7 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 		
 		// Slots must be transformed to item stacks when writing to variables
 		// Also, item stacks must be cloned (to be safe from Vanilla /clear)
-		Object[] newDelta = null; // Created if we can't store a type we need to input delta
+		Object[] newDelta = null; // Created when a needs to be cloned
 		if (changed instanceof Variable) {
 			for (int i = 0; i < delta.length; i++) {
 				Object value = delta[i];
@@ -290,20 +290,20 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 						item = item.clone(); // ItemStack in inventory is mutable
 					}
 					
-					if (newDelta != null) { // Always store to new array if it has been initialized
-						newDelta[i] = item;
-					} else if (!delta.getClass().getComponentType().isAssignableFrom(ItemStack.class)) {
-						// Initialize new delta to avoid storing incompatible type to array
-						newDelta = new Object[delta.length];
-						System.arraycopy(delta, 0, newDelta, 0, i); // Copy previously processed elements
-						newDelta[i] = item; // Convert this slot to item
-					} else {
-						delta[i] = item;
+					if (newDelta == null) {
+						newDelta = delta.clone();
 					}
+					newDelta[i] = item;
 				} else if (value instanceof ItemType) {
-					delta[i] = ((ItemType) value).clone();
+					if (newDelta == null) {
+						newDelta = delta.clone();
+					}
+					newDelta[i] = ((ItemType) value).clone();
 				} else if (value instanceof ItemStack) {
-					delta[i] = ((ItemStack) value).clone();
+					if (newDelta == null) {
+						newDelta = delta.clone();
+					}
+					newDelta[i] = ((ItemStack) value).clone();
 				}
 			}
 		}

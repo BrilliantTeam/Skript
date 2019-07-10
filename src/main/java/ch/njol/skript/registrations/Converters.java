@@ -37,13 +37,13 @@ import ch.njol.skript.classes.Converter.ConverterUtils;
 import ch.njol.util.Pair;
 
 /**
- * @author Peter Güttinger
+ * Contains all registered converters and allows operating with them.
  */
 public abstract class Converters {
 	
 	private Converters() {}
 	
-	private static List<ConverterInfo<?, ?>> converters = new ArrayList<ConverterInfo<?, ?>>(50);
+	private static List<ConverterInfo<?, ?>> converters = new ArrayList<>(50);
 	
 	@SuppressWarnings("null")
 	public static List<ConverterInfo<?, ?>> getConverters() {
@@ -53,22 +53,17 @@ public abstract class Converters {
 	/**
 	 * Registers a converter.
 	 * 
-	 * @param from
-	 * @param to
-	 * @param converter
+	 * @param from Type that the converter converts from.
+	 * @param to  Type that the converter converts to.
+	 * @param converter Actual converter.
 	 */
 	public static <F, T> void registerConverter(final Class<F> from, final Class<T> to, final Converter<F, T> converter) {
 		registerConverter(from, to, converter, 0);
 	}
 	
-	@Deprecated
-	public static <F, T> void registerConverter(final Class<F> from, final Class<T> to, final ch.njol.skript.classes.SerializableConverter<F, T> converter) {
-		registerConverter(from, to, (Converter<F, T>) converter);
-	}
-	
 	public static <F, T> void registerConverter(final Class<F> from, final Class<T> to, final Converter<F, T> converter, final int options) {
 		Skript.checkAcceptRegistrations();
-		final ConverterInfo<F, T> info = new ConverterInfo<F, T>(from, to, converter, options);
+		final ConverterInfo<F, T> info = new ConverterInfo<>(from, to, converter, options);
 		for (int i = 0; i < converters.size(); i++) {
 			final ConverterInfo<?, ?> info2 = converters.get(i);
 			if (info2.from.isAssignableFrom(from) && to.isAssignableFrom(info2.to)) {
@@ -79,20 +74,18 @@ public abstract class Converters {
 		converters.add(info);
 	}
 	
-	@Deprecated
-	public static <F, T> void registerConverter(final Class<F> from, final Class<T> to, final ch.njol.skript.classes.SerializableConverter<F, T> converter, final int options) {
-		registerConverter(from, to, (Converter<F, T>) converter, options);
-	}
-	
 	// REMIND how to manage overriding of converters? - shouldn't actually matter
 	public static void createMissingConverters() {
 		for (int i = 0; i < converters.size(); i++) {
 			final ConverterInfo<?, ?> info = converters.get(i);
 			for (int j = 0; j < converters.size(); j++) {// not from j = i+1 since new converters get added during the loops
 				final ConverterInfo<?, ?> info2 = converters.get(j);
+				
+				// info -> info2
 				if ((info.options & Converter.NO_RIGHT_CHAINING) == 0 && (info2.options & Converter.NO_LEFT_CHAINING) == 0
 						&& info2.from.isAssignableFrom(info.to) && !converterExistsSlow(info.from, info2.to)) {
 					converters.add(createChainedConverter(info, info2));
+					// info2 -> info
 				} else if ((info.options & Converter.NO_LEFT_CHAINING) == 0 && (info2.options & Converter.NO_RIGHT_CHAINING) == 0
 						&& info.from.isAssignableFrom(info2.to) && !converterExistsSlow(info2.from, info.to)) {
 					converters.add(createChainedConverter(info2, info));
@@ -101,6 +94,13 @@ public abstract class Converters {
 		}
 	}
 	
+	/**
+	 * Checks if a converter between given classes exists. This iterates over
+	 * all converters, which may take a while.
+	 * @param from Type to convert from.
+	 * @param to Type to convert to.
+	 * @return If a converter exists.
+	 */
 	private static boolean converterExistsSlow(final Class<?> from, final Class<?> to) {
 		for (final ConverterInfo<?, ?> i : converters) {
 			if ((i.from.isAssignableFrom(from) || from.isAssignableFrom(i.from)) && (i.to.isAssignableFrom(to) || to.isAssignableFrom(i.to))) {
@@ -112,7 +112,7 @@ public abstract class Converters {
 	
 	@SuppressWarnings("unchecked")
 	private static <F, M, T> ConverterInfo<F, T> createChainedConverter(final ConverterInfo<?, ?> first, final ConverterInfo<?, ?> second) {
-		return new ConverterInfo<F, T>((Class<F>) first.from, (Class<T>) second.to, new ChainedConverter<F, M, T>((Converter<F, M>) first.converter, (Converter<M, T>) second.converter), first.options | second.options);
+		return new ConverterInfo<>(first, second, new ChainedConverter<>((Converter<F, M>) first.converter, (Converter<M, T>) second.converter), first.options | second.options);
 	}
 	
 	/**
@@ -130,7 +130,6 @@ public abstract class Converters {
 			return null;
 		if (to.isInstance(o))
 			return (T) o;
-		@SuppressWarnings("null")
 		final Converter<? super F, ? extends T> conv = getConverter((Class<F>) o.getClass(), to);
 		if (conv == null)
 			return null;
@@ -180,7 +179,7 @@ public abstract class Converters {
 			return null;
 		if (to.isAssignableFrom(o.getClass().getComponentType()))
 			return (T[]) o;
-		final List<T> l = new ArrayList<T>(o.length);
+		final List<T> l = new ArrayList<>(o.length);
 		for (final Object e : o) {
 			final T c = convert(e, to);
 			if (c != null)
@@ -207,7 +206,7 @@ public abstract class Converters {
 		for (final Class<? extends T> t : to)
 			if (t.isAssignableFrom(o.getClass().getComponentType()))
 				return (T[]) o;
-		final List<T> l = new ArrayList<T>(o.length);
+		final List<T> l = new ArrayList<>(o.length);
 		for (final Object e : o) {
 			final T c = convert(e, to);
 			if (c != null)
@@ -257,7 +256,7 @@ public abstract class Converters {
 			throw new ClassCastException();
 	}
 
-	private final static Map<Pair<Class<?>, Class<?>>, Converter<?, ?>> convertersCache = new HashMap<Pair<Class<?>, Class<?>>, Converter<?, ?>>();
+	private final static Map<Pair<Class<?>, Class<?>>, ConverterInfo<?, ?>> convertersCache = new HashMap<>();
 	
 	/**
 	 * Tests whether a converter between the given classes exists.
@@ -288,15 +287,64 @@ public abstract class Converters {
 	 * @param to
 	 * @return the converter or null if none exist
 	 */
-	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <F, T> Converter<? super F, ? extends T> getConverter(final Class<F> from, final Class<T> to) {
-		final Pair<Class<?>, Class<?>> p = new Pair<Class<?>, Class<?>>(from, to);
+		ConverterInfo<? super F, ? extends T> info = getConverterInfo(from, to);
+		return info != null ? info.converter : null;
+	}
+	
+	/**
+	 * Gets a converter that has been registered before.
+	 * 
+	 * @param from
+	 * @param to
+	 * @return The converter info or null if no converters were found.
+	 */
+	@SuppressWarnings("unchecked")
+	@Nullable
+	public static <F, T> ConverterInfo<? super F, ? extends T> getConverterInfo(Class<F> from, Class<T> to) {
+		Pair<Class<?>, Class<?>> p = new Pair<>(from, to);
 		if (convertersCache.containsKey(p)) // can contain null to denote nonexistence of a converter
-			return (Converter<? super F, ? extends T>) convertersCache.get(p);
-		final Converter<? super F, ? extends T> c = getConverter_i(from, to);
+			return (ConverterInfo<? super F, ? extends T>) convertersCache.get(p);
+		ConverterInfo<? super F, ? extends T> c = lookupConverterInfo(from, to);
 		convertersCache.put(p, c);
 		return c;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Nullable
+	private static <F, T> ConverterInfo<? super F, ? extends T> lookupConverterInfo(Class<F> from, Class<T> to) {
+		// Check for existing converters between two types first
+		for (final ConverterInfo<?, ?> conv : converters) {
+			if (conv.from.isAssignableFrom(from) && to.isAssignableFrom(conv.to)) {
+				return (ConverterInfo<? super F, ? extends T>) conv;
+			}
+		}
+		
+		// None found? Try the converters that have either from OR to not match
+		for (final ConverterInfo<?, ?> conv : converters) {
+			if (conv.from.isAssignableFrom(from) && conv.to.isAssignableFrom(to)) {
+				// from matches, but to doesn't exactly and needs to be filtered
+
+				return new ConverterInfo<>(from, to, (Converter<F, T>) ConverterUtils
+						.createInstanceofConverter(conv.converter, to), 0);
+			} else if (from.isAssignableFrom(conv.from) && to.isAssignableFrom(conv.to)) {
+				// to matches, from doesn't exactly, and needs filtering 
+				return new ConverterInfo<>(from, to, (Converter<F, T>) ConverterUtils
+						.createInstanceofConverter(conv), 0);
+			}
+		}
+		
+		// Begin accepting both to and from not exactly matching
+		for (final ConverterInfo<?, ?> conv : converters) {
+			if (from.isAssignableFrom(conv.from) && conv.to.isAssignableFrom(to)) {
+				return new ConverterInfo<>(from, to, (Converter<F, T>) ConverterUtils
+						.createDoubleInstanceofConverter(conv, to), 0);
+			}
+		}
+		
+		// No converter available
+		return null;
 	}
 	
 	@SuppressWarnings("unchecked")

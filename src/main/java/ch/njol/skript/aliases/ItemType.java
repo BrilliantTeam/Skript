@@ -213,6 +213,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 		final ItemType bl = i.block, it = i.item;
 		block = bl == null ? null : bl.clone();
 		item = it == null ? null : it.clone();
+		types.clear();
 		for (final ItemData d : i) {
 			types.add(d.clone());
 		}
