@@ -35,11 +35,6 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class ClickEventTracker {
 	
-	/**
-	 * Maximum tracked event lifetime in milliseconds.
-	 */
-	private static final int MAX_EVENT_LIFETIME = 100;
-	
 	private static class TrackedEvent {
 		
 		/**
@@ -51,16 +46,10 @@ public class ClickEventTracker {
 		 * Hand used in event.
 		 */
 		final EquipmentSlot hand;
-		
-		/**
-		 * When this event was captured.
-		 */
-		final long timestamp;
 
-		public TrackedEvent(Cancellable event, EquipmentSlot hand, long timestamp) {
+		public TrackedEvent(Cancellable event, EquipmentSlot hand) {
 			this.event = event;
 			this.hand = hand;
-			this.timestamp = timestamp;
 		}
 		
 	}
@@ -74,16 +63,7 @@ public class ClickEventTracker {
 	public ClickEventTracker(JavaPlugin plugin) {
 		this.firstEvents = new HashMap<>();
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,
-				() -> {
-					Iterator<Map.Entry<UUID, TrackedEvent>> it = firstEvents.entrySet().iterator();
-					long now = System.currentTimeMillis();
-					while (it.hasNext()) {
-						TrackedEvent tracked = it.next().getValue();
-						if (now - tracked.timestamp > MAX_EVENT_LIFETIME) {
-							it.remove();
-						}
-					}
-				}, 1, 1);
+				() -> firstEvents.clear(), 1, 1);
 	}
 	
 	/**
@@ -106,7 +86,7 @@ public class ClickEventTracker {
 			event.setCancelled(first.event.isCancelled());
 			return false;
 		} else { // Remember and run this
-			firstEvents.put(uuid, new TrackedEvent(event, hand, System.currentTimeMillis()));
+			firstEvents.put(uuid, new TrackedEvent(event, hand));
 			return true;
 		}
 	}
