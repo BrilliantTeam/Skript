@@ -7,29 +7,32 @@ for prototyping etc.
 This Github fork of Skript is based on Mirreski's improvements which was built
 on Njol's original Skript.
 
-## Supported Versions
+## Requirements
 Skript requires **Spigot** to work. You heard it right, Bukkit does *not* work.
 **Paper**, which is a fork of Spigot, is recommended; it is required for some
 parts of Skript to be available.
 
-Skript supports **latest releases** of Minecraft 1.9, 1.10, 1.11, 1.12 and 1.13.
+Skript supports only the **latest** patch versions of Minecraft 1.9, 1.10, 1.11, 1.12 and 1.13.
 For example, this means that 1.12.2 is supported, but 1.12.1 is *not*.
-Testing with all minor Minecraft releases is not feasible for us.
+Testing with all old patch versions is not feasible for us.
 
 Minecraft 1.8 and earlier are not, and will not be supported. New Minecraft
 versions will be supported as soon as possible.
 
+## Download
+You can find the downloads for each version with their release notes in the [releases page](https://github.com/SkriptLang/Skript/releases).
+
 ## Documentation
-Documentation is available [here](https://skriptlang.github.io/Skript/) for the
+Documentation is available [here](https://skriptlang.github.io/Skript) for the
 latest version of Skript.
 
 ## Reporting Issues
 Please see our [contribution guidelines](https://github.com/SkriptLang/Skript/blob/master/.github/CONTRIBUTING.md)
 before reporting issues.
 
-## A Note About Addons
-We don't support addons here, even though some of Skript developers have also
-developed their own addons.
+## A Note About Add-ons
+We don't support add-ons here, even though some of Skript developers have also
+developed their own add-ons.
 
 ## Compiling
 Skript uses Gradle for compilation. Use your command prompt of preference and
@@ -41,7 +44,7 @@ and package Skript for you:
 gradlew clean build # on Windows
 ```
 
-You can get source code from the [releases](https://github.com/SkriptLang/Skript/releases) page.
+You can get source code from the [releases page](https://github.com/SkriptLang/Skript/releases).
 You may also clone this repository, but that code may or may not be stable.
 
 ### Compiling Modules
@@ -84,7 +87,7 @@ Please review our [contribution guidelines](https://github.com/SkriptLang/Skript
 In addition to that, if you are contributing Java code, check our
 [coding conventions](https://github.com/SkriptLang/Skript/blob/master/CODING_CONVENTIONS.md).
 
-## Maven repository
+## Maven Repository
 If you use Skript as (soft) dependency for your plugin, and use maven or Gradle,
 this is for you.
 
@@ -146,11 +149,11 @@ Or, if you use Maven:
 ```
 
 ## Relevant Links
-* [SkUnity Forums](https://forums.skunity.com/)
-* [Original Skript at BukkitDev](https://dev.bukkit.org/bukkit-plugins/skript/) (inactive)
-* [Addon Releases @SkUnity](https://forums.skunity.com/forums/addon-releases/)
-* [Skript Chat Discord Invite](https://discord.gg/0lx4QhQvwelCZbEX)
-* [Skript Hub](https://skripthub.net/)
+* [skUnity forums](https://forums.skunity.com)
+* [Add-on releases at skUnity](https://forums.skunity.com/forums/addon-releases)
+* [Skript Chat Discord invite](https://discord.gg/0lx4QhQvwelCZbEX)
+* [Skript Hub](https://skripthub.net)
+* [Original Skript at Bukkit](https://dev.bukkit.org/bukkit-plugins/skript) (inactive)
 
 Note that these resources are not maintained by Skript's developers. Don't
 contact us about any problems you might have with them.
