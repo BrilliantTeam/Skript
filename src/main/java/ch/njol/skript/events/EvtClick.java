@@ -155,7 +155,7 @@ public class EvtClick extends SkriptEvent {
 			
 			// PlayerInteractAtEntityEvent called only once for armor stands
 			if (!(e instanceof PlayerInteractAtEntityEvent)) {
-				if (!entityInteractTracker.checkEvent(clickEvent.getPlayer(), clickEvent)) {
+				if (!entityInteractTracker.checkEvent(clickEvent.getPlayer(), clickEvent, clickEvent.getHand())) {
 					return false; // Not first event this tick
 				}
 			}
@@ -184,7 +184,9 @@ public class EvtClick extends SkriptEvent {
 			if ((this.click & click) == 0)
 				return false; // We don't want to handle this kind of events
 			
-			if (!interactTracker.checkEvent(clickEvent.getPlayer(), clickEvent)) {
+			EquipmentSlot hand = clickEvent.getHand();
+			assert hand != null; // Not PHYSICAL interaction
+			if (!interactTracker.checkEvent(clickEvent.getPlayer(), clickEvent, hand)) {
 				return false; // Not first event this tick
 			}
 			

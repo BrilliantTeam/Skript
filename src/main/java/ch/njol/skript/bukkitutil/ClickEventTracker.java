@@ -20,21 +20,15 @@
 package ch.njol.skript.bukkitutil;
 
 import java.util.HashMap;
-import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventException;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.EventExecutor;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 
 /**
  * Tracks click events to remove extraneous events for one player click.
@@ -42,37 +36,77 @@ import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 public class ClickEventTracker {
 	
 	/**
+	 * Maximum tracked event lifetime in milliseconds.
+	 */
+	private static final int MAX_EVENT_LIFETIME = 100;
+	
+	private static class TrackedEvent {
+		
+		/**
+		 * The actual event that is tracked.
+		 */
+		final Cancellable event;
+		
+		/**
+		 * Hand used in event.
+		 */
+		final EquipmentSlot hand;
+		
+		/**
+		 * When this event was captured.
+		 */
+		final long timestamp;
+
+		public TrackedEvent(Cancellable event, EquipmentSlot hand, long timestamp) {
+			this.event = event;
+			this.hand = hand;
+			this.timestamp = timestamp;
+		}
+		
+	}
+	
+	/**
 	 * First events by players during this tick. They're stored by their UUIDs.
 	 * This map is cleared once per tick.
 	 */
-	final Map<UUID, Cancellable> firstEvents;
+	final Map<UUID, TrackedEvent> firstEvents;
 	
 	public ClickEventTracker(JavaPlugin plugin) {
 		this.firstEvents = new HashMap<>();
-		Bukkit.getPluginManager().registerEvent(ServerTickEndEvent.class, new Listener() {}, EventPriority.MONITOR, new EventExecutor() {
-			
-			@Override
-			public void execute(Listener listener, Event event) throws EventException {
-				firstEvents.clear(); // Clear all tracked data at end of tick
-			}
-		}, plugin);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,
+				() -> {
+					Iterator<Map.Entry<UUID, TrackedEvent>> it = firstEvents.entrySet().iterator();
+					long now = System.currentTimeMillis();
+					while (it.hasNext()) {
+						TrackedEvent tracked = it.next().getValue();
+						if (now - tracked.timestamp > MAX_EVENT_LIFETIME) {
+							it.remove();
+						}
+					}
+				}, 1, 1);
 	}
 	
 	/**
 	 * Processes a click event from a player.
 	 * @param player Player who caused it.
 	 * @param event The event.
+	 * @param hand Slot associated with the event.
 	 * @return If the event should be passed to scripts.
 	 */
-	public boolean checkEvent(Player player, Cancellable event) {
+	public boolean checkEvent(Player player, Cancellable event, EquipmentSlot hand) {
 		UUID uuid = player.getUniqueId();
-		Cancellable first = firstEvents.get(uuid);
+		TrackedEvent first = firstEvents.get(uuid);
 		if (first != null && first != event) { // We've checked an event before, and it is not this one
-			// So ignore this, but set its cancelled status based on one set to first event
-			event.setCancelled(first.isCancelled());
+			if ((hand == EquipmentSlot.HAND && first.hand == EquipmentSlot.OFF_HAND)
+					|| (hand == EquipmentSlot.OFF_HAND && first.hand == EquipmentSlot.HAND)) {
+				// Previous event had different hand, so we've captured one complete click interaction
+				firstEvents.remove(uuid); // Let next interaction event pass
+			}
+			// Ignore this, but set its cancelled status based on one set to first event
+			event.setCancelled(first.event.isCancelled());
 			return false;
 		} else { // Remember and run this
-			firstEvents.put(uuid, event);
+			firstEvents.put(uuid, new TrackedEvent(event, hand, System.currentTimeMillis()));
 			return true;
 		}
 	}
