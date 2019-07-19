@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -196,10 +197,21 @@ public class FunctionReference<T> {
 			for (int i = 0; i < parameters.length; i++)
 				l.addAll(Arrays.asList(parameters[i].getArray(e))); // TODO what if an argument is not available? pass null or abort?
 			params[0] = l.toArray();
+			// Don't allow mutating across function boundary; same hack is applied to variables
+			for (int i = 0; i < params[0].length; i++) {
+				if (params[0][i] instanceof Location)
+					params[0][i] = ((Location) params[0][i]).clone();
+			}
 		} else {
-			for (int i = 0; i < params.length; i++)
+			for (int i = 0; i < params.length; i++) {
 				params[i] = parameters[i].getArray(e); // TODO what if an argument is not available? pass null or abort?
+				// Don't allow mutating across function boundary; same hack is applied to variables
+				for (int j = 0; j < params[i].length; j++) {
+					params[i][j] = ((Location) params[i][j]).clone();
+				}
+			}
 		}
+		
 		assert function != null;
 		return function.execute(params);
 	}
