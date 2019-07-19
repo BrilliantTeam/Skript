@@ -90,7 +90,6 @@ import ch.njol.util.StringUtils;
 public abstract class Commands {
 	
 	public final static ArgsMessage m_too_many_arguments = new ArgsMessage("commands.too many arguments");
-	public final static Message m_correct_usage = new Message("commands.correct usage");
 	public final static Message m_internal_error = new Message("commands.internal error");
 	
 	private final static Map<String, ScriptCommand> commands = new HashMap<>();
