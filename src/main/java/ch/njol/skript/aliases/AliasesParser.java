@@ -22,6 +22,7 @@ package ch.njol.skript.aliases;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -486,7 +487,7 @@ public class AliasesParser {
 		/**
 		 * All possible variations by patterns of them.
 		 */
-		Map<String, Variation> variations = new HashMap<>();
+		Map<String, Variation> variations = new LinkedHashMap<>();
 		
 		if (slots.size() == 1) {
 			// Fast path: no variations
@@ -586,7 +587,7 @@ public class AliasesParser {
 		List<String> patterns = parseKeyPattern(name);
 		
 		// Create all variations now (might need them many times in future)
-		Map<String, Variation> variations = new HashMap<>();
+		Map<String, Variation> variations = new LinkedHashMap<>();
 		for (String pattern : patterns) {
 			assert pattern != null;
 			variations.putAll(parseKeyVariations(pattern));
