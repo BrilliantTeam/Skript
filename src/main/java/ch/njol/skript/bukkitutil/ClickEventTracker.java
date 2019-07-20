@@ -76,7 +76,7 @@ public class ClickEventTracker {
 	public boolean checkEvent(Player player, Cancellable event, EquipmentSlot hand) {
 		UUID uuid = player.getUniqueId();
 		TrackedEvent first = firstEvents.get(uuid);
-		if (first != null && first != event) { // We've checked an event before, and it is not this one
+		if (first != null && first.event != event) { // We've checked an event before, and it is not this one
 			if ((hand == EquipmentSlot.HAND && first.hand == EquipmentSlot.OFF_HAND)
 					|| (hand == EquipmentSlot.OFF_HAND && first.hand == EquipmentSlot.HAND)) {
 				// Previous event had different hand, so we've captured one complete click interaction
