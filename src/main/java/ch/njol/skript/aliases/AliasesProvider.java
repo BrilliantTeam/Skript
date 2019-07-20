@@ -60,6 +60,13 @@ import ch.njol.util.NonNullPair;
 public class AliasesProvider {
 	
 	/**
+	 * When an alias is not found, it will requested from this provider.
+	 * Null when this is global aliases provider.
+	 */
+	@Nullable
+	private final AliasesProvider parent;
+	
+	/**
 	 * All aliases that are currently loaded by this provider.
 	 */
 	private final Map<String, ItemType> aliases;
@@ -172,12 +179,13 @@ public class AliasesProvider {
 	/**
 	 * Constructs a new aliases provider with no data.
 	 */
-	public AliasesProvider(int expectedCount) {
-		aliases = new HashMap<>(expectedCount);
-		variations = new HashMap<>(expectedCount / 20);
-		aliasesMap = new AliasesMap();
+	public AliasesProvider(int expectedCount, @Nullable AliasesProvider parent) {
+		this.parent = parent;
+		this.aliases = new HashMap<>(expectedCount);
+		this.variations = new HashMap<>(expectedCount / 20);
+		this.aliasesMap = new AliasesMap();
 		
-		gson = new Gson();
+		this.gson = new Gson();
 	}
 	
 	/**
@@ -258,7 +266,7 @@ public class AliasesProvider {
 	public void addAlias(AliasName name, String id, @Nullable Map<String, Object> tags, Map<String, String> blockStates) {
 		// First, try to find if aliases already has a type with this id
 		// (so that aliases can refer to each other)
-		ItemType typeOfId = aliases.get(id);
+		ItemType typeOfId = getAlias(id);
 		EntityData<?> related = null;
 		List<ItemData> datas;
 		if (typeOfId != null) { // If it exists, use datas from it
@@ -326,12 +334,20 @@ public class AliasesProvider {
 
 	@Nullable
 	public ItemType getAlias(String alias) {
-		return aliases.get(alias);
+		ItemType item = aliases.get(alias);
+		if (item == null && parent != null) {
+			return parent.getAlias(alias);
+		}
+		return item;
 	}
 	
 	@Nullable
 	public AliasesMap.AliasData getAliasData(ItemData item) {
-		return aliasesMap.matchAlias(item).getData();
+		AliasesMap.AliasData data = aliasesMap.matchAlias(item).getData();
+		if (data == null && parent != null) {
+			return parent.getAliasData(item);
+		}
+		return data;
 	}
 
 	@Nullable

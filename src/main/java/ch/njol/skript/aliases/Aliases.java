@@ -57,7 +57,7 @@ import ch.njol.skript.util.Version;
 
 public abstract class Aliases {
 
-	private static final AliasesProvider provider = createProvider(10000);
+	private static final AliasesProvider provider = createProvider(10000, null);
 	private static final AliasesParser parser = createParser(provider);
 	
 	/**
@@ -71,9 +71,7 @@ public abstract class Aliases {
 		// Check script aliases first
 		ScriptAliases aliases = scriptAliases;
 		if (aliases != null) {
-			ItemType alias = aliases.provider.getAlias(s);
-			if (alias != null)
-				return alias;
+			return aliases.provider.getAlias(s); // Delegates to global provider if needed
 		}
 			
 		return provider.getAlias(s);
@@ -82,10 +80,11 @@ public abstract class Aliases {
 	/**
 	 * Creates an aliases provider with Skript's default configuration.
 	 * @param expectedCount Expected alias count.
+	 * @param parent Parent aliases provider.
 	 * @return Aliases provider.
 	 */
-	private static AliasesProvider createProvider(int expectedCount) {
-		return new AliasesProvider(expectedCount);
+	private static AliasesProvider createProvider(int expectedCount, @Nullable AliasesProvider parent) {
+		return new AliasesProvider(expectedCount, parent);
 	}
 	
 	/**
@@ -186,9 +185,7 @@ public abstract class Aliases {
 		// Check script aliases first
 		ScriptAliases aliases = scriptAliases;
 		if (aliases != null) {
-			MaterialName name = aliases.provider.getMaterialName(type);
-			if (name != null)
-				return name;
+			return aliases.provider.getMaterialName(type);
 		}
 		
 		// Then global aliases
@@ -517,9 +514,7 @@ public abstract class Aliases {
 	public static String getMinecraftId(ItemData data) {
 		ScriptAliases aliases = scriptAliases;
 		if (aliases != null) {
-			String id = aliases.provider.getMinecraftId(data);
-			if (id != null)
-				return id;
+			return aliases.provider.getMinecraftId(data);
 		}
 		return provider.getMinecraftId(data);
 	}
@@ -534,9 +529,7 @@ public abstract class Aliases {
 	public static EntityData<?> getRelatedEntity(ItemData data) {
 		ScriptAliases aliases = scriptAliases;
 		if (aliases != null) {
-			EntityData<?> entity = aliases.provider.getRelatedEntity(data);
-			if (entity != null)
-				return entity;
+			return aliases.provider.getRelatedEntity(data);
 		}
 		return provider.getRelatedEntity(data);
 	}
@@ -597,8 +590,8 @@ public abstract class Aliases {
 	 * @return Script aliases, ready to be added to.
 	 */
 	public static ScriptAliases createScriptAliases() {
-		AliasesProvider provider = createProvider(10);
-		return new ScriptAliases(provider, createParser(provider));
+		AliasesProvider localProvider = createProvider(10, provider);
+		return new ScriptAliases(localProvider, createParser(localProvider));
 	}
 	
 	/**

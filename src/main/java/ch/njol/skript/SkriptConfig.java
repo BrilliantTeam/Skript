@@ -373,7 +373,7 @@ public abstract class SkriptConfig {
 				try {
 					final InputStream in = Skript.getInstance().getResource("config.sk");
 					if (in == null) {
-						Skript.error("Your config is outdated, but Skript couldn't find the newest config in its jar. Please download Skript again from dev.bukkit.org.");
+						Skript.error("Your config is outdated, but Skript couldn't find the newest config in its jar.");
 						return false;
 					}
 					final Config newConfig = new Config(in, "Skript.jar/config.sk", false, false, ":");
