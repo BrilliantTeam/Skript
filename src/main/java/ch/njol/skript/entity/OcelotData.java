@@ -42,14 +42,14 @@ public class OcelotData extends EntityData<Ocelot> {
 	static {
 		if (TAMEABLE) {
 			try {
-				MethodHandle method = MethodHandles.publicLookup()
+				MethodHandle method = MethodHandles.lookup()
 					.findSpecial(Ocelot.class, "setTamed",
 						MethodType.methodType(Void.class, boolean.class), Ocelot.class);
 				assert method != null;
 				TAME_METHOD = method;
 			} catch (NoSuchMethodException | IllegalAccessException e) {
 				TAME_METHOD = null;
-				Skript.exception(e, "Version supports setTamed but MethodHandle lookup failed");
+				Skript.exception(e, "version supports setTamed but MethodHandle lookup failed");
 			}
 
 			EntityData.register(OcelotData.class, "ocelot", Ocelot.class, 1,
