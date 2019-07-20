@@ -63,7 +63,7 @@ public class ExprReversedList extends SimpleExpression<Object> {
 		List<Object> reversed = Arrays.asList(list.getAll(e).clone());
 		try {
 			Collections.reverse(reversed);
-		} catch (IllegalArgumentException ex) {
+		} catch (UnsupportedOperationException ex) {
 			Skript.error("Tried to reverse a list, but an exception was thrown!");
 		}
 		return reversed.toArray();
