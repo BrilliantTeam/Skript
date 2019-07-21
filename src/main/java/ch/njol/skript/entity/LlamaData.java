@@ -82,7 +82,12 @@ public class LlamaData extends EntityData<Llama> {
 	
 	@Override
 	public Class<? extends Llama> getType() {
-		return isTrader ? Llama.class : TraderLlama.class;
+		// If TraderLlama does not exist, this would ALWAYS throw ClassNotFoundException
+		// (no matter if isTrader == false)
+		if (TRADER_SUPPORT)
+			return isTrader ? Llama.class : TraderLlama.class;
+		assert isTrader == false; // Shouldn't be possible on this version
+		return Llama.class;
 	}
 	
 	@Override
