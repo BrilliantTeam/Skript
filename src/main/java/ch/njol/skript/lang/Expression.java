@@ -291,17 +291,20 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 					}
 					
 					if (newDelta == null) {
-						newDelta = delta.clone();
+						newDelta = new Object[delta.length];
+						System.arraycopy(delta, 0, newDelta, 0, delta.length);
 					}
 					newDelta[i] = item;
 				} else if (value instanceof ItemType) {
 					if (newDelta == null) {
-						newDelta = delta.clone();
+						newDelta = new Object[delta.length];
+						System.arraycopy(delta, 0, newDelta, 0, delta.length);
 					}
 					newDelta[i] = ((ItemType) value).clone();
 				} else if (value instanceof ItemStack) {
 					if (newDelta == null) {
-						newDelta = delta.clone();
+						newDelta = new Object[delta.length];
+						System.arraycopy(delta, 0, newDelta, 0, delta.length);
 					}
 					newDelta[i] = ((ItemStack) value).clone();
 				}
