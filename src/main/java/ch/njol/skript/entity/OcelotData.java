@@ -37,6 +37,14 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 public class OcelotData extends EntityData<Ocelot> {
 	
 	private static final boolean TAMEABLE = Skript.methodExists(Ocelot.class, "setTamed");
+	static {
+		if (TAMEABLE) {
+			EntityData.register(OcelotData.class, "ocelot", Ocelot.class, 1,
+					"wild ocelot", "ocelot", "cat");
+		} else {
+			EntityData.register(OcelotData.class, "ocelot", Ocelot.class, "ocelot");
+		}
+	}
 	
 	int tamed = 0;
 	
