@@ -538,9 +538,11 @@ public class VariableString implements Expression<String> {
 		Object[] string = this.stringUnformatted;
 		assert string != null;
 		List<MessageComponent> message = new ArrayList<>(components.length); // At least this much space
-		int stringPart = 0;
+		int stringPart = -1;
 		for (MessageComponent component : components) {
 			if (component == null) { // This component holds place for variable part
+				// Go over previous string part (stringPart >= 0) or take first part (stringPart == 0)
+				stringPart++;
 				Object o = string[stringPart];
 				
 				// Convert it to plain text
@@ -581,11 +583,16 @@ public class VariableString implements Expression<String> {
 				}
 				
 				assert text != null;
-				message.add(ChatMessages.plainText(text));
+				if (message.isEmpty()) { // No components, need to create one
+					message.add(ChatMessages.plainText(text));
+				} else { // Append to last component
+					message.get(message.size() - 1).text += text;
+				}
 			} else {
 				message.add(component);
+				if (stringPart == -1)
+					stringPart = 0; // There is text before expression parts
 			}
-			stringPart++;
 		}
 		
 		return message;
