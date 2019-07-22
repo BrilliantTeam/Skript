@@ -65,12 +65,7 @@ public class ExprShuffledList extends SimpleExpression<Object> {
 	protected Object[] get(Event e) {
 		Object[] origin = list.getAll(e);
 		List<Object> shuffled = Arrays.asList(origin.clone()); // Not yet shuffled...
-		
-		try {
-			Collections.shuffle(shuffled);
-		} catch (IllegalArgumentException ex) { // In case elements are not comparable
-			Skript.error("Tried to sort a list, but some objects are not comparable!");
-		}
+		Collections.shuffle(shuffled);
 		return shuffled.toArray();
 	}
 	
