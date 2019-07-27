@@ -583,11 +583,11 @@ public class VariableString implements Expression<String> {
 				}
 				
 				assert text != null;
-				if (message.isEmpty()) { // No components, need to create one
-					message.add(ChatMessages.plainText(text));
-				} else { // Append to last component
-					message.get(message.size() - 1).text += text;
+				MessageComponent plain = ChatMessages.plainText(text);
+				if (!message.isEmpty()) { // Copy styles from previous component
+					ChatMessages.copyStyles(message.get(message.size() - 1), plain);
 				}
+				message.add(plain);
 			} else {
 				message.add(component);
 				if (stringPart == -1)
