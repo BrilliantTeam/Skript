@@ -720,12 +720,13 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 	 * @return Whether everything could be removed from the inventory
 	 */
 	public boolean removeFrom(Inventory invi) {
-		ItemStack[] buf = getCopiedContents(invi);
-		
-		final boolean ok = removeFrom(Arrays.asList(buf));
-		
-		invi.setContents(buf);
-		return ok;
+		boolean success = true;
+		for (ItemData type : getTypes()) {
+			if (invi.removeItem(type.getStack()).isEmpty()) {
+				success = false; // Couldn't remove everything
+			}
+		}
+		return success;
 	}
 	
 	@SafeVarargs
