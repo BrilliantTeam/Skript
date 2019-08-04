@@ -77,11 +77,6 @@ public class ClickEventTracker {
 		UUID uuid = player.getUniqueId();
 		TrackedEvent first = firstEvents.get(uuid);
 		if (first != null && first.event != event) { // We've checked an event before, and it is not this one
-			if ((hand == EquipmentSlot.HAND && first.hand == EquipmentSlot.OFF_HAND)
-					|| (hand == EquipmentSlot.OFF_HAND && first.hand == EquipmentSlot.HAND)) {
-				// Previous event had different hand, so we've captured one complete click interaction
-				firstEvents.remove(uuid); // Let next interaction event pass
-			}
 			// Ignore this, but set its cancelled status based on one set to first event
 			event.setCancelled(first.event.isCancelled());
 			return false;
