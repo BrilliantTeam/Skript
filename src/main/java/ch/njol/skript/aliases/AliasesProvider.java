@@ -20,39 +20,22 @@
 package ch.njol.skript.aliases;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.Map.Entry;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.Gson;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.BukkitUnsafe;
 import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.bukkitutil.block.BlockCompat;
 import ch.njol.skript.bukkitutil.block.BlockValues;
-import ch.njol.skript.config.Config;
-import ch.njol.skript.config.EntryNode;
-import ch.njol.skript.config.Node;
-import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.entity.EntityData;
-import ch.njol.skript.entity.EntityType;
-import ch.njol.skript.localization.ArgsMessage;
-import ch.njol.skript.localization.Message;
-import ch.njol.skript.localization.Noun;
-import ch.njol.util.NonNullPair;
 
 /**
  * Provides aliases on Bukkit/Spigot platform.
@@ -177,6 +160,12 @@ public class AliasesProvider {
 	private final AliasesMap aliasesMap;
 	
 	/**
+	 * Contains known item datas. Used for deduplicating them when aliases
+	 * are loaded.
+	 */
+	private final Map<ItemData,ItemData> knownItems;
+	
+	/**
 	 * Constructs a new aliases provider with no data.
 	 */
 	public AliasesProvider(int expectedCount, @Nullable AliasesProvider parent) {
@@ -184,6 +173,7 @@ public class AliasesProvider {
 		this.aliases = new HashMap<>(expectedCount);
 		this.variations = new HashMap<>(expectedCount / 20);
 		this.aliasesMap = new AliasesMap();
+		this.knownItems = new HashMap<>(1000);
 		
 		this.gson = new Gson();
 	}
@@ -297,6 +287,15 @@ public class AliasesProvider {
 			ItemData data = new ItemData(stack, blockValues);
 			data.isAlias = true;
 			data.itemFlags = itemFlags;
+			
+			// Deduplicate item data
+			ItemData canonical = knownItems.get(data);
+			if (canonical != null) {
+				data = canonical;
+			} else {
+				knownItems.put(data, data);
+			}
+			
 			datas = Collections.singletonList(data);
 		}
 		
@@ -381,6 +380,7 @@ public class AliasesProvider {
 		aliases.clear();
 		variations.clear();
 		aliasesMap.clear();
+		knownItems.clear();
 	}
 
 	public int getAliasCount() {

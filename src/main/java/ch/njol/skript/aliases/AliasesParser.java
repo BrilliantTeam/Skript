@@ -693,7 +693,8 @@ public class AliasesParser {
 			if (id == null) {
 				Skript.warning(m_empty_alias.toString());
 			} else {
-				id = id.toLowerCase();
+				// Intern id to save some memory
+				id = id.toLowerCase().intern();
 				assert id != null;
 				try {
 					// Create singular and plural forms of the alias
