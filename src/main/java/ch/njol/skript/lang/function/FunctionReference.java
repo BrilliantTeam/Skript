@@ -143,7 +143,7 @@ public class FunctionReference<T> {
 		}
 		
 		for (int i = 0; i < parameters.length; i++) {
-			final Parameter<?> p = sign.parameters.get(singleUberParam ? 0 : i);
+			final Parameter<?> p = sign.parameters[singleUberParam ? 0 : i];
 			final RetainingLogHandler log = SkriptLogger.startRetainingLog();
 			try {
 				final Expression<?> e = parameters[i].getConvertedExpression(p.type.getC());

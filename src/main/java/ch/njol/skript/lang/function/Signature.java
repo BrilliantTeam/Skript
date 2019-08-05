@@ -47,7 +47,7 @@ public class Signature<T> {
 	/**
 	 * Parameters taken by this function, in order.
 	 */
-	final List<Parameter<?>> parameters;
+	final Parameter<?>[] parameters;
 	
 	/**
 	 * Return type of this function. For functions that return nothing, this
@@ -68,11 +68,10 @@ public class Signature<T> {
 	 */
 	final Collection<FunctionReference<?>> calls;
 	
-	@SuppressWarnings("null")
-	public Signature(String script, String name, List<Parameter<?>> parameters, @Nullable final ClassInfo<T> returnType, boolean single) {
+	public Signature(String script, String name, Parameter<?>[] parameters, @Nullable final ClassInfo<T> returnType, boolean single) {
 		this.script = script;
 		this.name = name;
-		this.parameters = Collections.unmodifiableList(parameters);
+		this.parameters = parameters;
 		this.returnType = returnType;
 		this.single = single;
 		
@@ -85,10 +84,10 @@ public class Signature<T> {
 	
 	@SuppressWarnings("null")
 	public Parameter<?> getParameter(int index) {
-		return parameters.get(index);
+		return parameters[index];
 	}
 	
-	public List<Parameter<?>> getParameters() {
+	public Parameter<?>[] getParameters() {
 		return parameters;
 	}
 	
@@ -107,7 +106,7 @@ public class Signature<T> {
 	 * @return Maximum number of parameters.
 	 */
 	public int getMaxParameters() {
-		return parameters.size();
+		return parameters.length;
 	}
 	
 	/**
@@ -117,8 +116,8 @@ public class Signature<T> {
 	 * @return Minimum number of parameters required.
 	 */
 	public int getMinParameters() {
-		for (int i = parameters.size() - 1; i >= 0; i--) {
-			if (parameters.get(i).def == null)
+		for (int i = parameters.length - 1; i >= 0; i--) {
+			if (parameters[i].def == null)
 				return i + 1;
 		}
 		return 0; // No-args function

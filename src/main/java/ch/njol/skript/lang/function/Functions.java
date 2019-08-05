@@ -89,15 +89,16 @@ public abstract class Functions {
 	 */
 	public static JavaFunction<?> registerFunction(final JavaFunction<?> function) {
 		Skript.checkAcceptRegistrations();
-		if (!function.name.matches(functionNamePattern))
-			throw new SkriptAPIException("Invalid function name '" + function.name + "'");
-		if (functions.containsKey(function.name))
-			throw new SkriptAPIException("Duplicate function " + function.name);
-		functions.put(function.name, new FunctionData(function));
-		javaFunctions.put(function.name, function);
+		String name = function.getName();
+		if (!name.matches(functionNamePattern))
+			throw new SkriptAPIException("Invalid function name '" + name + "'");
+		if (functions.containsKey(name))
+			throw new SkriptAPIException("Duplicate function " + name);
+		functions.put(name, new FunctionData(function));
+		javaFunctions.put(name, function);
 		Signature<?> sign = function.getSignature();
-		javaSignatures.put(function.name, sign); // This is backup for full reloads (reload all/scripts)
-		signatures.put(function.name, sign);
+		javaSignatures.put(name, sign); // This is backup for full reloads (reload all/scripts)
+		signatures.put(name, sign);
 		return function;
 	}
 	
@@ -132,7 +133,7 @@ public abstract class Functions {
 		Signature<?> sign = signatures.get(name);
 		if (sign == null) // Signature parsing failed, probably: null signature
 			return null; // This has been reported before...
-		final List<Parameter<?>> params = sign.parameters;
+		final Parameter<?>[] params = sign.parameters;
 		final ClassInfo<?> c = sign.returnType;
 		
 		if (Skript.debug() || node.debug())
@@ -140,8 +141,7 @@ public abstract class Functions {
 					+ (c != null ? " :: " + (sign.isSingle() ? c.getName().getSingular() : c.getName().getPlural()) : "") + ":");
 		
 		@SuppressWarnings("null")
-		final Function<?> f = new ScriptFunction<>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, sign.isSingle());
-//		functions.put(name, new FunctionData(f)); // in constructor
+		final Function<?> f = new ScriptFunction<>(sign, node);
 		return f;
 	}
 	
@@ -221,7 +221,7 @@ public abstract class Functions {
 		}
 		
 		@SuppressWarnings("unchecked")
-		Signature<?> sign = new Signature<>(script, name, params, (ClassInfo<Object>) returnClass, singleReturn);
+		Signature<?> sign = new Signature<>(script, name, params.toArray(new Parameter[params.size()]), (ClassInfo<Object>) returnClass, singleReturn);
 		Functions.signatures.put(name, sign);
 		Skript.debug("Registered function signature: " + name);
 		return sign;
@@ -296,7 +296,7 @@ public abstract class Functions {
 				
 				iter.remove();
 				r++;
-				final Signature<?> sign = signatures.get(d.function.name);
+				final Signature<?> sign = signatures.get(d.function.getName());
 				assert sign != null; // Function must have signature
 				
 				final Iterator<FunctionReference<?>> it = sign.calls.iterator();
@@ -328,7 +328,7 @@ public abstract class Functions {
 			if (d.function instanceof ScriptFunction) {
 				iter.remove();
 			} else {
-				final Signature<?> sign = signatures.get(d.function.name);
+				final Signature<?> sign = signatures.get(d.function.getName());
 				assert sign != null; // Function must have signature
 				sign.calls.clear();
 			}
@@ -349,7 +349,7 @@ public abstract class Functions {
 	 * @param func
 	 */
 	public static void putFunction(Function<?> func) {
-		functions.put(func.name, new FunctionData(func));
+		functions.put(func.getName(), new FunctionData(func));
 	}
 	
 	/**
