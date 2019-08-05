@@ -134,13 +134,13 @@ public abstract class Functions {
 			return null; // This has been reported before...
 		final List<Parameter<?>> params = sign.parameters;
 		final ClassInfo<?> c = sign.returnType;
-		final NonNullPair<String, Boolean> p = sign.info;
 		
 		if (Skript.debug() || node.debug())
-			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")" + (c != null && p != null ? " :: " + Utils.toEnglishPlural(c.getCodeName(), p.getSecond()) : "") + ":");
+			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")"
+					+ (c != null ? " :: " + (sign.isSingle() ? c.getName().getSingular() : c.getName().getPlural()) : "") + ":");
 		
 		@SuppressWarnings("null")
-		final Function<?> f = new ScriptFunction<>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, p == null ? false : !p.getSecond());
+		final Function<?> f = new ScriptFunction<>(name, params.toArray(new Parameter[params.size()]), node, (ClassInfo<Object>) c, sign.isSingle());
 //		functions.put(name, new FunctionData(f)); // in constructor
 		return f;
 	}
@@ -202,23 +202,26 @@ public abstract class Functions {
 			if (i == args.length())
 				break;
 		}
-		ClassInfo<?> c;
-		final NonNullPair<String, Boolean> p;
+		
+		// Parse return type if one exists
+		ClassInfo<?> returnClass;
+		boolean singleReturn;
 		if (returnType == null) {
-			c = null;
-			p = null;
+			returnClass = null;
+			singleReturn = false; // Ignored, nothing is returned
 		} else {
-			c = Classes.getClassInfoFromUserInput(returnType);
-			p = Utils.getEnglishPlural(returnType);
-			if (c == null)
-				c = Classes.getClassInfoFromUserInput(p.getFirst());
-			if (c == null) {
+			returnClass = Classes.getClassInfoFromUserInput(returnType);
+			NonNullPair<String, Boolean> p = Utils.getEnglishPlural(returnType);
+			singleReturn = p.getSecond();
+			if (returnClass == null)
+				returnClass = Classes.getClassInfoFromUserInput(p.getFirst());
+			if (returnClass == null) {
 				return signError("Cannot recognise the type '" + returnType + "'");
 			}
 		}
 		
 		@SuppressWarnings("unchecked")
-		Signature<?> sign = new Signature<>(script, name, params, (ClassInfo<Object>) c, p, p == null ? false : !p.getSecond());
+		Signature<?> sign = new Signature<>(script, name, params, (ClassInfo<Object>) returnClass, singleReturn);
 		Functions.signatures.put(name, sign);
 		Skript.debug("Registered function signature: " + name);
 		return sign;
@@ -262,7 +265,7 @@ public abstract class Functions {
 	}
 	
 	/**
-	 * Gets a signature of function with given name
+	 * Gets a signature of function with given name.
 	 * @param name Name of function.
 	 * @return Signature, or null if function does not exist.
 	 */

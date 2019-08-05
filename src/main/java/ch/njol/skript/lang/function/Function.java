@@ -29,7 +29,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.util.coll.CollectionUtils;
 
 /**
- * @author Peter Güttinger
+ * Functions can be called using arguments.
  */
 public abstract class Function<T> {
 	
@@ -150,7 +150,7 @@ public abstract class Function<T> {
 	 */
 	@SuppressWarnings("null")
 	public Signature<T> getSignature() {
-		return new Signature<>("unknown", name, Arrays.asList(parameters), returnType, null, single);
+		return new Signature<>("unknown", name, Arrays.asList(parameters), returnType, single);
 	}
 	
 }
