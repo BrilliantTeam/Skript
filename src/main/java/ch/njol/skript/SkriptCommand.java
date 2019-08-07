@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -368,6 +370,9 @@ public class SkriptCommand implements CommandExecutor {
 		if (isFolder) {
 			script = script.replace('/', File.separatorChar).replace('\\', File.separatorChar);
 		} else if (!StringUtils.endsWithIgnoreCase(script, ".sk")) {
+			if(!FilenameUtils.getExtension(script).equals("")) {
+				return null;
+			}
 			script = script + ".sk";
 		}
 		if (script.startsWith("-"))
