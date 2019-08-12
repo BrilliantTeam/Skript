@@ -50,7 +50,7 @@ import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
 
 /**
- * @author Peter Güttinger
+ * Static methods to work with functions.
  */
 public abstract class Functions {
 
@@ -77,9 +77,7 @@ public abstract class Functions {
 	final static Map<String, FunctionData> functions = new ConcurrentHashMap<>();
 	final static Map<String, Signature<?>> javaSignatures = new HashMap<>();
 	final static Map<String, Signature<?>> signatures = new ConcurrentHashMap<>();
-	
-	final static List<FunctionReference<?>> postCheckNeeded = new ArrayList<>();
-	
+		
 	static boolean callFunctionEvents = false;
 	
 	/**
@@ -119,7 +117,6 @@ public abstract class Functions {
 	 * @param node Section node.
 	 * @return Script function, or null if something went wrong.
 	 */
-	@SuppressWarnings("unchecked")
 	@Nullable
 	public static Function<?> loadFunction(final SectionNode node) {
 		SkriptLogger.setNode(node);
@@ -140,7 +137,6 @@ public abstract class Functions {
 			Skript.debug("function " + name + "(" + StringUtils.join(params, ", ") + ")"
 					+ (c != null ? " :: " + (sign.isSingle() ? c.getName().getSingular() : c.getName().getPlural()) : "") + ":");
 		
-		@SuppressWarnings("null")
 		final Function<?> f = new ScriptFunction<>(sign, node);
 		return f;
 	}
