@@ -42,9 +42,6 @@ public class ScriptFunction<T> extends Function<T> {
 	public ScriptFunction(Signature<T> sign, SectionNode node) {
 		super(sign);
 		
-		// here to allow recursion
-		Functions.functions.put(sign.getName(), new FunctionData(this));
-		
 		Functions.currentFunction = this;
 		try {
 			trigger = new Trigger(node.getConfig().getFile(), "function " + sign.getName(),

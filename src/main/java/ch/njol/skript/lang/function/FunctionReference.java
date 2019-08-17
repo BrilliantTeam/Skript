@@ -212,7 +212,7 @@ public class FunctionReference<T> {
 		}
 		
 		signature = (Signature<? extends T>) sign;
-		Functions.registerCaller(this);
+		sign.calls.add(this);
 		
 		return true;
 	}

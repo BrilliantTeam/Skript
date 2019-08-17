@@ -733,11 +733,6 @@ final public class ScriptLoader {
 					Commands.registerCommand(command);
 				}
 				
-				for (Function<?> func : functions) {
-					assert func != null;
-					Functions.putFunction(func);
-				}
-				
 				for (ParsedEventData event : events) {
 					setCurrentEvent("" + event.info.getFirst().getName().toLowerCase(Locale.ENGLISH), event.info.getFirst().events);
 					
