@@ -351,10 +351,10 @@ public abstract class Functions {
 	 * Clears all function calls and removes script functions.
 	 */
 	public static void clearFunctions() {
-		namespaces.clear();
-		globalFunctions.clear();
+		// Keep Java functions, remove everything else
+		namespaces.replaceAll((key, np) -> np == javaNamespace ? np : null);
+		globalFunctions.replaceAll((key, np) -> np == javaNamespace ? np : null);
 		
-		// TODO keep Java functions
 		assert toValidate.isEmpty() : toValidate;
 		toValidate.clear();
 	}
