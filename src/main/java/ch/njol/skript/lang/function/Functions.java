@@ -327,15 +327,18 @@ public abstract class Functions {
 		}
 		
 		// Remove references to this namespace from global functions
-		globalFunctions.replaceAll((name, np) -> np == namespace ? null : np);
+		for (Map.Entry<String, Namespace> entry : globalFunctions.entrySet()) {
+			if (entry.getValue() == namespace) {
+				globalFunctions.remove(entry.getKey());
+			}
+		}
 		
 		// Queue references to signatures we have for revalidation
 		// Can't validate here, because other scripts might be loaded soon
-		for (Signature<?> sign : namespace.getSignatures()) {
-			for (FunctionReference<?> ref : sign.calls) {
-				if (!script.equals(ref.script)) {
-					toValidate.add(ref);
-				}
+		Iterator<Namespace> it = globalFunctions.values().iterator();
+		while (it.hasNext()) {
+			if (it.next() == namespace) {
+				it.remove();
 			}
 		}
 		return namespace.getSignatures().size();
@@ -353,7 +356,13 @@ public abstract class Functions {
 	public static void clearFunctions() {
 		// Keep Java functions, remove everything else
 		namespaces.replaceAll((key, np) -> np == javaNamespace ? np : null);
-		globalFunctions.replaceAll((key, np) -> np == javaNamespace ? np : null);
+		
+		Iterator<Namespace> it = globalFunctions.values().iterator();
+		while (it.hasNext()) {
+			if (it.next() != javaNamespace) {
+				it.remove();
+			}
+		}
 		
 		assert toValidate.isEmpty() : toValidate;
 		toValidate.clear();
