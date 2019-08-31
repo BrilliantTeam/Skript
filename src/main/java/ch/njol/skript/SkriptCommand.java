@@ -368,6 +368,10 @@ public class SkriptCommand implements CommandExecutor {
 		if (isFolder) {
 			script = script.replace('/', File.separatorChar).replace('\\', File.separatorChar);
 		} else if (!StringUtils.endsWithIgnoreCase(script, ".sk")) {
+			int dot = script.lastIndexOf('.');
+			if (dot > 0 && !script.substring(dot+1).equals("")) {
+				return null;
+			}
 			script = script + ".sk";
 		}
 		if (script.startsWith("-"))
