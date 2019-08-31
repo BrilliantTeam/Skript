@@ -77,7 +77,7 @@ public class EvtClick extends SkriptEvent {
 	/**
 	 * Tracks PlayerInteractEvents to deduplicate them.
 	 */
-	private static final ClickEventTracker interactTracker = new ClickEventTracker(Skript.getInstance());
+	public static final ClickEventTracker interactTracker = new ClickEventTracker(Skript.getInstance());
 	
 	/**
 	 * Tracks PlayerInteractEntityEvents to deduplicate them.
