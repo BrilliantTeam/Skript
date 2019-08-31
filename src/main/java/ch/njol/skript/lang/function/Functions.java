@@ -238,7 +238,7 @@ public abstract class Functions {
 		} else {
 			returnClass = Classes.getClassInfoFromUserInput(returnType);
 			NonNullPair<String, Boolean> p = Utils.getEnglishPlural(returnType);
-			singleReturn = p.getSecond();
+			singleReturn = !p.getSecond();
 			if (returnClass == null)
 				returnClass = Classes.getClassInfoFromUserInput(p.getFirst());
 			if (returnClass == null) {

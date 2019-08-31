@@ -107,7 +107,7 @@ public abstract class Function<T> {
 		// Execute parameters or default value expressions
 		for (int i = 0; i < parameters.length; i++) {
 			Parameter<?> p = parameters[i];
-			Object[] val = params[i];
+			Object[] val = ps[i];
 			if (val == null) { // Go for default value
 				assert p.def != null; // Should've been parse error
 				val = p.def.getArray(e);
