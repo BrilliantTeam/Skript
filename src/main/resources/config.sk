@@ -68,7 +68,7 @@ effect command token: !
 #	!broadcast "<red>Please read the rules!" - if you want to get rid of the quotes you have to define a custom command
 #	!set time to 6:00 - sets the time in the current world
 # The command can also be abused, so only give the permission to trusted players, like owners & co-owners:
-#	!spawn 20 ender dragons - will destroy a large part of the world in a short time if no protection is present
+#	!set player's balance to 999999999 - when a compatible economy plugin is installed, this will give the command sender as much money as desired
 #	!create explosion of force 10000 - likely crashes the server or at least hangs it up for a long time
 #	!ban all players - as the effect implies
 
