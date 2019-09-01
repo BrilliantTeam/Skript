@@ -199,6 +199,28 @@ public class AliasesMap {
 		
 		throw new AssertionError(); // Shouldn't have reached here
 	}
+	
+	/**
+	 * Attempts to find an alias that exactly matches the given item.
+	 * @param item Item to match.
+	 * @return An exact match, or no match.
+	 */
+	public Match exactMatch(ItemData item) {
+		MaterialEntry entry = getEntry(item);
+		
+		// Special case: no aliases available!
+		if (entry.defaultItem == null && entry.items.isEmpty()) {
+			return new Match(MatchQuality.DIFFERENT, null);
+		}
+		
+		for (AliasData data : entry.items) {
+			if (item.matchAlias(data.getItem()) == MatchQuality.EXACT) {
+				return new Match(MatchQuality.EXACT, data);
+			}
+		}
+		
+		return new Match(MatchQuality.DIFFERENT, null);
+	}
 
 	/**
 	 * Clears all data from this aliases map.
