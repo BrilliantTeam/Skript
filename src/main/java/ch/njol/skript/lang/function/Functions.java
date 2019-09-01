@@ -183,7 +183,7 @@ public abstract class Functions {
 			} else {
 				Signature<?> sign = namespace.getSignature(name);
 				assert sign != null : "globalFunctions points to a wrong namespace";
-				return signError("A function named " + name + " already exists in script '" + sign.script + "'");
+				return signError("A function named '" + name + "' already exists in script '" + sign.script + "'");
 			}
 		}
 		
@@ -327,18 +327,20 @@ public abstract class Functions {
 		}
 		
 		// Remove references to this namespace from global functions
-		for (Map.Entry<String, Namespace> entry : globalFunctions.entrySet()) {
-			if (entry.getValue() == namespace) {
-				globalFunctions.remove(entry.getKey());
+		Iterator<Namespace> it = globalFunctions.values().iterator();
+		while (it.hasNext()) {
+			if (it.next() == namespace) {
+				it.remove();
 			}
 		}
 		
 		// Queue references to signatures we have for revalidation
 		// Can't validate here, because other scripts might be loaded soon
-		Iterator<Namespace> it = globalFunctions.values().iterator();
-		while (it.hasNext()) {
-			if (it.next() == namespace) {
-				it.remove();
+		for (Signature<?> sign : namespace.getSignatures()) {
+			for (FunctionReference<?> ref : sign.calls) {
+				if (!script.equals(ref.script)) {
+					toValidate.add(ref);
+				}
 			}
 		}
 		return namespace.getSignatures().size();
@@ -354,9 +356,7 @@ public abstract class Functions {
 	 * Clears all function calls and removes script functions.
 	 */
 	public static void clearFunctions() {
-		// Keep Java functions, remove everything else
-		namespaces.replaceAll((key, np) -> np == javaNamespace ? np : null);
-		
+		// Keep Java functions, remove everything else		
 		Iterator<Namespace> it = globalFunctions.values().iterator();
 		while (it.hasNext()) {
 			if (it.next() != javaNamespace) {

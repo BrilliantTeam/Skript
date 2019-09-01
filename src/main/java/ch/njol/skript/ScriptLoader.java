@@ -826,6 +826,8 @@ final public class ScriptLoader {
 			return null;
 		}
 		
+		Functions.clearFunctions(f); // Functions are still callable from other scripts
+		// We're just making it impossible to look them up
 		try {
 			String name = Skript.getInstance().getDataFolder().toPath().resolve(Skript.SCRIPTSFOLDER).relativize(f.toPath()).toString();
 			assert name != null;
