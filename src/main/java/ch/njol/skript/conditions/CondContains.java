@@ -102,22 +102,48 @@ public class CondContains extends Condition {
 	public boolean check(final Event e) {
 		boolean caseSensitive = SkriptConfig.caseSensitive.value();
 		
+		// Special case for listr variables and functions that return them
+		if ((containers instanceof Variable || containers instanceof ExprFunctionCall)
+				&& !containers.isSingle()) {
+			for (Object value : containers.getAll(e)) {
+				for (Object searched : items.getAll(e)) {
+					if (value.equals(searched)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		
 		return containers.check(e,
 				(Checker<Object>) container -> {
-					if ((containers instanceof Variable || containers instanceof ExprFunctionCall)
-							&& !containers.isSingle()) { // List variable
-						Object[] all = containers.getAll(e); // Compare all items to all entries in list
+					if (container instanceof Inventory) {
+						final Inventory invi = (Inventory) container;
+						return items.check(e, (Checker<Object>) type -> {
+							if (type instanceof ItemType)
+								return ((ItemType) type).isContainedIn(invi);
+							else if (type instanceof ItemStack)
+								return invi.contains((ItemStack) type);
+							else return false;
+						});
+					} else if (container instanceof String) {
+						final String s = (String) container;
 						return items.check(e,
-								(Checker<Object>) item -> {
-									for (Object o : all) {
-										if (Relation.EQUAL.is(Comparators.compare(o, item)))
-											return true; // Found equal, success!
+								(Checker<Object>) type -> {
+									if (type instanceof Variable) {
+										@SuppressWarnings("unchecked")
+										String toFind = ((Variable<String>) type).getSingle(e);
+										if (toFind != null)
+											return StringUtils.contains(s, toFind, caseSensitive);
 									}
-									return false; // Not found
+									return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
 								});
-					} else {
-						if (container instanceof Inventory) {
-							final Inventory invi = (Inventory) container;
+					} else { // Ok, so we have a variable...
+						Object val = container instanceof Variable
+								? ((Variable<?>) container).getSingle(e) : container;
+						
+						Inventory invi = Converters.convert(val, Inventory.class);
+						if (invi != null) {
 							return items.check(e, (Checker<Object>) type -> {
 								if (type instanceof ItemType)
 									return ((ItemType) type).isContainedIn(invi);
@@ -125,8 +151,10 @@ public class CondContains extends Condition {
 									return invi.contains((ItemStack) type);
 								else return false;
 							});
-						} else if (container instanceof String) {
-							final String s = (String) container;
+						}
+						
+						String s = Converters.convert(val, String.class);
+						if (s != null) {
 							return items.check(e,
 									(Checker<Object>) type -> {
 										if (type instanceof Variable) {
@@ -137,34 +165,6 @@ public class CondContains extends Condition {
 										}
 										return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
 									});
-						} else { // Ok, so we have a variable...
-							Object val = container instanceof Variable
-									? ((Variable<?>) container).getSingle(e) : container;
-							
-							Inventory invi = Converters.convert(val, Inventory.class);
-							if (invi != null) {
-								return items.check(e, (Checker<Object>) type -> {
-									if (type instanceof ItemType)
-										return ((ItemType) type).isContainedIn(invi);
-									else if (type instanceof ItemStack)
-										return invi.contains((ItemStack) type);
-									else return false;
-								});
-							}
-							
-							String s = Converters.convert(val, String.class);
-							if (s != null) {
-								return items.check(e,
-										(Checker<Object>) type -> {
-											if (type instanceof Variable) {
-												@SuppressWarnings("unchecked")
-												String toFind = ((Variable<String>) type).getSingle(e);
-												if (toFind != null)
-													return StringUtils.contains(s, toFind, caseSensitive);
-											}
-											return type instanceof String && StringUtils.contains(s, (String) type, caseSensitive);
-										});
-							}
 						}
 					}
 					return false;

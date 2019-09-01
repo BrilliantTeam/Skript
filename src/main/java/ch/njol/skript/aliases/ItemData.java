@@ -233,15 +233,12 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		if (type != item.getType())
 			return false; // Obvious mismatch
 		
-		if (itemFlags != 0) { // Either stack has tags (or durability)
-			if (ItemUtils.getDamage(stack) != ItemUtils.getDamage(item))
-				return false; // On 1.12 and below, damage is not in meta
-			if (stack.hasItemMeta() == item.hasItemMeta()) // Compare ItemMeta as in isSimilar() of ItemStack
-				return stack.hasItemMeta() ? itemFactory.equals(stack.getItemMeta(), item.getItemMeta()) : true;
-			else
-				return false;
-		}
-		return true;
+		if (ItemUtils.getDamage(stack) != ItemUtils.getDamage(item))
+			return false; // On 1.12 and below, damage is not in meta
+		if (stack.hasItemMeta() == item.hasItemMeta()) // Compare ItemMeta as in isSimilar() of ItemStack
+			return stack.hasItemMeta() ? itemFactory.equals(stack.getItemMeta(), item.getItemMeta()) : true;
+		else
+			return false;
 	}
 	
 	/**
