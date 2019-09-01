@@ -733,11 +733,6 @@ final public class ScriptLoader {
 					Commands.registerCommand(command);
 				}
 				
-				for (Function<?> func : functions) {
-					assert func != null;
-					Functions.putFunction(func);
-				}
-				
 				for (ParsedEventData event : events) {
 					setCurrentEvent("" + event.info.getFirst().getName().toLowerCase(Locale.ENGLISH), event.info.getFirst().events);
 					
@@ -831,6 +826,8 @@ final public class ScriptLoader {
 			return null;
 		}
 		
+		Functions.clearFunctions(f); // Functions are still callable from other scripts
+		// We're just making it impossible to look them up
 		try {
 			String name = Skript.getInstance().getDataFolder().toPath().resolve(Skript.SCRIPTSFOLDER).relativize(f.toPath()).toString();
 			assert name != null;

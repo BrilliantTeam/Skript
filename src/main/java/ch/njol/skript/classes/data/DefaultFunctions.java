@@ -342,7 +342,7 @@ public class DefaultFunctions {
 					0, 0,
 					0};
 			{
-				assert fields.length == offsets.length && offsets.length == scale.length && scale.length == relations.length && getMaxParameters() == fields.length;
+				assert fields.length == offsets.length && offsets.length == scale.length && scale.length == relations.length && getSignature().getMaxParameters() == fields.length;
 			}
 			
 			@Override
