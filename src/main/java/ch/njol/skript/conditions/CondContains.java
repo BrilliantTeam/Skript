@@ -107,7 +107,7 @@ public class CondContains extends Condition {
 				&& !containers.isSingle()) {
 			for (Object value : containers.getAll(e)) {
 				for (Object searched : items.getAll(e)) {
-					if (value.equals(searched)) {
+					if (Relation.EQUAL.is(Comparators.compare(searched, value))) {
 						return true;
 					}
 				}
