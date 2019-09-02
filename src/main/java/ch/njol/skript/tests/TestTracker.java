@@ -44,4 +44,11 @@ public class TestTracker {
 		return tests;
 	}
 	
+	public TestResults collectResults() {
+		TestResults results = new TestResults(getSucceededTests(), getFailedTests());
+		startedTests.clear();
+		failedTests.clear();
+		return results;
+	}
+	
 }
