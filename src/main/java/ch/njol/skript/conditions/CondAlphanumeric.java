@@ -39,7 +39,7 @@ import ch.njol.util.Kleenean;
 @Description({"Checks if the given string is alphanumeric."})
 @Examples({"if the argument is not alphanumeric:",
 		"	send \"Invalid name!\""})
-@Since("INSERT VERSION")
+@Since("2.4")
 public class CondAlphanumeric extends Condition {
 	
 	static {

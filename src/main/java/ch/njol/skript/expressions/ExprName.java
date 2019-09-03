@@ -90,7 +90,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"	set the player's display name to \"<red>[admin] <gold>%name of player%\"",
 		"	set the player's tab list name to \"<green>%player's name%\"",
 		"set the name of the player's tool to \"Legendary Sword of Awesomeness\""})
-@Since("before 2.1, 2.2-dev20 (inventory name), INSERT VERSION (non-living entity support, changeable inventory name)")
+@Since("before 2.1, 2.2-dev20 (inventory name), 2.4 (non-living entity support, changeable inventory name)")
 public class ExprName extends SimplePropertyExpression<Object, String> {
 
 	@Nullable
