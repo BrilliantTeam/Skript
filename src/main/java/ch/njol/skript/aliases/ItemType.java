@@ -760,7 +760,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 				assert list instanceof RandomAccess;
 				for (int i = 0; i < list.size(); i++) {
 					final ItemStack is = list.get(i);
-					if (is != null && d.isOfType(is)) {
+					if (is != null && d.equals(new ItemData(is))) {
 						if (all && amount == -1) {
 							list.set(i, null);
 							removed = 1;
