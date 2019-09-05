@@ -108,11 +108,11 @@ public class CondContains extends Condition {
 			for (Object value : containers.getAll(e)) {
 				for (Object searched : items.getAll(e)) {
 					if (Relation.EQUAL.is(Comparators.compare(searched, value))) {
-						return true;
+						return !isNegated();
 					}
 				}
 			}
-			return false;
+			return isNegated();
 		}
 		
 		return containers.check(e,
