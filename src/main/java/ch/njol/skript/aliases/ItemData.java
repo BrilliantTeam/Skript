@@ -169,13 +169,13 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		
 		this.stack = new ItemStack(type);
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
-		if (tags != null)
-			BukkitUnsafe.modifyItemStack(stack, tags);
+		if (tags != null) {
+			applyTags(tags);
+		}
 	}
 	
 	public ItemData(Material type, int amount) {
 		this.type = type;
-		
 		this.stack = new ItemStack(type, Math.abs(amount));
 		this.blockValues = BlockCompat.INSTANCE.getBlockValues(stack);
 	}
@@ -184,7 +184,6 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this(type, 1);
 	}
 	
-	@SuppressWarnings("null") // clone() always returns stuff
 	public ItemData(ItemData data) {
 		this.stack = data.stack.clone();
 		this.type = data.type;
@@ -197,6 +196,14 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 		this.stack = stack;
 		this.type = stack.getType();
 		this.blockValues = values;
+		
+		// Set ItemFlags as accurately as possible based on given stack
+		if (ItemUtils.getDamage(stack) != 0) {
+			itemFlags |= ItemFlags.CHANGED_DURABILITY;
+		}
+		if (stack.hasItemMeta()) {
+			itemFlags |= ItemFlags.CHANGED_TAGS;
+		}
 	}
 	
 	public ItemData(ItemStack stack) {
@@ -502,6 +509,15 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 			our.addItemFlags(flag);
 		}
 		setItemMeta(meta);
+	}
+	
+	/**
+	 * Applies tags to this item.
+	 * @param tags Tags in Mojang's JSON format.
+	 */
+	public void applyTags(String tags) {
+		BukkitUnsafe.modifyItemStack(stack, tags);
+		itemFlags |= ItemFlags.CHANGED_TAGS;
 	}
 	
 }
