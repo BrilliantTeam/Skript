@@ -851,7 +851,7 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			return true;
 		int added = 0;
 		for (int i = 0; i < buf.length; i++) {
-			if (Utils.itemStacksEqual(is, buf[i])) {
+			if (ItemUtils.itemStacksEqual(is, buf[i])) {
 				final int toAdd = Math.min(buf[i].getMaxStackSize() - buf[i].getAmount(), is.getAmount() - added);
 				added += toAdd;
 				buf[i].setAmount(buf[i].getAmount() + toAdd);

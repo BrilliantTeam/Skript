@@ -127,4 +127,19 @@ public class ItemUtils {
 		// Assume (naively) that all types are valid items
 		return type;
 	}
+	
+	/**
+	 * Tests whether two item stacks are of the same type, i.e. it ignores the amounts.
+	 *
+	 * @param is1
+	 * @param is2
+	 * @return Whether the item stacks are of the same type
+	 */
+	public static boolean itemStacksEqual(final @Nullable ItemStack is1, final @Nullable ItemStack is2) {
+		if (is1 == null || is2 == null)
+			return is1 == is2;
+		return is1.getType() == is2.getType() && ItemUtils.getDamage(is1) == ItemUtils.getDamage(is2)
+			&& is1.getItemMeta().equals(is2.getItemMeta());
+	}
+	
 }
