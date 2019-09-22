@@ -43,7 +43,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Examples({"set view distance of player to 10", "set {_view} to view distance of player",
 		"reset view distance of all players", "add 2 to view distance of player"})
 @RequiredPlugins("Paper 1.9-1.13.2")
-@Since("INSERT VERSION")
+@Since("2.4")
 public class ExprPlayerViewDistance extends PropertyExpression<Player, Number> {
 	
 	static {
