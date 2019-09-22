@@ -62,6 +62,7 @@ public class PandaData extends EntityData<Panda> {
 		Gene gen = mainGene;
 		if (gen == null)
 			gen = Gene.values()[ThreadLocalRandom.current().nextInt(0, 7)];
+		assert gen != null;
 		entity.setMainGene(gen);
 		entity.setHiddenGene(hiddenGene != null ? hiddenGene : gen);
 	}
