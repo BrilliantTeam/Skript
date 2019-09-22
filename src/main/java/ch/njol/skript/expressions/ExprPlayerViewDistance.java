@@ -47,7 +47,8 @@ import ch.njol.util.coll.CollectionUtils;
 public class ExprPlayerViewDistance extends PropertyExpression<Player, Number> {
 	
 	static {
-		if (Skript.methodExists(Player.class, "getViewDistance"))
+		// Not supported on 1.14 yet
+		if (Skript.methodExists(Player.class, "getViewDistance") && !Skript.isRunningMinecraft(1, 14))
 			register(ExprPlayerViewDistance.class, Number.class, "view distance[s]", "players");
 	}
 	
@@ -85,7 +86,7 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Number> {
 	
 	@Override
 	public void change(Event e, @Nullable Object[] delta, ChangeMode mode) {
-		int distance = delta == null ? 0 : (int) delta[0];
+		int distance = delta == null ? 0 : ((Number) delta[0]).intValue();
 		switch (mode) {
 			case DELETE:
 			case SET:
@@ -103,6 +104,8 @@ public class ExprPlayerViewDistance extends PropertyExpression<Player, Number> {
 			case RESET:
 				for (Player player : getExpr().getArray(e))
 					player.setViewDistance(Bukkit.getServer().getViewDistance());
+			default:
+				assert false;
 		}
 	}
 	
