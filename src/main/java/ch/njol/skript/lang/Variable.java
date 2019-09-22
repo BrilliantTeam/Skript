@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -122,7 +124,15 @@ public class Variable<T> implements Expression<T> {
 				Skript.error("A variable's name must neither start nor end with the separator '" + SEPARATOR + "' (error in variable {" + name + "})");
 			return false;
 		} else if (name.contains("*") && (!allowListVariable || name.indexOf("*") != name.length() - 1 || !name.endsWith(SEPARATOR + "*"))) {
-			if (printErrors) {
+			int count = StringUtils.count(name, '*');
+			Matcher m = Pattern.compile("(%(.*?)%)+").matcher(name); // Matches all data within %%
+			while (m.find()) {
+				String g = m.group();
+				count -= g == null ? 0 : StringUtils.count(g, '*');
+			}
+			if (count == 0 || (count == 1 && name.endsWith(SEPARATOR + "*")))
+				return true;
+			else if (printErrors) {
 				if (name.indexOf("*") == 0)
 					Skript.error("[2.0] Local variables now start with an underscore, e.g. {_local variable}. The asterisk is reserved for list variables. (error in variable {" + name + "})");
 				else
