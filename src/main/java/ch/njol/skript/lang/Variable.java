@@ -134,10 +134,10 @@ public class Variable<T> implements Expression<T> {
 			int count = asterisks.size();
 			int index = 0;
 			for (int i = 0; i < percents.size(); i += 2) {
-				if (index == asterisks.size() || i+1 == percents.size())
+				if (index == asterisks.size() || i+1 == percents.size()) // Out of bounds 
 					break;
 				int lb = percents.get(i), ub = percents.get(i+1);
-				System.out.println(lb + " " + ub + " " + asterisks.get(index));
+				// Continually decrement asterisk count by checking if any asterisks in current range 
 				while (index < asterisks.size() && lb < asterisks.get(index) && asterisks.get(index) < ub) {
 					count--;
 					index++;
