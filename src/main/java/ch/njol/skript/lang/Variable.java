@@ -28,8 +28,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -124,11 +122,26 @@ public class Variable<T> implements Expression<T> {
 				Skript.error("A variable's name must neither start nor end with the separator '" + SEPARATOR + "' (error in variable {" + name + "})");
 			return false;
 		} else if (name.contains("*") && (!allowListVariable || name.indexOf("*") != name.length() - 1 || !name.endsWith(SEPARATOR + "*"))) {
-			int count = StringUtils.count(name, '*');
-			Matcher m = Pattern.compile("(%(.*?)%)+").matcher(name); // Matches all data within %%
-			while (m.find()) {
-				String g = m.group();
-				count -= g == null ? 0 : StringUtils.count(g, '*');
+			List<Integer> asterisks = new ArrayList<>();
+			List<Integer> percents = new ArrayList<>();
+			for (int i = 0; i < name.length(); i++) {
+				char c = name.charAt(i);
+				if (c == '*')
+					asterisks.add(i);
+				else if (c == '%')
+					percents.add(i);
+			}
+			int count = asterisks.size();
+			int index = 0;
+			for (int i = 0; i < percents.size(); i += 2) {
+				if (index == asterisks.size() || i+1 == percents.size())
+					break;
+				int lb = percents.get(i), ub = percents.get(i+1);
+				System.out.println(lb + " " + ub + " " + asterisks.get(index));
+				while (index < asterisks.size() && lb < asterisks.get(index) && asterisks.get(index) < ub) {
+					count--;
+					index++;
+				}
 			}
 			if (count == 0 || (count == 1 && name.endsWith(SEPARATOR + "*")))
 				return true;
