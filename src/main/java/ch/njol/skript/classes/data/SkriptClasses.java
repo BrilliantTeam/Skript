@@ -658,8 +658,7 @@ public class SkriptClasses {
 					@Override
 					@Nullable
 					public Color parse(String input, ParseContext context) {
-						Optional<SkriptColor> color = SkriptColor.fromName(input);
-						return color.isPresent() ? color.get() : null;
+						return SkriptColor.fromName(input);
 					}
 					
 					@Override

@@ -113,8 +113,8 @@ public enum SkriptColor implements Color {
 		return (byte) (15 - dye.getWoolData());
 	}
 	
-	final static Map<String, SkriptColor> names = new HashMap<>();
-	final static Set<SkriptColor> colors = new HashSet<>();
+	final static Map<String, Color> names = new HashMap<>();
+	final static Set<Color> colors = new HashSet<>();
 	public final static String LANGUAGE_NODE = "colors";
 	
 	static {
@@ -134,41 +134,31 @@ public enum SkriptColor implements Color {
 	 * @param name The name of the color defined by Skript's .lang files.
 	 * @return Optional if any Skript Color matched up with the defined name
 	 */
-	public static Optional<SkriptColor> fromName(String name) {
-		return names.entrySet().stream()
-				.filter(entry -> entry.getKey().equals(name))
-				.map(Map.Entry::getValue)
-				.findAny();
+	@Nullable
+	public static Color fromName(String name) {
+		return names.get(name);
 	}
 	
 	/**
 	 * @param dye DyeColor to match against a defined Skript Color.
 	 * @return Optional if any Skript Color matched up with the defined DyeColor
 	 */
-	public static Optional<SkriptColor> fromDyeColor(DyeColor dye) {
-		return colors.stream()
-				.filter(color -> color.asDyeColor().equals(dye))
-				.findAny();
+	public static Color fromDyeColor(DyeColor dye) {
+		for (Color color : colors) {
+			if (color.asDyeColor().equals(dye))
+				return color;
+		}
+		assert false;
+		return null;
 	}
 	
-	public static Optional<SkriptColor> fromBukkitColor(org.bukkit.Color color) {
-		return colors.stream()
-				.filter(c -> c.asBukkitColor().equals(color))
-				.findAny();
-	}
-	
-	/**
-	 * @deprecated Magic numbers
-	 * @param data DyeColor to match against a defined Skript Color.
-	 * @return Optional if any Skript Color matched up with the defined DyeColor
-	 */
-	@Deprecated
-	public static Optional<SkriptColor> fromDyeData(short data) {
-		if (data < 0 || data >= 16)
-			return Optional.empty();
-		return colors.stream()
-				.filter(color -> color.getWoolData() == 15 - data)
-				.findAny();
+	public static Color fromBukkitColor(org.bukkit.Color color) {
+		for (Color c : colors) {
+			if (c.asBukkitColor().equals(color))
+				return c;
+		}
+		assert false;
+		return null;
 	}
 	
 	/**
@@ -177,12 +167,33 @@ public enum SkriptColor implements Color {
 	 * @return Optional if any Skript Color matched up with the defined DyeColor
 	 */
 	@Deprecated
-	public static Optional<SkriptColor> fromWoolData(short data) {
+	@Nullable
+	public static Color fromDyeData(short data) {
 		if (data < 0 || data >= 16)
-			return Optional.empty();
-		return colors.stream()
-				.filter(color -> color.getWoolData() == data)
-				.findAny();
+			return null;
+		
+		for (Color color : colors) {
+			if (color.asDyeColor().getDyeData() == data)
+				return color;
+		}
+		return null;
+	}
+	
+	/**
+	 * @deprecated Magic numbers
+	 * @param data DyeColor to match against a defined Skript Color.
+	 * @return Optional if any Skript Color matched up with the defined DyeColor
+	 */
+	@Deprecated
+	@Nullable
+	public static Color fromWoolData(short data) {
+		if (data < 0 || data >= 16)
+			return null;
+		for (Color color : colors) {
+			if (color.asDyeColor().getWoolData() == data)
+				return color;
+		}
+		return null;
 	}
 	
 	@Override
