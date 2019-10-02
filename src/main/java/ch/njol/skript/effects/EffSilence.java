@@ -30,7 +30,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
 @Name("Silence Entity")
@@ -53,21 +53,21 @@ public class EffSilence extends Effect {
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
-	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final SkriptParser.ParseResult parser) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		entities = (Expression<Entity>) exprs[0];
 		silence = matchedPattern % 2 == 0;
 		return true;
 	}
 	
 	@Override
-	protected void execute(final Event e) {
+	protected void execute(Event e) {
 		for (Entity entity : entities.getArray(e)) {
 			entity.setSilent(silence);
 		}
 	}
 	
 	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		return (silence ? "silence" : "unsilence") + entities.toString(e, debug);
+	public String toString(@Nullable Event e, boolean debug) {
+		return (silence ? "silence " : "unsilence ") + entities.toString(e, debug);
 	}
 }
