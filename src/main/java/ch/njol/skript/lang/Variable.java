@@ -143,15 +143,15 @@ public class Variable<T> implements Expression<T> {
 					index++;
 				}
 			}
-			if (count == 0 || (count == 1 && name.endsWith(SEPARATOR + "*")))
-				return true;
-			else if (printErrors) {
-				if (name.indexOf("*") == 0)
-					Skript.error("[2.0] Local variables now start with an underscore, e.g. {_local variable}. The asterisk is reserved for list variables. (error in variable {" + name + "})");
-				else
-					Skript.error("A variable's name must not contain any asterisks except at the end after '" + SEPARATOR + "' to denote a list variable, e.g. {variable" + SEPARATOR + "*} (error in variable {" + name + "})");
+			if (!(count == 0 || (count == 1 && name.endsWith(SEPARATOR + "*")))){
+				if (printErrors) {
+					if (name.indexOf("*") == 0)
+						Skript.error("[2.0] Local variables now start with an underscore, e.g. {_local variable}. The asterisk is reserved for list variables. (error in variable {" + name + "})");
+					else
+						Skript.error("A variable's name must not contain any asterisks except at the end after '" + SEPARATOR + "' to denote a list variable, e.g. {variable" + SEPARATOR + "*} (error in variable {" + name + "})");
+				}
+				return false;
 			}
-			return false;
 		} else if (name.contains(SEPARATOR + SEPARATOR)) {
 			if (printErrors)
 				Skript.error("A variable's name must not contain the separator '" + SEPARATOR + "' multiple times in a row (error in variable {" + name + "})");
