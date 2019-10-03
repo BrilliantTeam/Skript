@@ -475,6 +475,17 @@ public final class Skript extends JavaPlugin implements Listener {
 				
 				Language.setUseLocal(false);
 				
+				if (TestMode.ENABLED) {
+					info("Preparing Skript for testing...");
+					tainted = true;
+					try {
+						getAddonInstance().loadClasses("ch.njol.skript", "tests");
+					} catch (IOException e) {
+						Skript.exception("Failed to load testing environment.");
+						Bukkit.getServer().shutdown();
+					}
+				}
+				
 				stopAcceptingRegistrations();
 				
 				
@@ -532,26 +543,18 @@ public final class Skript extends JavaPlugin implements Listener {
 				
 				// Skript initialization done
 				debug("Early init done");
-				if (TestMode.ENABLED) {
-					info("Preparing Skript for testing...");
-					try {
-						getAddonInstance().loadClasses("ch.njol.skript", "tests");
-					} catch (IOException e) {
-						Skript.exception("Failed to load testing environment.");
-						Bukkit.getServer().shutdown();
-					}
-					
+				if (TestMode.ENABLED) { // Ignore late init (scripts, etc.) in test mode
 					if (!TestMode.DEV_MODE) { // Run tests NOW!
-						info("Running all tests...");
+						info("Running all tests from " + TestMode.TEST_DIR);
 						ScriptLoader.loadScripts(ScriptLoader.loadStructures(TestMode.TEST_DIR.toFile()));
 						Bukkit.getPluginManager().callEvent(new SkriptTestEvent());
 						
 						info("Collecting results to " + TestMode.RESULTS_FILE);
 						String results = new Gson().toJson(TestTracker.collectResults());
 						try {
-							Files.write(TestMode.RESULTS_FILE, results.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW);
+							Files.write(TestMode.RESULTS_FILE, results.getBytes(StandardCharsets.UTF_8));
 						} catch (IOException e) {
-							Skript.exception("Failed to write test results.");
+							Skript.exception(e, "Failed to write test results.");
 						}
 						info("Testing done, shutting down the server.");
 						Bukkit.getServer().shutdown();
@@ -761,6 +764,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		 */
 		String burgerEnabled = System.getProperty("skript.burger.enable");
 		if (burgerEnabled != null) {
+			tainted = true;
 			String version = System.getProperty("skript.burger.version");
 			String burgerInput;
 			if (version == null) { // User should have provided JSON file path

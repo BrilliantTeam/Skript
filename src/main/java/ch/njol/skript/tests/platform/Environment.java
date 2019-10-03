@@ -1,12 +1,33 @@
+/**
+ *   This file is part of Skript.
+ *
+ *  Skript is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Skript is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Copyright 2011-2017 Peter Güttinger and contributors
+ */
 package ch.njol.skript.tests.platform;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ProcessBuilder.Redirect;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -95,7 +116,7 @@ public class Environment {
 		Files.createDirectories(skript.getParent());
 		try {
 			Files.copy(new File(getClass().getProtectionDomain().getCodeSource().getLocation()
-				    .toURI()).toPath(), skript);
+				    .toURI()).toPath(), skript, StandardCopyOption.REPLACE_EXISTING);
 		} catch (URISyntaxException e) {
 			throw new AssertionError(e);
 		}
@@ -109,7 +130,7 @@ public class Environment {
 			Path source = dataRoot.resolve(resource.getSource());
 			Path target = env.resolve(resource.getTarget());
 			Files.createDirectories(target.getParent());
-			Files.copy(source, target);
+			Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
 		}
 		
 		// Download additional resources
@@ -119,22 +140,32 @@ public class Environment {
 			Path target = env.resolve(resource.getTarget());
 			Files.createDirectories(target.getParent());
 			try (InputStream is = url.openStream()) {
-				Files.copy(is, target);
+				Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
 			}
 		}
 	}
 	
-	public void runTests(Path root, boolean devMode, String... jvmArgs) throws IOException, InterruptedException {
-		Path env = root.resolve(name);
+	public void runTests(Path runnerRoot, Path testsRoot, boolean devMode, String... jvmArgs) throws IOException, InterruptedException {
+		Path env = runnerRoot.resolve(name);
 		List<String> args = new ArrayList<>();
+		args.add("java");
+		args.add("-ea");
 		args.add("-Dskript.testing.enabled=true");
-		args.add("-Dskript.testing.dir=test_cases");
+		args.add("-Dskript.testing.dir=" + testsRoot);
 		args.add("-Dskript.testing.devMode=" + devMode);
 		args.add("-Dskript.testing.results=test_results.json");
+		args.addAll(Arrays.asList(jvmArgs));
 		args.addAll(Arrays.asList(commandLine));
 		
-		args.addAll(Arrays.asList(jvmArgs));
-		Process process = new ProcessBuilder(args).directory(env.toFile()).start();
-		process.waitFor();
+		Process process = new ProcessBuilder(args)
+				.directory(env.toFile())
+				.redirectOutput(Redirect.INHERIT)
+				.redirectError(Redirect.INHERIT)
+				.redirectInput(Redirect.INHERIT)
+				.start();
+		int code = process.waitFor();
+		if (code != 0) {
+			throw new IOException("environment returned with code " + code);
+		}
 	}
 }

@@ -349,7 +349,7 @@ public class SkriptCommand implements CommandExecutor {
 			} else if (args[0].equalsIgnoreCase("test") && TestMode.DEV_MODE) {
 				File script = TestMode.TEST_DIR.resolve(args[1] + ".sk").toFile();
 				assert script != null;
-				ScriptLoader.loadScripts(ScriptLoader.loadStructures(script)); // Load test
+				ScriptLoader.loadScripts(ScriptLoader.loadStructure(script)); // Load test
 				Bukkit.getPluginManager().callEvent(new SkriptTestEvent()); // Run it
 				ScriptLoader.unloadScript(script); // Unload it
 				
