@@ -13,10 +13,11 @@ import ch.njol.skript.lang.SkriptParser;
 public class EvtTestCase extends SkriptEvent {
 	
 	static {
-		Skript.registerEvent("Test Case", EvtTestCase.class, PlayerEditBookEvent.class, "test %string%")
-			.description("Contents represent one test case.")
-			.examples("")
-			.since("INSERT VERSION");
+		if (TestMode.ENABLED)
+			Skript.registerEvent("Test Case", EvtTestCase.class, PlayerEditBookEvent.class, "test %string%")
+				.description("Contents represent one test case.")
+				.examples("")
+				.since("INSERT VERSION");
 	}
 	
 	@SuppressWarnings("null")

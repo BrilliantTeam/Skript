@@ -23,7 +23,8 @@ import ch.njol.util.Kleenean;
 public class EffAssert extends Effect  {
 
 	static {
-		Skript.registerEffect(EffAssert.class, "assert <.+> with %string%");
+		if (TestMode.ENABLED)
+			Skript.registerEffect(EffAssert.class, "assert <.+> with %string%");
 	}
 
 	@SuppressWarnings("null")
