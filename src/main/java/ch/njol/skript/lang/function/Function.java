@@ -61,6 +61,11 @@ public abstract class Function<T> {
 		return sign.getParameters();
 	}
 	
+	@SuppressWarnings("null")
+	public Parameter<?> getParameter(int index) {
+		return getParameters()[index];
+	}
+	
 	public boolean isSingle() {
 		return sign.isSingle();
 	}
