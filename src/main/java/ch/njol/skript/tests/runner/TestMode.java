@@ -1,14 +1,16 @@
-package ch.njol.skript.tests;
+package ch.njol.skript.tests.runner;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import ch.njol.skript.tests.TestResults;
 
 /**
  * Static utilities for Skript's 'test mode'.
  */
 public class TestMode {
 	
-	private static final String ROOT = "skript.testMode.";
+	private static final String ROOT = "skript.testing.";
 	
 	/**
 	 * Determines if test mode is enabled. In test mode, Skript will not load
@@ -26,9 +28,10 @@ public class TestMode {
 	public static final Path TEST_DIR = Paths.get(System.getProperty(ROOT + "dir"));
 	
 	/**
-	 * Enable test development mode.
+	 * Enable test development mode. Skript will allow individual test scripts
+	 * to be loaded and ran, and prints results to chat or console.
 	 */
-	public static final boolean DEV_MODE = "true".equals(System.getProperty(ROOT + "devMode"));
+	public static final boolean DEV_MODE = ENABLED && "true".equals(System.getProperty(ROOT + "devMode"));
 	
 	/**
 	 * Path to file where to save results in JSON format.

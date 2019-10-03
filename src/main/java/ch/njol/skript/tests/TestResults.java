@@ -32,4 +32,17 @@ public class TestResults {
 		return failed;
 	}
 	
+	@SuppressWarnings("null")
+	public String createReport() {
+		StringBuilder sb = new StringBuilder("Succeeded:\n");
+		for (String test : succeeded) {
+			sb.append(test).append('\n');
+		}
+		sb.append("Failed:\n");
+		for (Map.Entry<String, String> entry : failed.entrySet()) {
+			sb.append(entry.getKey()).append(": ").append(entry.getValue()).append('\n');
+		}
+		return sb.toString();
+	}
+	
 }

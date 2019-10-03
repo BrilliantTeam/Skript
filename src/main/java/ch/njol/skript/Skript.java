@@ -127,6 +127,9 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Comparators;
 import ch.njol.skript.registrations.Converters;
 import ch.njol.skript.registrations.EventValues;
+import ch.njol.skript.tests.runner.SkriptTestEvent;
+import ch.njol.skript.tests.runner.TestMode;
+import ch.njol.skript.tests.runner.TestTracker;
 import ch.njol.skript.timings.SkriptTimings;
 import ch.njol.skript.update.ReleaseManifest;
 import ch.njol.skript.update.ReleaseStatus;
@@ -525,6 +528,38 @@ public final class Skript extends JavaPlugin implements Listener {
 				} finally {
 					c.stop();
 					h.stop();
+				}
+				
+				// Skript initialization done
+				debug("Early init done");
+				if (TestMode.ENABLED) {
+					info("Preparing Skript for testing...");
+					try {
+						getAddonInstance().loadClasses("ch.njol.skript", "tests");
+					} catch (IOException e) {
+						Skript.exception("Failed to load testing environment.");
+						Bukkit.getServer().shutdown();
+					}
+					
+					if (!TestMode.DEV_MODE) { // Run tests NOW!
+						info("Running all tests...");
+						ScriptLoader.loadScripts(ScriptLoader.loadStructures(TestMode.TEST_DIR.toFile()));
+						Bukkit.getPluginManager().callEvent(new SkriptTestEvent());
+						
+						info("Collecting results to " + TestMode.RESULTS_FILE);
+						String results = new Gson().toJson(TestTracker.collectResults());
+						try {
+							Files.write(TestMode.RESULTS_FILE, results.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW);
+						} catch (IOException e) {
+							Skript.exception("Failed to write test results.");
+						}
+						info("Testing done, shutting down the server.");
+						Bukkit.getServer().shutdown();
+					} else {
+						info("Test development mode enabled. Test scripts are at " + TestMode.TEST_DIR);
+					}
+					
+					return;
 				}
 				
 				final long vld = System.currentTimeMillis() - vls;
@@ -1430,6 +1465,11 @@ public final class Skript extends JavaPlugin implements Listener {
 	private static boolean checkedPlugins = false;
 	
 	/**
+	 * Set by Skript when doing something that users shouldn't do.
+	 */
+	private static boolean tainted = false;
+	
+	/**
 	 * Used if something happens that shouldn't happen
 	 * 
 	 * @param cause exception that shouldn't occur
@@ -1468,8 +1508,10 @@ public final class Skript extends JavaPlugin implements Listener {
 		logEx("[Skript] Severe Error:");
 		logEx(info);
 		logEx();
-		logEx("Something went horribly wrong with Skript.");
-		logEx("This issue is NOT your fault! You probably can't fix it yourself, either.");
+		if (!tainted) {
+			logEx("Something went horribly wrong with Skript.");
+			logEx("This issue is NOT your fault! You probably can't fix it yourself, either.");
+		}
 		
 		// Parse something useful out of the stack trace
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -1484,7 +1526,10 @@ public final class Skript extends JavaPlugin implements Listener {
 		SkriptUpdater updater = Skript.getInstance().getUpdater();
 		
 		// Check if server platform is supported
-		if (!isRunningMinecraft(1, 9)) {
+		if (tainted) {
+			logEx("Skript is running with developer command-line options.");
+			logEx("If you are not a developer, consider disabling them.");
+		} else if (!isRunningMinecraft(1, 9)) {
 			logEx("You are running an outdated Minecraft version not supported by Skript.");
 			logEx("Please update to Minecraft 1.9.4 or later or fix this yourself and send us a pull request.");
 			logEx("Alternatively, use an older Skript version; do note that those are also unsupported by us.");
@@ -1493,7 +1538,7 @@ public final class Skript extends JavaPlugin implements Listener {
 		} else if (!serverPlatform.supported){
 			logEx("Your server platform appears to be unsupported by Skript. It might not work reliably.");
 			logEx("You can report this at " + issuesUrl + ". However, we may be unable to fix the issue.");
-			logEx("It is recommended that you switch to Paper or Spigot, should you encounter problems.");
+			logEx("It is recommended that you switch to Paper or Spigot, should you encounter more problems.");
 		} else if (updater != null && updater.getReleaseStatus() == ReleaseStatus.OUTDATED) {
 			logEx("You're running outdated version of Skript! Please try updating it NOW; it might fix this.");
 			logEx("Run /sk update check to get a download link to latest Skript!");

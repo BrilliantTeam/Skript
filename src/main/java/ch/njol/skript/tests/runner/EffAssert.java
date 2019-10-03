@@ -1,4 +1,4 @@
-package ch.njol.skript.tests;
+package ch.njol.skript.tests.runner;
 
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
