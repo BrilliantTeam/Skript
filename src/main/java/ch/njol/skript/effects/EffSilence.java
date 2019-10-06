@@ -44,7 +44,7 @@ public class EffSilence extends Effect {
 			"silence %entities%",
 			"unsilence %entities%",
 			"make %entities% silent",
-			"make %entities% (not silent|audible)");
+			"make %entities% not silent");
 	}
 	
 	@SuppressWarnings("null")
