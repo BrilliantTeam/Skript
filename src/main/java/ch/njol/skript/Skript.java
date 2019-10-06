@@ -546,10 +546,23 @@ public final class Skript extends JavaPlugin implements Listener {
 				if (TestMode.ENABLED) { // Ignore late init (scripts, etc.) in test mode
 					if (!TestMode.DEV_MODE) { // Run tests NOW!
 						info("Running all tests from " + TestMode.TEST_DIR);
-						ScriptLoader.loadScripts(ScriptLoader.loadStructures(TestMode.TEST_DIR.toFile()));
+						
+						// Treat parse errors as fatal testing failure
+						CountingLogHandler errorCounter = new CountingLogHandler(Level.SEVERE);
+						try {
+							SkriptLogger.startLogHandler(errorCounter);
+							ScriptLoader.loadScripts(ScriptLoader.loadStructures(TestMode.TEST_DIR.toFile()));
+						} finally {
+							errorCounter.stop();
+						}
+						
 						Bukkit.getPluginManager().callEvent(new SkriptTestEvent());
 						
 						info("Collecting results to " + TestMode.RESULTS_FILE);
+						if (errorCounter.getCount() > 0) {
+							TestTracker.testStarted("parse scripts");
+							TestTracker.testFailed(errorCounter.getCount() + " error(s) found");
+						}
 						String results = new Gson().toJson(TestTracker.collectResults());
 						try {
 							Files.write(TestMode.RESULTS_FILE, results.getBytes(StandardCharsets.UTF_8));

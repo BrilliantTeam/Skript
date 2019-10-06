@@ -26,13 +26,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+
+import ch.njol.skript.tests.TestResults;
+import ch.njol.util.NonNullPair;
 
 /**
  * Main entry point of test platform. It allows running this Skript on
@@ -72,10 +79,42 @@ public class PlatformMain {
 		System.out.println("Test environments: " + String.join(",",
 				envs.stream().map(Environment::getName).collect(Collectors.toList())));
 		
+		Set<String> allTests = new HashSet<>();
+		Map<String, List<NonNullPair<Environment, String>>> failures = new HashMap<>();
+		
+		// Run tests and collect the results
 		for (Environment env : envs) {
 			System.out.println("Starting testing on " + env.getName());
 			env.initialize(dataRoot, runnerRoot, false);
-			env.runTests(runnerRoot, testsRoot, devMode, "-Xmx1G");
+			TestResults results = env.runTests(runnerRoot, testsRoot, devMode, "-Xmx1G");
+			
+			// Collect results
+			allTests.addAll(results.getSucceeded());
+			allTests.addAll(results.getFailed().keySet());
+			for (Map.Entry<String, String> fail : results.getFailed().entrySet()) {
+				failures.computeIfAbsent(fail.getKey(), (k) -> new ArrayList<>())
+						.add(new NonNullPair<>(env, fail.getValue()));
+			}
+		}
+		
+		// Sort results in alphabetical order
+		List<String> succeeded = allTests.stream().filter(name -> !failures.containsKey(name)).collect(Collectors.toList());
+		Collections.sort(succeeded);
+		List<String> failNames = new ArrayList<>(failures.keySet());
+		Collections.sort(failNames);
+		
+		// All succeeded tests in a single line
+		System.out.println("Succeeded: " + String.join(", ", succeeded));
+		if (!failNames.isEmpty()) { // More space for failed tests, they're important
+			System.err.println("Failed:");
+			for (String failed : failNames) {
+				List<NonNullPair<Environment, String>> errors = failures.get(failed);
+				System.err.println("  " + failed + " (on " + errors.size() + " environments)");
+				for (NonNullPair<Environment, String> error : errors) {
+					System.err.println("    " + error.getSecond() + " (on " + error.getFirst().getName() + ")");
+				}
+			}
+			System.exit(failNames.size()); // Error code to indicate how many tests failed
 		}
 	}
 }

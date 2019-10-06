@@ -173,7 +173,9 @@ compileTestJava.options.encoding = 'UTF-8'
 void createTestTask(String name, String environments, boolean devMode) {
 	tasks.create(name, Exec) {
 		dependsOn jar
-		standardInput = System.in
+		if (devMode) {
+			standardInput = System.in
+		}
 		commandLine 'java', '-cp',
 				'build/libs/Skript.jar:' + project.configurations.runtimeClasspath.find {it.name.startsWith('gson')},
 				'ch.njol.skript.tests.platform.PlatformMain',
@@ -183,7 +185,8 @@ void createTestTask(String name, String environments, boolean devMode) {
 
 createTestTask('skriptTest', 'src/test/skript/environments/main', false)
 createTestTask('skriptTestFull', 'src/test/skript/environments/', false)
-createTestTask('skriptTestDebug', 'src/test/skript/environments/main/paper-1.14.4.json', true)
+createTestTask('skriptTestDev', 'src/test/skript/environments/main/' + System.getenv('skript.testEnv') == null
+		? 'paper-1.14.4.json' : System.getenv('skript.testEnv'), true)
 
 // Build flavor configurations
 task githubResources(type: ProcessResources) {

@@ -56,7 +56,7 @@ public class TestTracker {
 	}
 	
 	public static Map<String, String> getFailedTests() {
-		return failedTests;
+		return new HashMap<>(failedTests);
 	}
 	
 	public static Set<String> getSucceededTests() {

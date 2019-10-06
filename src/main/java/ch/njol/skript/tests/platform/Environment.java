@@ -31,6 +31,13 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.gson.Gson;
+
+import ch.njol.skript.tests.TestResults;
 
 /**
  * Test environment information.
@@ -145,7 +152,7 @@ public class Environment {
 		}
 	}
 	
-	public void runTests(Path runnerRoot, Path testsRoot, boolean devMode, String... jvmArgs) throws IOException, InterruptedException {
+	public TestResults runTests(Path runnerRoot, Path testsRoot, boolean devMode, String... jvmArgs) throws IOException, InterruptedException {
 		Path env = runnerRoot.resolve(name);
 		List<String> args = new ArrayList<>();
 		args.add("java");
@@ -163,9 +170,20 @@ public class Environment {
 				.redirectError(Redirect.INHERIT)
 				.redirectInput(Redirect.INHERIT)
 				.start();
+		Runtime.getRuntime().addShutdownHook(new Thread(() ->  {
+			if (process.isAlive()) {
+				process.destroy();
+			}
+		})); // When we exit, try to make them exit too
 		int code = process.waitFor();
 		if (code != 0) {
 			throw new IOException("environment returned with code " + code);
 		}
+		
+		// Read test results
+		TestResults results = new Gson().fromJson(new String(Files.readAllBytes(env.resolve("test_results.json"))), TestResults.class);
+		assert results != null;
+		return results;
 	}
+	
 }
