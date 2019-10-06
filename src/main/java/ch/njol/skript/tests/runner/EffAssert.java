@@ -36,7 +36,7 @@ import ch.njol.skript.lang.TriggerItem;
 import ch.njol.util.Kleenean;
 
 @Name("Assert")
-@Description("Assert that condition is true.")
+@Description("Assert that condition is true. Test fails when it is not.")
 @Examples("")
 @Since("INSERT VERSION")
 public class EffAssert extends Effect  {

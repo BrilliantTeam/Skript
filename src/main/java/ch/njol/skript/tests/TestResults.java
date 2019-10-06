@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Test results.
+ * Contains test results: successes and failures. Can be serialized e.g.
+ * with GSON for transfering it between processes.
  */
 public class TestResults {
 	

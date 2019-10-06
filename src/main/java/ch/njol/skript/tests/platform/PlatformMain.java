@@ -94,8 +94,10 @@ public class PlatformMain {
 			allTests.addAll(results.getSucceeded());
 			allTests.addAll(results.getFailed().keySet());
 			for (Map.Entry<String, String> fail : results.getFailed().entrySet()) {
+				String error = fail.getValue();
+				assert error != null;
 				failures.computeIfAbsent(fail.getKey(), (k) -> new ArrayList<>())
-						.add(new NonNullPair<>(env, fail.getValue()));
+						.add(new NonNullPair<>(env, error));
 			}
 		}
 		

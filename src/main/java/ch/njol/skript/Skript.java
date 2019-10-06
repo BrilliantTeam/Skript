@@ -548,10 +548,13 @@ public final class Skript extends JavaPlugin implements Listener {
 						info("Running all tests from " + TestMode.TEST_DIR);
 						
 						// Treat parse errors as fatal testing failure
+						@SuppressWarnings("null")
 						CountingLogHandler errorCounter = new CountingLogHandler(Level.SEVERE);
 						try {
 							SkriptLogger.startLogHandler(errorCounter);
-							ScriptLoader.loadScripts(ScriptLoader.loadStructures(TestMode.TEST_DIR.toFile()));
+							File testDir = TestMode.TEST_DIR.toFile();
+							assert testDir != null;
+							ScriptLoader.loadScripts(ScriptLoader.loadStructures(testDir));
 						} finally {
 							errorCounter.stop();
 						}
