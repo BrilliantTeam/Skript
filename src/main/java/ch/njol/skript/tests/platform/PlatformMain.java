@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,13 +77,14 @@ public class PlatformMain {
 			envs = Collections.singletonList(gson.fromJson(new String(
 					Files.readAllBytes(envsRoot),StandardCharsets.UTF_8), Environment.class));
 		}
-		System.out.println("Test environments: " + String.join(",",
+		System.out.println("Test environments: " + String.join(", ",
 				envs.stream().map(Environment::getName).collect(Collectors.toList())));
 		
 		Set<String> allTests = new HashSet<>();
 		Map<String, List<NonNullPair<Environment, String>>> failures = new HashMap<>();
 		
 		// Run tests and collect the results
+		envs.sort(Comparator.comparing(Environment::getName));
 		for (Environment env : envs) {
 			System.out.println("Starting testing on " + env.getName());
 			env.initialize(dataRoot, runnerRoot, false);
@@ -104,6 +106,8 @@ public class PlatformMain {
 		Collections.sort(failNames);
 		
 		// All succeeded tests in a single line
+		System.out.println("Tested environments: " + String.join(", ",
+				envs.stream().map(Environment::getName).collect(Collectors.toList())));
 		System.out.println("Succeeded: " + String.join(", ", succeeded));
 		if (!failNames.isEmpty()) { // More space for failed tests, they're important
 			System.err.println("Failed:");
