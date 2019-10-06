@@ -34,7 +34,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
 @Name("Silence Entity")
-@Description("Makes an entity silent/unsilent.")
+@Description("Controls whether or not an entity is silent.")
 @Examples("make target entity silent")
 @Since("INSERT VERSION")
 public class EffSilence extends Effect {
@@ -44,7 +44,7 @@ public class EffSilence extends Effect {
 			"silence %entities%",
 			"unsilence %entities%",
 			"make %entities% silent",
-			"make %entities% (not silent|unsilent)");
+			"make %entities% (not silent|audible)");
 	}
 	
 	@SuppressWarnings("null")
