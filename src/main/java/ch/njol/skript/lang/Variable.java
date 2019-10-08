@@ -143,7 +143,7 @@ public class Variable<T> implements Expression<T> {
 					index++;
 				}
 			}
-			if (!(count == 0 || (count == 1 && name.endsWith(SEPARATOR + "*")))){
+			if (!(count == 0 || (count == 1 && name.endsWith(SEPARATOR + "*")))) {
 				if (printErrors) {
 					if (name.indexOf("*") == 0)
 						Skript.error("[2.0] Local variables now start with an underscore, e.g. {_local variable}. The asterisk is reserved for list variables. (error in variable {" + name + "})");
