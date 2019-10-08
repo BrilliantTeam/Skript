@@ -568,6 +568,10 @@ public final class Skript extends JavaPlugin implements Listener {
 							TestTracker.testStarted("parse scripts");
 							TestTracker.testFailed(errorCounter.getCount() + " error(s) found");
 						}
+						if (errored) { // Check for exceptions thrown while script was executing
+							TestTracker.testStarted("run scripts");
+							TestTracker.testFailed("exception was thrown during execution");
+						}
 						String results = new Gson().toJson(TestTracker.collectResults());
 						try {
 							Files.write(TestMode.RESULTS_FILE, results.getBytes(StandardCharsets.UTF_8));
@@ -1490,6 +1494,11 @@ public final class Skript extends JavaPlugin implements Listener {
 	private static boolean tainted = false;
 	
 	/**
+	 * Set to true when an exception is thrown.
+	 */
+	private static boolean errored = false;
+	
+	/**
 	 * Used if something happens that shouldn't happen
 	 * 
 	 * @param cause exception that shouldn't occur
@@ -1497,6 +1506,7 @@ public final class Skript extends JavaPlugin implements Listener {
 	 * @return an EmptyStacktraceException to throw if code execution should terminate.
 	 */
 	public static EmptyStacktraceException exception(@Nullable Throwable cause, final @Nullable Thread thread, final @Nullable TriggerItem item, final String... info) {
+		errored = true;
 		// First error: gather plugin package information
 		if (!checkedPlugins) { 
 			for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {

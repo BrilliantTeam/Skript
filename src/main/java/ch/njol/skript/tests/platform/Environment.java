@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -170,11 +172,28 @@ public class Environment {
 				.redirectError(Redirect.INHERIT)
 				.redirectInput(Redirect.INHERIT)
 				.start();
+		
+		// When we exit, try to make them exit too
 		Runtime.getRuntime().addShutdownHook(new Thread(() ->  {
 			if (process.isAlive()) {
 				process.destroy();
 			}
-		})); // When we exit, try to make them exit too
+		}));
+		
+		// Catch tests running for abnormally long time
+		if (!devMode) {
+			new Timer("runner watchdog", true).schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					if (process.isAlive()) {
+						System.err.println("Test environment is taking too long, failing...");
+						System.exit(1);
+					}
+				}
+			}, 8 * 60_000);
+		}
+		
 		int code = process.waitFor();
 		if (code != 0) {
 			throw new IOException("environment returned with code " + code);
