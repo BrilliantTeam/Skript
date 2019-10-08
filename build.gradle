@@ -133,7 +133,7 @@ task checkAliases {
 	doLast {
 		def aliasFolder = new File('skript-aliases')
 		if (!aliasFolder.exists() || aliasFolder.listFiles().length == 0) {
-			throw new InvalidUserDataException("Aliases are missing from 'skript-aliases'. Consider fetching submodules with `git submodule update --init`.")
+			throw new InvalidUserDataException("Aliases are missing from 'skript-aliases' folder. Consider fetching submodules with `git submodule update --init`.")
 		}
 	}
 }

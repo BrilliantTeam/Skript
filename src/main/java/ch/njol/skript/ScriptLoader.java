@@ -832,8 +832,8 @@ final public class ScriptLoader {
 		Functions.clearFunctions(f); // Functions are still callable from other scripts
 		// We're just making it impossible to look them up
 		try {
-			Path scriptsFolder = Skript.getInstance().getDataFolder().toPath().toAbsolutePath();
-			String name = scriptsFolder.resolve(Skript.SCRIPTSFOLDER).relativize(f.toPath().toAbsolutePath()).toString();
+			String name = Skript.getInstance().getDataFolder().toPath().toAbsolutePath()
+					.resolve(Skript.SCRIPTSFOLDER).relativize(f.toPath().toAbsolutePath()).toString();
 			assert name != null;
 			return loadStructure(new FileInputStream(f), name);
 		} catch (final IOException e) {

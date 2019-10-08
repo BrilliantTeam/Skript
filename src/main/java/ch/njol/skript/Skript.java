@@ -544,7 +544,9 @@ public final class Skript extends JavaPlugin implements Listener {
 				// Skript initialization done
 				debug("Early init done");
 				if (TestMode.ENABLED) { // Ignore late init (scripts, etc.) in test mode
-					if (!TestMode.DEV_MODE) { // Run tests NOW!
+					if (TestMode.DEV_MODE) { // Run tests NOW!
+						info("Test development mode enabled. Test scripts are at " + TestMode.TEST_DIR);
+					} else {
 						info("Running all tests from " + TestMode.TEST_DIR);
 						
 						// Treat parse errors as fatal testing failure
@@ -574,8 +576,6 @@ public final class Skript extends JavaPlugin implements Listener {
 						}
 						info("Testing done, shutting down the server.");
 						Bukkit.getServer().shutdown();
-					} else {
-						info("Test development mode enabled. Test scripts are at " + TestMode.TEST_DIR);
 					}
 					
 					return;
