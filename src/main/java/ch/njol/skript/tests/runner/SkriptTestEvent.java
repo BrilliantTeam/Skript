@@ -17,13 +17,25 @@
  *
  * Copyright 2011-2017 Peter Güttinger and contributors
  */
-package ch.njol.skript.lang.function;
+package ch.njol.skript.tests.runner;
+
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
 /**
- * Function reference, which is impossible to validate has
- * unknown return types. Can not be instantiated.
+ * Raised by Skript when tests are run.
  */
-public class Unknown {
+public class SkriptTestEvent extends Event {
+
+	private static final HandlerList handlers = new HandlerList();
 	
-	private Unknown() {}
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+	
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+	
 }

@@ -24,6 +24,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -733,11 +734,6 @@ final public class ScriptLoader {
 					Commands.registerCommand(command);
 				}
 				
-				for (Function<?> func : functions) {
-					assert func != null;
-					Functions.putFunction(func);
-				}
-				
 				for (ParsedEventData event : events) {
 					setCurrentEvent("" + event.info.getFirst().getName().toLowerCase(Locale.ENGLISH), event.info.getFirst().events);
 					
@@ -801,7 +797,7 @@ final public class ScriptLoader {
 	 *
 	 * @param directory a directory or a single file
 	 */
-	public static List<Config> loadStructures(final File directory) {
+	public static List<Config> loadStructures(File directory) {
 		if (!directory.isDirectory())
 			return loadStructures(new File[]{directory});
 		
@@ -813,7 +809,9 @@ final public class ScriptLoader {
 			if (f.isDirectory()) {
 				loadedFiles.addAll(loadStructures(f));
 			} else {
-				loadedFiles.add(loadStructure(f));
+				Config cfg = loadStructure(f);
+				if (cfg != null)
+					loadedFiles.add(cfg);
 			}
 		}
 		return loadedFiles;
@@ -831,8 +829,11 @@ final public class ScriptLoader {
 			return null;
 		}
 		
+		Functions.clearFunctions(f); // Functions are still callable from other scripts
+		// We're just making it impossible to look them up
 		try {
-			String name = Skript.getInstance().getDataFolder().toPath().resolve(Skript.SCRIPTSFOLDER).relativize(f.toPath()).toString();
+			String name = Skript.getInstance().getDataFolder().toPath().toAbsolutePath()
+					.resolve(Skript.SCRIPTSFOLDER).relativize(f.toPath().toAbsolutePath()).toString();
 			assert name != null;
 			return loadStructure(new FileInputStream(f), name);
 		} catch (final IOException e) {

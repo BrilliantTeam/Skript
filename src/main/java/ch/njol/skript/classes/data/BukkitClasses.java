@@ -102,6 +102,7 @@ public class BukkitClasses {
 	public BukkitClasses() {}
 
 	static {
+		final boolean GET_ENTITY_METHOD_EXISTS = Skript.methodExists(Bukkit.class, "getEntity", UUID.class);
 		Classes.registerClass(new ClassInfo<>(Entity.class, "entity")
 				.user("entit(y|ies)")
 				.name("Entity")
@@ -120,12 +121,29 @@ public class BukkitClasses {
 					@Override
 					@Nullable
 					public Entity parse(final String s, final ParseContext context) {
+						UUID uuid;
+						try {
+							uuid = UUID.fromString(s);
+						} catch (IllegalArgumentException iae) {
+							return null;
+						}
+						if (GET_ENTITY_METHOD_EXISTS) {
+							return Bukkit.getEntity(uuid);
+						} else {
+							for (World world : Bukkit.getWorlds()) {
+								for (Entity entity : world.getEntities()) {
+									if (entity.getUniqueId().equals(uuid)) {
+										return entity;
+									}
+								}
+							}
+						}
 						return null;
 					}
 					
 					@Override
 					public boolean canParse(final ParseContext context) {
-						return false;
+						return context == ParseContext.COMMAND;
 					}
 					
 					@Override
