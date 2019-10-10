@@ -29,7 +29,9 @@ improve existing tests.
 ### Regression tests
 Under <code>regressions</code>, there are regression tests. Such tests are
 created when bugs are fixed to ensure they do not come back in future.
-File names should contain respective issue (or PR) number and its title.
+File names should contain respective issue number and its title. If no issue
+is available, PR number and title can be used in place of them.
+
 For example, <code>2381-multiplication in list index.sk</code>. Use only
 lower case letters in names, because issue titles are not consistent with
 their capitalization.
