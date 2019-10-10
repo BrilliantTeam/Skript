@@ -359,6 +359,7 @@ public class SkriptCommand implements CommandExecutor {
 				} else {
 					script = TestMode.TEST_DIR.resolve(
 							Arrays.stream(args).skip(1).collect(Collectors.joining(" ")) + ".sk").toFile();
+					TestMode.lastTestFile = script;
 				}
 				assert script != null;
 				if (!script.exists()) {
