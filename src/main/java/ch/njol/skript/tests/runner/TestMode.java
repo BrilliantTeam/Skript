@@ -19,8 +19,11 @@
  */
 package ch.njol.skript.tests.runner;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.tests.TestResults;
 
@@ -58,4 +61,9 @@ public class TestMode {
 	@SuppressWarnings("null")
 	public static final Path RESULTS_FILE = ENABLED ? Paths.get(System.getProperty(ROOT + "results")) : null;
 	
+	/**
+	 * In development mode, file that was last run.
+	 */
+	@Nullable
+	public static File lastTestFile;
 }
