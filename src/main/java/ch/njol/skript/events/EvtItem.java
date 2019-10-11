@@ -42,7 +42,7 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Checker;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "unchecked"})
 public class EvtItem extends SkriptEvent {
 	
 	private final static boolean hasConsumeEvent = Skript.classExists("org.bukkit.event.player.PlayerItemConsumeEvent");
@@ -76,9 +76,9 @@ public class EvtItem extends SkriptEvent {
 					.since("2.2-Fixes-V10");
 		}
 		if (hasEntityPickupItemEvent) {
-			Skript.registerEvent("Pick Up", EvtItem.class, EntityPickupItemEvent.class, "[(player|entity)] (pick[ ]up|picking up) [[of] %itemtypes%]")
+			Skript.registerEvent("Pick Up", EvtItem.class, new Class[] {PlayerPickupItemEvent.class, EntityPickupItemEvent.class}, "[(player|1¦entity)] (pick[ ]up|picking up) [[of] %itemtypes%]")
 				.description("Called when a player/entity picks up an item. Please note that the item is still on the ground when this event is called.")
-				.examples("on pick up:", "on pickup of diamond:")
+				.examples("on pick up:", "on entity pickup of wheat:")
 				.since("<i>unknown</i> (before 2.1), INSERT VERSION (entity)")
 				.requiredPlugins("1.12.2+ for entity");
 		} else {
@@ -120,11 +120,13 @@ public class EvtItem extends SkriptEvent {
 	
 	@Nullable
 	private Literal<ItemType> types;
+	private boolean entity;
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init(final Literal<?>[] args, final int matchedPattern, final ParseResult parser) {
 		types = (Literal<ItemType>) args[0];
+		entity = parser.mark == 1;
 		return true;
 	}
 	
@@ -133,6 +135,8 @@ public class EvtItem extends SkriptEvent {
 	public boolean check(final Event e) {
 		if (e instanceof ItemSpawnEvent) // To make 'last dropped item' possible.
 			EffSpawn.lastSpawned = ((ItemSpawnEvent) e).getEntity();
+		if (hasEntityPickupItemEvent && ((!entity && e instanceof EntityPickupItemEvent) || (entity && e instanceof PlayerPickupItemEvent)))
+			return false;
 		if (types == null)
 			return true;
 		final ItemStack is;
