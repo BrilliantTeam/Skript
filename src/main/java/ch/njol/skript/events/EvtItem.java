@@ -21,6 +21,7 @@ package ch.njol.skript.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -39,7 +40,6 @@ import ch.njol.skript.effects.EffSpawn;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.util.Checker;
 
 @SuppressWarnings("deprecation")
@@ -47,6 +47,7 @@ public class EvtItem extends SkriptEvent {
 	
 	private final static boolean hasConsumeEvent = Skript.classExists("org.bukkit.event.player.PlayerItemConsumeEvent");
 	private final static boolean hasPrepareCraftEvent = Skript.classExists("org.bukkit.event.inventory.PrepareItemCraftEvent");
+	private final static boolean hasEntityPickupItemEvent = Skript.classExists("org.bukkit.event.entity.EntityPickupItemEvent");
 	
 	static {
 		Skript.registerEvent("Dispense", EvtItem.class, BlockDispenseEvent.class, "dispens(e|ing) [[of] %itemtypes%]")
@@ -74,10 +75,18 @@ public class EvtItem extends SkriptEvent {
 					.examples("on preparing craft of torch:")
 					.since("2.2-Fixes-V10");
 		}
-		Skript.registerEvent("Pick Up", EvtItem.class, PlayerPickupItemEvent.class, "[player] (pick[ ]up|picking up) [[of] %itemtypes%]")
+		if (hasEntityPickupItemEvent) {
+			Skript.registerEvent("Pick Up", EvtItem.class, EntityPickupItemEvent.class, "[(player|entity)] (pick[ ]up|picking up) [[of] %itemtypes%]")
+				.description("Called when a player/entity picks up an item. Please note that the item is still on the ground when this event is called.")
+				.examples("on pick up:", "on pickup of diamond:")
+				.since("<i>unknown</i> (before 2.1), INSERT VERSION (entity)")
+				.requiredPlugins("1.12.2+ for entity");
+		} else {
+			Skript.registerEvent("Pick Up", EvtItem.class, PlayerPickupItemEvent.class, "[player] (pick[ ]up|picking up) [[of] %itemtypes%]")
 				.description("Called when a player picks up an item. Please note that the item is still on the ground when this event is called.")
 				.examples("on pick up:")
 				.since("<i>unknown</i> (before 2.1)");
+		}
 		// TODO brew event
 //		Skript.registerEvent("Brew", EvtItem.class, BrewEvent.class, "brew[ing] [[of] %itemtypes%]")
 //				.description("Called when a potion finished brewing.")
@@ -137,6 +146,8 @@ public class EvtItem extends SkriptEvent {
 			is = ((CraftItemEvent) e).getRecipe().getResult();
 		} else if (hasPrepareCraftEvent && e instanceof PrepareItemCraftEvent) {
 			is = ((PrepareItemCraftEvent) e).getRecipe().getResult();
+		} else if (e instanceof EntityPickupItemEvent) {
+			is = ((EntityPickupItemEvent) e).getItem().getItemStack();
 		} else if (e instanceof PlayerPickupItemEvent) {
 			is = ((PlayerPickupItemEvent) e).getItem().getItemStack();
 		} else if (hasConsumeEvent && e instanceof PlayerItemConsumeEvent) {
