@@ -42,7 +42,7 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Checker;
 
-@SuppressWarnings({"deprecation", "unchecked"})
+@SuppressWarnings("deprecation")
 public class EvtItem extends SkriptEvent {
 	
 	private final static boolean hasConsumeEvent = Skript.classExists("org.bukkit.event.player.PlayerItemConsumeEvent");
@@ -76,6 +76,7 @@ public class EvtItem extends SkriptEvent {
 					.since("2.2-Fixes-V10");
 		}
 		if (hasEntityPickupItemEvent) {
+			//noinspection unchecked
 			Skript.registerEvent("Pick Up", EvtItem.class, new Class[] {PlayerPickupItemEvent.class, EntityPickupItemEvent.class}, "[(player|1¦entity)] (pick[ ]up|picking up) [[of] %itemtypes%]")
 				.description("Called when a player/entity picks up an item. Please note that the item is still on the ground when this event is called.")
 				.examples("on pick up:", "on entity pickup of wheat:")
