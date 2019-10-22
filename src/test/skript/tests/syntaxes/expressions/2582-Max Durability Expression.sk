@@ -1,0 +1,5 @@
+test "max durability":
+	assert max durability of dirt is 0 with "max durability of non-tool failed"
+	assert max durability of glass is 0 with "max durability of non-tool failed"
+	assert max durability of shears is 238 with "max durability of tool failed"
+	assert max durability of diamond sword is 1561 with "max durability of tool failed"
