@@ -19,4 +19,4 @@ test "string cases":
 	assert "Hello 👀layer!" in upper snake case is "HELLO_👀LAYER!" with "upper snake case failed"
 	assert "What is y🖐ur name?" in kebab case is "What-is-y🖐ur-name?" with "default kebab case failed"
 	assert "W🧠at is your name?" in lower kebab case is "w🧠at-is-your-name?" with "lower kebab case failed"
-	assert "What 🤵s your name" in upper kebab case is "WHAT-🤵S-YOUR-NAME?" with "upper kebab case failed"
+	assert "What 🤵s your name" in upper kebab case is "WHAT-🤵S-YOUR-NAME" with "upper kebab case failed"
