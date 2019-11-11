@@ -812,7 +812,7 @@ entities:
 		pattern: <age> villager(|1¦s)|(4¦)[villager] (kid(|1¦s)|child(|1¦ren))
 	normal:
 		name: villager¦s
-		pattern: <age> villager(|1¦s)|(4¦)[villager] (kid(|1¦s)|child(|1¦ren))
+		pattern: <age> [unemployed] villager(|1¦s)|(4¦)[[unemployed] villager] (kid(|1¦s)|child(|1¦ren))
 	armorer:
 		name: armorer¦s
 		pattern: <age> armorer(|1¦s)|(4¦)armorer (kid(|1¦s)|child(|1¦ren))
