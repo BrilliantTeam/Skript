@@ -32,9 +32,6 @@ a:visited {
   padding-left: 0em;
   height: 1.37em;
   z-index: 9999;
-  
-  display: flex;
-  flex-wrap: wrap;
 }
 
 #global-navigation > a {
@@ -233,6 +230,8 @@ ul > .skript-code-block {
   
   #global-navigation {
     height: 4.1em;
+    display: flex;
+    flex-wrap: wrap;
   }
   #global-navigation > a {
     padding: 0.2em;
