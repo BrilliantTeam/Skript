@@ -32,6 +32,9 @@ a:visited {
   padding-left: 0em;
   height: 1.37em;
   z-index: 9999;
+  
+  display: flex;
+  flex-wrap: wrap;
 }
 
 #global-navigation > a {
@@ -221,4 +224,30 @@ ul > .skript-code-block {
   padding: 0.8em;
   
   background-color: wheat;
+}
+
+@media (max-width: 600px) {
+  body {
+    grid-template-columns: 0px minmax(80%, 100%);
+  }
+  
+  #global-navigation {
+    height: 4.1em;
+  }
+  #global-navigation > a {
+    padding: 0.2em;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+  }
+  
+  #nav-title {
+    display: none;
+  }
+  #side-nav {
+    display: none;
+  }
+  
+  #content {
+    top: 5.63em;
+  }
 }
