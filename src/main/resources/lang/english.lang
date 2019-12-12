@@ -1449,9 +1449,9 @@ visual effects:
 	sneeze:
 		name: sneeze @-
 		pattern: sneeze
-	campfire_cozy_smoke:
-		name: campfire cozy smoke @-
-		pattern: campfire cozy smoke
+	campfire_cosy_smoke:
+		name: campfire cosy smoke @-
+		pattern: campfire co(s|z)y smoke
 	campfire_signal_smoke:
 		name: campfire signal smoke @-
 		pattern: campfire signal smoke
