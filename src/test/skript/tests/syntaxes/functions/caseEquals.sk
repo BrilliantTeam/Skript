@@ -2,5 +2,5 @@ test "case equals function":
 	assert caseEquals("") is true with "case equals function failed ##1"
 	assert caseEquals("dummy") is true with "case equals function failed ##2"
 	assert caseEquals("hi", "Hi") is false with "case equals function failed ##3"
-	assert caseEquals("text", "text", "text") is false with "case equals function failed ##4"
+	assert caseEquals("text", "text", "tExt") is false with "case equals function failed ##4"
 	assert caseEquals("🐢<-turtle", "🐢<-turtle", "🐢<-turtle", "🐢<-turtle") is true with "case equals function failed ##5"
