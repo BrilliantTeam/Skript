@@ -41,6 +41,7 @@ import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Checker;
+import ch.njol.util.coll.CollectionUtils;
 
 @SuppressWarnings("deprecation")
 public class EvtItem extends SkriptEvent {
@@ -76,8 +77,8 @@ public class EvtItem extends SkriptEvent {
 					.since("2.2-Fixes-V10");
 		}
 		if (hasEntityPickupItemEvent) {
-			//noinspection unchecked
-			Skript.registerEvent("Pick Up", EvtItem.class, new Class[] {PlayerPickupItemEvent.class, EntityPickupItemEvent.class}, "[(player|1¦entity)] (pick[ ]up|picking up) [[of] %itemtypes%]")
+			Skript.registerEvent("Pick Up", EvtItem.class, CollectionUtils.array(PlayerPickupItemEvent.class, EntityPickupItemEvent.class),
+					"[(player|1¦entity)] (pick[ ]up|picking up) [[of] %itemtypes%]")
 				.description("Called when a player/entity picks up an item. Please note that the item is still on the ground when this event is called.")
 				.examples("on pick up:", "on entity pickup of wheat:")
 				.since("<i>unknown</i> (before 2.1), INSERT VERSION (entity)")
