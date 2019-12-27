@@ -520,10 +520,10 @@ public class SimpleEvents {
 				.since("INSERT VERSION");
 		}
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent")) {
-			Skript.registerEvent("Armor Change", SimpleEvent.class, PlayerArmorChangeEvent.class, "[player] armor (change|equip)")
-				.description("Called when a player equips a piece of armor.")
+			Skript.registerEvent("Armor Change", SimpleEvent.class, PlayerArmorChangeEvent.class, "[player] armor change[d]")
+				.description("Called when armor pieces of a player are changed.")
 				.requiredPlugins("Paper")
-				.examples("on armor equip:",
+				.examples("on armor change:",
 					"	send \"You equipped %event-item%!\"")
 				.since("INSERT VERSION");
 		}
