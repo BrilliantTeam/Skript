@@ -93,6 +93,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.spigotmc.event.entity.EntityDismountEvent;
 import org.spigotmc.event.entity.EntityMountEvent;
 
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import ch.njol.skript.Skript;
@@ -516,6 +517,14 @@ public class SimpleEvents {
 					"Note: the riptide action is performed client side, so manipulating the player in this event may have undesired effects.")
 				.examples("on riptide:",
 					"	send \"You are riptiding!\"")
+				.since("INSERT VERSION");
+		}
+		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent")) {
+			Skript.registerEvent("Armor Change", SimpleEvent.class, PlayerArmorChangeEvent.class, "[player] armor change[d]")
+				.description("Called when armor pieces of a player are changed.")
+				.requiredPlugins("Paper")
+				.examples("on armor change:",
+					"	send \"You equipped %event-item%!\"")
 				.since("INSERT VERSION");
 		}
 	}
