@@ -41,13 +41,14 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 
-/**
- * @author Peter Güttinger
- */
 @Name("Ban")
-@Description({"Bans/unbans a player or an IP address. Option values for ban reason and temp ban time span.",
-	"Note that if the timespan is not set, or if the value of the timespan is <none>, it will permanently ban the player.",
-	"Note that banning a player will not kick them from the server. You may use the <a href='effects.html#EffKick'>kick effect</a> if you wish so."})
+@Description({"Bans or unbans a player or an IP address.",
+	"If a reason is given, it will be shown to the player when they try to join the server while banned.",
+	"A length of ban may also be given to apply a temporary ban. If it is absent for any reason, a permanent ban will be used instead.",
+	"We recommend that you test your scripts so that no accidental permanent bans are applied.",
+	"",
+	"Note that banning people does not kick them from the server.",
+	"Consider using the <a href='effects.html#EffKick'>kick effect</a> after applying a ban."})
 @Examples({"unban player",
 	"ban \"127.0.0.1\"",
 	"IP-ban the player because \"he is an idiot\"",
