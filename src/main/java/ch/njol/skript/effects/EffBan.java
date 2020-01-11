@@ -53,7 +53,7 @@ import ch.njol.util.Kleenean;
 	"ban \"127.0.0.1\"",
 	"IP-ban the player because \"he is an idiot\"",
 	"ban player due to \"inappropriate language\" for 2 days"})
-@Since("1.4, 2.1.1 (ban reason), INSERT VERSION (timespan)")
+@Since("1.4, 2.1.1 (ban reason), 2.5 (timespan)")
 public class EffBan extends Effect {
 	
 	static {

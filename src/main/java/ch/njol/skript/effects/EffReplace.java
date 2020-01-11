@@ -58,7 +58,7 @@ import ch.njol.util.StringUtils;
 		"	replace all \"kys\", \"idiot\" and \"noob\" with \"****\" in the message",
 		" ",
 		"replace all stone and dirt in player's inventory and player's top inventory with diamond"})
-@Since("2.0, 2.2-dev24 (replace in muliple strings and replace items in inventory), INSERT VERSION (replace first, case sensitivity)")
+@Since("2.0, 2.2-dev24 (replace in muliple strings and replace items in inventory), 2.5 (replace first, case sensitivity)")
 public class EffReplace extends Effect {
 	static {
 		Skript.registerEffect(EffReplace.class,

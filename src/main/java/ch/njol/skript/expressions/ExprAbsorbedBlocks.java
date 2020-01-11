@@ -46,7 +46,7 @@ import ch.njol.util.Kleenean;
 @Description("The blocks absorbed by a sponge block.")
 @Events("sponge absorb")
 @Examples("the absorbed blocks")
-@Since("INSERT VERSION")
+@Since("2.5")
 public class ExprAbsorbedBlocks extends SimpleExpression<BlockStateBlock> {
 	
 	static {
