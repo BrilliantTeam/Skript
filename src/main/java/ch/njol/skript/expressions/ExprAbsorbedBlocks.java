@@ -43,7 +43,7 @@ import ch.njol.skript.util.BlockStateBlock;
 import ch.njol.util.Kleenean;
 
 @Name("Absorbed blocks")
-@Description("Blocks which are absorbed in a sponge absorb event. Cannot be used outside of sponge absorb events.")
+@Description("The blocks absorbed by a sponge block.")
 @Events("sponge absorb")
 @Examples("the absorbed blocks")
 @Since("INSERT VERSION")
@@ -56,7 +56,7 @@ public class ExprAbsorbedBlocks extends SimpleExpression<BlockStateBlock> {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!ScriptLoader.isCurrentEvent(SpongeAbsorbEvent.class)) {
-			Skript.error("The absorbed blocks are only usable in sponge absorb events", ErrorQuality.SEMANTIC_ERROR);
+			Skript.error("The 'absorbed blocks' are only usable in sponge absorb events", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}
 		return true;
