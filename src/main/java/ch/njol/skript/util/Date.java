@@ -88,7 +88,7 @@ public class Date implements Comparable<Date>, YggdrasilSerializable {
 	 * Subtract a {@link Timespan} from this date
 	 *
 	 * @param span Timespan to subtract
-	 * @return This dat with the subtracted timespan
+	 * @return This date with the subtracted timespan
 	 */
 	public Date subtract(final Timespan span) {
 		timestamp -= span.getMilliSeconds();
