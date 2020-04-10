@@ -19,12 +19,10 @@
  */
 package ch.njol.skript.util;
 
-import java.time.ZoneId;
 import java.util.TimeZone;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.yggdrasil.YggdrasilSerializable;
 
@@ -67,18 +65,34 @@ public class Date implements Comparable<Date>, YggdrasilSerializable {
 	}
 	
 	/**
+	 * Get the timestamp of this date
+	 *
 	 * @return The timestamp in milliseconds
 	 */
 	public long getTimestamp() {
 		return timestamp;
 	}
 	
-	public void add(final Timespan span) {
+	/**
+	 * Add a {@link Timespan} to this date
+	 *
+	 * @param span Timespan to add
+	 * @return This date with the added timespan
+	 */
+	public Date add(final Timespan span) {
 		timestamp += span.getMilliSeconds();
+		return this;
 	}
 	
-	public void subtract(final Timespan span) {
+	/**
+	 * Subtract a {@link Timespan} from this date
+	 *
+	 * @param span Timespan to subtract
+	 * @return This dat with the subtracted timespan
+	 */
+	public Date subtract(final Timespan span) {
 		timestamp -= span.getMilliSeconds();
+		return this;
 	}
 	
 	@Override
@@ -98,9 +112,7 @@ public class Date implements Comparable<Date>, YggdrasilSerializable {
 		if (!(obj instanceof Date))
 			return false;
 		final Date other = (Date) obj;
-		if (timestamp != other.timestamp)
-			return false;
-		return true;
+		return timestamp == other.timestamp;
 	}
 	
 }
