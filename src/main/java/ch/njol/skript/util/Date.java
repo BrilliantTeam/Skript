@@ -49,6 +49,15 @@ public class Date implements Comparable<Date>, YggdrasilSerializable {
 		this.timestamp = timestamp - offset;
 	}
 	
+	/**
+	 * Get a new Date with the current time
+	 *
+	 * @return New date with the current time
+	 */
+	public static Date now() {
+		return new Date(System.currentTimeMillis());
+	}
+	
 	public Timespan difference(final Date other) {
 		return new Timespan(Math.abs(timestamp - other.timestamp));
 	}
@@ -77,22 +86,38 @@ public class Date implements Comparable<Date>, YggdrasilSerializable {
 	 * Add a {@link Timespan} to this date
 	 *
 	 * @param span Timespan to add
-	 * @return This date with the added timespan
 	 */
-	public Date add(final Timespan span) {
+	public void add(final Timespan span) {
 		timestamp += span.getMilliSeconds();
-		return this;
 	}
 	
 	/**
 	 * Subtract a {@link Timespan} from this date
 	 *
 	 * @param span Timespan to subtract
-	 * @return This date with the subtracted timespan
 	 */
-	public Date subtract(final Timespan span) {
+	public void subtract(final Timespan span) {
 		timestamp -= span.getMilliSeconds();
-		return this;
+	}
+	
+	/**
+	 * Get a new instance of this Date with the added timespan
+	 *
+	 * @param span Timespan to add to this Date
+	 * @return New Date with the added timespan
+	 */
+	public Date plus(Timespan span) {
+		return new Date(timestamp + span.getMilliSeconds());
+	}
+	
+	/**
+	 * Get a new instance of this Date with the subtracted timespan
+	 *
+	 * @param span Timespan to subtract from this Date
+	 * @return New Date with the subtracted timespan
+	 */
+	public Date minus(Timespan span) {
+		return new Date(timestamp - span.getMilliSeconds());
 	}
 	
 	@Override
