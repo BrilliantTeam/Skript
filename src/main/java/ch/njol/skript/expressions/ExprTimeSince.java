@@ -33,6 +33,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -43,42 +44,31 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("Time Since")
-@Description("The time that has passed since a date. This will return 0 seconds if the given date is in the future.")
-@Examples("send \"You died %time since last death of player% ago!\" to player")
+@Description("The time that has passed since a date. If the given date is in the future, a value will not be returned.")
+@Examples("send \"You died %time since % ago!\" to player")
 @Since("INSERT VERSION")
-public class ExprTimeSince extends SimpleExpression<Timespan> {
+public class ExprTimeSince extends SimplePropertyExpression<Date, Timespan> {
 
 	static {
-		Skript.registerExpression(ExprTimeSince.class, Timespan.class, ExpressionType.SIMPLE, "time since %dates%");
-	}
-
-	@SuppressWarnings("null")
-	private Expression<Date> dates;
-
-	@SuppressWarnings({"unchecked", "null"})
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		dates = (Expression<Date>) exprs[0];
-		return true;
+		Skript.registerExpression(ExprTimeSince.class, Timespan.class, ExpressionType.PROPERTY, "time since %dates%");
 	}
 
 	@Override
 	@Nullable
-	protected Timespan[] get(Event e) {
-		List<Timespan> timespans = new ArrayList<>();
-		Date now = new Date();
-		for (Date date : dates.getArray(e))
-			if (date.compareTo(now) > 0) {
-				timespans.add(new Timespan());
-			} else {
-				timespans.add(date.difference(now));
-			}
-		return timespans.toArray(new Timespan[0]);
-	}
+	public Timespan convert(Date date) {
 
-	@Override
-	public boolean isSingle() {
-		return dates.isSingle();
+		Date now = Date.now();
+
+		/*
+		 * This condition returns whether the date the player is using is
+		 * before the current date, the same as the current date, or after the current date.
+		 * A value less than 0 indicates that the new date is BEFORE the current date.
+		 * A value of 0 indicates that the new date is the SAME as the current date.
+		 * A value greater than 0 indicates that the new date is AFTER the current date.
+		 */
+		if (date.compareTo(now) < 1)
+			return date.difference(now);
+		return null;
 	}
 
 	@Override
@@ -87,8 +77,8 @@ public class ExprTimeSince extends SimpleExpression<Timespan> {
 	}
 
 	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return "time since " + dates.toString(e, debug);
+	protected String getPropertyName() {
+		return "time since";
 	}
 
 }
