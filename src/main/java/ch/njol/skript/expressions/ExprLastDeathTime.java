@@ -43,7 +43,7 @@ import ch.njol.util.coll.CollectionUtils;
 @Description({"The time of the last death of a player.", 
 				"Any changes that would result in the death time being in the future are ignored.",
 				"This expression affects the 'TIME_SINCE_DEATH' statistic."})
-@Examples("send \"Your last death was %last death of player%!\" to player")
+@Examples("send \"Your last death was at %the last death time of the player%!\" to player")
 @Since("INSERT VERSION")
 public class ExprLastDeathTime extends SimplePropertyExpression<Player, Date> {
 
@@ -114,14 +114,14 @@ public class ExprLastDeathTime extends SimplePropertyExpression<Player, Date> {
 
 				if (deathTime.compareTo(now) < 1) {
 					// Get the timespan representing the new time since death (in ticks).
-					long newTimespanInTicks= deathTime.difference(now).getTicks_i();
+					long newTimespanInTicks = deathTime.difference(now).getTicks_i();
 
 					/*
 					 *  Convert to int.
 					 *  If it is greater than the max value for an integer,
 					 *  the user probably wants to set it to the max value, right?
 					 */
-					int newTimeSinceDeath = newTimespanInTicks < Integer.MAX_VALUE ? (int) newTimespanInTicks : Integer.MAX_VALUE;
+					int newTimeSinceDeath = Math.min((int) newTimespanInTicks, Integer.MAX_VALUE);
 
 					player.setStatistic(Statistic.TIME_SINCE_DEATH, newTimeSinceDeath);
 				}
@@ -141,7 +141,7 @@ public class ExprLastDeathTime extends SimplePropertyExpression<Player, Date> {
 				 *  If it is greater than the max value for an integer,
 				 *  the user probably wants to set it to the max value, right?
 				 */
-				int newTimeSinceDeath = newTimespanInTicks < Integer.MAX_VALUE ? (int) newTimespanInTicks : Integer.MAX_VALUE;
+				int newTimeSinceDeath = Math.min((int) newTimespanInTicks, Integer.MAX_VALUE);
 
 				player.setStatistic(Statistic.TIME_SINCE_DEATH, newTimeSinceDeath);
 
@@ -160,7 +160,7 @@ public class ExprLastDeathTime extends SimplePropertyExpression<Player, Date> {
 
 				if (newDate.compareTo(now) < 1) {
 					long newTimespanInTicks = ((Date) delta[0]).difference(now).getTicks_i();
-					int newTimeSinceDeath = newTimespanInTicks < Integer.MAX_VALUE ? (int) newTimespanInTicks : Integer.MAX_VALUE;
+					int newTimeSinceDeath = Math.min((int) newTimespanInTicks, Integer.MAX_VALUE);
 					player.setStatistic(Statistic.TIME_SINCE_DEATH, newTimeSinceDeath);
 				}
 

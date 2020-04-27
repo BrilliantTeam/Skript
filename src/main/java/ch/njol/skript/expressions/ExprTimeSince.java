@@ -45,12 +45,12 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Time Since")
 @Description("The time that has passed since a date. If the given date is in the future, a value will not be returned.")
-@Examples("send \"You died %time since % ago!\" to player")
+@Examples("send \"You died %time since the last death time of the player% ago!\" to player")
 @Since("INSERT VERSION")
 public class ExprTimeSince extends SimplePropertyExpression<Date, Timespan> {
 
 	static {
-		Skript.registerExpression(ExprTimeSince.class, Timespan.class, ExpressionType.PROPERTY, "time since %dates%");
+		Skript.registerExpression(ExprTimeSince.class, Timespan.class, ExpressionType.PROPERTY, "[the] time since %dates%");
 	}
 
 	@Override
@@ -79,6 +79,11 @@ public class ExprTimeSince extends SimplePropertyExpression<Date, Timespan> {
 	@Override
 	protected String getPropertyName() {
 		return "time since";
+	}
+
+	@Override
+	public String toString(final @Nullable Event e, final boolean debug) {
+		return "the time since " + getExpr().toString(e, debug);
 	}
 
 }
