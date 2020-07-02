@@ -30,7 +30,7 @@ import ch.njol.skript.doc.Since;
 @Description("Checks if a block is powered by redstone")
 @Examples({"if clicked block is redstone powered:",
 	"\tsend \"This block is well-powered by redstone!\""})
-@Since("INSERT VERSION")
+@Since("2.5")
 public class CondIsBlockRedstonePowered extends PropertyCondition<Block> {
 	
 	static {

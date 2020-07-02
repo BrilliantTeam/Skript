@@ -30,7 +30,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 @Description("Power of a redstone block")
 @Examples({"if redstone power of targeted block is 15:",
 	"\tsend \"This block is very powerful!\""})
-@Since("INSERT VERSION")
+@Since("2.5")
 public class ExprRedstoneBlockPower extends SimplePropertyExpression<Block, Number> {
 	
 	static {
