@@ -19,33 +19,22 @@
  */
 package ch.njol.skript.expressions;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Statistic;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Timespan;
-import ch.njol.util.Kleenean;
-import ch.njol.util.coll.CollectionUtils;
 
 @Name("Time Since")
 @Description("The time that has passed since a date. If the given date is in the future, a value will not be returned.")
-@Examples("send \"You died %time since the last death time of the player% ago!\" to player")
+@Examples("send \"%time since 5 minecraft days ago% has passed since 5 minecraft days ago!\" to player")
 @Since("INSERT VERSION")
 public class ExprTimeSince extends SimplePropertyExpression<Date, Timespan> {
 
@@ -56,7 +45,6 @@ public class ExprTimeSince extends SimplePropertyExpression<Date, Timespan> {
 	@Override
 	@Nullable
 	public Timespan convert(Date date) {
-
 		Date now = Date.now();
 
 		/*
