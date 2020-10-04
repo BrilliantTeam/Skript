@@ -538,8 +538,8 @@ public abstract class Utils {
 		// Sometimes, the message has already been restored
 		if (!message.equals(m)) {
 			m = m.replace("\\$", "$").replace("\\\\", "\\");
-			m = ChatColor.translateAlternateColorCodes('&', "" + m);
 		}
+		m = ChatColor.translateAlternateColorCodes('&', "" + m);
 		return "" + m;
 	}
 	
@@ -576,7 +576,6 @@ public abstract class Utils {
 		// Sometimes, the message has already been restored
 		if (!message.equals(m)) {
 			m = m.replace("\\$", "$").replace("\\\\", "\\");
-			m = ChatColor.translateAlternateColorCodes('&', "" + m);
 		}
 		m = ChatColor.translateAlternateColorCodes('&', "" + m);
 		return "" + m;
