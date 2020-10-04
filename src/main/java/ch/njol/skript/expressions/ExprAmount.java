@@ -36,6 +36,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.UnparsedLiteral;
 import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 
 /**
@@ -75,9 +76,6 @@ public class ExprAmount extends SimpleExpression<Number> {
 	@Override
 	@SuppressWarnings({"null", "unchecked"})
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		exprs[0] = exprs[0].getConvertedExpression(Object.class);
-		if (exprs[0] == null)
-			return false;
 		this.exprs = exprs[0] instanceof ExpressionList ? (ExpressionList<?>) exprs[0] : new ExpressionList<>(new Expression<?>[]{exprs[0]}, Object.class, false);
 		this.recursive = matchedPattern == 1;
 		for (Expression<?> expr : this.exprs.getExpressions()) {
@@ -99,21 +97,17 @@ public class ExprAmount extends SimpleExpression<Number> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Number[] get(final Event e) {
-		int currentSize = 0;
 		if (recursive) {
-			if (exprs.getAnd())
+			int currentSize = 0;
 			for (Expression<?> expr : exprs.getExpressions()) {
 				Object var = ((Variable<?>) expr).getRaw(e);
-				if (var != null) {
+				if (var != null) { // Should already be a map
 					currentSize += getRecursiveSize((Map<String, ?>) var);
 				}
 			}
-		} else {
-			for (Expression<?> expr : exprs.getExpressions()) {
-				currentSize += expr.getArray(e).length;
-			}
+			return new Number[]{currentSize};
 		}
-		return new Number[]{currentSize};
+		return new Number[]{exprs.getArray(e).length};
 	}
 
 	@SuppressWarnings("unchecked")
