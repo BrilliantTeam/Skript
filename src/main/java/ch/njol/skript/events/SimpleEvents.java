@@ -56,6 +56,7 @@ import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -579,6 +580,11 @@ public class SimpleEvents {
 			.examples("on block fertilize:",
 				"\tsend \"Fertilized %size of fertilized blocks% blocks got fertilized.\"")
 			.since("2.5");
+		Skript.registerEvent("Arm Swing", SimpleEvent.class, PlayerAnimationEvent.class, "[player] arm swing")
+			.description("Called when a player swings his arm.")
+			.examples("on arm swing:",
+				"\tsend \"You swung your arm!\"")
+			.since("INSERT VERSION");
 		if (Skript.classExists("org.bukkit.event.player.PlayerItemMendEvent")) {
 			Skript.registerEvent("Item Mend", SimpleEvent.class, PlayerItemMendEvent.class, "item mend[ing]")
 				.description("Called when a player has an item repaired via the Mending enchantment.")
