@@ -110,6 +110,11 @@ task jar(overwrite: true, type: ShadowJar) {
 	from sourceSets.main.output
 }
 
+task build(overwrite: true, type: ShadowJar) {
+	archiveName System.getenv('SKRIPT_JAR_NAME') == null ? 'Skript.jar' : System.getenv("SKRIPT_JAR_NAME")
+	from sourceSets.main.output
+}
+
 //jar.dependsOn shadowJar
 tasks.withType(ShadowJar) {
 	configurations = [project.configurations.shade]
