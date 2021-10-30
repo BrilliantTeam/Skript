@@ -92,12 +92,7 @@ public class JavaClasses {
 					public String toVariableNameString(Number n) {
 						return StringUtils.toString(n.doubleValue(), VARIABLENAME_NUMBERACCURACY);
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "-?\\d+(\\.\\d+)?";
-					}
-				}).serializer(new Serializer<Number>() {
+                }).serializer(new Serializer<Number>() {
 					@Override
 					public Fields serialize(Number n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil
@@ -159,12 +154,7 @@ public class JavaClasses {
 					public String toVariableNameString(Long l) {
 						return "" + l;
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "-?\\d+";
-					}
-				}).serializer(new Serializer<Long>() {
+                }).serializer(new Serializer<Long>() {
 					@Override
 					public Fields serialize(Long n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil
@@ -221,12 +211,7 @@ public class JavaClasses {
 					public String toVariableNameString(Integer i) {
 						return "" + i;
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "-?\\d+";
-					}
-				}).serializer(new Serializer<Integer>() {
+                }).serializer(new Serializer<Integer>() {
 					@Override
 					public Fields serialize(Integer n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil
@@ -288,12 +273,7 @@ public class JavaClasses {
 					public String toVariableNameString(Double d) {
 						return StringUtils.toString(d, VARIABLENAME_NUMBERACCURACY);
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "-?\\d+(\\.\\d+)?";
-					}
-				}).serializer(new Serializer<Double>() {
+                }).serializer(new Serializer<Double>() {
 					@Override
 					public Fields serialize(Double n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil
@@ -354,12 +334,7 @@ public class JavaClasses {
 					public String toVariableNameString(Float f) {
 						return StringUtils.toString(f.doubleValue(), VARIABLENAME_NUMBERACCURACY);
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "-?\\d+(\\.\\d+)?";
-					}
-				}).serializer(new Serializer<Float>() {
+                }).serializer(new Serializer<Float>() {
 					@Override
 					public Fields serialize(Float n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil
@@ -424,12 +399,7 @@ public class JavaClasses {
 					public String toVariableNameString(Boolean b) {
 						return "" + b;
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "(true|false)";
-					}
-				}).serializer(new Serializer<Boolean>() {
+                }).serializer(new Serializer<Boolean>() {
 					@Override
 					public Fields serialize(Boolean n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil
@@ -486,12 +456,7 @@ public class JavaClasses {
 					public String toVariableNameString(Short s) {
 						return "" + s;
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "-?\\d+";
-					}
-				}).serializer(new Serializer<Short>() {
+                }).serializer(new Serializer<Short>() {
 					@Override
 					public Fields serialize(Short n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil
@@ -548,12 +513,7 @@ public class JavaClasses {
 					public String toVariableNameString(Byte b) {
 						return "" + b;
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "-?\\d+";
-					}
-				}).serializer(new Serializer<Byte>() {
+                }).serializer(new Serializer<Byte>() {
 					@Override
 					public Fields serialize(Byte n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil
@@ -641,12 +601,7 @@ public class JavaClasses {
 					public String toVariableNameString(String s) {
 						return s;
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return ".*";
-					}
-				}).serializer(new Serializer<String>() {
+                }).serializer(new Serializer<String>() {
 					@Override
 					public Fields serialize(String n) {
 						throw new IllegalStateException(); // serialised natively by Yggdrasil

@@ -171,12 +171,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 					public String toVariableNameString(final EntityData o) {
 						return "entitydata:" + o.toString();
 					}
-					
-					@Override
-					public String getVariableNamePattern() {
-						return "entitydata:.+";
-					}
-				}).serializer(serializer));
+                }).serializer(serializer));
 	}
 	
 	private final static class EntityDataInfo<T extends EntityData<?>> extends SyntaxElementInfo<T> implements LanguageChangeListener {
