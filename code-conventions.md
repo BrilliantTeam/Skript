@@ -203,7 +203,8 @@ Skript **must** run on these MC versions, in one way or another.
 If your contribution breaks compatibility for any of these versions we cannot accept it.
 
 Please try to make sure contributions are future-safe, to the best of your ability.
-Avoid targeting features of specific versions (e.g. via reflection.)
+Where possible, avoid using version-specific code to target a feature (e.g. accessing different copies of an internal class via reflection for each minecraft version) as this creates additional maintenance work every time a new version releases.
+Checking whether a class exists in order to target supported versions is acceptable.
 
 ### Support the Target Servers
 
@@ -213,8 +214,7 @@ Contributions must **not** break this cross-compatibility.
 
 Paper-specific functionality and syntax are acceptable. Please make sure these contributions do not break compatibility with Spigot.
 
-Skript tentatively supports Glowstone (by coincidence rather than design.) \
-While we are not making an effort to preserve this compatibility, please don't intentionally break it!
+Skript may also run on other server platforms. While these are not supported, please do not deliberately break compatibility for them.
 
 We do not support Bukkit/CraftBukkit.
 
