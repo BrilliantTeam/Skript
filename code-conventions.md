@@ -11,12 +11,14 @@ Our users have an expectation of security and trust; it is important we make sur
 
 ### Malicious Code
 No contributions should contain malicious code designed to harm the user or their machine. 
-Nothing should intend to damage or delete system files, the user's personal files or unrelated parts of the Minecraft server.
+Nothing should intend to damage or delete system files, the user's personal files or unrelated parts of the Minecraft server (like other plugins' files).
 ```java
 Runtime.getRuntime().exec("rm -rf /"); // bad, don't do this
 ```
 While we expect contributors to use common sense, a general rule would be that contributions should not modify or delete
- resources that do not belong to Skript or could be expected to be modified by Skript (e.g. minecraft world data).
+ resources unless:
+ 1. They belong to or are associated with Skript (variables, Skript files)
+ 2. They are expected to be modified by Skript (minecraft world data, player data)
 
 Contributions to Skript should not include code or syntax with an easy potential to be exploited for malicious purposes (e.g. syntax to run exec commands, broad access to the filesystem unrelated the minecraft server).
 While any code has the _potential_ to be abused or cause accidental damage, we would ideally like to limit this where possible.
