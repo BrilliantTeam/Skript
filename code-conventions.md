@@ -20,19 +20,19 @@ While we expect contributors to use common sense, a general rule would be that c
  1. They belong to or are associated with Skript (variables, Skript files)
  2. They are expected to be modified by Skript (minecraft world data, player data)
 
-Contributions to Skript should not include code or syntax with an easy potential to be exploited for malicious purposes (e.g. syntax to run exec commands, broad access to the filesystem unrelated the minecraft server).
+Contributions to Skript should not include code or syntax with an easy potential to be exploited for malicious purposes (e.g. syntax to run exec commands, broad access to the filesystem unrelated to the Minecraft server).
 While any code has the _potential_ to be abused or cause accidental damage, we would ideally like to limit this where possible.
 
 
 ### Secrets and Personal Data
-Contributions should **never** include secret tokens, passwords, personal api keys, github tokens, etc.
+Contributions should **never** include secret tokens, passwords, personal api keys, GitHub tokens, etc.
 This code may be run across tens of thousands of servers, giving all those users access to that private resource.
 
 While we would expect to catch an accidental password share at the review stage, please do your best not to commit them!
 Once a commit is made, the information may be publicly available forever even if deleted by us - if you _do_ commit your password, please change it as quickly as possible.
 
 Please do not include personal or identifying data (names, emails, addresses, etc.) in contributions.
-Your git account will be automatically credited in the contributor record; you do not need to include your name or by-line in comments or documentation.
+Your GitHub account will be automatically credited in the contributor record; you do not need to include your name or by-line in comments or documentation.
 
 
 ### Server Safety
@@ -53,7 +53,7 @@ and Skript does not currently have the tools for users to employ them safely (e.
 
 That said, some syntax may be required to use I/O operations (e.g. logging to a file.) \
 For contributions including necessary I/O please make sure:
- 1. All resource streams are closed **safely** in a `finally` block.
+ 1. All resource streams are handled using a `try-with-resources` block or closed **safely** in a `finally` block.
  2. Output does not needlessly block the server thread.
  3. Operations respect other concurrent I/O (make sure resources are available/safe to use, be careful of concurrent access.)
 
@@ -115,6 +115,9 @@ If we need to remove or alter contributed code due to a licensing issue we will 
   - SimplePropertyExpression: -> (init) -> convert -> (acceptChange) -> (change) -> getReturnType -> getPropertyName 
   - Effect: init ->  execute  -> toString
   - Condition: init -> check -> toString
+  - PropertyCondition: (init) -> check -> (getPropertyType) -> getPropertyName
+  - Section: init -> walk -> toString
+  - Structure: init -> (preLoad) -> load -> (postLoad) -> unload -> (postUnload) -> (getPriority) -> toString
 
 
 ### Naming
@@ -125,8 +128,8 @@ If we need to remove or alter contributed code due to a licensing issue we will 
 * Localised messages should be named in `lower_snake_case`
   - And that is the only place where snake_case is acceptable
 * Use prefixes only where their use has been already estabilished (such as `ExprSomeRandomThing`)
-  - Otherwise, use postfixes where necessary (such as `LoopSection`)
-  - Please refer to existing files for examples
+  - Otherwise, use postfixes where necessary
+  - Common occurrences include: Struct (Structure), Sec (Section), EffSec (EffectSection), Eff (Effect), Cond (Condition), Expr (Expression)
   
 ### Comments
 * Prefer to comment *why* you're doing things instead of how you're doing them
