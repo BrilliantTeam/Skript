@@ -1746,6 +1746,7 @@ inventory types:
 	stonecutter: stonecutter inventory
 	smithing: smithing inventory
 	composter: composter inventory
+	chiseled_bookshelf: chiseled bookshelf, bookshelf
 
 # -- Spawn Reasons --
 spawn reasons:
