@@ -16,7 +16,7 @@
  *
  * Copyright Peter Güttinger, SkriptLang team and contributors
  */
-package ch.njol.skript.tests.runner;
+package ch.njol.skript.test.runner;
 
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;

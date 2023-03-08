@@ -16,20 +16,19 @@
  *
  * Copyright Peter Güttinger, SkriptLang team and contributors
  */
-package ch.njol.skript.tests.runner;
+package ch.njol.skript.test.runner;
 
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.NoDoc;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
@@ -37,8 +36,7 @@ import ch.njol.util.Kleenean;
 
 @Name("Assert")
 @Description("Assert that condition is true. Test fails when it is not.")
-@Examples("")
-@Since("2.5")
+@NoDoc
 public class EffAssert extends Effect  {
 
 	static {
@@ -49,14 +47,12 @@ public class EffAssert extends Effect  {
 	@Nullable
 	private Condition condition;
 
-	@SuppressWarnings("null")
 	private Expression<String> errorMsg;
-	
 	private boolean shouldFail;
 
-	@SuppressWarnings({"null", "unchecked"})
 	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+	@SuppressWarnings("unchecked")
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		String conditionString = parseResult.regexes.get(0).group();
 		errorMsg = (Expression<String>) exprs[0];
 		shouldFail = parseResult.mark != 0;
@@ -65,9 +61,8 @@ public class EffAssert extends Effect  {
 		try {
 			condition = Condition.parse(conditionString, "Can't understand this condition: " + conditionString);
 			
-			if (shouldFail) {
+			if (shouldFail)
 				return true;
-			}
 			
 			if (condition == null) {
 				logHandler.printError();
@@ -82,18 +77,22 @@ public class EffAssert extends Effect  {
 	}
 
 	@Override
-	protected void execute(Event e) {}
-	
+	protected void execute(Event event) {}
+
 	@Nullable
 	@Override
-	public TriggerItem walk(Event e) {
-		if (shouldFail && condition == null) {
+	public TriggerItem walk(Event event) {
+		if (shouldFail && condition == null)
 			return getNext();
-		}
-		
-		if (condition.check(e) == shouldFail) {
-			String msg = errorMsg.getSingle(e);
-			TestTracker.testFailed(msg != null ? msg : "assertation failed");
+
+		if (condition.check(event) == shouldFail) {
+			String message = errorMsg.getSingle(event);
+			assert message != null; // Should not happen, developer needs to fix test.
+			if (SkriptJUnitTest.getCurrentJUnitTest() != null) {
+				TestTracker.junitTestFailed(SkriptJUnitTest.getCurrentJUnitTest(), message);
+			} else {
+				TestTracker.testFailed(message);
+			}
 			return null;
 		}
 		return getNext();

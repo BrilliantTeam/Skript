@@ -16,12 +16,25 @@
  *
  * Copyright Peter Güttinger, SkriptLang team and contributors
  */
+package ch.njol.skript.test.runner;
+
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+
 /**
- * Support for script-based testing.
+ * Raised by Skript when tests are run.
  */
-@NonNullByDefault({DefaultLocation.PARAMETER, DefaultLocation.RETURN_TYPE, DefaultLocation.FIELD})
-package ch.njol.skript.tests.platform;
+public class SkriptTestEvent extends Event {
 
-import org.eclipse.jdt.annotation.DefaultLocation;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
+	private static final HandlerList handlers = new HandlerList();
+	
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+	
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+	
+}

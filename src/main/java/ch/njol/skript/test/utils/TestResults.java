@@ -16,7 +16,7 @@
  *
  * Copyright Peter Güttinger, SkriptLang team and contributors
  */
-package ch.njol.skript.tests;
+package ch.njol.skript.test.utils;
 
 import java.util.Map;
 import java.util.Set;

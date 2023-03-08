@@ -16,11 +16,8 @@
  *
  * Copyright Peter Güttinger, SkriptLang team and contributors
  */
-/**
- * Support for script-based testing.
- */
 @NonNullByDefault({DefaultLocation.PARAMETER, DefaultLocation.RETURN_TYPE, DefaultLocation.FIELD})
-package ch.njol.skript.tests;
+package org.skriptlang.skript.test.tests.classes;
 
 import org.eclipse.jdt.annotation.DefaultLocation;
 import org.eclipse.jdt.annotation.NonNullByDefault;

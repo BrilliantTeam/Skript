@@ -16,7 +16,7 @@
  *
  * Copyright Peter Güttinger, SkriptLang team and contributors
  */
-package ch.njol.skript.tests.platform;
+package ch.njol.skript.test.platform;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,7 +39,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-import ch.njol.skript.tests.TestResults;
+import ch.njol.skript.test.utils.TestResults;
 import ch.njol.util.NonNullPair;
 
 /**
@@ -62,6 +62,7 @@ public class PlatformMain {
 		assert envsRoot != null;
 		boolean devMode = "true".equals(args[4]);
 		boolean genDocs = "true".equals(args[5]);
+		boolean junit = "true".equals(args[6]);
 		
 		// Load environments
 		List<Environment> envs;
@@ -80,17 +81,22 @@ public class PlatformMain {
 		}
 		System.out.println("Test environments: " + String.join(", ",
 				envs.stream().map(Environment::getName).collect(Collectors.toList())));
-		
-		Set<String> allTests = new HashSet<>();
+
 		Map<String, List<NonNullPair<Environment, String>>> failures = new HashMap<>();
-		
+		Set<String> allTests = new HashSet<>();
+
 		boolean docsFailed = false;
 		// Run tests and collect the results
 		envs.sort(Comparator.comparing(Environment::getName));
 		for (Environment env : envs) {
 			System.out.println("Starting testing on " + env.getName());
 			env.initialize(dataRoot, runnerRoot, false);
-			TestResults results = env.runTests(runnerRoot, testsRoot, devMode, genDocs, "-Xmx5G");
+			TestResults results = null;
+			if (junit) {
+				results = env.runJUnit(runnerRoot, testsRoot, "-Xmx5G");
+			} else {
+				results = env.runTests(runnerRoot, testsRoot, devMode, genDocs, "-Xmx5G");
+			}
 			if (results == null) {
 				if (devMode) {
 					// Nothing to report, it's the dev mode environment.
@@ -131,24 +137,29 @@ public class PlatformMain {
 		Collections.sort(succeeded);
 		List<String> failNames = new ArrayList<>(failures.keySet());
 		Collections.sort(failNames);
-		
+
 		// All succeeded tests in a single line
-		System.out.printf("%s Results %s%n", StringUtils.repeat("-", 25), StringUtils.repeat("-", 25));
-		System.out.println("Tested environments: " + String.join(", ",
+		StringBuilder output = new StringBuilder(String.format("%s Results %s%n", StringUtils.repeat("-", 25), StringUtils.repeat("-", 25)));
+		output.append("\nTested environments: " + String.join(", ",
 				envs.stream().map(Environment::getName).collect(Collectors.toList())));
-		System.out.println("\nSucceeded: " + String.join(", ", succeeded));
+		output.append("\nSucceeded:\n  " + String.join((junit ? "\n  " : ", "), succeeded));
+
 		if (!failNames.isEmpty()) { // More space for failed tests, they're important
-			System.err.println("Failed:");
+			output.append("\nFailed:");
 			for (String failed : failNames) {
 				List<NonNullPair<Environment, String>> errors = failures.get(failed);
-				System.err.println("  " + failed + " (on " + errors.size() + " environments)");
+				output.append("  " + failed + " (on " + errors.size() + " environment" + (errors.size() == 1 ? "" : "s") + ")");
 				for (NonNullPair<Environment, String> error : errors) {
-					System.err.println("    " + error.getSecond() + " (on " + error.getFirst().getName() + ")");
+					output.append("    " + error.getSecond() + " (on " + error.getFirst().getName() + ")");
 				}
 			}
-			System.exit(failNames.size()); // Error code to indicate how many tests failed
+			output.append(String.format("%n%n%s", StringUtils.repeat("-", 60)));
+			System.err.print(output.toString());
+			System.exit(failNames.size()); // Error code to indicate how many tests failed.
+			return;
 		}
-		System.out.printf("%n%s", StringUtils.repeat("-", 60));
+		output.append(String.format("%n%n%s", StringUtils.repeat("-", 60)));
+		System.out.print(output.toString());
 	}
 
 }
