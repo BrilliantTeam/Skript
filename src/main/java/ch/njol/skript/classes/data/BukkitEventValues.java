@@ -107,6 +107,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerItemMendEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
@@ -1649,6 +1650,22 @@ public final class BukkitEventValues {
 				}
 			}, EventValues.TIME_NOW);
 		}
+
+    // PlayerItemHeldEvent
+		EventValues.registerEventValue(PlayerItemHeldEvent.class, Slot.class, new Getter<Slot, PlayerItemHeldEvent>() {
+			@Override
+			@Nullable
+			public Slot get(PlayerItemHeldEvent event) {
+				return new InventorySlot(event.getPlayer().getInventory(), event.getNewSlot());
+			}
+		}, EventValues.TIME_NOW);
+		EventValues.registerEventValue(PlayerItemHeldEvent.class, Slot.class, new Getter<Slot, PlayerItemHeldEvent>() {
+			@Override
+			@Nullable
+			public Slot get(PlayerItemHeldEvent event) {
+				return new InventorySlot(event.getPlayer().getInventory(), event.getPreviousSlot());
+			}
+		}, EventValues.TIME_PAST);
 
 		// PlayerPickupArrowEvent
 		// This event value is restricted to MC 1.14+ due to an API change which has the return type changed
