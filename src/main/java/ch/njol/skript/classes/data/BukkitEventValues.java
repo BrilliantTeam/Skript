@@ -109,6 +109,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemMendEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
@@ -1649,6 +1650,25 @@ public final class BukkitEventValues {
 			}, EventValues.TIME_NOW);
 		}
 
+		// PlayerPickupArrowEvent
+		// This event value is restricted to MC 1.14+ due to an API change which has the return type changed
+		// which throws a NoSuchMethodError if used in a 1.13 server.
+		if (Skript.isRunningMinecraft(1, 14))
+			EventValues.registerEventValue(PlayerPickupArrowEvent.class, Projectile.class, new Getter<Projectile, PlayerPickupArrowEvent>() {
+				@Override
+				public Projectile get(PlayerPickupArrowEvent event) {
+					return event.getArrow();
+				}
+			}, EventValues.TIME_NOW);
+
+		EventValues.registerEventValue(PlayerPickupArrowEvent.class, ItemStack.class, new Getter<ItemStack, PlayerPickupArrowEvent>() {
+			@Override
+			@Nullable
+			public ItemStack get(PlayerPickupArrowEvent event) {
+				return event.getItem().getItemStack();
+			}
+		}, EventValues.TIME_NOW);
+
 		//PlayerQuitEvent
 		if (Skript.classExists("org.bukkit.event.player.PlayerQuitEvent$QuitReason"))
 			EventValues.registerEventValue(PlayerQuitEvent.class, QuitReason.class, new Getter<QuitReason, PlayerQuitEvent>() {
@@ -1658,5 +1678,7 @@ public final class BukkitEventValues {
 					return event.getReason();
 				}
 			}, EventValues.TIME_NOW);
+
 	}
+
 }
