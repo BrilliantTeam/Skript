@@ -33,9 +33,6 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.VectorMath;
 
-/**
- * @author bi0qaw
- */
 @Name("Vectors - Rotate around XYZ")
 @Description("Rotates a vector around x, y, or z axis by some degrees")
 @Examples({"rotate {_v} around x-axis by 90",
@@ -45,7 +42,7 @@ import ch.njol.util.VectorMath;
 public class EffVectorRotateXYZ extends Effect {
 
 	static {
-		Skript.registerEffect(EffVectorRotateXYZ.class, "rotate %vectors% around (1¦x|2¦y|3¦z)(-| )axis by %number% [degrees]");
+		Skript.registerEffect(EffVectorRotateXYZ.class, "rotate %vectors% around (0¦x|1¦y|2¦z)(-| )axis by %number% [degrees]");
 	}
 
 	private final static Character[] axes = new Character[] {'x', 'y', 'z'};
@@ -68,28 +65,28 @@ public class EffVectorRotateXYZ extends Effect {
 
 	@Override
 	@SuppressWarnings("null")
-	protected void execute(Event e) {
-		Number d = degree.getSingle(e);
+	protected void execute(Event event) {
+		Number d = degree.getSingle(event);
 		if (d == null)
 			return;
 		switch (axis) {
-			case 1:
-				for (Vector v : vectors.getArray(e))
+			case 0:
+				for (Vector v : vectors.getArray(event))
 					VectorMath.rotX(v, d.doubleValue());
 				break;
-			case 2:
-				for (Vector v : vectors.getArray(e))
+			case 1:
+				for (Vector v : vectors.getArray(event))
 					VectorMath.rotY(v, d.doubleValue());
 				break;
-			case 3:
-				for (Vector v : vectors.getArray(e))
+			case 2:
+				for (Vector v : vectors.getArray(event))
 					VectorMath.rotZ(v, d.doubleValue());
 		}
 	}
 
 	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return "rotate " + vectors.toString(e, debug) + " around " + axes[axis] + "-axis" + " by " + degree + "degrees";
+	public String toString(@Nullable Event event, boolean debug) {
+		return "rotate " + vectors.toString(event, debug) + " around " + axes[axis] + "-axis" + " by " + degree.toString(event, debug) + "degrees";
 	}
 
 }

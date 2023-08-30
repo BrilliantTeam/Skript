@@ -30,9 +30,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 
-/**
- * @author bi0qaw
- */
 @Name("Vectors - Length")
 @Description("Gets or sets the length of a vector.")
 @Examples({"send \"%standard length of vector 1, 2, 3%\"",
@@ -61,43 +58,44 @@ public class ExprVectorLength extends SimplePropertyExpression<Vector, Number> {
 	}
 
 	@Override
-	public void change(Event e, @Nullable Object[] delta, ChangeMode mode) {
+	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
 		assert delta != null;
-		final Vector v = getExpr().getSingle(e);
+		final Vector v = getExpr().getSingle(event);
 		if (v == null)
 			return;
-		double n = ((Number) delta[0]).doubleValue();
+		double deltaLength = ((Number) delta[0]).doubleValue();
 		switch (mode) {
+			case REMOVE:
+				deltaLength = -deltaLength;
+				//$FALL-THROUGH$
 			case ADD:
-				if (n < 0 && v.lengthSquared() < n * n) {
+				if (deltaLength < 0 && v.lengthSquared() < deltaLength * deltaLength) {
 					v.zero();
 				} else {
-					double l = n + v.length();
+					double l = deltaLength + v.length();
 					v.normalize().multiply(l);
 				}
-				getExpr().change(e, new Vector[]{v}, ChangeMode.SET);
+				getExpr().change(event, new Vector[]{v}, ChangeMode.SET);
 				break;
-			case REMOVE:
-				n = -n;
-				//$FALL-THROUGH$
 			case SET:
-				if (n < 0)
+				if (deltaLength < 0) {
 					v.zero();
-				else
-					v.normalize().multiply(n);
-				getExpr().change(e, new Vector[]{v}, ChangeMode.SET);
+				} else {
+					v.normalize().multiply(deltaLength);
+				}
+				getExpr().change(event, new Vector[]{v}, ChangeMode.SET);
 				break;
 		}
 	}
 
 	@Override
-	protected String getPropertyName() {
-		return "vector length";
+	public Class<? extends Number> getReturnType() {
+		return Number.class;
 	}
 
 	@Override
-	public Class<? extends Number> getReturnType() {
-		return Number.class;
+	protected String getPropertyName() {
+		return "vector length";
 	}
 
 }

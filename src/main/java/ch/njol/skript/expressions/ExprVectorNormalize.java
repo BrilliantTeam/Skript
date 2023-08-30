@@ -34,9 +34,6 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-/**
- * @author bi0qaw
- */
 @Name("Vectors - Normalized")
 @Description("Returns the same vector but with length 1.")
 @Examples({"set {_v} to normalized {_v}"})
@@ -61,8 +58,8 @@ public class ExprVectorNormalize extends SimpleExpression<Vector> {
 
 	@Override
 	@SuppressWarnings("null")
-	protected Vector[] get(Event e) {
-		Vector v = vector.getSingle(e);
+	protected Vector[] get(Event event) {
+		Vector v = vector.getSingle(event);
 		if (v == null)
 			return null;
 		return CollectionUtils.array(v.clone().normalize());
@@ -79,8 +76,8 @@ public class ExprVectorNormalize extends SimpleExpression<Vector> {
 	}
 
 	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return "normalized " + vector.toString(e, debug);
+	public String toString(@Nullable Event event, boolean debug) {
+		return "normalized " + vector.toString(event, debug);
 	}
 
 }

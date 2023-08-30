@@ -35,9 +35,6 @@ import ch.njol.skript.util.Patterns;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
-/**
- * @author bi0qaw
- */
 @Name("Vectors - Arithmetic")
 @Description("Arithmetic expressions for vectors.")
 @Examples({"set {_v} to vector 1, 2, 3 // 5",
@@ -119,12 +116,9 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 	}
 
 	@Override
-	protected Vector[] get(Event e) {
-		Vector v1 = first.getSingle(e), v2 = second.getSingle(e);
-		if (v1 == null)
-			v1 = new Vector();
-		if (v2 == null)
-			v2 = new Vector();
+	protected Vector[] get(Event event) {
+		Vector v1 = first.getOptionalSingle(event).orElse(new Vector());
+		Vector v2 = second.getOptionalSingle(event).orElse(new Vector());
 		return CollectionUtils.array(op.calculate(v1, v2));
 	}
 
@@ -139,8 +133,8 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 	}
 
 	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return first.toString(e, debug) + " " + op +  " " + second.toString(e, debug);
+	public String toString(@Nullable Event event, boolean debug) {
+		return first.toString(event, debug) + " " + op +  " " + second.toString(event, debug);
 	}
 
 }
