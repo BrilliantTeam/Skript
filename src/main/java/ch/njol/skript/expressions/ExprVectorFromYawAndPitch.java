@@ -37,9 +37,7 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Vector from Pitch and Yaw")
 @Description("Creates a vector from a yaw and pitch value.")
-@Examples({
-	"set {_v} to vector from yaw 45 and pitch 45"
-})
+@Examples("set {_v} to vector from yaw 45 and pitch 45")
 @Since("2.2-dev28")
 public class ExprVectorFromYawAndPitch extends SimpleExpression<Vector> {
 

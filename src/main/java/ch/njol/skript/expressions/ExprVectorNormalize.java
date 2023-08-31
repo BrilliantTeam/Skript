@@ -36,9 +36,7 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Normalized")
 @Description("Returns the same vector but with length 1.")
-@Examples({
-	"set {_v} to normalized {_v}"
-})
+@Examples("set {_v} to normalized {_v}")
 @Since("2.2-dev28")
 public class ExprVectorNormalize extends SimpleExpression<Vector> {
 

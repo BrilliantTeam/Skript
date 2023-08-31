@@ -35,9 +35,7 @@ import ch.njol.util.VectorMath;
 
 @Name("Vectors - Rotate Around Vector")
 @Description("Rotates one or more vectors around another vector")
-@Examples({
-	"rotate {_v} around vector 1, 0, 0 by 90"
-})
+@Examples("rotate {_v} around vector 1, 0, 0 by 90")
 @Since("2.2-dev28")
 public class EffVectorRotateAroundAnother extends Effect {
 

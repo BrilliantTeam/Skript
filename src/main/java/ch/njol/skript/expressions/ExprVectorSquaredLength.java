@@ -28,9 +28,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 
 @Name("Vectors - Squared Length")
 @Description("Gets the squared length of a vector.")
-@Examples({
-	"send \"%squared length of vector 1, 2, 3%\""
-})
+@Examples("send \"%squared length of vector 1, 2, 3%\"")
 @Since("2.2-dev28")
 public class ExprVectorSquaredLength extends SimplePropertyExpression<Vector, Number> {
 
