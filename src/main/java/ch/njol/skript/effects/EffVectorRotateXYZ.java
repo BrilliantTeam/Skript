@@ -34,10 +34,12 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.VectorMath;
 
 @Name("Vectors - Rotate around XYZ")
-@Description("Rotates a vector around x, y, or z axis by some degrees")
-@Examples({"rotate {_v} around x-axis by 90",
-		"rotate {_v} around y-axis by 90",
-		"rotate {_v} around z-axis by 90 degrees"})
+@Description("Rotates one or more vectors around the x, y, or z axis by some amount of degrees")
+@Examples({
+	"rotate {_v} around x-axis by 90",
+	"rotate {_v} around y-axis by 90",
+	"rotate {_v} around z-axis by 90 degrees"
+})
 @Since("2.2-dev28")
 public class EffVectorRotateXYZ extends Effect {
 
@@ -66,21 +68,21 @@ public class EffVectorRotateXYZ extends Effect {
 	@Override
 	@SuppressWarnings("null")
 	protected void execute(Event event) {
-		Number d = degree.getSingle(event);
-		if (d == null)
+		Number angle = degree.getSingle(event);
+		if (angle == null)
 			return;
 		switch (axis) {
 			case 0:
 				for (Vector v : vectors.getArray(event))
-					VectorMath.rotX(v, d.doubleValue());
+					VectorMath.rotX(v, angle.doubleValue());
 				break;
 			case 1:
 				for (Vector v : vectors.getArray(event))
-					VectorMath.rotY(v, d.doubleValue());
+					VectorMath.rotY(v, angle.doubleValue());
 				break;
 			case 2:
 				for (Vector v : vectors.getArray(event))
-					VectorMath.rotZ(v, d.doubleValue());
+					VectorMath.rotZ(v, angle.doubleValue());
 		}
 	}
 

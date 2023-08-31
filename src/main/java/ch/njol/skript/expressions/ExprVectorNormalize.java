@@ -36,7 +36,9 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Normalized")
 @Description("Returns the same vector but with length 1.")
-@Examples({"set {_v} to normalized {_v}"})
+@Examples({
+	"set {_v} to normalized {_v}"
+})
 @Since("2.2-dev28")
 public class ExprVectorNormalize extends SimpleExpression<Vector> {
 
@@ -62,7 +64,10 @@ public class ExprVectorNormalize extends SimpleExpression<Vector> {
 		Vector v = vector.getSingle(event);
 		if (v == null)
 			return null;
-		return CollectionUtils.array(v.clone().normalize());
+		v = v.clone();
+		if (!v.isNormalized())
+			v.normalize();
+		return CollectionUtils.array(v);
 	}
 
 	@Override

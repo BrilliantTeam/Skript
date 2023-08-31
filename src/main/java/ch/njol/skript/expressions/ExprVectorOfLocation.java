@@ -37,7 +37,9 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Vector from Location")
 @Description("Creates a vector from a location.")
-@Examples({"set {_v} to vector of {_loc}"})
+@Examples({
+	"set {_v} to vector of {_loc}"
+})
 @Since("2.2-dev28")
 public class ExprVectorOfLocation extends SimpleExpression<Vector> {
 
@@ -60,10 +62,10 @@ public class ExprVectorOfLocation extends SimpleExpression<Vector> {
 	@Override
 	@SuppressWarnings("null")
 	protected Vector[] get(Event event) {
-		Location l = location.getSingle(event);
-		if (l == null)
+		Location location = this.location.getSingle(event);
+		if (location == null)
 			return null;
-		return CollectionUtils.array(l.toVector());
+		return CollectionUtils.array(location.toVector());
 	}
 
 	@Override

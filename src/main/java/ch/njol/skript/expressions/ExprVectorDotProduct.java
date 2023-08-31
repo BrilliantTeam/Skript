@@ -36,7 +36,9 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Dot Product")
 @Description("Gets the dot product between two vectors.")
-@Examples({"set {_v} to {_v2} dot {_v3}"})
+@Examples({
+	"set {_dot} to {_v1} dot {_v2}"
+})
 @Since("2.2-dev28")
 public class ExprVectorDotProduct extends SimpleExpression<Number> {
 

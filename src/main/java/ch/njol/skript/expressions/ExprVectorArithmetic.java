@@ -37,15 +37,13 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Arithmetic")
 @Description("Arithmetic expressions for vectors.")
-@Examples({"set {_v} to vector 1, 2, 3 // 5",
-		"set {_v} to {_v} ++ {_v}",
-		"set {_v} to {_v} ++ 5",
-		"set {_v} to {_v} -- {_v}",
-		"set {_v} to {_v} -- 5",
-		"set {_v} to {_v} ** {_v}",
-		"set {_v} to {_v} ** 5",
-		"set {_v} to {_v} // {_v}",
-		"set {_v} to {_v} // 5"})
+@Examples({
+	"set {_v} to vector 1, 2, 3 // vector 5, 5, 5",
+	"set {_v} to {_v} ++ {_v}",
+	"set {_v} to {_v} -- {_v}",
+	"set {_v} to {_v} ** {_v}",
+	"set {_v} to {_v} // {_v}"
+})
 @Since("2.2-dev28")
 public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 
@@ -104,14 +102,14 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 	private Expression<Vector> first, second;
 
 	@SuppressWarnings("null")
-	private Operator op;
+	private Operator operator;
 
 	@Override
 	@SuppressWarnings({"unchecked", "null"})
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		first = (Expression<Vector>) exprs[0];
 		second = (Expression<Vector>) exprs[1];
-		op = patterns.getInfo(matchedPattern);
+		operator = patterns.getInfo(matchedPattern);
 		return true;
 	}
 
@@ -119,7 +117,7 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 	protected Vector[] get(Event event) {
 		Vector v1 = first.getOptionalSingle(event).orElse(new Vector());
 		Vector v2 = second.getOptionalSingle(event).orElse(new Vector());
-		return CollectionUtils.array(op.calculate(v1, v2));
+		return CollectionUtils.array(operator.calculate(v1, v2));
 	}
 
 	@Override
@@ -134,7 +132,7 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return first.toString(event, debug) + " " + op +  " " + second.toString(event, debug);
+		return first.toString(event, debug) + " " + operator +  " " + second.toString(event, debug);
 	}
 
 }

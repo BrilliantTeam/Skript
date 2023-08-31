@@ -37,7 +37,9 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Vector Between Locations")
 @Description("Creates a vector between two locations.")
-@Examples({"set {_v} to vector between {_loc1} and {_loc2}"})
+@Examples({
+	"set {_v} to vector between {_loc1} and {_loc2}"
+})
 @Since("2.2-dev28")
 public class ExprVectorBetweenLocations extends SimpleExpression<Vector> {
 
@@ -60,11 +62,11 @@ public class ExprVectorBetweenLocations extends SimpleExpression<Vector> {
 	@Override
 	@SuppressWarnings("null")
 	protected Vector[] get(Event event) {
-		Location l1 = from.getSingle(event);
-		Location l2 = to.getSingle(event);
-		if (l1 == null || l2 == null)
+		Location from = this.from.getSingle(event);
+		Location to = this.to.getSingle(event);
+		if (from == null || to == null)
 			return null;
-		return CollectionUtils.array(new Vector(l2.getX() - l1.getX(), l2.getY() - l1.getY(), l2.getZ() - l1.getZ()));
+		return CollectionUtils.array(new Vector(to.getX() - from.getX(), to.getY() - from.getY(), to.getZ() - from.getZ()));
 	}
 
 	@Override

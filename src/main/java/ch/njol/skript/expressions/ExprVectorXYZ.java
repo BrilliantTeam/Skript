@@ -36,16 +36,18 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - XYZ Component")
 @Description("Gets or changes the x, y or z component of a vector.")
-@Examples({"set {_v} to vector 1, 2, 3",
-		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
-		"add 1 to x of {_v}",
-		"add 2 to y of {_v}",
-		"add 3 to z of {_v}",
-		"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
-		"set x component of {_v} to 1",
-		"set y component of {_v} to 2",
-		"set z component of {_v} to 3",
-		"send \"%x component of {_v}%, %y component of {_v}%, %z component of {_v}%\"",})
+@Examples({
+	"set {_v} to vector 1, 2, 3",
+	"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
+	"add 1 to x of {_v}",
+	"add 2 to y of {_v}",
+	"add 3 to z of {_v}",
+	"send \"%x of {_v}%, %y of {_v}%, %z of {_v}%\"",
+	"set x component of {_v::*} to 1",
+	"set y component of {_v::*} to 2",
+	"set z component of {_v::*} to 3",
+	"send \"%x component of {_v::*}%, %y component of {_v::*}%, %z component of {_v::*}%\""
+})
 @Since("2.2-dev28")
 public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	

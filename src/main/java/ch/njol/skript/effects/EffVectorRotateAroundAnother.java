@@ -34,8 +34,10 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.VectorMath;
 
 @Name("Vectors - Rotate Around Vector")
-@Description("Rotates a vector around another vector")
-@Examples({"rotate {_v} around vector 1, 0, 0 by 90"})
+@Description("Rotates one or more vectors around another vector")
+@Examples({
+	"rotate {_v} around vector 1, 0, 0 by 90"
+})
 @Since("2.2-dev28")
 public class EffVectorRotateAroundAnother extends Effect {
 
@@ -61,12 +63,12 @@ public class EffVectorRotateAroundAnother extends Effect {
 	@SuppressWarnings("null")
 	@Override
 	protected void execute(Event event) {
-		Vector v2 = second.getSingle(event);
-		Number d = degree.getSingle(event);
-		if (v2 == null || d == null)
+		Vector axis = second.getSingle(event);
+		Number angle = degree.getSingle(event);
+		if (axis == null || angle == null)
 			return;
 		for (Vector v1 : first.getArray(event))
-			VectorMath.rot(v1, v2, d.doubleValue());
+			VectorMath.rot(v1, axis, angle.doubleValue());
 	}
 
 	@Override

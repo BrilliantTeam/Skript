@@ -37,7 +37,9 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Vector from Pitch and Yaw")
 @Description("Creates a vector from a yaw and pitch value.")
-@Examples({"set {_v} to vector from yaw 45 and pitch 45"})
+@Examples({
+	"set {_v} to vector from yaw 45 and pitch 45"
+})
 @Since("2.2-dev28")
 public class ExprVectorFromYawAndPitch extends SimpleExpression<Vector> {
 
@@ -60,12 +62,12 @@ public class ExprVectorFromYawAndPitch extends SimpleExpression<Vector> {
 	@Override
 	@SuppressWarnings("null")
 	protected Vector[] get(Event event) {
-		Number y = yaw.getSingle(event);
-		Number p = pitch.getSingle(event);
-		if (y == null || p == null)
+		Number skriptYaw = yaw.getSingle(event);
+		Number skriptPitch = pitch.getSingle(event);
+		if (skriptYaw == null || skriptPitch == null)
 			return null;
-		float yaw = VectorMath.fromSkriptYaw(VectorMath.wrapAngleDeg(y.floatValue()));
-		float pitch = VectorMath.fromSkriptPitch(VectorMath.wrapAngleDeg(p.floatValue()));
+		float yaw = VectorMath.fromSkriptYaw(VectorMath.wrapAngleDeg(skriptYaw.floatValue()));
+		float pitch = VectorMath.fromSkriptPitch(VectorMath.wrapAngleDeg(skriptPitch.floatValue()));
 		return CollectionUtils.array(VectorMath.fromYawAndPitch(yaw, pitch));
 	}
 

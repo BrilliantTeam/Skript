@@ -32,10 +32,12 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Length")
 @Description("Gets or sets the length of a vector.")
-@Examples({"send \"%standard length of vector 1, 2, 3%\"",
-		"set {_v} to vector 1, 2, 3",
-		"set standard length of {_v} to 2",
-		"send \"%standard length of {_v}%\""})
+@Examples({
+	"send \"%standard length of vector 1, 2, 3%\"",
+	"set {_v} to vector 1, 2, 3",
+	"set standard length of {_v} to 2",
+	"send \"%standard length of {_v}%\""
+})
 @Since("2.2-dev28")
 public class ExprVectorLength extends SimplePropertyExpression<Vector, Number> {
 
@@ -60,32 +62,37 @@ public class ExprVectorLength extends SimplePropertyExpression<Vector, Number> {
 	@Override
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
 		assert delta != null;
-		final Vector v = getExpr().getSingle(event);
-		if (v == null)
-			return;
+		final Vector[] vectors = getExpr().getArray(event);
 		double deltaLength = ((Number) delta[0]).doubleValue();
 		switch (mode) {
 			case REMOVE:
 				deltaLength = -deltaLength;
 				//$FALL-THROUGH$
 			case ADD:
-				if (deltaLength < 0 && v.lengthSquared() < deltaLength * deltaLength) {
-					v.zero();
-				} else {
-					double l = deltaLength + v.length();
-					v.normalize().multiply(l);
+				for (Vector v : vectors) {
+					if (deltaLength < 0 && v.lengthSquared() < deltaLength * deltaLength) {
+						v.zero();
+					} else {
+						double newLength = deltaLength + v.length();
+						if (!v.isNormalized())
+							v.normalize();
+						v.multiply(newLength);
+					}
 				}
-				getExpr().change(event, new Vector[]{v}, ChangeMode.SET);
 				break;
 			case SET:
-				if (deltaLength < 0) {
-					v.zero();
-				} else {
-					v.normalize().multiply(deltaLength);
+				for (Vector v : vectors) {
+					if (deltaLength < 0) {
+						v.zero();
+					} else {
+						if (!v.isNormalized())
+							v.normalize();
+						v.multiply(deltaLength);
+					}
 				}
-				getExpr().change(event, new Vector[]{v}, ChangeMode.SET);
 				break;
 		}
+		getExpr().change(event, vectors, ChangeMode.SET);
 	}
 
 	@Override
