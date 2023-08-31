@@ -59,13 +59,13 @@ public class ExprVectorNormalize extends SimpleExpression<Vector> {
 	@Override
 	@SuppressWarnings("null")
 	protected Vector[] get(Event event) {
-		Vector v = vector.getSingle(event);
-		if (v == null)
+		Vector vector = this.vector.getSingle(event);
+		if (vector == null)
 			return null;
-		v = v.clone();
-		if (!v.isNormalized())
-			v.normalize();
-		return CollectionUtils.array(v);
+		vector = vector.clone();
+		if (!vector.isNormalized())
+			vector.normalize();
+		return CollectionUtils.array(vector);
 	}
 
 	@Override

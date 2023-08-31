@@ -67,8 +67,8 @@ public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 	}
 	
 	@Override
-	public Number convert(Vector v) {
-		return axis == 0 ? v.getX() : (axis == 1 ? v.getY() : v.getZ());
+	public Number convert(Vector vector) {
+		return axis == 0 ? vector.getX() : (axis == 1 ? vector.getY() : vector.getZ());
 	}
 	
 	@Override
@@ -90,23 +90,23 @@ public class ExprVectorXYZ extends SimplePropertyExpression<Vector, Number> {
 				deltaValue = -deltaValue;
 				//$FALL-THROUGH$
 			case ADD:
-				for (Vector v : vectors) {
+				for (Vector vector : vectors) {
 					if (axis == 0)
-						v.setX(v.getX() + deltaValue);
+						vector.setX(vector.getX() + deltaValue);
 					else if (axis == 1)
-						v.setY(v.getY() + deltaValue);
+						vector.setY(vector.getY() + deltaValue);
 					else
-						v.setZ(v.getZ() + deltaValue);
+						vector.setZ(vector.getZ() + deltaValue);
 				}
 				break;
 			case SET:
-				for (Vector v : vectors) {
+				for (Vector vector : vectors) {
 					if (axis == 0)
-						v.setX(deltaValue);
+						vector.setX(deltaValue);
 					else if (axis == 1)
-						v.setY(deltaValue);
+						vector.setY(deltaValue);
 					else
-						v.setZ(deltaValue);
+						vector.setZ(deltaValue);
 				}
 				break;
 			default:

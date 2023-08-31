@@ -36,9 +36,7 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Create from XYZ")
 @Description("Creates a vector from x, y and z values.")
-@Examples({
-	"set {_v} to vector 0, 1, 0"
-})
+@Examples("set {_v} to vector 0, 1, 0")
 @Since("2.2-dev28")
 public class ExprVectorFromXYZ extends SimpleExpression<Vector> {
 

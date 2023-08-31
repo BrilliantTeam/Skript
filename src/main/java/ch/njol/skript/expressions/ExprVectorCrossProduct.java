@@ -58,11 +58,11 @@ public class ExprVectorCrossProduct extends SimpleExpression<Vector> {
 	@Override
 	@SuppressWarnings("null")
 	protected Vector[] get(Event event) {
-		Vector v1 = first.getSingle(event);
-		Vector v2 = second.getSingle(event);
-		if (v1 == null || v2 == null)
+		Vector first = this.first.getSingle(event);
+		Vector second = this.second.getSingle(event);
+		if (first == null || second == null)
 			return null;
-		return CollectionUtils.array(v1.clone().crossProduct(v2));
+		return CollectionUtils.array(first.clone().crossProduct(second));
 	}
 
 	@Override

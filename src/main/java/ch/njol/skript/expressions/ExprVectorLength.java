@@ -69,25 +69,25 @@ public class ExprVectorLength extends SimplePropertyExpression<Vector, Number> {
 				deltaLength = -deltaLength;
 				//$FALL-THROUGH$
 			case ADD:
-				for (Vector v : vectors) {
-					if (deltaLength < 0 && v.lengthSquared() < deltaLength * deltaLength) {
-						v.zero();
+				for (Vector vector : vectors) {
+					if (deltaLength < 0 && vector.lengthSquared() < deltaLength * deltaLength) {
+						vector.zero();
 					} else {
-						double newLength = deltaLength + v.length();
-						if (!v.isNormalized())
-							v.normalize();
-						v.multiply(newLength);
+						double newLength = deltaLength + vector.length();
+						if (!vector.isNormalized())
+							vector.normalize();
+						vector.multiply(newLength);
 					}
 				}
 				break;
 			case SET:
-				for (Vector v : vectors) {
+				for (Vector vector : vectors) {
 					if (deltaLength < 0) {
-						v.zero();
+						vector.zero();
 					} else {
-						if (!v.isNormalized())
-							v.normalize();
-						v.multiply(deltaLength);
+						if (!vector.isNormalized())
+							vector.normalize();
+						vector.multiply(deltaLength);
 					}
 				}
 				break;

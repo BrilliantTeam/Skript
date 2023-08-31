@@ -73,16 +73,16 @@ public class EffVectorRotateXYZ extends Effect {
 			return;
 		switch (axis) {
 			case 0:
-				for (Vector v : vectors.getArray(event))
-					VectorMath.rotX(v, angle.doubleValue());
+				for (Vector vector : vectors.getArray(event))
+					VectorMath.rotX(vector, angle.doubleValue());
 				break;
 			case 1:
-				for (Vector v : vectors.getArray(event))
-					VectorMath.rotY(v, angle.doubleValue());
+				for (Vector vector : vectors.getArray(event))
+					VectorMath.rotY(vector, angle.doubleValue());
 				break;
 			case 2:
-				for (Vector v : vectors.getArray(event))
-					VectorMath.rotZ(v, angle.doubleValue());
+				for (Vector vector : vectors.getArray(event))
+					VectorMath.rotZ(vector, angle.doubleValue());
 		}
 	}
 

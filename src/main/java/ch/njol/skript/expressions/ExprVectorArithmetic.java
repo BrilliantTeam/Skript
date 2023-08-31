@@ -44,32 +44,32 @@ import ch.njol.util.coll.CollectionUtils;
 	"set {_v} to {_v} ** {_v}",
 	"set {_v} to {_v} // {_v}"
 })
-@Since("2.2-dev28")
+@Since("2.2-desecond8")
 public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 
 	private enum Operator {
 		PLUS("++") {
 			@Override
-			public Vector calculate(final Vector v1, final Vector v2) {
-				return v1.clone().add(v2);
+			public Vector calculate(final Vector first, final Vector second) {
+				return first.clone().add(second);
 			}
 		},
 		MINUS("--") {
 			@Override
-			public Vector calculate(final Vector v1, final Vector v2) {
-				return v1.clone().subtract(v2);
+			public Vector calculate(final Vector first, final Vector second) {
+				return first.clone().subtract(second);
 			}
 		},
 		MULT("**") {
 			@Override
-			public Vector calculate(final Vector v1, final Vector v2) {
-				return v1.clone().multiply(v2);
+			public Vector calculate(final Vector first, final Vector second) {
+				return first.clone().multiply(second);
 			}
 		},
 		DIV("//") {
 			@Override
-			public Vector calculate(final Vector v1, final Vector v2) {
-				return v1.clone().divide(v2);
+			public Vector calculate(final Vector first, final Vector second) {
+				return first.clone().divide(second);
 			}
 		};
 
@@ -79,7 +79,7 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 			this.sign = sign;
 		}
 
-		public abstract Vector calculate(Vector v1, Vector v2);
+		public abstract Vector calculate(Vector first, Vector second);
 
 		@Override
 		public String toString() {
@@ -115,9 +115,9 @@ public class ExprVectorArithmetic extends SimpleExpression<Vector> {
 
 	@Override
 	protected Vector[] get(Event event) {
-		Vector v1 = first.getOptionalSingle(event).orElse(new Vector());
-		Vector v2 = second.getOptionalSingle(event).orElse(new Vector());
-		return CollectionUtils.array(operator.calculate(v1, v2));
+		Vector first = this.first.getOptionalSingle(event).orElse(new Vector());
+		Vector second = this.second.getOptionalSingle(event).orElse(new Vector());
+		return CollectionUtils.array(operator.calculate(first, second));
 	}
 
 	@Override

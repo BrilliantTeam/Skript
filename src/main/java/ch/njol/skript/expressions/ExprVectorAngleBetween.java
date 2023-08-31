@@ -60,11 +60,11 @@ public class ExprVectorAngleBetween extends SimpleExpression<Number> {
 	@Override
 	@SuppressWarnings("null")
 	protected Number[] get(Event event) {
-		Vector v1 = first.getSingle(event);
-		Vector v2 = second.getSingle(event);
-		if (v1 == null || v2 == null)
+		Vector first = this.first.getSingle(event);
+		Vector second = this.second.getSingle(event);
+		if (first == null || second == null)
 			return null;
-		return CollectionUtils.array(v1.angle(v2) * (float) VectorMath.RAD_TO_DEG);
+		return CollectionUtils.array(first.angle(second) * (float) VectorMath.RAD_TO_DEG);
 	}
 
 	@Override

@@ -37,9 +37,7 @@ import ch.njol.util.coll.CollectionUtils;
 
 @Name("Vectors - Vector Between Locations")
 @Description("Creates a vector between two locations.")
-@Examples({
-	"set {_v} to vector between {_loc1} and {_loc2}"
-})
+@Examples("set {_v} to vector between {_loc1} and {_loc2}")
 @Since("2.2-dev28")
 public class ExprVectorBetweenLocations extends SimpleExpression<Vector> {
 

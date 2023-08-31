@@ -44,7 +44,7 @@ public class EffVectorRotateAroundAnother extends Effect {
 	}
 	
 	@SuppressWarnings("null")
-	private Expression<Vector> first, second;
+	private Expression<Vector> vectors, axis;
 
 	@SuppressWarnings("null")
 	private Expression<Number> degree;
@@ -52,8 +52,8 @@ public class EffVectorRotateAroundAnother extends Effect {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean kleenean, ParseResult parseResult) {
-		first = (Expression<Vector>) exprs[0];
-		second = (Expression<Vector>) exprs[1];
+		vectors = (Expression<Vector>) exprs[0];
+		axis = (Expression<Vector>) exprs[1];
 		degree = (Expression<Number>) exprs[2];
 		return true;
 	}
@@ -61,17 +61,17 @@ public class EffVectorRotateAroundAnother extends Effect {
 	@SuppressWarnings("null")
 	@Override
 	protected void execute(Event event) {
-		Vector axis = second.getSingle(event);
+		Vector axis = this.axis.getSingle(event);
 		Number angle = degree.getSingle(event);
 		if (axis == null || angle == null)
 			return;
-		for (Vector v1 : first.getArray(event))
-			VectorMath.rot(v1, axis, angle.doubleValue());
+		for (Vector vector : vectors.getArray(event))
+			VectorMath.rot(vector, axis, angle.doubleValue());
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "rotate " + first.toString(event, debug) + " around " + second.toString(event, debug) + " by " + degree.toString(event, debug) + "degrees";
+		return "rotate " + vectors.toString(event, debug) + " around " + axis.toString(event, debug) + " by " + degree.toString(event, debug) + "degrees";
 	}
 
 }
