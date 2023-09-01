@@ -41,7 +41,7 @@ public class EvtMove extends SkriptEvent {
 			events = CollectionUtils.array(PlayerMoveEvent.class, EntityMoveEvent.class);
 		else
 			events = CollectionUtils.array(PlayerMoveEvent.class);
-		Skript.registerEvent("Move / Rotate", EvtMove.class, events, "%entitydata% (move|walk|step|rotate:(look around|rotate))")
+		Skript.registerEvent("Move / Rotate", EvtMove.class, events, "%entitydata% (move|walk|step|rotate:(look[ing] around|rotate))")
 				.description(
 						"Called when a player or entity moves or rotates their head.",
 						"NOTE: Move event will only be called when the entity/player moves position, not orientation (ie: looking around). Use the keyword 'rotate' instead.",
