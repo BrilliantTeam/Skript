@@ -79,15 +79,11 @@ public class EvtMove extends SkriptEvent {
 	public boolean check(Event event) {
 		if (isPlayer && event instanceof PlayerMoveEvent) {
 			PlayerMoveEvent playerEvent = (PlayerMoveEvent) event;
-			if (isRotate)
-				return rotateCheck(playerEvent.getFrom(), playerEvent.getTo());
-			return moveCheck(playerEvent.getFrom(), playerEvent.getTo());
+			return moveCheck(playerEvent.getFrom(), playerEvent.getTo()) ^ isRotate;
 		} else if (HAS_ENTITY_MOVE && event instanceof EntityMoveEvent) {
 			EntityMoveEvent entityEvent = (EntityMoveEvent) event;
 			if (type.isInstance(entityEvent.getEntity())) {
-				if (isRotate)
-					return rotateCheck(entityEvent.getFrom(), entityEvent.getTo());
-				return moveCheck(entityEvent.getFrom(), entityEvent.getTo());
+				return moveCheck(entityEvent.getFrom(), entityEvent.getTo()) ^ isRotate;
 			}
 		}
 		return false;
@@ -113,10 +109,6 @@ public class EvtMove extends SkriptEvent {
 
 	private static boolean moveCheck(Location from, Location to) {
 		return from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ() || from.getWorld() != to.getWorld();
-	}
-
-	private static boolean rotateCheck(Location from, Location to) {
-		return !moveCheck(from, to) && from.getYaw() != to.getYaw() || from.getPitch() != to.getPitch();
 	}
 
 }
