@@ -41,7 +41,9 @@ public class EvtMove extends SkriptEvent {
 			events = CollectionUtils.array(PlayerMoveEvent.class, EntityMoveEvent.class);
 		else
 			events = CollectionUtils.array(PlayerMoveEvent.class);
-		Skript.registerEvent("Move / Rotate", EvtMove.class, events, "%entitydata% (move|walk|step|rotate:(look[ing] around|rotate))")
+		Skript.registerEvent("Move / Rotate", EvtMove.class, events,
+				"%entitydata% (move|walk|step|rotate:(look[ing] around|rotate))",
+				"%entitydata% (move|walk|step) or (look[ing] around|rotate)")
 				.description(
 						"Called when a player or entity moves or rotates their head.",
 						"NOTE: Move event will only be called when the entity/player moves position, not orientation (ie: looking around). Use the keyword 'rotate' instead.",
@@ -63,30 +65,65 @@ public class EvtMove extends SkriptEvent {
 	private EntityData<?> type;
 	private boolean isPlayer;
 	private boolean isRotate;
+	private Move moveType;
+
+	private enum Move {
+
+		POSITION("move"),
+		ORIENTATION("rotate"),
+		POSITION_OR_ORIENTATION("move or rotate");
+
+		private final String toString;
+		Move(String toString) {
+			this.toString = toString;
+		}
+
+		public String getString() {
+			return toString;
+		}
+
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
 		type = ((Literal<EntityData<?>>) args[0]).getSingle();
-		isPlayer = Player.class.isAssignableFrom(type.getType());
-		isRotate = parseResult.hasTag("rotate");
 		if (!HAS_ENTITY_MOVE && !isPlayer) {
 			Skript.error("Entity move event requires Paper 1.16.5+");
 			return false;
+		}
+		isPlayer = Player.class.isAssignableFrom(type.getType());
+		if (matchedPattern == 1) {
+			moveType = Move.POSITION_OR_ORIENTATION;
+		} else if (parseResult.hasTag("rotate")) {
+			moveType = Move.ORIENTATION;
+		} else {
+			moveType = Move.POSITION;
 		}
 		return true;
 	}
 
 	@Override
 	public boolean check(Event event) {
+		Location from, to;
 		if (isPlayer && event instanceof PlayerMoveEvent) {
 			PlayerMoveEvent playerEvent = (PlayerMoveEvent) event;
-			return moveCheck(playerEvent.getFrom(), playerEvent.getTo()) ^ isRotate;
+			from = playerEvent.getFrom();
+			to = playerEvent.getTo();
 		} else if (HAS_ENTITY_MOVE && event instanceof EntityMoveEvent) {
 			EntityMoveEvent entityEvent = (EntityMoveEvent) event;
-			if (type.isInstance(entityEvent.getEntity())) {
-				return moveCheck(entityEvent.getFrom(), entityEvent.getTo()) ^ isRotate;
-			}
+			from = entityEvent.getFrom();
+			to = entityEvent.getTo();
+		} else {
+			return false;
+		}
+		switch (moveType) {
+			case POSITION:
+				return hasChangedPosition(from, to);
+			case ORIENTATION:
+				return hasChangedOrientation(from, to);
+			case POSITION_OR_ORIENTATION:
+				return true;
 		}
 		return false;
 	}
@@ -105,11 +142,15 @@ public class EvtMove extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return type + " move";
+		return type + " " + moveType.getString();
 	}
 
-	private static boolean moveCheck(Location from, Location to) {
+	private static boolean hasChangedPosition(Location from, Location to) {
 		return from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ() || from.getWorld() != to.getWorld();
+	}
+
+	private static boolean hasChangedOrientation(Location from, Location to) {
+		return from.getYaw() != to.getYaw() || from.getPitch() != to.getPitch();
 	}
 
 }
