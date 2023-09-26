@@ -37,6 +37,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.localization.Noun;
 import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
@@ -135,6 +136,12 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 				if (getters.containsKey(event)) {
 					hasValue = getters.get(event) != null;
 					continue;
+				}
+				if (EventValues.hasMultipleGetters(event, c, getTime()) == Kleenean.TRUE) {
+					Noun typeName = Classes.getExactClassInfo(componentType).getName();
+					log.printError("There are multiple " + typeName.toString(true) + " in " + Utils.a(getParser().getCurrentEventName()) + " event. " +
+							"You must define which " + typeName + " to use.");
+					return false;
 				}
 				Getter<? extends T, ?> getter;
 				if (exact) {
