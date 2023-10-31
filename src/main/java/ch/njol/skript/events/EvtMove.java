@@ -42,12 +42,12 @@ public class EvtMove extends SkriptEvent {
 		else
 			events = CollectionUtils.array(PlayerMoveEvent.class);
 		Skript.registerEvent("Move / Rotate", EvtMove.class, events,
-				"%entitydata% (move|walk|step|rotate:(look[ing] around|rotate))",
-				"%entitydata% (move|walk|step) or (look[ing] around|rotate)",
-				"%entitydata% (look[ing] around|rotate) or (move|walk|step)")
+				"%entitydata% (move|walk|step|rotate:(turn[ing] around|rotate))",
+				"%entitydata% (move|walk|step) or (turn[ing] around|rotate)",
+				"%entitydata% (turn[ing] around|rotate) or (move|walk|step)")
 				.description(
 						"Called when a player or entity moves or rotates their head.",
-						"NOTE: Move event will only be called when the entity/player moves position, keyword 'rotate' is for orientation (ie: looking around), and the combined syntax listens for both.",
+						"NOTE: Move event will only be called when the entity/player moves position, keyword 'turn around' is for orientation (ie: looking around), and the combined syntax listens for both.",
 						"NOTE: These events can be performance heavy as they are called quite often.")
 				.examples(
 						"on player move:",
@@ -56,10 +56,10 @@ public class EvtMove extends SkriptEvent {
 						"on skeleton move:",
 							"\tif event-entity is not in world \"world\":",
 								"\t\tkill event-entity",
-						"on player rotate:",
-							"send action bar \"You are currently looking around!\" to player")
+						"on player turning around:",
+							"send action bar \"You are currently turning your head around!\" to player")
 				.requiredPlugins("Paper 1.16.5+ (entity move)")
-				.since("2.6, INSERT VERSION (rotate)");
+				.since("2.6, INSERT VERSION (turn around)");
 	}
 
 	private EntityData<?> entityData;
