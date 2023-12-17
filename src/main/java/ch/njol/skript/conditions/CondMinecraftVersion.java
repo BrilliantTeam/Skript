@@ -16,10 +16,9 @@
  *
  * Copyright Peter Güttinger, SkriptLang team and contributors
  */
-package ch.njol.skript.expressions;
+package ch.njol.skript.conditions;
 
 import org.bukkit.event.Event;
-import org.bukkit.util.Vector;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -27,60 +26,42 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.Version;
 import ch.njol.util.Kleenean;
-import ch.njol.util.coll.CollectionUtils;
 
-@Name("Vectors - Normalized")
-@Description("Returns the same vector but with length 1.")
-@Examples("set {_v} to normalized {_v}")
-@Since("2.2-dev28")
-public class ExprVectorNormalize extends SimpleExpression<Vector> {
-
+@Name("Running Minecraft")
+@Description("Checks if current Minecraft version is given version or newer.")
+@Examples("running minecraft \"1.14\"")
+@Since("2.5")
+public class CondMinecraftVersion extends Condition {
+	
 	static {
-		Skript.registerExpression(ExprVectorNormalize.class, Vector.class, ExpressionType.SIMPLE,
-				"normalize[d] %vector%",
-				"%vector% normalized");
+		Skript.registerCondition(CondMinecraftVersion.class, "running [(1¦below)] minecraft %string%");
 	}
 
 	@SuppressWarnings("null")
-	private Expression<Vector> vector;
-
+	private Expression<String> version;
+	
+	@SuppressWarnings({"null", "unchecked"})
 	@Override
-	@SuppressWarnings({"unchecked", "null"})
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		vector = (Expression<Vector>) exprs[0];
+		version = (Expression<String>) exprs[0];
+		setNegated(parseResult.mark == 1);
 		return true;
 	}
-
+	
 	@Override
-	@SuppressWarnings("null")
-	protected Vector[] get(Event event) {
-		Vector vector = this.vector.getSingle(event);
-		if (vector == null)
-			return null;
-		vector = vector.clone();
-		if (!vector.isNormalized())
-			vector.normalize();
-		return CollectionUtils.array(vector);
+	public boolean check(Event e) {
+		String ver = version.getSingle(e);
+		return ver != null ? Skript.isRunningMinecraft(new Version(ver)) ^ isNegated() : false;
 	}
-
+	
 	@Override
-	public boolean isSingle() {
-		return true;
+	public String toString(@Nullable Event e, boolean debug) {
+		return "is running minecraft " + version.toString(e, debug);
 	}
-
-	@Override
-	public Class<? extends Vector> getReturnType() {
-		return Vector.class;
-	}
-
-	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "normalized " + vector.toString(event, debug);
-	}
-
+	
 }
