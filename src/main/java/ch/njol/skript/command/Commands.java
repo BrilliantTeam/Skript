@@ -134,7 +134,7 @@ public abstract class Commands {
 	private final static Pattern escape = Pattern.compile("[" + Pattern.quote("(|)<>%\\") + "]");
 	@SuppressWarnings("null")
 	private final static Pattern unescape = Pattern.compile("\\\\[" + Pattern.quote("(|)<>%\\") + "]");
-	
+
 	public static String escape(String string) {
 		return "" + escape.matcher(string).replaceAll("\\\\$0");
 	}
