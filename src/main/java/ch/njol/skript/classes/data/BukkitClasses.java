@@ -60,6 +60,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+import org.bukkit.event.entity.EntityTransformEvent.TransformReason;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -1541,6 +1542,12 @@ public class BukkitClasses {
 					.description("The inventory close reason in an <a href='/events.html#inventory_close'>inventory close event</a>.")
 					.requiredPlugins("Paper")
 					.since("INSERT VERSION"));
+
+		Classes.registerClass(new EnumClassInfo<>(TransformReason.class, "transformreason", "transform reasons")
+				.user("(entity)? ?transform ?(reason|cause)s?")
+				.name("Transform Reason")
+				.description("Represents a transform reason of an <a href='events.html#entity transform'>entity transform event</a>.")
+				.since("INSERT VERSION"));
 	}
 
 }
