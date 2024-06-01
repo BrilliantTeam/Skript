@@ -296,7 +296,7 @@ task githubResources(type: ProcessResources) {
 		include '**'
 		version = project.property('version')
 		def channel = 'stable'
-		if (version.contains('pre'))
+		if (version.contains('-'))
 			channel = 'prerelease'
 		filter ReplaceTokens, tokens: [
 			'version'         : version,
@@ -329,7 +329,7 @@ task spigotResources(type: ProcessResources) {
 		include '**'
 		version = project.property('version')
 		def channel = 'stable'
-		if (version.contains('pre'))
+		if (version.contains('-'))
 			channel = 'prerelease'
 		filter ReplaceTokens, tokens: [
 			'version'         : version,
