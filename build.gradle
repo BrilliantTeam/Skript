@@ -380,6 +380,7 @@ task nightlyRelease(type: ShadowJar) {
 }
 
 javadoc {
+	mustRunAfter(tasks.withType(ProcessResources))
 	title = 'Skript ' + project.property('version')
 	source = sourceSets.main.allJava
 
