@@ -105,6 +105,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.EntityTransformEvent.TransformReason;
 import org.bukkit.event.entity.FireworkExplodeEvent;
@@ -623,6 +624,20 @@ public final class BukkitEventValues {
 				return e.getEntity();
 			}
 		}, 0);
+
+		// EntityTeleportEvent
+		EventValues.registerEventValue(EntityTeleportEvent.class, Location.class, new Getter<Location, EntityTeleportEvent>() {
+			@Override
+			public @Nullable Location get(EntityTeleportEvent event) {
+				return event.getFrom();
+			}
+		}, EventValues.TIME_PAST);
+		EventValues.registerEventValue(EntityTeleportEvent.class, Location.class, new Getter<Location, EntityTeleportEvent>() {
+			@Override
+			public @Nullable Location get(EntityTeleportEvent event) {
+				return event.getTo();
+			}
+		}, EventValues.TIME_NOW);
 
 		// EntityChangeBlockEvent
 		EventValues.registerEventValue(EntityChangeBlockEvent.class, Block.class, new Getter<Block, EntityChangeBlockEvent>() {
