@@ -22,7 +22,7 @@
 # This file, all scripts and other files ending in .sk are NOT .yml/YAML files, but very similar!
 # Please remember the following when editing files:
 # - To indent sections you can use spaces like in YAML, but tabs are also allowed. Just remember to stick to the one or the other for a section/trigger.
-# - '#' starts a comment like in YAML. If you don't want it to start a comment simply double it: '##' (You also have to double these in "quoted text")
+# - '#' starts a comment like in YAML. If you don't want it to start a comment simply double it: '##' (You do NOT have to double these in "quoted text")
 # - If you use special characters (§, äöü, éèàôç, ñ, etc.) you have to encode the file in UTF-8.
 #
 
