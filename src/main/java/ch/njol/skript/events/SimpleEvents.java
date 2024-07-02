@@ -767,7 +767,7 @@ public class SimpleEvents {
 							"on bell ring:",
 								"\tsend \"<gold>Ding-dong!<reset>\" to all players in radius 10 of event-block"
 						)
-						.since("INSERT VERSION")
+						.since("2.9.0")
 						.requiredPlugins("Spigot 1.19.4+ or Paper 1.16.5+ (no event-direction)");
 			}
 		}
@@ -785,7 +785,7 @@ public class SimpleEvents {
 						"on bell resonate:",
 							"\tsend \"<red>Raiders are nearby!\" to all players in radius 32 around event-block"
 					)
-					.since("INSERT VERSION")
+					.since("2.9.0")
 					.requiredPlugins("Spigot 1.19.4+");
 		}
 
@@ -801,7 +801,7 @@ public class SimpleEvents {
 							"\tif player has permission \"safeFrom.enderman\":",
 								"\t\tcancel event"
 					)
-					.since("INSERT VERSION")
+					.since("2.9.0")
 					.requiredPlugins("Paper");
 		}
 	}

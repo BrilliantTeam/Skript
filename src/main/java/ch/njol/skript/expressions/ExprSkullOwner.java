@@ -38,7 +38,7 @@ import org.eclipse.jdt.annotation.Nullable;
 	"set {_owner} to the skull owner of event-block",
 	"set skull owner of {_block} to \"Njol\" parsed as offlineplayer"
 })
-@Since("INSERT VERSION")
+@Since("2.9.0")
 public class ExprSkullOwner extends SimplePropertyExpression<Block, OfflinePlayer> {
 
 	static {

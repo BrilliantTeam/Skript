@@ -45,7 +45,7 @@ import org.jetbrains.annotations.Nullable;
 	"delete max durability of player's tool"
 })
 @RequiredPlugins("Minecraft 1.20.5+ (custom amount)")
-@Since("2.5, INSERT VERSION (change)")
+@Since("2.5, 2.9.0 (change)")
 public class ExprMaxDurability extends SimplePropertyExpression<Object, Integer> {
 
 	static {

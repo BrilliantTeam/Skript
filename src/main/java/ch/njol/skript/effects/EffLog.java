@@ -57,7 +57,7 @@ import ch.njol.util.Kleenean;
 	"on command:",
 		"\tlog \"%player% just executed %full command%!\" to file \"server/commands.log\" with a severity of warning"
 })
-@Since("2.0, INSERT VERSION (severities)")
+@Since("2.0, 2.9.0 (severities)")
 public class EffLog extends Effect {
 	static {
 		Skript.registerEffect(EffLog.class, "log %strings% [(to|in) [file[s]] %-strings%] [with [the|a] severity [of] (1:warning|2:severe)]");

@@ -69,7 +69,7 @@ import java.util.regex.Pattern;
 	"play sound \"BLOCK_AMETHYST_BLOCK_RESONATE\" with seed 1 on target entity for the player #1.20.1+"
 })
 @RequiredPlugins("Paper 1.19.4+ or Adventure API 4.12.0+ (sound seed)")
-@Since("2.2-dev28, 2.4 (sound categories), INSERT VERSION (sound seed & entity emitter)")
+@Since("2.2-dev28, 2.4 (sound categories), 2.9.0 (sound seed & entity emitter)")
 public class EffPlaySound extends Effect {
 
 	private static final boolean ADVENTURE_API = Skript.classExists("net.kyori.adventure.sound.Sound$Builder");

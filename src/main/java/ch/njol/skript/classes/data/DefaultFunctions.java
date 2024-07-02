@@ -605,7 +605,7 @@ public class DefaultFunctions {
 				"set {_p} to offlineplayer(\"069a79f4-44e9-4726-a5be-fca90e38aaf5\")",
 				"set {_p} to offlineplayer(\"Notch\", false)"
 			)
-			.since("2.8.0, INSERT VERSION (prevent lookups)");
+			.since("2.8.0, 2.9.0 (prevent lookups)");
 		} // end offline player function
 
 		Functions.registerFunction(new SimpleJavaFunction<Boolean>("isNaN", numberParam, DefaultClasses.BOOLEAN, true) {
@@ -632,7 +632,7 @@ public class DefaultFunctions {
 			.examples(
 				"concat(\"hello \", \"there\") # hello there",
 				"concat(\"foo \", 100, \" bar\") # foo 100 bar"
-			).since("INSERT VERSION");
+			).since("2.9.0");
 
 	}
 	

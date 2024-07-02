@@ -43,7 +43,7 @@ public class EvtTeleport extends SkriptEvent {
 				"on player teleport:",
 				"on creeper teleport:"
 			)
-			.since("1.0, INSERT VERSION (entity teleport)");
+			.since("1.0, 2.9.0 (entity teleport)");
 	}
 
 	@Nullable
