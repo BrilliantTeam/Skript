@@ -27,7 +27,7 @@ import ch.njol.util.coll.CollectionUtils;
 		"\tif event-block is spawner:",
 			"\t\tsend \"Spawner's type is %target block's entity type%\""
 })
-@Since("2.4, INSERT VERSION (trial spawner)")
+@Since("2.4, 2.9.2 (trial spawner)")
 public class ExprSpawnerType extends SimplePropertyExpression<Block, EntityData> {
 
 	private static final boolean HAS_TRIAL_SPAWNER = Skript.classExists("org.bukkit.block.TrialSpawner");
