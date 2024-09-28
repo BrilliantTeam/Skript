@@ -173,12 +173,12 @@ public class DelayedChangeBlock implements Block {
 		if (newState != null) {
 			newState.setType(type);
 		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
 					block.setType(type);
 				}
-			});
+			};
 		}
 	}
 
@@ -302,12 +302,12 @@ public class DelayedChangeBlock implements Block {
 		if (newState != null) {
 			return false;
 		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
 					block.breakNaturally();
 				}
-			});
+			};
 			return true;
 		}
 	}
@@ -317,12 +317,12 @@ public class DelayedChangeBlock implements Block {
 		if (newState != null) {
 			return false;
 		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
 					block.breakNaturally(tool);
 				}
-			});
+			};
 			return true;
 		}
 	}
@@ -332,12 +332,12 @@ public class DelayedChangeBlock implements Block {
 		if (newState != null) {
 			return false;
 		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
 					block.breakNaturally(triggerEffect);
 				}
-			});
+			};
 			return true;
 		}
 	}
@@ -347,12 +347,12 @@ public class DelayedChangeBlock implements Block {
 		if (newState != null) {
 			return false;
 		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
 					block.breakNaturally(tool, triggerEffect);
 				}
-			});
+			};
 			return true;
 		}
 	}
@@ -411,12 +411,12 @@ public class DelayedChangeBlock implements Block {
 		if (newState != null) {
 			newState.setType(type);
 		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
+			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
 					block.setType(type, applyPhysics);
 				}
-			});
+			};
 		}
 	}
 
@@ -435,7 +435,12 @@ public class DelayedChangeBlock implements Block {
 		if (newState != null) {
 			newState.setBlockData(data);
 		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), () -> block.setBlockData(data, applyPhysics));
+			new Task(Skript.getInstance(), 1) {
+				@Override
+				public void run() {
+					block.setBlockData(data, applyPhysics);
+				}
+			};
 		}
 	}
 
