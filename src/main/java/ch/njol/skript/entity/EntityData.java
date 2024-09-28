@@ -456,12 +456,14 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	}
 
 	private E apply(E entity) {
-		if (baby.isTrue()) {
-			EntityUtils.setBaby(entity);
-		} else if (baby.isFalse()) {
-			EntityUtils.setAdult(entity);
-		}
-		set(entity);
+		entity.getScheduler().execute(Skript.getInstance(), () -> {
+			if (baby.isTrue()) {
+				EntityUtils.setBaby(entity);
+			} else if (baby.isFalse()) {
+				EntityUtils.setAdult(entity);
+			}
+			set(entity);
+		}, null, 0);
 		return entity;
 	}
 
