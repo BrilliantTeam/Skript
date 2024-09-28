@@ -25,6 +25,7 @@ import ch.njol.skript.doc.HTMLGenerator;
 import ch.njol.skript.localization.ArgsMessage;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.PluralizingArgsMessage;
+import ch.njol.skript.log.BukkitLoggerFilter;
 import ch.njol.skript.log.RedirectingLogHandler;
 import ch.njol.skript.log.TimingLogHandler;
 import ch.njol.skript.test.runner.SkriptTestEvent;
@@ -33,6 +34,7 @@ import ch.njol.skript.test.runner.TestTracker;
 import ch.njol.skript.util.ExceptionUtils;
 import ch.njol.skript.util.FileUtils;
 import ch.njol.skript.util.SkriptColor;
+import ch.njol.skript.util.Task;
 import ch.njol.util.OpenCloseable;
 import ch.njol.util.StringUtils;
 import org.bukkit.Bukkit;
@@ -433,16 +435,19 @@ public class SkriptCommand implements CommandExecutor {
 				ScriptLoader.loadScripts(scriptFile, logHandler)
 					.thenAccept(scriptInfo ->
 						// Code should run on server thread
-						Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), () -> {
-							Bukkit.getPluginManager().callEvent(new SkriptTestEvent()); // Run it
-							ScriptLoader.unloadScripts(ScriptLoader.getLoadedScripts());
+						new Task(Skript.getInstance(), 1) {
+							@Override
+							public void run() {
+								Bukkit.getPluginManager().callEvent(new SkriptTestEvent()); // Run it
+								ScriptLoader.unloadScripts(ScriptLoader.getLoadedScripts());
 
-							// Get results and show them
-							String[] lines = TestTracker.collectResults().createReport().split("\n");
-							for (String line : lines) {
-								Skript.info(sender, line);
+								// Get results and show them
+								String[] lines = TestTracker.collectResults().createReport().split("\n");
+								for (String line : lines) {
+									Skript.info(sender, line);
+								}
 							}
-						})
+						}
 					);
 			}
 

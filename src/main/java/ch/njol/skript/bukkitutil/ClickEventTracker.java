@@ -31,7 +31,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.effects.EffCancelEvent;
+import ch.njol.skript.util.Task;
 
 /**
  * Tracks click events to remove extraneous events for one player click.
@@ -72,11 +74,13 @@ public class ClickEventTracker {
 	public ClickEventTracker(JavaPlugin plugin) {
 		this.firstEvents = new HashMap<>();
 		this.modifiedEvents = new HashSet<>();
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin,
-				() -> {
-					firstEvents.clear();
-					modifiedEvents.clear();
-				}, 1, 1);
+		new Task(Skript.getInstance(), 1, 1) {
+			@Override
+			public void run() {
+				firstEvents.clear();
+				modifiedEvents.clear();
+			}
+		};
 	}
 	
 	/**

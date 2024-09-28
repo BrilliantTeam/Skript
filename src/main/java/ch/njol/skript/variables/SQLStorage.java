@@ -568,49 +568,55 @@ public abstract class SQLStorage extends VariablesStorage {
 //		assert !Thread.holdsLock(db);
 //		synchronized (syncDeserializing) {
 
-		final SQLException e = Task.callSync(new Callable<SQLException>() {
-			@Override
-			@Nullable
-			public SQLException call() throws Exception {
-				try {
-					while (r.next()) {
-						int i = 1;
-						final String name = r.getString(i++);
-						if (name == null) {
-							Skript.error("Variable with NULL name found in the database '" + databaseName + "', ignoring it");
-							continue;
-						}
-						final String type = r.getString(i++);
-						final byte[] value = r.getBytes(i++); // Blob not supported by SQLite
-						lastRowID = r.getLong(i++);
-						if (value == null) {
-							Variables.variableLoaded(name, null, SQLStorage.this);
-						} else {
-							final ClassInfo<?> c = Classes.getClassInfoNoError(type);
-							@SuppressWarnings("unused")
-							Serializer<?> s;
-							if (c == null || (s = c.getSerializer()) == null) {
-								Skript.error("Cannot load the variable {" + name + "} from the database '" + databaseName + "', because the type '" + type + "' cannot be recognised or cannot be stored in variables");
+		SQLException e = null;
+		try {
+			e = new Callable<SQLException>() {
+				@Override
+				@Nullable
+				public SQLException call() throws Exception {
+					try {
+						while (r.next()) {
+							int i = 1;
+							final String name = r.getString(i++);
+							if (name == null) {
+								Skript.error("Variable with NULL name found in the database '" + databaseName + "', ignoring it");
 								continue;
 							}
+							final String type = r.getString(i++);
+							final byte[] value = r.getBytes(i++); // Blob not supported by SQLite
+							lastRowID = r.getLong(i++);
+							if (value == null) {
+								Variables.variableLoaded(name, null, SQLStorage.this);
+							} else {
+								final ClassInfo<?> c = Classes.getClassInfoNoError(type);
+								@SuppressWarnings("unused")
+								Serializer<?> s;
+								if (c == null || (s = c.getSerializer()) == null) {
+									Skript.error("Cannot load the variable {" + name + "} from the database '" + databaseName + "', because the type '" + type + "' cannot be recognised or cannot be stored in variables");
+									continue;
+								}
 //					if (s.mustSyncDeserialization()) {
 //						syncDeserializing.add(new VariableInfo(name, value, c));
 //					} else {
-							final Object d = Classes.deserialize(c, value);
-							if (d == null) {
-								Skript.error("Cannot load the variable {" + name + "} from the database '" + databaseName + "', because it cannot be loaded as " + c.getName().withIndefiniteArticle());
-								continue;
-							}
-							Variables.variableLoaded(name, d, SQLStorage.this);
+								final Object d = Classes.deserialize(c, value);
+								if (d == null) {
+									Skript.error("Cannot load the variable {" + name + "} from the database '" + databaseName + "', because it cannot be loaded as " + c.getName().withIndefiniteArticle());
+									continue;
+								}
+								Variables.variableLoaded(name, d, SQLStorage.this);
 //					}
+							}
 						}
+					} catch (final SQLException e) {
+						return e;
 					}
-				} catch (final SQLException e) {
-					return e;
+					return null;
 				}
-				return null;
-			}
-		});
+			}.call();
+		} catch (Exception error) {
+			// TODO Auto-generated catch block
+			error.printStackTrace();
+		}
 		if (e != null)
 			throw e;
 
@@ -703,49 +709,55 @@ public abstract class SQLStorage extends VariablesStorage {
 			}
 		};
 
-		final SQLException e = Task.callSync(new Callable<SQLException>() {
-			@SuppressWarnings("null")
-			@Override
-			@Nullable
-			public SQLException call() throws Exception {
-				try {
-					while (r.next()) {
-						int i = 1;
-						final String name = r.getString(i++);
-						if (name == null) {
-							Skript.error("Variable with NULL name found in the database, ignoring it");
-							continue;
-						}
-						final String type = r.getString(i++);
-						final String value = r.getString(i++);
-						lastRowID = r.getLong(i++);
-						if (type == null || value == null) {
-							Variables.variableLoaded(name, null, hadNewTable ? temp : SQLStorage.this);
-						} else {
-							final ClassInfo<?> c = Classes.getClassInfoNoError(type);
-							Serializer<?> s;
-							if (c == null || (s = c.getSerializer()) == null) {
-								Skript.error("Cannot load the variable {" + name + "} from the database, because the type '" + type + "' cannot be recognised or not stored in variables");
+		SQLException e = null;
+		try {
+			e = new Callable<SQLException>() {
+				@SuppressWarnings("null")
+				@Override
+				@Nullable
+				public SQLException call() throws Exception {
+					try {
+						while (r.next()) {
+							int i = 1;
+							final String name = r.getString(i++);
+							if (name == null) {
+								Skript.error("Variable with NULL name found in the database, ignoring it");
 								continue;
 							}
+							final String type = r.getString(i++);
+							final String value = r.getString(i++);
+							lastRowID = r.getLong(i++);
+							if (type == null || value == null) {
+								Variables.variableLoaded(name, null, hadNewTable ? temp : SQLStorage.this);
+							} else {
+								final ClassInfo<?> c = Classes.getClassInfoNoError(type);
+								Serializer<?> s;
+								if (c == null || (s = c.getSerializer()) == null) {
+									Skript.error("Cannot load the variable {" + name + "} from the database, because the type '" + type + "' cannot be recognised or not stored in variables");
+									continue;
+								}
 //					if (s.mustSyncDeserialization()) {
 //						oldSyncDeserializing.add(new OldVariableInfo(name, value, c));
 //					} else {
-							final Object d = s.deserialize(value);
-							if (d == null) {
-								Skript.error("Cannot load the variable {" + name + "} from the database, because '" + value + "' cannot be parsed as a " + type);
-								continue;
-							}
-							Variables.variableLoaded(name, d, SQLStorage.this);
+								final Object d = s.deserialize(value);
+								if (d == null) {
+									Skript.error("Cannot load the variable {" + name + "} from the database, because '" + value + "' cannot be parsed as a " + type);
+									continue;
+								}
+								Variables.variableLoaded(name, d, SQLStorage.this);
 //					}
+							}
 						}
+					} catch (final SQLException e) {
+						return e;
 					}
-				} catch (final SQLException e) {
-					return e;
+					return null;
 				}
-				return null;
-			}
-		});
+			}.call();
+		} catch (Exception error) {
+			// TODO Auto-generated catch block
+			error.printStackTrace();
+		}
 		if (e != null)
 			throw e;
 
