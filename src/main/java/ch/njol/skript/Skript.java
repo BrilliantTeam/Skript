@@ -1613,7 +1613,23 @@ public final class Skript extends JavaPlugin implements Listener {
 				Bukkit.getPluginManager().callEvent(e);
 				if (e.getCommand().isEmpty() || e.isCancelled())
 					return false;
-				return Bukkit.dispatchCommand(e.getSender(), e.getCommand());
+
+				Lock lock = new ReentrantLock();
+
+				Bukkit.getGlobalRegionScheduler().run(Skript.getInstance(), (ignored) -> {
+					try {
+						lock.lock();
+						Bukkit.dispatchCommand(e.getSender(), e.getCommand());
+					} finally {
+						lock.unlock();
+					}
+				});
+
+				try {
+					return lock.tryLock();
+				} finally {
+					lock.unlock();
+				}
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace(); // just like Bukkit
