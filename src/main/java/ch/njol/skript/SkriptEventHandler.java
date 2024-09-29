@@ -50,8 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public final class SkriptEventHandler {
@@ -191,39 +189,12 @@ public final class SkriptEventHandler {
 			logTriggerEnd(trigger);
 		};
 
-		if (trigger.getEvent().canExecuteAsynchronously()) {
+		if (trigger.getEvent().canExecuteAsynchronously()) { // todo: off it to another thread?
 			if (trigger.getEvent().check(event))
 				execute.run();
 		} else { // Ensure main thread
 			if (trigger.getEvent().check(event)) {
-				Lock lock = new ReentrantLock();
-				Runnable packedRunnable = () -> {
-					try {
-						lock.lock();
-						execute.run();
-					} finally {
-						lock.unlock();
-					}
-				};
-
-				if (event instanceof PlayerEvent)
-					((PlayerEvent) event).getPlayer().getScheduler().run(Skript.getInstance(),
-						(ignored) -> packedRunnable.run(), () -> {});
-				else if (event instanceof EntityEvent)
-					((EntityEvent) event).getEntity().getScheduler().run(Skript.getInstance(),
-						(ignored) -> packedRunnable.run(), () -> {});
-				else if (event instanceof BlockEvent)
-					Bukkit.getRegionScheduler().execute(Skript.getInstance(), ((BlockEvent) event).getBlock().getLocation(),
-						packedRunnable);
-				else
-					Bukkit.getGlobalRegionScheduler().execute(Skript.getInstance(), packedRunnable);
-
-				try {
-					lock.tryLock();
-					return;
-				} finally {
-					lock.unlock();
-				}
+				execute.run();
 			}
 		}
 
