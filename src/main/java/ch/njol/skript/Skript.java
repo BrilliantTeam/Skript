@@ -146,6 +146,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Filter;
@@ -1236,7 +1238,9 @@ public final class Skript extends JavaPlugin implements Listener {
 			beforeDisable();
 		}
 
-		Bukkit.getScheduler().cancelTasks(this);
+		// Bukkit.getScheduler().cancelTasks(this);
+
+		Bukkit.getGlobalRegionScheduler().cancelTasks(this);
 
 		for (Closeable c : closeOnDisable) {
 			try {
@@ -1587,7 +1591,23 @@ public final class Skript extends JavaPlugin implements Listener {
 				Bukkit.getPluginManager().callEvent(e);
 				if (e.isCancelled() || !e.getMessage().startsWith("/"))
 					return false;
-				return Bukkit.dispatchCommand(e.getPlayer(), e.getMessage().substring(1));
+
+				Lock lock = new ReentrantLock();
+
+				((Player) sender).getScheduler().run(Skript.getInstance(), (ignored) -> {
+					try {
+						lock.lock();
+						Bukkit.dispatchCommand(e.getPlayer(), e.getMessage().substring(1));
+					} finally {
+						lock.unlock();
+					}
+				}, () -> {});
+
+				try {
+					return lock.tryLock();
+				} finally {
+					lock.unlock();
+				}
 			} else {
 				final ServerCommandEvent e = new ServerCommandEvent(sender, command);
 				Bukkit.getPluginManager().callEvent(e);

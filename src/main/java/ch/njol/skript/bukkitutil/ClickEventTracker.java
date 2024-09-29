@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -72,8 +74,8 @@ public class ClickEventTracker {
 	private final Set<Cancellable> modifiedEvents;
 	
 	public ClickEventTracker(JavaPlugin plugin) {
-		this.firstEvents = new HashMap<>();
-		this.modifiedEvents = new HashSet<>();
+		this.firstEvents = new ConcurrentHashMap<>();
+		this.modifiedEvents = new CopyOnWriteArraySet<>();
 		new Task(Skript.getInstance(), 1, 1) {
 			@Override
 			public void run() {

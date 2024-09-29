@@ -170,12 +170,9 @@ public class BlockStateBlock implements Block {
 	@Override
 	public void setType(Material type) {
 		if (delayChanges) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), new Runnable() {
-				@Override
-				public void run() {
+			Bukkit.getGlobalRegionScheduler().runDelayed(Skript.getInstance(), (ignored) -> {
 					state.getBlock().setType(type);
-				}
-			});
+			}, 1);
 		} else {
 			state.setType(type);
 		}

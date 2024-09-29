@@ -306,19 +306,10 @@ public abstract class Commands {
 						if (handleEffectCommand(event.getPlayer(), event.getMessage()))
 							event.setCancelled(true);
 					} else {
-						Future<Boolean> f = Bukkit.getScheduler().callSyncMethod(Skript.getInstance(), () -> handleEffectCommand(event.getPlayer(), event.getMessage()));
-						try {
-							while (true) {
-								try {
-									if (f.get())
-										event.setCancelled(true);
-									break;
-								} catch (InterruptedException ignored) {
-								}
-							}
-						} catch (ExecutionException e) {
-							Skript.exception(e);
-						}
+						Bukkit.getGlobalRegionScheduler().run(Skript.getInstance(), (ignored) -> {
+							handleEffectCommand(event.getPlayer(), event.getMessage());
+							event.setCancelled(false);
+						});
 					}
 				}
 			}, Skript.getInstance());

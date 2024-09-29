@@ -52,7 +52,7 @@ public abstract class AsyncEffect extends Effect {
 		if (!Skript.getInstance().isEnabled()) // See https://github.com/SkriptLang/Skript/issues/3702
 			return null;
 
-		Bukkit.getScheduler().runTaskAsynchronously(Skript.getInstance(), () -> {
+		Bukkit.getAsyncScheduler().runNow(Skript.getInstance(), (ignored) -> {
 			// Re-set local variables
 			if (localVars != null)
 				Variables.setLocalVariables(e, localVars);
@@ -60,7 +60,7 @@ public abstract class AsyncEffect extends Effect {
 			execute(e); // Execute this effect
 			
 			if (getNext() != null) {
-				Bukkit.getScheduler().runTask(Skript.getInstance(), () -> { // Walk to next item synchronously
+				Bukkit.getGlobalRegionScheduler().run(Skript.getInstance(), (ignored2) -> { // Walk to next item synchronously
 					Object timing = null;
 					if (SkriptTimings.enabled()) { // getTrigger call is not free, do it only if we must
 						Trigger trigger = getTrigger();

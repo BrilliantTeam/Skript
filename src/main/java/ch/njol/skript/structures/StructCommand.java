@@ -343,7 +343,7 @@ public class StructCommand extends Structure {
 			if (DELAY_COMMAND_SYNCING) {
 				// if the plugin is disabled, the server is likely closing and delaying will cause an error.
 				if (Bukkit.getPluginManager().isPluginEnabled(Skript.getInstance()))
-					Bukkit.getScheduler().runTask(Skript.getInstance(), this::forceCommandSync);
+					Bukkit.getGlobalRegionScheduler().run(Skript.getInstance(), (ignored) -> this.forceCommandSync());
 			} else {
 				forceCommandSync();
 			}

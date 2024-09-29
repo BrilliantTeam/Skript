@@ -71,16 +71,32 @@ public abstract class Task implements Runnable, Closeable {
 			return;
 
 		if (period == -1) {
-			if (delay <= 0) {
-				task = Bukkit.getAsyncScheduler().runNow(plugin, task -> this.run());
+			if (async) {
+				if (delay <= 0) {
+					task = Bukkit.getAsyncScheduler().runNow(plugin, task -> this.run());
+				} else {
+					task = Bukkit.getAsyncScheduler().runDelayed(plugin, task -> this.run(), (long) ((double) delay / 20.0) * 1000, TimeUnit.MILLISECONDS);
+				}
 			} else {
-				task = Bukkit.getAsyncScheduler().runDelayed(plugin, task -> this.run(), (delay / 20) * 1000, TimeUnit.MILLISECONDS);
+				if (delay <= 0) {
+					task = Bukkit.getGlobalRegionScheduler().run(plugin, task -> this.run());
+				} else {
+					task = Bukkit.getGlobalRegionScheduler().runDelayed(plugin, task -> this.run(), delay);
+				}
 			}
 		} else {
-			if (delay <= 0) {
-				task = Bukkit.getGlobalRegionScheduler().run(plugin, task -> this.run());
+			if (async) {
+				if (delay <= 0) {
+					task = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, task -> this.run(), 1, period * 1000, TimeUnit.MILLISECONDS);
+				} else {
+					task = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, task -> this.run(), (long) ((double) delay / 20.0) * 1000, period * 1000, TimeUnit.MILLISECONDS);
+				}
 			} else {
-				task = Bukkit.getGlobalRegionScheduler().runDelayed(plugin, task -> this.run(), delay);
+				if (delay <= 0) {
+					task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> this.run(), 1, period);
+				} else {
+					task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> this.run(), delay, period);
+				}
 			}
 		}
 		assert task != null;
@@ -164,6 +180,7 @@ public abstract class Task implements Runnable, Closeable {
 				Skript.exception(e);
 			}
 		}
+
 		final Future<T> f = Bukkit.getScheduler().callSyncMethod(p, c);
 		try {
 			while (true) {

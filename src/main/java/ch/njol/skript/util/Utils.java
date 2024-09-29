@@ -517,7 +517,7 @@ public abstract class Utils {
 		completableFuture.whenComplete((r, ex) -> messenger.unregisterIncomingPluginChannel(skript, channel, listener));
 
 		// if we haven't gotten a response after a minute, let's just assume there wil never be one
-		Bukkit.getScheduler().scheduleSyncDelayedTask(skript, () -> {
+		Bukkit.getGlobalRegionScheduler().runDelayed(skript, (ignored) -> {
 
 			if (!completableFuture.isDone())
 				completableFuture.cancel(true);

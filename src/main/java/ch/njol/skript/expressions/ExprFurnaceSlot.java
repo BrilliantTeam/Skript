@@ -247,7 +247,7 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 				((FurnaceSmeltEvent) event).setResult(item != null ? item : new ItemStack(Material.AIR));
 			} else {
 				if (getTime() == EventValues.TIME_FUTURE) { // Since this is a future expression, run it AFTER the event
-					Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), () -> FurnaceEventSlot.super.setItem(item));
+					Bukkit.getGlobalRegionScheduler().runDelayed(Skript.getInstance(), (ignored) -> FurnaceEventSlot.super.setItem(item), 1);
 				} else {
 					super.setItem(item);
 				}

@@ -183,7 +183,7 @@ public class EvtClick extends SkriptEvent {
 			assert false;
 			return false;
 		}
-		
+
 		if (tools != null && !tools.check(event, new Checker<ItemType>() {
 			@Override
 			public boolean check(final ItemType t) {
@@ -199,7 +199,7 @@ public class EvtClick extends SkriptEvent {
 		})) {
 			return false;
 		}
-		
+
 		if (type != null) {
 			return type.check(event, new Checker<Object>() {
 				@Override
