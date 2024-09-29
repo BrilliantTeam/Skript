@@ -86,7 +86,7 @@ public class EffIgnite extends Effect {
 				new Task(Skript.getInstance(), 1) {
 					@Override
 					public void run() {
-						entity.setFireTicks(duration);
+						entity.getScheduler().run(Skript.getInstance(), (ignored) -> entity.setFireTicks(duration), null);
 					}
 				};
 			} else {

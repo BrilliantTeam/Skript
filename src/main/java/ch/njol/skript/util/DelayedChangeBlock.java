@@ -176,7 +176,7 @@ public class DelayedChangeBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					block.setType(type);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), block.getLocation(), (ignored) -> block.setType(type));
 				}
 			};
 		}
@@ -305,7 +305,7 @@ public class DelayedChangeBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					block.breakNaturally();
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), block.getLocation(), (ignored) -> block.breakNaturally());
 				}
 			};
 			return true;
@@ -320,7 +320,7 @@ public class DelayedChangeBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					block.breakNaturally(tool);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), block.getLocation(), (ignored) -> block.breakNaturally(tool));
 				}
 			};
 			return true;
@@ -335,7 +335,7 @@ public class DelayedChangeBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					block.breakNaturally(triggerEffect);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), block.getLocation(), (ignored) -> block.breakNaturally(triggerEffect));
 				}
 			};
 			return true;
@@ -350,7 +350,7 @@ public class DelayedChangeBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					block.breakNaturally(tool, triggerEffect);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), block.getLocation(), (ignored) -> block.breakNaturally(tool, triggerEffect));
 				}
 			};
 			return true;
@@ -414,7 +414,7 @@ public class DelayedChangeBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					block.setType(type, applyPhysics);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), block.getLocation(), (ignored) -> block.setType(type, applyPhysics));
 				}
 			};
 		}
@@ -438,7 +438,7 @@ public class DelayedChangeBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					block.setBlockData(data, applyPhysics);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), block.getLocation(), (ignored) -> block.setBlockData(data, applyPhysics));
 				}
 			};
 		}

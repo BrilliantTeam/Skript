@@ -299,7 +299,7 @@ public class BlockStateBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					state.getBlock().breakNaturally();
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), state.getBlock().getLocation(), (ignored) -> state.getBlock().breakNaturally());
 				}
 			};
 			return true;
@@ -314,7 +314,7 @@ public class BlockStateBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					state.getBlock().breakNaturally(tool);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), state.getBlock().getLocation(), (ignored) -> state.getBlock().breakNaturally(tool));
 				}
 			};
 			return true;
@@ -329,7 +329,7 @@ public class BlockStateBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					state.getBlock().breakNaturally(triggerEffect);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), state.getBlock().getLocation(), (ignored) -> state.getBlock().breakNaturally(triggerEffect));
 				}
 			};
 			return true;
@@ -344,7 +344,7 @@ public class BlockStateBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					state.getBlock().breakNaturally(tool, triggerEffect);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), state.getBlock().getLocation(), (ignored) -> state.getBlock().breakNaturally(tool, triggerEffect));
 				}
 			};
 			return true;
@@ -414,7 +414,7 @@ public class BlockStateBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					state.getBlock().setType(type, applyPhysics);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), state.getBlock().getLocation(), (ignored) -> state.getBlock().setType(type, applyPhysics));
 				}
 			};
 		} else { // Can't do physics for block state
@@ -433,7 +433,7 @@ public class BlockStateBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					state.getBlock().setBlockData(data);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), state.getBlock().getLocation(), (ignored) -> state.getBlock().setBlockData(data));
 				}
 			};
 		} else {
@@ -447,7 +447,7 @@ public class BlockStateBlock implements Block {
 			new Task(Skript.getInstance(), 1) {
 				@Override
 				public void run() {
-					state.getBlock().setBlockData(data, applyPhysics);
+					Bukkit.getRegionScheduler().run(Skript.getInstance(), state.getBlock().getLocation(), (ignored) -> state.getBlock().setBlockData(data, applyPhysics));
 				}
 			};
 		} else { // Cannot apply physics to a block state

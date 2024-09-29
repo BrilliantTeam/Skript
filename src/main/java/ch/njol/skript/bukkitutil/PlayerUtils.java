@@ -54,7 +54,7 @@ public abstract class PlayerUtils {
 			@Override
 			public void run() {
 				for (Player p : inventoryUpdateList)
-					p.updateInventory();
+					p.getScheduler().run(Skript.getInstance(), (ignored) -> p.updateInventory(), null);
 
 				inventoryUpdateList.clear();
 			}
